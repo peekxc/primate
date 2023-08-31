@@ -1,0 +1,31 @@
+[build-system]
+build-backend = 'mesonpy'
+requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "imate"]
+
+[project]
+name = "pyimate"
+version = '0.0.3'
+readme = "README.md"
+classifiers = [
+	"Intended Audience :: Science/Research",
+	"Development Status :: 3 - Alpha",
+	"License :: OSI Approved :: Apache Software License",
+	"Programming Language :: Python :: 3"
+]
+authors = [
+	{ name = "Matt Piekenbrock", email = "matt.piekenbrock@gmail.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+	"numpy", 
+	"scipy", 
+  "imate"
+]
+license = {file = "LICENSE"}
+# include = [
+# 	{ path = "pyimate/**/*.so", format = "wheel" },
+# 	{ path = "pyimate/**/*.pyd", format = "wheel" },
+# ]
+
+[tool.meson-python.args]
+setup = ['--default-library=static']

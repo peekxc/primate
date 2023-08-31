@@ -1,3 +1,10 @@
+build 
+.vscode 
+examples
+trash 
+**/**/*.pyd
+# todo 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
