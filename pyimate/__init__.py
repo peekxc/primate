@@ -3,6 +3,7 @@
 import _random_generator
 import _diagonalize
 import _orthogonalize
+import _sparse_eigen
 # from . import functions
 # import _operators
 # from ortho import * 

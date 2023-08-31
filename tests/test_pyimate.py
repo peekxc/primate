@@ -4,6 +4,23 @@ from scipy.sparse.linalg import LinearOperator, aslinearoperator
 def test_blas():
   pass
 
+def test_eigen():
+  # %% test lanczos tridiagonalization
+  import numpy as np 
+  import pyimate
+  from scipy.linalg import eigh_tridiagonal
+  from scipy.sparse.linalg import eigsh
+  from scipy.sparse import random
+  n = 30 
+  A = random(n,n,density=0.30**2)
+  A = A @ A.T
+  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+  v0 = np.random.uniform(size=A.shape[1])
+  pyimate._sparse_eigen.lanczos_tridiagonalize(A, v0, 1e-9, n-1, alpha, beta)
+  ew_lanczos = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))[1:]
+  ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
+  assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
+
 def test_lanczos():
   # %% test lanczos tridiagonalization
   from scipy.sparse.linalg import eigsh
