@@ -19,13 +19,9 @@
 #include "_definitions/types.h"      // IndexType
 #include <cassert>                      // assert
 #include <cstdlib>                      // NULL
-
-// TODO: this seems just too difficult to actually do with meson somehow
-// #include "mkl.h" // this almost works 
-// #include <cblas.h>
-#include <mkl.h>
 #include "_lapack/lapack_api.h"      // lapack_xstev, lapack_xbdsdc
-
+// #include <cblas.h>
+// #include <mkl.h>
 
 // MJP Added: just link directly to the externs, let meson handle lapack linking
 // https://scicomp.stackexchange.com/questions/26395/how-to-start-using-lapack-in-c

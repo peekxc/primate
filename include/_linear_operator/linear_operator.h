@@ -18,25 +18,55 @@ struct TypeString< float > {
   static constexpr const char* value = "float32";
 };
 
+// Generalizes concepts from: https://ameli.github.io/imate/generated/imate.Matrix.html#imate-matrix
 template < typename T, typename F = typename T::value_type >
 concept LinearOperator = requires(T op, const F* input, F* output) {
-  { op.matvec(input, output) };
+  { op.matvec(input, output) }; // y = A x 
   { op.shape() } -> std::convertible_to< std::pair< size_t, size_t > >;
 };
 
 template < typename T, typename F = typename T::value_type >
 concept AdjointOperator = requires(T op, const F* input, F* output) {
-  { op.rmatvec(input, output) };
+  { op.rmatvec(input, output) }; // y = A^T x 
 } && LinearOperator< T, F >;
 
+template < typename T, typename F = typename T::value_type >
+concept LinearAdditiveOperator = requires(T op, const F* input, const F alpha, F* output) {
+  { op.matvec_add(input, alpha, output) }; // y = y + \alpha * Ax
+} && LinearOperator< T, F >;
+
+template < typename T, typename F = typename T::value_type >
+concept AdjointAdditiveOperator = requires(T op, const F* input, const F alpha, F* output) {
+  { op.rmatvec_add(input, alpha, output) }; // y = y + \alpha * A^T x
+} && AdjointOperator< T, F >;
+
+template < typename T, typename F = typename T::value_type >
+concept Operator = 
+  LinearOperator< T, F > || 
+  AdjointOperator< T, F > || 
+  LinearAdditiveOperator< T, F > ||
+  AdjointAdditiveOperator< T, F >
+;
+
+// TODO: revisit the use of a random-access container 
+// template <typename Container>
+// concept RandomAccessContainer = requires(Container c) {
+//   { c[0] } -> std::same_as< typename Container::reference >;
+//   { c.size() } -> std::convertible_to< size_t >;
+// };
 
 // template < typename T, typename F = typename T::value_type >
-// concept LinearAddOperator = requires(T op, const F* vector, const F alpha, F* product) {
-//   { op.rmatvec(input, output) };
+// concept AffineOperator = requires(T op) {
+//   { op.parameters } -> std::same_as< decltype(op.parameters) >;
+//   requires RandomAccessContainer< decltype(op.parameters) >;
+// } && Operator< T, F >;
 
-// } && LinearOperator< T, F >;
-
-
+// Represents the operator (A + tB) for parameter T = { t1, t2, ..., tn }
+template < typename T, typename F = typename T::value_type >
+concept AffineOperator = requires(T op, F* params) {
+  { op.set_parameters(params) };
+  { op.get_num_parameters() } -> std::convertible_to< size_t >;
+} && Operator< T, F >;
 
 // TODO: aslinearoperator on a sparse matrix and buffer_info by default 
 // Should match: https://github.com/scipy/scipy/blob/v1.11.2/scipy/sparse/linalg/_interface.py

@@ -1,28 +1,24 @@
 #include <pybind11/pybind11.h>
-#include <functions/functions.h>
-// #include <_c_trace_estimator/c_trace_estimator.h>
+// #include <functions/functions.h>
 
-// #include <_c_linear_operator/c_linear_operator.h>
-// #include "_random_generator/"
+#include <_trace_estimator/trace_estimator.h>
 
-
-
-class SmoothStepEps : public Function {
-  public:
-    SmoothStepEps(){
-      eps = 0; 
-    }
-    virtual float function(const float lambda_) const {
-      return 0;
-    };
-    virtual double function(const double lambda_) const {
-      return 0;
-    }
-    virtual long double function(const long double lambda_) const {
-      return 0;
-    }
-    double eps;
-};
+// class SmoothStepEps : public Function {
+//   public:
+//     SmoothStepEps(){
+//       eps = 0; 
+//     }
+//     virtual float function(const float lambda_) const {
+//       return 0;
+//     };
+//     virtual double function(const double lambda_) const {
+//       return 0;
+//     }
+//     virtual long double function(const long double lambda_) const {
+//       return 0;
+//     }
+//     double eps;
+// };
 
 // void trace_estimator(){
 //   auto S = SmoothStepEps();
@@ -62,6 +58,9 @@ int apply_smoothstep(int i, int j) {
   return i + j;
 }
 
+void trace_estimator_py(){
+  
+}
 
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "pybind11 example plugin"; // optional module docstring
