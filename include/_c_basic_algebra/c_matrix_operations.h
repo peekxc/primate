@@ -59,7 +59,7 @@
 /// \param[out] c
 ///             The output column vector (written in-place).
 
-template <typename DataType>
+template < typename DataType >
 struct cMatrixOperations {
 
 	static void dense_matvec(

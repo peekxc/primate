@@ -2,11 +2,12 @@
 #include <pybind11/numpy.h>
 // #include <pybind11/stl.h>
 // #include "../_definitions/types.h"
+#include <_definitions/definitions.h>
+#include <_definitions/types.h>
 #include <_diagonalization/diagonalization.h>
 #include <_diagonalization/lanczos_tridiagonalization.h>
 #include <_diagonalization/golub_kahn_bidiagonalization.h>
-#include <_definitions/definitions.h>
-#include <_definitions/types.h>
+
 #include "pylinops.h"
 namespace py = pybind11;
 
@@ -65,11 +66,29 @@ void test_lanczos(py::array_t< float > d, py::array_t< float > v, const float to
   lanczos_tridiagonalization< DiagonalOperator, float >(&op, v.data(), n, n, tol, orth, alpha_out, beta_out);
 }
 
+// Wraps an arbitrary Python object as a linear operator.
+// The object must have a matvec and shape attribute. 
+IndexType lanczos_tridiagonalize_py(const py::object& op, const py_arr_f& v, const float lanczos_tol, const int orthogonalize, py_arr_f& alpha, py_arr_f& beta){
+  auto lo = PyLinearOperator< float >(op);
+  std::pair< size_t, size_t > shape = lo.shape();
+  auto n = static_cast< long int >(shape.first);
+  auto m = static_cast< int >(shape.second);
+  if (n != m){ throw std::invalid_argument("The Lanczos iterations only works with square operators!"); }
+  auto alpha_out = static_cast< float* >(alpha.request().ptr);
+  auto beta_out = static_cast< float* >(beta.request().ptr);
+  if (alpha.shape(0) < m || beta.shape(0) < m){
+    throw std::invalid_argument("Ouputs arrays 'alpha' / 'beta' must ");
+  }
+  lanczos_tridiagonalization< PyLinearOperator< float >, float >(&lo, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
+  return 0; 
+}
+
+
 // See virtual overriding: https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
 PYBIND11_MODULE(_diagonalize, m) {
   m.def("eigh_tridiagonal", &eigh_tridiagonal_py);
   m.def("svd_bidiagonal", &svd_bidiagonal_py);
-  // m.def("lanczos_tridiagonalize", &lanczos_tridiagonalize_py);
+  m.def("lanczos_tridiagonalize", &lanczos_tridiagonalize_py);
   m.def("golub_kahan_bidiagonalize", &golub_kahan_bidiagonalize_py);
   m.def("test_lanczos", &test_lanczos);
 }

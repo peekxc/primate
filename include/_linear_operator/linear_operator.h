@@ -30,6 +30,14 @@ concept AdjointOperator = requires(T op, const F* input, F* output) {
 } && LinearOperator< T, F >;
 
 
+// template < typename T, typename F = typename T::value_type >
+// concept LinearAddOperator = requires(T op, const F* vector, const F alpha, F* product) {
+//   { op.rmatvec(input, output) };
+
+// } && LinearOperator< T, F >;
+
+
+
 // TODO: aslinearoperator on a sparse matrix and buffer_info by default 
 // Should match: https://github.com/scipy/scipy/blob/v1.11.2/scipy/sparse/linalg/_interface.py
 // via LO_facade : https://vector-of-bool.github.io/2020/06/13/cpp20-iter-facade.html

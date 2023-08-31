@@ -4,6 +4,27 @@ from scipy.sparse.linalg import LinearOperator, aslinearoperator
 def test_blas():
   pass
 
+def test_lanczos():
+  # %% test lanczos tridiagonalization
+  from scipy.sparse.linalg import eigsh
+  from scipy.linalg import eigh_tridiagonal
+  from pyimate import _diagonalize
+  np.random.seed(1234)
+  n = 30
+  A = np.random.uniform(size=(n, n)).astype(np.float32)
+  A = A @ A.T
+  lo = aslinearoperator(A)
+  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+  
+  ## In general not guaranteed, but with full re-orthogonalization it seems likely!
+  tol = np.zeros(30)
+  for i in range(30):
+    v0 = np.random.uniform(size=lo.shape[1])
+    _diagonalize.lanczos_tridiagonalize(lo, v0, 1e-8, n-1, alpha, beta)
+    ew = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))
+    tol[i] = np.mean(np.abs(ew - np.sort(eigsh(A, k=n, return_eigenvectors=False))))
+  assert np.all(tol < 1e-5)
+
 def test_operators():
   # %% Test diagonal operator 
   from pyimate import _operators
@@ -97,21 +118,7 @@ def test_operators():
     np.abs(svds(my_op, k=9, tol=0)[1])
     np.abs(svds(MyLinearOp(aslinearoperator(A)), k=9, tol=0)[1])
 
-  # %% test lanczos tridiagonalization
-  from scipy.sparse.linalg import eigsh
-  from scipy.linalg import eigh_tridiagonal
-  from pyimate import _diagonalize, _operators
-  A = np.random.uniform(size=(10, 10)).astype(np.float32)
-  A = A @ A.T
-  lo = aslinearoperator(A)
-  op = _operators.PyLinearOperator(lo)
-  v0 = np.random.uniform(size=op.shape[1])
-  alpha, beta = np.zeros(10, dtype=np.float32), np.zeros(10, dtype=np.float32)
-  op.lanczos(v0, 1e-14, 9, alpha, beta)
-  ew = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))
 
-  ## this is not guarenteed, but with full re-orthogonalization it seems likely!
-  assert np.allclose(ew, np.sort(eigsh(A, k=10, return_eigenvectors=False)), atol=1e-5)
 
   # %% test bidiagonalization
   from pyimate import _diagonalize

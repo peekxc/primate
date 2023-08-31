@@ -41,8 +41,9 @@ incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; 
 incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
 
 ## Header includes
-inc_pybind11 = include_directories('extern' / 'pybind11' / 'include')
 inc_np = include_directories(incdir_numpy)
+inc_pybind11 = include_directories('extern' / 'pybind11' / 'include')
+inc_eigen = include_directories('extern' / 'eigen')
 inc_imate = include_directories(incdir_imate)
 inc_pkg = include_directories('include')
 

@@ -3,27 +3,18 @@
 
 #include <type_traits>
 #include <concepts>
+#include <vector> 
 #include <algorithm>
 #include <functional>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
-
-#include <_definitions/definitions.h>
-#include <_definitions/types.h>
-#include <_diagonalization/diagonalization.h>
-#include <_diagonalization/lanczos_tridiagonalization.h>
-#include <_diagonalization/golub_kahn_bidiagonalization.h>
-#include <_linear_operator/linear_operator.h>
-#include <_c_basic_algebra/c_matrix_operations.h>
-
-#include "pylinops.h"
 namespace py = pybind11;
 
 using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >;
-
-namespace py = pybind11;
+using std::vector; 
+using std::pair; 
 
 template< typename F = float > 
 struct PyDiagonalOperator {
@@ -54,7 +45,7 @@ struct PyDiagonalOperator {
   }
 };
 
-
+#include <_c_basic_algebra/c_matrix_operations.h>  // cMatrixOperations
 template< typename F = float > 
 struct PyDenseMatrix {
   py::array_t< F, py::array::c_style | py::array::forcecast > _data; 

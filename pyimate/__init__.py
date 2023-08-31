@@ -1,14 +1,18 @@
-import numpy as np 
-from trace import * 
+
+# from trace import * 
 import _random_generator
 import _diagonalize
 import _orthogonalize
-import _operators
+# from . import functions
+# import _operators
 # from ortho import * 
 
-def eigh_tridiagonal(alphas: np.ndarray, betas: np.ndarray, V: np.ndarray):
-  _diagonalize.eigh_tridiagonal(alphas, betas, V)
-  return V
+from .functions import *
+
+# import numpy as np 
+# def eigh_tridiagonal(alphas: numpy.ndarray, betas: np.ndarray, V: np.ndarray):
+#   _diagonalize.eigh_tridiagonal(alphas, betas, V)
+#   return V
 
 def rademacher(n: int):
   import numpy as np

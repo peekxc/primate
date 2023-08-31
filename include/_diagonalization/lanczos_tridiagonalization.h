@@ -17,7 +17,6 @@
 #include "../_orthogonalization/orthogonalization.h"  // Orthogonalization
 #include "../_c_basic_algebra/c_vector_operations.h"  // cVectorOperations
 
-
 // ============================
 // c lanczos tridiagonalization
 // ============================
@@ -112,7 +111,7 @@
 ///             smaller. This counter keeps track of the *non-zero* size of \c
 ///             alpha and \c beta.
 
-template < LinearOperator Matrix, typename DataType = typename Matrix::value_type >
+template < LinearOperator Matrix, typename DataType = typename Matrix::value_type  >
 IndexType lanczos_tridiagonalization(
     Matrix* A,
     const DataType* v,
