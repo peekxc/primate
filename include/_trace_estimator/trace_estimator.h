@@ -14,8 +14,9 @@
 #include <omp.h>  // omp_set_num_threads
 #include <cmath>  // sqrt, pow
 #include <cstddef>  // NULL
+#include <concepts>     // invocable 
 #include "convergence_tools.h"  // check_convergence, average_estimates
-#include "../_utilities/timer.h"  // Timer
+#include "../_timer/timer.h"  // Timer
 #include "../_random_generator/random_array_generator.h"  // RandomArrayGenerator
 #include "../_diagonalization/diagonalization.h"  // Diagonalization
 #include "../_diagonalization/lanczos_tridiagonalization.h"  // c_lanczos_tridiagonalization
@@ -177,13 +178,12 @@
     ///               \c convergence_rtol times \c trace.
     ///             * \c 0 indicates the convergence criterion was not met for at
     ///               least one of the trace inquiries.
-    template< LinearOperator Matrix, typename DataType = typename Matrix::value_type > 
+    template< bool gramian, std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
     FlagType trace_estimator(
             Matrix* A,
             DataType* parameters,
             const IndexType num_inquiries,
-            const Function* matrix_function,
-            const FlagType gram,
+            Func&& matrix_function,
             const DataType exponent,
             const FlagType orthogonalize,
             const IndexType lanczos_degree,
@@ -204,8 +204,7 @@
             FlagType* converged,
             float& alg_wall_time)
     {
-        // Matrix size
-        IndexType matrix_size = A->get_num_rows();
+        IndexType matrix_size = static_cast< std::pair< size_t, size_t > >(A->shape()).first;
 
         // Set the number of threads
         omp_set_num_threads(num_threads);
@@ -252,8 +251,8 @@
                 int thread_id = omp_get_thread_num();
 
                 // Perform one Monte-Carlo sampling to estimate trace
-                stochastic_lanczos_quadrature(
-                    A, parameters, num_inquiries, matrix_function, gram,
+                stochastic_lanczos_quadrature< gramian >(
+                    A, parameters, num_inquiries, matrix_function,
                     exponent, orthogonalize, lanczos_degree, lanczos_tol,
                     random_number_generator,
                     &random_vectors[matrix_size*thread_id], converged,
@@ -398,13 +397,12 @@
     ///             Each element of \c trace_estimates is the estimated trace for
     ///             each parameter inquiry.
 
-    template < AffineOperator Matrix, typename DataType = typename Matrix::value_type >
+    template < bool gramian, std::floating_point DataType, AffineOperator Matrix, std::invocable< DataType > Func >
     void stochastic_lanczos_quadrature(
         Matrix* A,
         DataType* parameters,
         const IndexType num_inquiries,
-        const Function* matrix_function,
-        const FlagType gram,
+        Func&& matrix_function,
         const DataType exponent,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
@@ -415,7 +413,7 @@
         DataType* trace_estimate)
     {
         // Matrix size
-        IndexType matrix_size = A->shape().first;
+        IndexType matrix_size = static_cast< std::pair< size_t, size_t > >(A->shape()).first;
 
         // Fill random vectors with Rademacher distribution (+1, -1), normalized
         // but not orthogonalized. Settng num_threads to zero indicates to not
@@ -437,7 +435,7 @@
         DataType* right_singularvectors_transposed = NULL;
 
         // Actual number of inquiries
-        // IndexType required_num_inquiries = num_inquiries;
+        IndexType required_num_inquiries = num_inquiries;
         // if (A->is_eigenvalue_relation_known())
         // {
         //     // When a relation between eigenvalues and the parameters of the linear
@@ -500,8 +498,7 @@
 
             // Set parameter of linear operator A
             A->set_parameters(&parameters[j*num_parameters]);
-
-            if (gram) {
+            if constexpr (gramian) {
                 // Use Golub-Kahn-Lanczos Bi-diagonalization
                 lanczos_size[j] = golub_kahn_bidiagonalization(
                     A, random_vector, matrix_size, lanczos_degree, lanczos_tol,
@@ -509,13 +506,11 @@
                 );
 
                 // Allocate matrix of singular vectors (1D array, Fortran ordering)
-                left_singularvectors = \
-                    new DataType[lanczos_size[j] * lanczos_size[j]];
-                right_singularvectors_transposed = \
-                    new DataType[lanczos_size[j] * lanczos_size[j]];
+                left_singularvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
+                right_singularvectors_transposed = new DataType[lanczos_size[j] * lanczos_size[j]];
 
                 // Note: alpha is written in-place with singular values
-                Diagonalization<DataType>::svd_bidiagonal(
+                svd_bidiagonal< DataType >(
                     alpha, beta, left_singularvectors,
                     right_singularvectors_transposed, lanczos_size[j]
                 );
@@ -538,7 +533,7 @@
                 eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
 
                 // Note: alpha is written in-place with eigenvalues
-                Diagonalization<DataType>::eigh_tridiagonal(
+                eigh_tridiagonal< DataType >(
                     alpha, beta, eigenvectors, lanczos_size[j]
                 );
 
@@ -604,10 +599,8 @@
             // matrices, such as if the input matrix is identity, or rank
             // deficient. By using lanczos_size[j] instead of lanczos_degree, all
             // issues with special matrices will resolve.
-            for (i=0; i < lanczos_size[j]; ++i)
-            {
-                quadrature_sum += tau[j][i] * tau[j][i] * \
-                        matrix_function->function(pow(theta[j][i], exponent));
+            for (i=0; i < lanczos_size[j]; ++i) {
+                quadrature_sum += tau[j][i] * tau[j][i] * matrix_function(pow(theta[j][i], exponent));
             }
 
             trace_estimate[j] = matrix_size * quadrature_sum;

@@ -17,7 +17,7 @@
 
 #include <cmath>  // sqrt, std::abs, INFINITY, NAN, isnan
 #include <algorithm>  // std::max
-#include "../definitions/types.h"
+#include "../_definitions/types.h"
 
 // From: https://www.boost.org/doc/libs/1_83_0/boost/histogram/detail/erf_inv.hpp
 // Simple implementation of erf_inv so that we do not depend on boost::math.
@@ -123,7 +123,7 @@ struct ConvergenceTools {
     ///               \c convergence_rtol times \c trace.
     ///             * \c 0 indicates the convergence criterion was not met for at
     ///               least one of the trace inquiries.
-    FlagType check_convergence(
+    static FlagType check_convergence(
             DataType** samples,
             const IndexType min_num_samples,
             const IndexType num_inquiries,
@@ -282,7 +282,7 @@ struct ConvergenceTools {
     ///             The error of estimation of trace, which is the standard
     ///             deviation of the rows of \c samples array. The size of this
     ///             array is \c num_inquiries.
-    void average_estimates(
+    static void average_estimates(
             const DataType confidence_level,
             const DataType outlier_significance_level,
             const IndexType num_inquiries,

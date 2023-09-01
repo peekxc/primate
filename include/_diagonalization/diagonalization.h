@@ -197,7 +197,7 @@ int eigh_tridiagonal(
 /// \return         Integer \c info indicates the status of the computation.
 ///                 Zero indicates a successful computation.
 
-template <typename DataType>
+template < typename DataType >
 int svd_bidiagonal(
 				DataType* diagonals,
 				DataType* supdiagonals,
