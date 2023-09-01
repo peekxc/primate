@@ -232,9 +232,9 @@
 
         // Using square-root of max possible chunk size for parallel schedules
         unsigned int chunk_size = static_cast<int>(
-                sqrt(static_cast<DataType>(max_num_samples) / num_threads));
-        if (chunk_size < 1)
-        {
+            sqrt(static_cast<DataType>(max_num_samples) / num_threads)
+        );
+        if (chunk_size < 1) {
             chunk_size = 1;
         }
 
