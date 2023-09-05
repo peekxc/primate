@@ -4,6 +4,20 @@ from scipy.sparse.linalg import LinearOperator, aslinearoperator
 def test_blas():
   pass
 
+
+def test_trace_estimator():
+  import imate
+  from pyimate.trace import trace_estimator
+  T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19))
+  tr_est, info = trace_estimator(T, orthogonalize=20, confidence_level=0.99, error_atol=0.0, error_rtol=1e-2, min_num_samples=150, max_num_samples=200)
+  print(f"True: {np.sum(T.diagonal()):.8f}, Est: {np.mean(tr_est):.8f}")
+  
+  info['convergence']['samples'].mean(axis=1)
+  n_samples = int(info['convergence']['num_samples_used'])
+  np.cumsum(np.ravel(info['convergence']['samples']))/np.arange(1, n_samples+1)
+  # imate.trace(T, method="slq")
+  pass
+
 def test_eigen():
   # %% test lanczos tridiagonalization
   import numpy as np 

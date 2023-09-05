@@ -32,11 +32,10 @@ using py_arr_f = py::array_t< float >;
 //   return i + j;
 // }
 
-float trace_estimator_py(
+float trace_estimator_slq_py(
   const Eigen::SparseMatrix< float >* matrix, 
   const py_arr_f& parameters, 
   const size_t num_inqueries,
-  const bool gramian, 
   const float exponent, 
   const int orthogonalize, 
   const size_t lanczos_degree, 
@@ -46,6 +45,7 @@ float trace_estimator_py(
   const float error_atol, 
   const float error_rtol,
   const float confidence, 
+  const float outlier,
   const size_t num_threads, 
   py_arr_f& trace,
   py_arr_f& error,
@@ -55,7 +55,7 @@ float trace_estimator_py(
   py::array_t< int >& num_outliers,
   py::array_t< int >& converged
 ){
-  if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
+  // if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
   float* params = static_cast< float* >(parameters.request().ptr);
   auto matrix_function = [](float eigenvalue) -> float { return eigenvalue; }; 
   float* trace_out = static_cast< float* >(trace.request().ptr); 
@@ -83,23 +83,11 @@ float trace_estimator_py(
   trace_estimator< false, float >(
     &lo, params, num_inqueries, matrix_function, 
     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
-    error_atol, error_rtol, confidence, (const float) 1.0f - confidence, 
+    error_atol, error_rtol, confidence, outlier, 
     num_threads, 
     trace_out, error_out, samples_out, processed_samples_indices_out, num_samples_used_out, num_outliers_out, converged_out,
     alg_wall_time
   );
-  // if (gramian){
-  //   trace_estimator< true, float >(
-  //     &lo, params, num_inqueries, matrix_function, 
-  //     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
-  //     error_atol, error_rtol, confidence, (const float) 1.0f - confidence, 
-  //     num_threads, 
-  //     trace_out, error_out, samples_out, processed_samples_indices_out, num_samples_used_out, num_outliers_out, converged_out,
-  //     alg_wall_time
-  //   );
-  // } else {
-    
-  // }
   
   delete[] samples_out;
   return alg_wall_time; 
@@ -107,5 +95,5 @@ float trace_estimator_py(
 
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  m.def("trace_estimator", &trace_estimator_py);
+  m.def("trace_estimator_slq", &trace_estimator_slq_py);
 };

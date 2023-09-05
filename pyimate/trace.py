@@ -1,12 +1,169 @@
-# from imate._c_trace_estimator import pyc_trace_estimator
-# from imate.trace
-# import numpy as np
-# import os
-# import sys 
-# import imate
+# SPDX-FileCopyrightText: Copyright 2021, Siavash Ameli <sameli@berkeley.edu>
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileType: SOURCE
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the license found in the LICENSE.txt file in the root
+# directory of this source tree.
 
-# imate_dir = imate.__path__
-# import _trace
+import numpy as np
+from scipy.sparse import spmatrix
+from typing import * 
+
+# import time
+import _trace
+from imate._trace_estimator.trace_estimator_utilities import get_operator_parameters, check_arguments
+# from imate.trace_estimator_plot_utilities import plot_convergence
+# from imate.trace_estimator_utilities import get_operator, \
+#         get_operator_parameters, check_arguments, get_machine_precision, \
+#         find_num_inquiries, print_summary
+
+def trace_estimator(
+  A: spmatrix,
+  parameters: Iterable = None,
+  matrix_function: Union[str, Callable] = "identity",
+  p: int = 1.0,
+  min_num_samples: int = 10,
+  max_num_samples: int = 50,
+  error_atol: float = None,
+  error_rtol: float = 1e-2,
+  confidence_level: float = 0.95,
+  outlier_level: float = 0.001,
+  lanczos_degree: int = 20,
+  lanczos_tol: int = None,
+  orthogonalize: int = 0,
+  num_threads: int = 1,
+  verbose: bool = False,
+  plot: bool = False
+):
+    """
+    Reference:
+      `Ubaru, S., Chen, J., and Saad, Y. (2017)
+      <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
+      Fast Estimation of :math:`\\mathrm{tr}(F(A))` Via Stochastic Lanczos
+      Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.
+    """
+    assert isinstance(A, spmatrix), "A must be a sparse matrix, for now."
+
+    # Check operator A, and convert to a linear operator (if not already)
+    # Aop = get_operator(A)
+    i_dtype, f_dtype = np.int32, np.float32 
+    lanczos_tol = float(np.finfo(f_dtype).eps) if lanczos_tol is None else float(lanczos_tol)
+
+    # Validates operator size + initialize parameters array
+    # parameters, parameters_size = get_operator_parameters(parameters, f_dtype)
+    # parameters = parameters.astype(f_dtype)
+    parameters = np.array([1], dtype=f_dtype)
+
+    # Find number of inquiries, which is the number of batches of different set
+    # of parameters to produce different linear operators. These batches are
+    # concatenated in the "parameters" array.
+    num_inquiries = 1 #find_num_inquiries(Aop, parameters_size)
+
+    ## Check input arguments have proper type and values
+    error_atol, error_rtol = check_arguments(
+      False, p, min_num_samples, max_num_samples, error_atol,
+      error_rtol, confidence_level, outlier_level,
+      lanczos_degree, lanczos_tol, orthogonalize, num_threads,
+      0, verbose, plot, False
+    )
+    nq, ns = num_inquiries, max_num_samples                     # num queries, num samples 
+    trace = np.empty((nq,), dtype=f_dtype)                      # Allocate output trace as array of size num_inquiries
+    error = np.empty((nq,), dtype=f_dtype)                      # Error of computing trace within a confidence interval
+    samples = np.nan * np.ones((ns, nq), dtype=f_dtype)         # Array of all Monte-Carlo samples where array trace is averaged based upon
+    processed_samples_indices = np.zeros((ns,), dtype=i_dtype)  # Track the order of process of samples in rows of samples array
+    num_samples_used = np.zeros((nq,), dtype=i_dtype)           # Store how many samples used for each inquiry till reaching convergence
+    num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
+    converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
+    # alg_wall_times = np.zeros((1, ), dtype=float)
+
+    ## The final call
+    alg_wall_time = _trace.trace_estimator_slq(
+      A, parameters, num_inquiries,
+      p, orthogonalize, lanczos_degree, lanczos_tol, 
+      min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_level,
+      num_threads,
+      trace, error, samples,
+      processed_samples_indices, num_samples_used, num_outliers, converged
+    )
+
+    # Dictionary of output info
+    info = {
+        'matrix':
+        {
+            'data_type': f_dtype,
+            'gram': False,
+            'exponent': p,
+            'num_inquiries': num_inquiries,
+            'num_operator_parameters': 1, #Aop.get_num_parameters(),
+            'parameters': parameters
+        },
+        'error':
+        {
+            'absolute_error': None,
+            'relative_error': None,
+            'error_atol': error_atol,
+            'error_rtol': error_rtol,
+            'confidence_level': confidence_level,
+            'outlier_significance_level': outlier_level
+        },
+        'convergence':
+        {
+            'converged': converged,
+            'all_converged': converged,
+            'min_num_samples': min_num_samples,
+            'max_num_samples': max_num_samples,
+            'num_samples_used': None,
+            'num_outliers': None,
+            'samples': None,
+            'samples_mean': None,
+            'samples_processed_order': processed_samples_indices
+        },
+        'time':
+        {
+            'tot_wall_time': 0,
+            'alg_wall_time': alg_wall_time,
+            'cpu_proc_time': 0
+        },
+        'solver':
+        {
+            'version': 0,
+            'lanczos_degree': lanczos_degree,
+            'lanczos_tol': lanczos_tol,
+            'orthogonalize': orthogonalize,
+            'method': 'slq',
+        }
+    }
+
+    # Fill arrays of info depending on whether output is scalar or array
+    output_is_array = False if (parameters is None) or np.isscalar(parameters) else True
+    if output_is_array:
+      info['error']['absolute_error'] = error
+      info['error']['relative_error'] = error / np.abs(trace)
+      info['convergence']['converged'] = converged.astype(bool)
+      info['convergence']['num_samples_used'] = num_samples_used
+      info['convergence']['num_outliers'] = num_outliers
+      info['convergence']['samples'] = samples
+      info['convergence']['samples_mean'] = trace
+    else:
+      info['error']['absolute_error'] = error[0]
+      info['error']['relative_error'] = error[0] / np.abs(trace[0])
+      info['convergence']['converged'] = bool(converged[0])
+      info['convergence']['num_samples_used'] = num_samples_used[0]
+      info['convergence']['num_outliers'] = num_outliers[0]
+      info['convergence']['samples'] = samples[:, 0]
+      info['convergence']['samples_mean'] = trace[0]
+
+    # # print summary
+    # if verbose:
+    #     print_summary(info)
+
+    # # Plot results
+    # if plot:
+    #     plot_convergence(info)
+
+    return (trace, info) if output_is_array else (trace[0], info)
+
 
 # def trace_est() -> int:
 #   return _trace.apply_smoothstep(1, 2)
