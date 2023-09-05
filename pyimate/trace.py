@@ -12,7 +12,10 @@ from typing import *
 
 # import time
 import _trace
-from imate._trace_estimator.trace_estimator_utilities import get_operator_parameters, check_arguments
+from imate._trace_estimator import trace_estimator_utilities as te_util 
+from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
+
+# from imate._trace_estimator.trace_estimator_utilities import get_operator_parameters, check_arguments
 # from imate.trace_estimator_plot_utilities import plot_convergence
 # from imate.trace_estimator_utilities import get_operator, \
 #         get_operator_parameters, check_arguments, get_machine_precision, \
@@ -28,11 +31,11 @@ def trace_estimator(
   error_atol: float = None,
   error_rtol: float = 1e-2,
   confidence_level: float = 0.95,
-  outlier_level: float = 0.001,
+  outlier_significance_level: float = 0.001,
   lanczos_degree: int = 20,
   lanczos_tol: int = None,
   orthogonalize: int = 0,
-  num_threads: int = 1,
+  num_threads: int = 0,
   verbose: bool = False,
   plot: bool = False
 ):
@@ -53,7 +56,7 @@ def trace_estimator(
     # Validates operator size + initialize parameters array
     # parameters, parameters_size = get_operator_parameters(parameters, f_dtype)
     # parameters = parameters.astype(f_dtype)
-    parameters = np.array([1], dtype=f_dtype)
+    parameters = np.array([0.0], dtype=f_dtype)
 
     # Find number of inquiries, which is the number of batches of different set
     # of parameters to produce different linear operators. These batches are
@@ -61,9 +64,9 @@ def trace_estimator(
     num_inquiries = 1 #find_num_inquiries(Aop, parameters_size)
 
     ## Check input arguments have proper type and values
-    error_atol, error_rtol = check_arguments(
+    error_atol, error_rtol = te_util.check_arguments(
       False, p, min_num_samples, max_num_samples, error_atol,
-      error_rtol, confidence_level, outlier_level,
+      error_rtol, confidence_level, outlier_significance_level,
       lanczos_degree, lanczos_tol, orthogonalize, num_threads,
       0, verbose, plot, False
     )
@@ -81,22 +84,33 @@ def trace_estimator(
     alg_wall_time = _trace.trace_estimator_slq(
       A, parameters, num_inquiries,
       p, orthogonalize, lanczos_degree, lanczos_tol, 
-      min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_level,
+      min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
       num_threads,
       trace, error, samples,
       processed_samples_indices, num_samples_used, num_outliers, converged
     )
 
+
+    ## Matrix size info (if available)
+    matrix_size = A.shape[0]
+    matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
+    matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
+    sparse = None if matrix_density is None else matrix_density <= 0.50
+
     # Dictionary of output info
     info = {
         'matrix':
         {
-            'data_type': f_dtype,
+            'data_type': np.finfo(f_dtype).dtype.name.encode('utf-8'),
             'gram': False,
             'exponent': p,
             'num_inquiries': num_inquiries,
             'num_operator_parameters': 1, #Aop.get_num_parameters(),
-            'parameters': parameters
+            'parameters': parameters, 
+            'size': matrix_size,               # legacy
+            'sparse': sparse,
+            'nnz': matrix_nnz,
+            'density': matrix_density  
         },
         'error':
         {
@@ -105,12 +119,12 @@ def trace_estimator(
             'error_atol': error_atol,
             'error_rtol': error_rtol,
             'confidence_level': confidence_level,
-            'outlier_significance_level': outlier_level
+            'outlier_significance_level': outlier_significance_level
         },
         'convergence':
         {
             'converged': converged,
-            'all_converged': converged,
+            'all_converged': np.all(converged),
             'min_num_samples': min_num_samples,
             'max_num_samples': max_num_samples,
             'num_samples_used': None,
@@ -125,9 +139,15 @@ def trace_estimator(
             'alg_wall_time': alg_wall_time,
             'cpu_proc_time': 0
         },
+        'device': {
+            'num_cpu_threads': num_threads,
+            'num_gpu_devices': 0,
+            'num_gpu_multiprocessors': 0,
+            'num_gpu_threads_per_multiprocessor': 0
+        },
         'solver':
         {
-            'version': 0,
+            'version': None,
             'lanczos_degree': lanczos_degree,
             'lanczos_tol': lanczos_tol,
             'orthogonalize': orthogonalize,
@@ -154,13 +174,8 @@ def trace_estimator(
       info['convergence']['samples'] = samples[:, 0]
       info['convergence']['samples_mean'] = trace[0]
 
-    # # print summary
-    # if verbose:
-    #     print_summary(info)
-
-    # # Plot results
-    # if plot:
-    #     plot_convergence(info)
+    if verbose: te_util.print_summary(info)
+    if plot: te_plot.plot_convergence(info)
 
     return (trace, info) if output_is_array else (trace[0], info)
 

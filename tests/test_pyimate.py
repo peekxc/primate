@@ -36,7 +36,6 @@ def test_eigen():
   assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
 
 def test_lanczos():
-  # %% test lanczos tridiagonalization
   from scipy.sparse.linalg import eigsh
   from scipy.linalg import eigh_tridiagonal
   from pyimate import _diagonalize

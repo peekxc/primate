@@ -3,7 +3,7 @@
 #include <Eigen/SparseCore> // SparseMatrix
 
 namespace py = pybind11;
-using py_arr_f = py::array_t< float >;
+// using py_arr_f = py::array_t< float >;
 
 template< std::floating_point F >
 struct SparseEigenLinearOperator {

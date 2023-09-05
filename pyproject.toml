@@ -4,7 +4,7 @@ requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "ima
 
 [project]
 name = "pyimate"
-version = '0.0.4'
+version = '0.0.5'
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",

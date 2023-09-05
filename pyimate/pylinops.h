@@ -16,6 +16,18 @@ using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >
 using std::vector; 
 using std::pair; 
 
+// struct DiagonalOperator {
+//   using value_type = float; 
+//   vector< float > _diagonals; 
+//   DiagonalOperator(vector< float > d) : _diagonals(d.begin(), d.end()) {}
+//   auto matvec(const float* inp, float* out) const -> void {
+//     std::transform(inp, inp + _diagonals.size(), _diagonals.begin(), out, std::multiplies< float >());
+//   }
+//   auto shape() const -> pair< size_t, size_t > { 
+//     return std::make_pair(_diagonals.size(), _diagonals.size());
+//   }
+// };
+
 template< typename F = float > 
 struct PyDiagonalOperator {
   vector< F > _diagonals; 
