@@ -11,24 +11,14 @@
 #ifndef _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 #define _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 
-
-// =======
-// Headers
-// =======
 #include "../_definitions/types.h"  // IndexType, LongIndexType
-#include "./random_number_generator.h"
+#include <random>   // uniform_random_bit_generator
+#include "random_concepts.h" // ThreadSafeRBG
 #include <omp.h>  // omp_set_num_threads, omp_get_thread_num
 #include <stdint.h>  // uint64_t
-// #include "../_c_trace_estimator/c_orthogonalization.h"  // cOrthogonalization
-// #include "../_c_basic_algebra/c_vector_operations.h"  // cVectorOperations
 
-template <typename DataType>
-struct RandomArrayGenerator
-{
-// =====================
-// generate random array
-// =====================
-
+template < typename DataType >
+struct VectorGenerator {
 /// \brief      Generates a pseudo-random array with Rademacher distribution
 ///             where elements are either \c +1 or \c -1.
 ///
@@ -63,9 +53,9 @@ struct RandomArrayGenerator
 ///             then no paralel thread is created inside this function, rather
 ///             it is assumed that this functon is called inside a parallel
 ///             region from the caller.
-
-static void generate_random_array(
-        RandomNumberGenerator& random_number_generator,
+template< ThreadSafeRBG RBG > 
+static void generate_array(
+        RBG& random_bit_generator,
         DataType* array,
         const LongIndexType array_size,
         const IndexType num_threads)
@@ -75,8 +65,7 @@ static void generate_random_array(
     // function, rather, this function was called from another caller function
     // that was already parallelized and this function should be executed in
     // one of those threads.
-    if (num_threads > 0)
-    {
+    if (num_threads > 0) {
         // num_threads parallel threads will be created in this function.
         omp_set_num_threads(num_threads);
     }
@@ -107,69 +96,28 @@ static void generate_random_array(
         // that the parent (caller) function created outside of this function.
         // But, if num_thread is non-zero, the following thread id is the
         // thread id that is created inside this parallel loop.
-        if (num_threads > 0)
-        {
+        if (num_threads > 0) {
             thread_id = omp_get_thread_num();
         }
 
         #pragma omp for schedule(static)
-        for (LongIndexType i=0;
-             i < static_cast<LongIndexType>(array_size/num_bits); ++i)
-        {
-            // Generate 64 bits (one integer)
-            uint64_t bits = random_number_generator.next(thread_id);
-
-            // Fill 64 elements of array with +1 or -1 depending on the bits
-            for (IndexType j=0; j < num_bits; ++j)
-            {
-                // Check if the j-th bit (from right to left) is 1 or 0
-                if (bits & ( uint64_t(1) << j))
-                {
-                    // Bit is 1. Write +1.0 in array
-                    array[i*num_bits + j] = 1.0;
-                }
-                else
-                {
-                    // Bit is 0. Write -1.0 in array
-                    array[i*num_bits + j] = -1.0;
-                }
+        for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+            std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+            for (IndexType j=0; j < num_bits; ++j) {
+                array[i*num_bits + j] = ubits[j] ? 1.0 : -1.0; //Shift checks the j-th bit (from right to left) is 1 or 0
             }
         }
     }
-
-    // The previous for loop (the above) does not fill all elements of array
-    // since it only iterates on the multiples of 64 (num_bits). We fill the
-    // rest of the array. There are less than 64 elements remained to fill. So,
-    // it suffice to generate only 64 bits (one integer) for the rest of the
-    // elements of the array
-    uint64_t bits = random_number_generator.next(thread_id);
-
     // This loop should have less than 64 iterations.
-    for (LongIndexType j = \
-            static_cast<LongIndexType>(array_size/num_bits) * num_bits;
-         j < array_size; ++j)
-    {
-        // Check if the j-th bit (from right to left) is 1 or 0
-        if (bits & ( uint64_t(1) << j))
-        {
-            // Bit is 1. Write +1.0 in array
-            array[j] = 1.0;
-        }
-        else
-        {
-            // Bit is 0. Write -1.0 in array
-            array[j] = -1.0;
-        }
+    std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+    for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+        array[j] = ubits[i] ? 1.0 : -1.0;
     }
 };
 };
 
-// ===============================
-// Explicit template instantiation
-// ===============================
-
-template struct RandomArrayGenerator<float>;
-template struct RandomArrayGenerator<double>;
-template struct RandomArrayGenerator<long double>;
+template struct VectorGenerator<float>;
+template struct VectorGenerator<double>;
+template struct VectorGenerator<long double>;
 
 #endif 

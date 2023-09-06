@@ -1,6 +1,9 @@
 import numpy as np 
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
 
+def test_randomness():
+  pass
+
 def test_blas():
   pass
 

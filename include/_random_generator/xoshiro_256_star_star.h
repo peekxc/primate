@@ -1,5 +1,5 @@
 /*
- *  SPDX-FileCopyrightText: Copyright 2021, Siavash Ameli <sameli@berkeley.edu>
+ *  SPDX-FileCopyrightText: Copyright 2021, Siavash Ameli <sameli@berkeley.edu>, Matt Piekenbrock <matt.piekenbrock@gmail.com>
  *  SPDX-License-Identifier: BSD-3-Clause
  *  SPDX-FileType: SOURCE
  *
@@ -13,13 +13,10 @@
 #define _RANDOM_GENERATOR_XOSHIRO_256_STAR_STAR_H_
 
 
-// =======
-// Headers
-// =======
-
+#include <array> 
 #include <stdint.h>  // uint64_t, UINT64_C
 #include <cstdlib>  // NULL
-#include "./split_mix_64.h"  // SplitMix64
+#include "./split_mix64.h"  // SplitMix64
 
 // stdint.h in old compilers (e.g. gcc 4.4.7) does not declare UINT64_C macro.
 #ifndef UINT64_C
@@ -52,120 +49,97 @@
 ///
 /// \sa      SplitMix64
 
-struct Xoshiro256StarStar
-{
-        Xoshiro256StarStar(): state(NULL)
-        {
-            // Allocate state
-            this->state = new uint64_t[4];
 
-            // Initializing SplitMix64 random generator
-            SplitMix64 split_mix_64;
+struct Xoshiro256StarStar{
+    static constexpr size_t state_size = 8;
+    static inline uint64_t rotation_left( const uint64_t x, int k){
+        return (x << k) | (x >> (64 - k));
+    };
+    std::array< uint64_t, 4 > state;
 
-            for (int i=0; i < 4; ++i)
-            {
-                this->state[i] = split_mix_64.next();
-            }
-        };
-        ~Xoshiro256StarStar(){
-            if (this->state != NULL)
-            {
-                delete[] this->state;
-                this->state = NULL;
-            }
-        };
-        uint64_t next(){
-            const uint64_t result = this->rotation_left(this->state[1] * 5, 7) * 9;
-            const uint64_t t = this->state[1] << 17;
-
-            this->state[2] ^= this->state[0];
-            this->state[3] ^= this->state[1];
-            this->state[1] ^= this->state[2];
-            this->state[0] ^= this->state[3];
-
-            this->state[2] ^= t;
-            this->state[3] = this->rotation_left(this->state[3], 45);
-
-            return result;
-        };
-        void jump(){
-            static const uint64_t JUMP[] = {
-                0x180ec6d33cfd0aba,
-                0xd5a61266f0c9392c,
-                0xa9582618e03fc9aa,
-                0x39abdc4529b1661c
-            };
-
-            uint64_t s0 = 0;
-            uint64_t s1 = 0;
-            uint64_t s2 = 0;
-            uint64_t s3 = 0;
-
-            for (unsigned int i = 0; i < sizeof(JUMP) / sizeof(*JUMP); ++i)
-            {
-                for (int b = 0; b < 64; ++b)
-                {
-                    if (JUMP[i] & UINT64_C(1) << b)
-                    {
-                        s0 ^= this->state[0];
-                        s1 ^= this->state[1];
-                        s2 ^= this->state[2];
-                        s3 ^= this->state[3];
-                    }
-
-                    this->next();
-                }
-            }
-
-            this->state[0] = s0;
-            this->state[1] = s1;
-            this->state[2] = s2;
-            this->state[3] = s3;
-        };
-        void long_jump(){
-            static const uint64_t LONG_JUMP[] = {
-                0x76e15d3efefdcbbf,
-                0xc5004e441c522fb3,
-                0x77710069854ee241,
-                0x39109bb02acbe635
-            };
-
-            uint64_t s0 = 0;
-            uint64_t s1 = 0;
-            uint64_t s2 = 0;
-            uint64_t s3 = 0;
-
-            for (unsigned int i = 0; i < sizeof(LONG_JUMP) / sizeof(*LONG_JUMP); ++i)
-            {
-                for (int b = 0; b < 64; ++b)
-                {
-                    if (LONG_JUMP[i] & UINT64_C(1) << b)
-                    {
-                        s0 ^= this->state[0];
-                        s1 ^= this->state[1];
-                        s2 ^= this->state[2];
-                        s3 ^= this->state[3];
-                    }
-
-                    this->next();
-                }
-            }
-
-            this->state[0] = s0;
-            this->state[1] = s1;
-            this->state[2] = s2;
-            this->state[3] = s3;
+    Xoshiro256StarStar(){
+        SplitMix64 split_mix_64;
+        state = { split_mix_64(), split_mix_64(), split_mix_64(), split_mix_64() };
+    };
+    void seed(std::seed_seq& S){
+        std::array< std::uint32_t, 8 > seeds;
+        S.generate(seeds.begin(), seeds.end());
+        state[0] = (static_cast< std::uint64_t >(seeds[0]) << 32) | seeds[1];
+        state[1] = (static_cast< std::uint64_t >(seeds[2]) << 32) | seeds[3];
+        state[2] = (static_cast< std::uint64_t >(seeds[4]) << 32) | seeds[5];
+        state[3] = (static_cast< std::uint64_t >(seeds[6]) << 32) | seeds[7];
+    };
+    uint64_t operator()(){
+        const uint64_t result = rotation_left(state[1] * 5, 7) * 9;
+        const uint64_t t = state[1] << 17;  
+        state[2] ^= state[0];
+        state[3] ^= state[1];
+        state[1] ^= state[2];
+        state[0] ^= state[3];
+        state[2] ^= t;
+        state[3] = rotation_left(state[3], 45);
+        return result;
     };
 
-    protected:
-        static inline uint64_t rotation_left(
-                const uint64_t x,
-                int k){
-            return (x << k) | (x >> (64 - k));
+    void jump(){
+        static const uint64_t JUMP[] = {
+            0x180ec6d33cfd0aba,
+            0xd5a61266f0c9392c,
+            0xa9582618e03fc9aa,
+            0x39abdc4529b1661c
         };
 
-        // Member data
-        uint64_t *state;
+        uint64_t s0 = 0;
+        uint64_t s1 = 0;
+        uint64_t s2 = 0;
+        uint64_t s3 = 0;
+
+        for (unsigned int i = 0; i < sizeof(JUMP) / sizeof(*JUMP); ++i) {
+            for (int b = 0; b < 64; ++b) {
+                if (JUMP[i] & UINT64_C(1) << b) {
+                    s0 ^= state[0];
+                    s1 ^= state[1];
+                    s2 ^= state[2];
+                    s3 ^= state[3];
+                }
+                this->operator()();
+            }
+        }
+
+        state[0] = s0;
+        state[1] = s1;
+        state[2] = s2;
+        state[3] = s3;
+    };
+    void long_jump(){
+        static const uint64_t LONG_JUMP[] = {
+            0x76e15d3efefdcbbf,
+            0xc5004e441c522fb3,
+            0x77710069854ee241,
+            0x39109bb02acbe635
+        };
+
+        uint64_t s0 = 0;
+        uint64_t s1 = 0;
+        uint64_t s2 = 0;
+        uint64_t s3 = 0;
+
+        for (unsigned int i = 0; i < sizeof(LONG_JUMP) / sizeof(*LONG_JUMP); ++i) {
+            for (int b = 0; b < 64; ++b) {
+                if (LONG_JUMP[i] & UINT64_C(1) << b) {
+                    s0 ^= state[0];
+                    s1 ^= state[1];
+                    s2 ^= state[2];
+                    s3 ^= state[3];
+                }
+                this->operator()();
+            }
+        }
+        state[0] = s0;
+        state[1] = s1;
+        state[2] = s2;
+        state[3] = s3;
+    };
 };
 
 

@@ -17,7 +17,8 @@
 #include <concepts>     // invocable 
 #include "convergence_tools.h"  // check_convergence, average_estimates
 #include "../_timer/timer.h"  // Timer
-#include "../_random_generator/random_array_generator.h"  // RandomArrayGenerator
+#include "../_random_generator/random_concepts.h"  // ThreadSafeRBG
+#include "../_random_generator/vector_generator.h"  // vector generator
 #include "../_diagonalization/diagonalization.h"  // Diagonalization
 #include "../_diagonalization/lanczos_tridiagonalization.h"  // c_lanczos_tridiagonalization
 #include "../_diagonalization/golub_kahn_bidiagonalization.h"  // c_golub_kahn_bidiagonaliza...
@@ -217,9 +218,8 @@
         IndexType random_vectors_size = matrix_size * num_threads;
         DataType* random_vectors = new DataType[random_vectors_size];
 
-        // Initialize random number generator to generate in parallel threads
-        // independently.
-        RandomNumberGenerator random_number_generator(num_threads);
+        // Thread-safe random bit generator
+        auto rng = ThreadedRNG64(num_threads);
 
         // The counter of filled size of processed_samples_indices array
         // This scalar variable is defined as array to be shared among al threads
@@ -254,7 +254,7 @@
                 stochastic_lanczos_quadrature< gramian >(
                     A, parameters, num_inquiries, matrix_function,
                     exponent, orthogonalize, lanczos_degree, lanczos_tol,
-                    random_number_generator,
+                    rng,
                     &random_vectors[matrix_size*thread_id], converged,
                     samples[i]
                 );
@@ -397,7 +397,7 @@
     ///             Each element of \c trace_estimates is the estimated trace for
     ///             each parameter inquiry.
 
-    template < bool gramian, std::floating_point DataType, AffineOperator Matrix, std::invocable< DataType > Func >
+    template < bool gramian, std::floating_point DataType, AffineOperator Matrix, std::invocable< DataType > Func, ThreadSafeRBG RBG >
     void stochastic_lanczos_quadrature(
         Matrix* A,
         DataType* parameters,
@@ -407,7 +407,7 @@
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
         const DataType lanczos_tol,
-        RandomNumberGenerator& random_number_generator,
+        RBG& rng,
         DataType* random_vector,
         FlagType* converged,
         DataType* trace_estimate)
@@ -420,9 +420,9 @@
         // create any new threads in RandomNumbrGenerator since the current
         // function is inside a parallel thread.
         IndexType num_threads = 0;
-        RandomArrayGenerator<DataType>::generate_random_array(
-            random_number_generator, random_vector, matrix_size, num_threads
-        );
+        VectorGenerator< DataType >::generate_array(
+            rng, random_vector, matrix_size, num_threads
+        ); 
 
         // Allocate diagonals (alpha) and supdiagonals (beta) of Lanczos matrix
         DataType* alpha = new DataType[lanczos_degree];

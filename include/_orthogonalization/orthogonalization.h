@@ -20,8 +20,9 @@
 #include <cmath>  // sqrt, std::fabs
 #include <limits>  // std::numeric_limits
 #include "../_c_basic_algebra/c_vector_operations.h"  
-#include "../_random_generator/random_array_generator.h" 
-#include "../_random_generator/random_number_generator.h"
+#include "../_random_generator/random_concepts.h" 
+#include "../_random_generator/threadedrng64.h" 
+#include "../_random_generator/vector_generator.h"
 
 
 template <typename DataType>
@@ -291,7 +292,7 @@ static void orthogonalize_vectors(
     IndexType max_num_trials = 20;
     IndexType num_trials = 0;
     IndexType num_threads = 1;
-    RandomNumberGenerator random_number_generator(num_threads);
+    auto random_number_generator = ThreadedRNG64(num_threads);
 
     while (i < num_vectors)
     {
@@ -355,9 +356,10 @@ static void orthogonalize_vectors(
                 if (distance < 2.0 * epsilon * sqrt(vector_size))
                 {
                     // Regenerate new random vector for i-th vector
-                    RandomArrayGenerator<DataType>::generate_random_array(
+                    VectorGenerator<DataType>::generate_random_array(
                             random_number_generator, &vectors[i*vector_size],
-                            vector_size, num_threads);
+                            vector_size, num_threads
+                    );
 
                     // Repeat the reorthogonalization for i-th vector against
                     // all previous vectors again.
@@ -380,9 +382,10 @@ static void orthogonalize_vectors(
             if (norm_i < epsilon * sqrt(vector_size))
             {
                 // Regenerate new random vector for i-th vector
-                RandomArrayGenerator<DataType>::generate_random_array(
+                VectorGenerator<DataType>::generate_random_array(
                         random_number_generator, &vectors[i*vector_size],
-                        vector_size, num_threads);
+                        vector_size, num_threads
+                );
 
                 // Repeat the reorthogonalization for i-th vector against
                 // all previous vectors again.

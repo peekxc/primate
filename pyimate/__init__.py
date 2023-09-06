@@ -1,9 +1,9 @@
 
 # from trace import * 
 import _random_generator
-import _diagonalize
-import _orthogonalize
-import _sparse_eigen
+# import _diagonalize
+# import _orthogonalize
+# import _sparse_eigen
 # from . import functions
 # import _operators
 # from ortho import * 
@@ -15,11 +15,11 @@ from .functions import *
 #   _diagonalize.eigh_tridiagonal(alphas, betas, V)
 #   return V
 
-def rademacher(n: int):
-  import numpy as np
-  out = np.empty(n, dtype=np.float32)
-  _random_generator.rademacher(out, 1)
-  return out
+# def rademacher(n: int):
+#   import numpy as np
+#   out = np.empty(n, dtype=np.float32)
+#   _random_generator.rademacher(out, 1)
+#   return out
 
 
 # Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
