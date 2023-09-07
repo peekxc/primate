@@ -37,7 +37,8 @@ def trace_estimator(
   orthogonalize: int = 0,
   num_threads: int = 0,
   verbose: bool = False,
-  plot: bool = False
+  plot: bool = False, 
+  **kwargs
 ):
     """
     Reference:
@@ -83,17 +84,27 @@ def trace_estimator(
     converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
     # alg_wall_times = np.zeros((1, ), dtype=float)
 
-    ## The final call; 
-    alg_wall_time = _trace.trace_estimator_slq( # trace_eigen_identity
-      A, parameters, num_inquiries,
+    ## The final call:
+    trace_args = (parameters, num_inquiries, 
       p, orthogonalize, lanczos_degree, lanczos_tol, 
-      min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
-      num_threads,
-      trace, error, samples,
-      processed_samples_indices, num_samples_used, num_outliers, converged
+      min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level, 
+      num_threads, 
+      trace, error, samples, 
+      processed_samples_indices, num_samples_used, num_outliers, converged 
     )
-
-
+    if isinstance(matrix_function, str):
+      if matrix_function == "identity":
+        alg_wall_time = _trace.trace_eigen_identity(A, *trace_args)
+      elif matrix_function == "sqrt":
+        alg_wall_time = _trace.trace_eigen_sqrt(A, *trace_args)
+      elif matrix_function == "smoothstep":
+        a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
+        alg_wall_time = _trace.trace_eigen_smoothstep(A, a, b, *trace_args)
+      else:
+        raise ValueError(f"Unknown matrix function '{matrix_function}'")
+    else:
+      raise NotImplementedError("Not done yet")
+      
     ## Matrix size info (if available)
     matrix_size = A.shape[0]
     matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None

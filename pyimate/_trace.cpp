@@ -36,11 +36,8 @@ float trace_estimator_slq_py(
   py::array_t< int >& num_outliers,
   py::array_t< int >& converged
 ){
-  int num_threads_ = num_threads;
-  if (num_threads_ < 1) {
-    num_threads_ = omp_get_max_threads();
-  }
-  num_threads_ = std::max(num_threads_, 1);
+  // Set the number of threads based on user input
+  int num_threads_ = num_threads < 1 ? omp_get_max_threads() : std::max(num_threads, 1);
 
   // if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
   float* params = static_cast< float* >(parameters.request().ptr);
@@ -75,39 +72,6 @@ float trace_estimator_slq_py(
   return alg_wall_time; 
 }
 
-// template< std::floating_point DataType, Operator MatrixOp, std::invocable< DataType > Func > 
-// float call_trace(const MatrixOp* matrix, Func&& matrix_function, py::args& args){
-//   const py_arr_f parameters = args[0].cast< py_arr_f >(); 
-//   const size_t num_inqueries = args[1].cast< size_t >(); 
-//   const float exponent = args[2].cast< float >(); 
-//   const int orthogonalize = args[3].cast< int >(); 
-//   const float lanczos_degree = args[4].cast< float >(); 
-//   const float lanczos_tol = args[5].cast<float>();
-//   const size_t min_num_samples = args[6].cast<size_t>();
-//   const size_t max_num_samples = args[7].cast<size_t>();
-//   const float error_atol = args[8].cast<float>();
-//   const float error_rtol = args[9].cast<float>();
-//   const float confidence = args[10].cast<float>();
-//   const float outlier = args[11].cast<float>();
-//   const int num_threads = args[12].cast<int>();
-//   py_arr_f trace = args[13].cast< py_arr_f >();
-//   py_arr_f error = args[14].cast< py_arr_f >();
-//   py_arr_f samples = args[15].cast< py_arr_f>();
-//   py::array_t<int> processed_samples_indices = args[16].cast<py::array_t<int>>();
-//   py::array_t<int> num_samples_used = args[17].cast<py::array_t<int>>();
-//   py::array_t<int> num_outliers = args[18].cast<py::array_t<int>>();
-//   py::array_t<int> converged = args[19].cast<py::array_t<int>>();
-//   float alg_time = trace_estimator_slq_py< float >(
-//     matrix, matrix_function, 
-//     parameters, num_inqueries, 
-//     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
-//     error_atol, error_rtol, confidence, outlier, 
-//     num_threads, 
-//     trace, error, samples, processed_samples_indices, num_samples_used, num_outliers, converged
-//   );
-//   return alg_time; 
-// }
-
 #define TRACE_ARG_DEFS \
   const py_arr_f& parameters, const size_t num_inqueries, \
   const float exponent, const int orthogonalize, const size_t lanczos_degree, const float lanczos_tol, const size_t min_num_samples, const size_t max_num_samples, \
@@ -130,6 +94,27 @@ float trace_eigen_identity(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS
   B.setIdentity();
   const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
   const auto matrix_function = [](float eigenvalue) -> float { return eigenvalue; }; 
+  float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
+  return alg_time; 
+}
+
+float trace_eigen_sqrt(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS) {
+  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
+  B.setIdentity();
+  const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
+  const auto matrix_function = [](float eigenvalue) -> float { return std::sqrt(eigenvalue); }; 
+  float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
+  return alg_time; 
+}
+
+float trace_eigen_smoothstep(const Eigen::SparseMatrix< float >* A, const float a, const float b, TRACE_ARG_DEFS) {
+  float d = (b-a);
+  const auto matrix_function = [a, d](float eigenvalue) -> float { 
+    return std::min(std::max((eigenvalue-a)/d, 0.0f), 1.0f); 
+  }; 
+  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
+  B.setIdentity();
+  const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
   float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
   return alg_time; 
 }
@@ -238,6 +223,8 @@ void parallel_computation(py::array_t<double>& result_array, int num_threads) {
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
   m.def("trace_estimator_slq", &trace_estimator_slq_py2);
-  m.def("trace_eigen_identity", &trace_eigen_identity, py::call_guard<py::gil_scoped_release>());
+  m.def("trace_eigen_identity", &trace_eigen_identity);
+  m.def("trace_eigen_sqrt", &trace_eigen_sqrt);
+  m.def("trace_eigen_smoothstep", &trace_eigen_smoothstep);
   m.def("parallel_computation", &parallel_computation, "Perform parallel computation using OpenMP");
 };
