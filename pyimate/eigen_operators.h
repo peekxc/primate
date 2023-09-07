@@ -29,7 +29,7 @@ struct SparseEigenAffineOperator {
   
   const Eigen::SparseMatrix< F > A;  
   const Eigen::SparseMatrix< F > B;  
-  std::vector< F > _params; 
+  mutable std::vector< F > _params; 
 
   SparseEigenAffineOperator(
     const Eigen::SparseMatrix< F >& _A,
@@ -41,7 +41,7 @@ struct SparseEigenAffineOperator {
 
   // Or possibly: https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html
   // TODO: use aliasing to avoid the copies, see: https://eigen.tuxfamily.org/dox/group__TutorialMatrixArithmetic.html
-  void matvec(const F* inp, F* out){
+  void matvec(const F* inp, F* out) const {
     auto input = Eigen::VectorXf(A.cols());
     std::copy(inp, inp + A.cols(), input.begin());  
     auto output = A * input;
@@ -49,15 +49,15 @@ struct SparseEigenAffineOperator {
     // output.noalias() += mat * input;
   }
 
-  auto shape() -> std::pair< size_t, size_t > {
+  auto shape() const -> std::pair< size_t, size_t > {
     return std::make_pair((size_t) A.rows(), (size_t) A.cols());
   }
 
-  void set_parameters(F* params){
+  void set_parameters(F* params) const {
     std::copy(params, params + _params.size(), _params.begin());
   }
 
-  auto get_num_parameters() -> size_t {
+  auto get_num_parameters() const -> size_t {
     return _params.size();
   }
 

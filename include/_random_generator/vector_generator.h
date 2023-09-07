@@ -15,7 +15,8 @@
 #include <random>   // uniform_random_bit_generator
 #include "random_concepts.h" // ThreadSafeRBG
 #include <omp.h>  // omp_set_num_threads, omp_get_thread_num
-#include <stdint.h>  // uint64_t
+#include <cstdint>  // uint64_t
+#include <bitset>
 
 template < typename DataType >
 struct VectorGenerator {

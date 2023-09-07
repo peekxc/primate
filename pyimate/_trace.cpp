@@ -1,39 +1,20 @@
 #include <pybind11/pybind11.h>
 
-#include "eigen_operators.h"
+#include <_linear_operator/linear_operator.h>
 #include <_definitions/types.h>
+#include <_definitions/definitions.h>
 #include <_trace_estimator/trace_estimator.h>
-// #include <_functions/functions.h>
-#include <_diagonalization/lanczos_tridiagonalization.h>
-
+#include "eigen_operators.h"
 
 namespace py = pybind11;
 using py_arr_f = py::array_t< float >;
-// class SmoothStepEps : public Function {
-//   public:
-//     SmoothStepEps(){
-//       eps = 0; 
-//     }
-//     virtual float function(const float lambda_) const {
-//       return 0;
-//     };
-//     virtual double function(const double lambda_) const {
-//       return 0;
-//     }
-//     virtual long double function(const long double lambda_) const {
-//       return 0;
-//     }
-//     double eps;
-// };
+using namespace pybind11::literals;
 
-
-// int apply_smoothstep(int i, int j) {
-//   auto S = SmoothStepEps();
-//   return i + j;
-// }
-
+// For passing by reference, see: https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#pass-by-reference
+template< std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
 float trace_estimator_slq_py(
-  const Eigen::SparseMatrix< float >* matrix, 
+  const Matrix* matrix, 
+  Func&& matrix_function, 
   const py_arr_f& parameters, 
   const size_t num_inqueries,
   const float exponent, 
@@ -63,7 +44,6 @@ float trace_estimator_slq_py(
 
   // if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
   float* params = static_cast< float* >(parameters.request().ptr);
-  auto matrix_function = [](float eigenvalue) -> float { return eigenvalue; }; 
   float* trace_out = static_cast< float* >(trace.request().ptr); 
   float* error_out = static_cast< float* >(error.request().ptr); 
   int* processed_samples_indices_out = static_cast< int* >(processed_samples_indices.request().ptr); 
@@ -83,11 +63,8 @@ float trace_estimator_slq_py(
   }
 
   // TODO: add parameters, allow arbitrary B
-  auto B = Eigen::SparseMatrix< float >(matrix->rows(), matrix->cols());
-  B.setIdentity();
-  auto lo = SparseEigenAffineOperator(*matrix, B, 0.0);
   trace_estimator< false, float >(
-    &lo, params, num_inqueries, matrix_function, 
+    matrix, params, num_inqueries, matrix_function, 
     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
     error_atol, error_rtol, confidence, outlier, 
     num_threads_, 
@@ -99,7 +76,55 @@ float trace_estimator_slq_py(
   return alg_wall_time; 
 }
 
+template< std::floating_point DataType, Operator MatrixOp, std::invocable< DataType > Func > 
+float call_trace(const MatrixOp* matrix, Func&& matrix_function, const py::args& args){
+  const py_arr_f parameters = args[0].cast< py_arr_f >(); 
+  const size_t num_inqueries = args[1].cast< size_t >(); 
+  const float exponent = args[2].cast< float >(); 
+  const int orthogonalize = args[3].cast< int >(); 
+  const float lanczos_degree = args[4].cast< float >(); 
+  const float lanczos_tol = args[5].cast<float>();
+  const size_t min_num_samples = args[6].cast<size_t>();
+  const size_t max_num_samples = args[7].cast<size_t>();
+  const float error_atol = args[8].cast<float>();
+  const float error_rtol = args[9].cast<float>();
+  const float confidence = args[10].cast<float>();
+  const float outlier = args[11].cast<float>();
+  const int num_threads = args[12].cast<int>();
+  py_arr_f trace = args[13].cast<py_arr_f>();
+  py_arr_f error = args[14].cast<py_arr_f>();
+  py_arr_f samples = args[15].cast<py_arr_f>();
+  py::array_t<int> processed_samples_indices = args[16].cast<py::array_t<int>>();
+  py::array_t<int> num_samples_used = args[17].cast<py::array_t<int>>();
+  py::array_t<int> num_outliers = args[18].cast<py::array_t<int>>();
+  py::array_t<int> converged = args[19].cast<py::array_t<int>>();
+
+  // Make the call -- at this point the gil should be released
+  float alg_time = trace_estimator_slq_py< float >(
+    matrix, matrix_function, 
+    parameters, num_inqueries, 
+    exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
+    error_atol, error_rtol, confidence, outlier, 
+    num_threads, 
+    trace, error, samples, processed_samples_indices, num_samples_used, num_outliers, converged
+  );
+  return alg_time; 
+}
+
+// template < typename ...Params>
+// Params&&... params
+// std::forward<Params>(params)...
+float trace_eigen_identity(const Eigen::SparseMatrix< float >* A, const py::args& args) {
+  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
+  B.setIdentity();
+  const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
+  const auto matrix_function = [](float eigenvalue) -> float { return eigenvalue; }; 
+  float alg_time = call_trace< float >(&lo, matrix_function, args);
+  return alg_time; 
+}
+
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  m.def("trace_estimator_slq", &trace_estimator_slq_py);
+  // m.def("trace_estimator_slq", &trace_estimator_slq_py, py::call_guard<py::gil_scoped_release>());
+  m.def("trace_eigen_identity", &trace_eigen_identity, py::call_guard<py::gil_scoped_release>());  
 };

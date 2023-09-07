@@ -84,8 +84,8 @@ void rademacher_xs(py::array_t< float, py::array::c_style> out, const IndexType 
 PYBIND11_MODULE(_random_generator, m) {
   // m.def("rademacher_xoshiro256", &rademacher_xoshiro256);
   // m.def("rademacher_pcg", &rademacher_pcg);
-  m.def("rademacher_mt", &rademacher_mt);
-  m.def("rademacher_sx", &rademacher_sx);
-  m.def("rademacher_xs", &rademacher_xs);
+  m.def("rademacher_mt", &rademacher_mt, py::call_guard<py::gil_scoped_release>());
+  m.def("rademacher_sx", &rademacher_sx, py::call_guard<py::gil_scoped_release>());
+  m.def("rademacher_xs", &rademacher_xs, py::call_guard<py::gil_scoped_release>());
   // m.def("rademacher", &rademacher, py::call_guard<py::gil_scoped_release>());
 }

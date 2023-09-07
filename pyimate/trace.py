@@ -81,7 +81,7 @@ def trace_estimator(
     # alg_wall_times = np.zeros((1, ), dtype=float)
 
     ## The final call
-    alg_wall_time = _trace.trace_estimator_slq(
+    alg_wall_time = _trace.trace_eigen_identity(
       A, parameters, num_inquiries,
       p, orthogonalize, lanczos_degree, lanczos_tol, 
       min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
