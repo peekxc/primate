@@ -51,7 +51,6 @@ struct ThreadedRNG64 {
         std::uint_fast32_t seed_data[RNE::state_size];
         for (int i = 0; i < num_threads; ++i) {
             std::generate_n(seed_data, RNE::state_size, std::ref(rd)); // generate evenly-distributed 32-bit seeds
-            // seed_gen.generate(std::begin(seed_data), std::end(seed_data));
             std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
             generators[i].seed(seed_gen);
         }

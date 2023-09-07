@@ -75,8 +75,7 @@ static void generate_array(
     // But if we call it inside a #pragma omp parallel, it gives the newer
     // thread id that is "created" by the pragma.
     int thread_id = 0;
-    if (num_threads == 0)
-    {
+    if (num_threads == 0) {
         // If num_threads is zero (which means we will not create a new thread
         // in this function), we get the thread id of the parent function.
         thread_id = omp_get_thread_num();

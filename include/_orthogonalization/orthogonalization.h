@@ -356,7 +356,7 @@ static void orthogonalize_vectors(
                 if (distance < 2.0 * epsilon * sqrt(vector_size))
                 {
                     // Regenerate new random vector for i-th vector
-                    VectorGenerator<DataType>::generate_random_array(
+                    VectorGenerator<DataType>::generate_array(
                             random_number_generator, &vectors[i*vector_size],
                             vector_size, num_threads
                     );
@@ -382,7 +382,7 @@ static void orthogonalize_vectors(
             if (norm_i < epsilon * sqrt(vector_size))
             {
                 // Regenerate new random vector for i-th vector
-                VectorGenerator<DataType>::generate_random_array(
+                VectorGenerator<DataType>::generate_array(
                         random_number_generator, &vectors[i*vector_size],
                         vector_size, num_threads
                 );
