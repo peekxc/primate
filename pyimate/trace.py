@@ -48,6 +48,9 @@ def trace_estimator(
     """
     assert isinstance(A, spmatrix), "A must be a sparse matrix, for now."
 
+    # pybind11 GIL support is terribly documented so we always run 1 thread for now
+    num_threads = 1
+
     # Check operator A, and convert to a linear operator (if not already)
     # Aop = get_operator(A)
     i_dtype, f_dtype = np.int32, np.float32 
@@ -80,8 +83,8 @@ def trace_estimator(
     converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
     # alg_wall_times = np.zeros((1, ), dtype=float)
 
-    ## The final call
-    alg_wall_time = _trace.trace_eigen_identity(
+    ## The final call; 
+    alg_wall_time = _trace.trace_estimator_slq( # trace_eigen_identity
       A, parameters, num_inquiries,
       p, orthogonalize, lanczos_degree, lanczos_tol, 
       min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
