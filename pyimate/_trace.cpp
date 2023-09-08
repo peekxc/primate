@@ -4,6 +4,7 @@
 #include <_definitions/types.h>
 #include <_definitions/definitions.h>
 #include <_trace_estimator/trace_estimator.h>
+#include <_timer/timer.h>
 #include "eigen_operators.h"
 
 namespace py = pybind11;
@@ -58,7 +59,6 @@ float trace_estimator_slq_py(
   for (ssize_t i = 0; i < s_rows; ++i) {
     samples_out[i] = samples_ptr + i * s_cols;
   }
-
   trace_estimator< false, float >(
     matrix, params, num_inqueries, matrix_function, 
     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
@@ -90,6 +90,7 @@ float trace_estimator_slq_py(
 
 
 float trace_eigen_identity(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS) {
+
   auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
   B.setIdentity();
   const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
