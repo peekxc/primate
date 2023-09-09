@@ -182,7 +182,7 @@
     template< bool gramian, std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
     FlagType trace_estimator(
             Matrix* A,
-            DataType* parameters,
+            const DataType* parameters,
             const IndexType num_inquiries,
             Func&& matrix_function,
             const DataType exponent,
@@ -397,7 +397,7 @@
     template < bool gramian, std::floating_point DataType, AffineOperator Matrix, std::invocable< DataType > Func, ThreadSafeRBG RBG >
     void stochastic_lanczos_quadrature(
         Matrix* A,
-        DataType* parameters,
+        const DataType* parameters,
         const IndexType num_inquiries,
         Func&& matrix_function,
         const DataType exponent,

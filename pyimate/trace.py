@@ -38,7 +38,7 @@ def trace_estimator(
   num_threads: int = 0,
   verbose: bool = False,
   plot: bool = False, 
-  info: bool = False, 
+  return_info: bool = False, 
   **kwargs
 ):
     """
@@ -113,7 +113,7 @@ def trace_estimator(
     sparse = None if matrix_density is None else matrix_density <= 0.50
 
     # Dictionary of output info
-    if not(info): return trace
+    if not(return_info): return trace
     info = {
         'matrix':
         {
