@@ -447,19 +447,13 @@
         IndexType i;
         IndexType j;
         DataType** theta = new DataType*[num_inquiries];
-        for (j=0; j < num_inquiries; ++j) {
-            theta[j] = new DataType[lanczos_degree];
-            for (i=0; i < lanczos_degree; ++i) {
-                theta[j][i] = 0.0;  // Initialize components to zero
-            }
-        }
-
-        // Allocate and initialize tau
         DataType** tau = new DataType*[num_inquiries];
         for (j=0; j < num_inquiries; ++j) {
+            theta[j] = new DataType[lanczos_degree];
             tau[j] = new DataType[lanczos_degree];
             for (i=0; i < lanczos_degree; ++i) {
-                tau[j][i] = 0.0;   // Initialize components to zero
+                theta[j][i] = 0.0;  
+                tau[j][i] = 0.0;   
             }
         }
 
@@ -473,19 +467,20 @@
         IndexType num_parameters = A->get_num_parameters();
         // IndexType num_parameters = A->parameters.size();
 
-        // Lanczos iterations, computes theta and tau for each inquiry parameter
-        for (j=0; j < required_num_inquiries; ++j) {
-            // If trace is already converged, do not compute on the new sample.
-            // However, exclude the case where required_num_inquiries is not the
-            // same as num_inquiries, since in this case, we compute one inquiry
-            // for multiple parameters.
-            if ((converged[j] == 1) && (required_num_inquiries == num_inquiries)) {
-                continue; // MJP: why isn't this a break?
-            }
+        if constexpr (gramian) {
+            // Lanczos iterations for gramian, computes theta and tau for each inquiry parameter
+            for (j=0; j < required_num_inquiries; ++j) {
+                // If trace is already converged, do not compute on the new sample.
+                // However, exclude the case where required_num_inquiries is not the
+                // same as num_inquiries, since in this case, we compute one inquiry
+                // for multiple parameters.
+                if ((converged[j] == 1) && (required_num_inquiries == num_inquiries)) {
+                    continue; // MJP: why isn't this a break?
+                }
 
-            // Set parameter of linear operator A
-            A->set_parameters(&parameters[j*num_parameters]);
-            if constexpr (gramian) {
+                // Set parameter of linear operator A
+                A->set_parameters(&parameters[j*num_parameters]);
+
                 // Use Golub-Kahn-Lanczos Bi-diagonalization
                 lanczos_size[j] = golub_kahn_bidiagonalization(
                     A, random_vector, matrix_size, lanczos_degree, lanczos_tol,
@@ -507,18 +502,20 @@
                     theta[j][i] = alpha[i] * alpha[i];
                     tau[j][i] = right_singularvectors_transposed[i];
                 }
-            } else {
-                // Use Lanczos Tri-diagonalization
+            }
+        } else {
+            // Allocate eigenvectors matrix (1D array with Fortran ordering)
+            // MJP: Moved eigenvector to a pre-allocation model of size (lanczos_degree * lanczos_degree) 
+            // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe
+            // eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
+            eigenvectors = new DataType[lanczos_degree * lanczos_degree];
+            for (j=0; j < required_num_inquiries; ++j) {
+                
+                // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
                 lanczos_size[j] = lanczos_tridiagonalization(
-                    A, random_vector, matrix_size, lanczos_degree, lanczos_tol,
-                    orthogonalize, alpha, beta
+                    A, random_vector, matrix_size, lanczos_degree, lanczos_tol, orthogonalize, 
+                    alpha, beta
                 );
-
-                // Allocate eigenvectors matrix (1D array with Fortran ordering)
-                // MJP: why is this allocated inside here?? why not re-use memory? 
-                // Could just allocate memory of size (lanczos_degree * lanczos_degree) which is thread-specific
-                // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe
-                eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
 
                 // Note: alpha is written in-place with eigenvalues
                 eigh_tridiagonal< DataType >(

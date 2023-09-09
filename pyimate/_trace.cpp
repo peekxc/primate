@@ -41,7 +41,7 @@ float trace_estimator_slq_py(
   int num_threads_ = num_threads < 1 ? omp_get_max_threads() : std::max(num_threads, 1);
 
   // if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
-  float* params = static_cast< float* >(parameters.request().ptr);
+  float* params = static_cast< float* >(parameters.request().ptr); // parameters.data(); 
   float* trace_out = static_cast< float* >(trace.request().ptr); 
   float* error_out = static_cast< float* >(error.request().ptr); 
   int* processed_samples_indices_out = static_cast< int* >(processed_samples_indices.request().ptr); 
@@ -59,6 +59,7 @@ float trace_estimator_slq_py(
   for (ssize_t i = 0; i < s_rows; ++i) {
     samples_out[i] = samples_ptr + i * s_cols;
   }
+  // omp_set_num_threads(num_threads);
   trace_estimator< false, float >(
     matrix, params, num_inqueries, matrix_function, 
     exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
@@ -90,7 +91,6 @@ float trace_estimator_slq_py(
 
 
 float trace_eigen_identity(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS) {
-
   auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
   B.setIdentity();
   const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
