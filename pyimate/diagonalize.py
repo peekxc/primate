@@ -18,3 +18,9 @@ def lanczos(A: Union[LinearOperator, spmatrix], v0: Optional[np.ndarray] = None,
     return T
   else:
     return alpha, beta
+
+
+# import numpy as np 
+# def eigh_tridiagonal(alphas: numpy.ndarray, betas: np.ndarray, V: np.ndarray):
+#   _diagonalize.eigh_tridiagonal(alphas, betas, V)
+#   return V

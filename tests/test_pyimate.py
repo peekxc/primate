@@ -10,9 +10,9 @@ def test_blas():
 
 def test_trace_estimator():
   import imate
-  from pyimate.trace import trace_estimator
+  from pyimate.trace import slq
   T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19))
-  tr_est, info = trace_estimator(T, orthogonalize=20, confidence_level=0.99, error_atol=0.0, error_rtol=1e-2, min_num_samples=150, max_num_samples=200)
+  tr_est = slq(T, orthogonalize=20, confidence_level=0.99, error_atol=0.0, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
   print(f"True: {np.sum(T.diagonal()):.8f}, Est: {np.mean(tr_est):.8f}")
   
   info['convergence']['samples'].mean(axis=1)

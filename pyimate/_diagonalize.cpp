@@ -12,7 +12,7 @@
 #include "eigen_operators.h"
 namespace py = pybind11;
 
-// using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >;
+using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >;
 
 void eigh_tridiagonal_py(const py_arr_f& diagonals, const py_arr_f& subdiagonals, py_arr_f& eigenvectors){
   auto* diagonals_ = static_cast< float *>(diagonals.request().ptr);
@@ -89,21 +89,6 @@ IndexType golub_kahan_bidiagonalize_py(PyAdjointOperator< float >* op, const py_
   return 0; 
 }
 
-// void test_lanczos(py::array_t< float > d, py::array_t< float > v, const float tol, const int orth, py_arr_f& alpha, py_arr_f& beta){
-//   // auto buffer = d.request();
-//   auto n = static_cast< long int >(d.shape(0)); 
-//   // auto m = static_cast< int >(d.shape(1));
-//   const size_t n_elems = static_cast< size_t >(n);
-//   std::vector< float > diag_(d.data(), d.data() + n_elems);
-//   auto op = DiagonalOperator(diag_);
-//   // auto alpha_out = std::vector< float >(n, 0.0);
-//   // auto beta_out = std::vector< float >(n, 0.0);
-//   auto alpha_out = static_cast< float* >(alpha.request().ptr);
-//   auto beta_out = static_cast< float* >(beta.request().ptr);
-//   lanczos_tridiagonalization< DiagonalOperator, float >(&op, v.data(), n, n, tol, orth, alpha_out, beta_out);
-// }
-
-
 // Also for variable binding: https://pybind11.readthedocs.io/en/stable/advanced/functions.html#binding-functions-with-template-parameters
 // See virtual overriding: https://pybind11.readthedocs.io/en/stable/advanced/classes.html#overriding-virtual-functions-in-python
 PYBIND11_MODULE(_diagonalize, m) {
@@ -120,5 +105,4 @@ PYBIND11_MODULE(_diagonalize, m) {
     const auto lo = PyLinearOperator< float >(op); // attempt to wrap
     lanczos_tridiagonalize_api(&lo, v, lanczos_tol, orthogonalize, alpha, beta);
   });
-  // m.def("test_lanczos", &test_lanczos);
 }

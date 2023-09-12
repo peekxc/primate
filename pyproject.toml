@@ -4,7 +4,7 @@ requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "ima
 
 [project]
 name = "pyimate"
-version = '0.0.6'
+version = '0.0.7'
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",
@@ -22,10 +22,10 @@ dependencies = [
   "imate"
 ]
 license = {file = "LICENSE"}
-# include = [
-# 	{ path = "pyimate/**/*.so", format = "wheel" },
-# 	{ path = "pyimate/**/*.pyd", format = "wheel" },
-# ]
+include = [
+	{ path = "pyimate/**/*.so", format = "wheel" },
+	# { path = "pyimate/**/*.pyd", format = "wheel" },
+]
 
-[tool.meson-python.args]
-setup = ['--default-library=static']
+# [tool.meson-python.args]
+# setup = ['--default-library=static']

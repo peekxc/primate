@@ -6,7 +6,7 @@ foreach ext: extensions
   py.extension_module(
     ext,
     ext + '.cpp',
-    include_directories: [inc_pkg, inc_imate, incdir_numpy, inc_pybind11, inc_eigen],
+    include_directories: [inc_pkg, incdir_numpy, inc_pybind11, inc_eigen],
     dependencies: [lapack, blas, omp],
     install: true, 
     cpp_args: _cpp_args
@@ -26,5 +26,3 @@ py.install_sources(
   subdir: 'pyimate', 
   pure: false                              # Will be installed next to binaries
 )
-
-subdir('functions')

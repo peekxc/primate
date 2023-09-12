@@ -6,13 +6,13 @@
 #include <vector> 
 #include <algorithm>
 #include <functional>
+#include <_c_basic_algebra/c_matrix_operations.h>  // cMatrixOperations
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 namespace py = pybind11;
 
-using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >;
 using std::vector; 
 using std::pair; 
 
@@ -57,7 +57,6 @@ struct PyDiagonalOperator {
   }
 };
 
-#include <_c_basic_algebra/c_matrix_operations.h>  // cMatrixOperations
 template< typename F = float > 
 struct PyDenseMatrix {
   py::array_t< F, py::array::c_style | py::array::forcecast > _data; 

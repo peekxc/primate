@@ -33,18 +33,19 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-unused-function',
   '-Wno-conversion',
   '-Wno-misleading-indentation',
-  '-std=c++20'
+  '-std=c++20', 
+  '-fPIC'
 )
 
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
-incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
+# incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
 
 ## Header includes
 inc_np = include_directories(incdir_numpy)
 inc_pybind11 = include_directories('extern' / 'pybind11' / 'include')
 inc_eigen = include_directories('extern' / 'eigen')
-inc_imate = include_directories(incdir_imate)
+# inc_imate = include_directories(incdir_imate)
 inc_pkg = include_directories('include')
 
 ## Add dependencies, if they are available
@@ -177,17 +178,17 @@ dependency_map = {
 }
 
 ## Dependencies information
-foreach name, dep : dependency_map
-  message(name + '_NAME', dep.name())
-  message(name + '_FOUND', dep.found())
-  if dep.found()
-    message(name + '_VERSION', dep.version())
-    message(name + '_TYPE_NAME', dep.type_name())
-    message(name + '_INCLUDEDIR', dep.get_variable('includedir', default_value: 'unknown'))
-    message(name + '_LIBDIR', dep.get_variable('libdir', default_value: 'unknown'))
-    message(name + '_PCFILEDIR', dep.get_variable('pcfiledir', default_value: 'unknown'))
-  endif
-endforeach
+# foreach name, dep : dependency_map
+#   message(name + '_NAME', dep.name())
+#   message(name + '_FOUND', dep.found())
+#   if dep.found()
+#     message(name + '_VERSION', dep.version())
+#     message(name + '_TYPE_NAME', dep.type_name())
+#     message(name + '_INCLUDEDIR', dep.get_variable('includedir', default_value: 'unknown'))
+#     message(name + '_LIBDIR', dep.get_variable('libdir', default_value: 'unknown'))
+#     message(name + '_PCFILEDIR', dep.get_variable('pcfiledir', default_value: 'unknown'))
+#   endif
+# endforeach
 
 ## Compile the package directory
 subdir('pyimate')

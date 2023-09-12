@@ -24,7 +24,6 @@ void gram_schmidt (
   cOrthogonalization< float >::gram_schmidt_process(V_data, vector_size, num_vectors, last_vector, num_ortho, v_data);
 }
 
-
 void orthogonalize_vectors (py_arr_f& V){
   float* V_data = static_cast< float* >(V.request().ptr);
   LongIndexType num_vectors = static_cast< LongIndexType >(V.shape(0));

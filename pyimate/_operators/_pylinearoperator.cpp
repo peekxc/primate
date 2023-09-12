@@ -18,6 +18,5 @@ PYBIND11_MODULE(_pylinearoperator, m) {
     .def("matvec", (py::array_t< float >(PyLinearOperator< float >::*)(const py::array_t< float >&) const) &PyLinearOperator< float >::matvec)
     .def_property_readonly("shape", &PyLinearOperator< float >::shape)
     .def_property_readonly("dtype", &PyLinearOperator< float >::dtype)
-    .def("lanczos", &lanczos_tridiagonalize_py)
     ;
 }

@@ -1,5 +1,7 @@
 #include <pybind11/pybind11.h>
 
+#include <omp.h> // omp_get_num_threads
+#include <cmath> // log, 
 #include <_linear_operator/linear_operator.h>
 #include <_definitions/types.h>
 #include <_definitions/definitions.h>
@@ -8,30 +10,29 @@
 #include "eigen_operators.h"
 
 namespace py = pybind11;
-using py_arr_f = py::array_t< float >;
 using namespace pybind11::literals;
 
 // For passing by reference, see: https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#pass-by-reference
-template< std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
-float trace_estimator_slq_py(
+template< std::floating_point F, Operator Matrix, std::invocable< F > Func > 
+F trace_estimator_slq_py(
   const Matrix* matrix, 
   Func&& matrix_function, 
-  const py_arr_f& parameters, 
+  const py::array_t< F >& parameters, 
   const size_t num_inqueries,
-  const float exponent, 
+  const F exponent, 
   const int orthogonalize, 
   const size_t lanczos_degree, 
-  const float lanczos_tol, 
+  const F lanczos_tol, 
   const size_t min_num_samples, 
   const size_t max_num_samples, 
-  const float error_atol, 
-  const float error_rtol,
-  const float confidence, 
-  const float outlier,
+  const F error_atol, 
+  const F error_rtol,
+  const F confidence, 
+  const F outlier,
   const int num_threads, 
-  py_arr_f& trace,
-  py_arr_f& error,
-  py_arr_f& samples,
+  py::array_t< F >& trace,
+  py::array_t< F >& error,
+  py::array_t< F >& samples,
   py::array_t< int >& processed_samples_indices,
   py::array_t< int >& num_samples_used,
   py::array_t< int >& num_outliers,
@@ -41,29 +42,29 @@ float trace_estimator_slq_py(
   const int num_threads_ = num_threads < 1 ? omp_get_max_threads() : std::max(num_threads, 1);
 
   // if (gramian){ throw std::invalid_argument("Gramian not available yet."); }
-  const float* params = parameters.data(); // static_cast< float* >(parameters.request().ptr); // 
-  float* trace_out = static_cast< float* >(trace.request().ptr); 
-  float* error_out = static_cast< float* >(error.request().ptr); 
+  const F* params = parameters.data(); // static_cast< float* >(parameters.request().ptr); // 
+  F* trace_out = static_cast< F* >(trace.request().ptr); 
+  F* error_out = static_cast< F* >(error.request().ptr); 
   int* processed_samples_indices_out = static_cast< int* >(processed_samples_indices.request().ptr); 
   int* num_samples_used_out = static_cast< int* >(num_samples_used.request().ptr); 
   int* num_outliers_out = static_cast< int* >(num_outliers.request().ptr); 
   int* converged_out = static_cast< int* >(converged.request().ptr); 
-  float alg_wall_time = 0.0; 
+  F alg_wall_time = 0.0; 
 
   // Convert samples 2d array 
   py::buffer_info samples_buffer = samples.request();
-  float* samples_ptr = static_cast< float* >(samples_buffer.ptr);   
+  F* samples_ptr = static_cast< F* >(samples_buffer.ptr);   
   ssize_t s_rows = samples.shape(0);
   ssize_t s_cols = samples.shape(1);
-  float** samples_out = new float*[s_rows];
+  F** samples_out = new F*[s_rows];
   for (ssize_t i = 0; i < s_rows; ++i) {
     samples_out[i] = samples_ptr + i * s_cols;
   }
   
   // Call the trace estimators
   {
-    py::gil_scoped_release gil_release; // this is safe, but doesn't appear to be necessary
-    trace_estimator< false, float >(
+    // py::gil_scoped_release gil_release; // this is safe, but doesn't appear to be necessary
+    trace_estimator< false, F >(
       matrix, params, num_inqueries, matrix_function, 
       exponent, orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, 
       error_atol, error_rtol, confidence, outlier, 
@@ -77,12 +78,12 @@ float trace_estimator_slq_py(
   return alg_wall_time; 
 }
 
-#define TRACE_ARG_DEFS \
-  const py_arr_f& parameters, const size_t num_inqueries, \
-  const float exponent, const int orthogonalize, const size_t lanczos_degree, const float lanczos_tol, const size_t min_num_samples, const size_t max_num_samples, \
-  const float error_atol,  const float error_rtol, const float confidence, const float outlier, \
+#define TRACE_PARAMS \
+  const py::array_t< F >& parameters, const size_t num_inqueries, \
+  const F exponent, const int orthogonalize, const size_t lanczos_degree, const F lanczos_tol, const size_t min_num_samples, const size_t max_num_samples, \
+  const F error_atol,  const F error_rtol, const F confidence, const F outlier, \
   const int num_threads, \
-  py_arr_f& trace, py_arr_f& error, py_arr_f& samples, \
+  py::array_t< F >& trace, py::array_t< F >& error, py::array_t< F >& samples, \
   py::array_t< int >& processed_samples_indices, py::array_t< int >& num_samples_used, py::array_t< int >& num_outliers, py::array_t< int >& converged
 
 #define TRACE_ARGS \
@@ -93,70 +94,68 @@ float trace_estimator_slq_py(
   trace, error, samples, \
   processed_samples_indices, num_samples_used, num_outliers, converged
 
-
-float trace_eigen_identity(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS) {
-  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
+template< std::floating_point F = float, std::invocable< F > MatrixFunc >
+auto trace_eigen(const Eigen::SparseMatrix< F >* A, MatrixFunc&& f, TRACE_PARAMS) -> F {
+  auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
   B.setIdentity();
   const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
-  const auto matrix_function = [](float eigenvalue) -> float { return eigenvalue; }; 
-  float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
+  F alg_time = trace_estimator_slq_py< F >(&lo, f, TRACE_ARGS);
   return alg_time; 
 }
 
-float trace_eigen_sqrt(const Eigen::SparseMatrix< float >* A, TRACE_ARG_DEFS) {
-  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
-  B.setIdentity();
-  const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
-  const auto matrix_function = [](float eigenvalue) -> float { return std::sqrt(eigenvalue); }; 
-  float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
-  return alg_time; 
-}
-
-float trace_eigen_smoothstep(const Eigen::SparseMatrix< float >* A, const float a, const float b, TRACE_ARG_DEFS) {
-  float d = (b-a);
-  const auto matrix_function = [a, d](float eigenvalue) -> float { 
-    return std::min(std::max((eigenvalue-a)/d, 0.0f), 1.0f); 
-  }; 
-  auto B = Eigen::SparseMatrix< float >(A->rows(), A->cols());
-  B.setIdentity();
-  const auto lo = SparseEigenAffineOperator(*A, B, 0.0);
-  float alg_time = trace_estimator_slq_py< float >(&lo, matrix_function, TRACE_ARGS);
-  return alg_time; 
-}
-
-
-// Parallel computation for testing
-void parallel_computation(py::array_t<double>& result_array, int num_threads) {
-  int num_threads_ = num_threads;
-  if (num_threads_ < 1) {
-    num_threads_ = omp_get_max_threads();
-  }
-  num_threads_ = std::max(num_threads_, 1);
-  omp_set_num_threads(num_threads);
-
-  // Get a pointer to the underlying data of the NumPy array
-  auto result_ptr = static_cast< double* >(result_array.request().ptr);
-
-  // Get the size of the result array
-  size_t size = result_array.size();
-
-  // Release the GIL before parallel computation
-  {
-      py::gil_scoped_release gil_release;
-
-      // Parallel computation using OpenMP
-      #pragma omp parallel for
-      for (size_t i = 0; i < size; ++i) {
-          result_ptr[i] = i * 2.0;
-      }
-  }
+// See: https://stackoverflow.com/questions/67071795/calling-parallel-c-code-in-python-using-pybind11
+template< std::floating_point F >
+void eigen_trace(py::module &m){
+  m.def("trace_eigen_identity", [](const Eigen::SparseMatrix< F >* A, TRACE_PARAMS){
+    const auto f = std::identity(); //[](F eigenvalue) -> F { return eigenvalue; }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_smoothstep", [](const Eigen::SparseMatrix< F >* A, const F a, const F b, TRACE_PARAMS){
+    const F d = (b-a);
+    const auto f = [a, d](F eigenvalue) -> F { 
+      return std::min(std::max((eigenvalue-a)/d, F(0.0)), F(1.0)); 
+    }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_sqrt", [](const Eigen::SparseMatrix< F >* A, TRACE_PARAMS){
+    const auto f = [](F eigenvalue) -> F {  return std::sqrt(eigenvalue); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_inv", [](const Eigen::SparseMatrix< F >* A, TRACE_PARAMS){
+    const auto f = [](F eigenvalue) -> F {  return (F(1.0)/eigenvalue); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_log", [](const Eigen::SparseMatrix< F >* A, TRACE_PARAMS){
+    const auto f = [](F eigenvalue) -> F {  return std::log(eigenvalue); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_exp", [](const Eigen::SparseMatrix< F >* A, TRACE_PARAMS){
+    const auto f = [](F eigenvalue) -> F {  return std::exp(eigenvalue); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_pow", [](const Eigen::SparseMatrix< F >* A, const F p, TRACE_PARAMS){
+    const auto f = [p](F eigenvalue) -> F {  return std::pow(eigenvalue, p); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_gaussian", [](const Eigen::SparseMatrix< F >* A, const F mu, const F sigma, TRACE_PARAMS){
+    const auto f = [mu, sigma](F eigenvalue) -> F {  
+      auto x = (eigenvalue - mu) / sigma;
+      return (0.5 * M_SQRT1_2 * M_2_SQRTPI / sigma) * exp(-0.5 * x * x); 
+    }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
+  m.def("trace_eigen_numrank", [](const Eigen::SparseMatrix< F >* A, const F threshold, TRACE_PARAMS){
+    const auto f = [threshold](F eigenvalue) -> F {  
+      return eigenvalue > threshold ? F(1.0) : F(0.0);
+    }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
 }
 
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  m.def("trace_eigen_identity", &trace_eigen_identity);
-  m.def("trace_eigen_sqrt", &trace_eigen_sqrt);
-  m.def("trace_eigen_smoothstep", &trace_eigen_smoothstep);
-  m.def("parallel_computation", &parallel_computation);
+  eigen_trace< float >(m);
+  eigen_trace< double >(m);
+  eigen_trace< long double >(m);
 };

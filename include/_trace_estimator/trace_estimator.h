@@ -203,7 +203,7 @@
             IndexType* num_samples_used,
             IndexType* num_outliers,
             FlagType* converged,
-            float& alg_wall_time)
+            DataType& alg_wall_time)
     {
         IndexType matrix_size = static_cast< std::pair< size_t, size_t > >(A->shape()).first;
 

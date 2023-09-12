@@ -31,7 +31,8 @@ namespace py = pybind11;
 //   VectorGenerator< float >::generate_array(rbg, data, array_sz, num_threads); 
 // }
 
-void rademacher_mt(py::array_t< float, py::array::c_style> out, const IndexType num_threads = 1){
+// By not by reference?
+void rademacher_mt(py::array_t< float, py::array::c_style >& out, const IndexType num_threads = 1){
   // pcg_extras::seed_seq_from< std::random_device > seed_source;
   // std::mt19937_64 rng(seed_source);
   auto rbg = ThreadedRNG64< std::mt19937_64 >(num_threads);
@@ -40,14 +41,14 @@ void rademacher_mt(py::array_t< float, py::array::c_style> out, const IndexType 
   VectorGenerator< float >::generate_array(rbg, data, array_sz, num_threads); 
 }
 
-void rademacher_sx(py::array_t< float, py::array::c_style> out, const IndexType num_threads = 1){
+void rademacher_sx(py::array_t< float, py::array::c_style >& out, const IndexType num_threads = 1){
   auto rbg = ThreadedRNG64< SplitMix64 >(num_threads);
   auto* data = static_cast< float *>(out.request().ptr);
   auto array_sz = static_cast< LongIndexType >(out.size());
   VectorGenerator< float >::generate_array(rbg, data, array_sz, num_threads); 
 }
 
-void rademacher_xs(py::array_t< float, py::array::c_style> out, const IndexType num_threads = 1){
+void rademacher_xs(py::array_t< float, py::array::c_style >& out, const IndexType num_threads = 1){
   auto rbg = ThreadedRNG64< Xoshiro256StarStar >(num_threads);
   auto* data = static_cast< float *>(out.request().ptr);
   auto array_sz = static_cast< LongIndexType >(out.size());
@@ -84,8 +85,8 @@ void rademacher_xs(py::array_t< float, py::array::c_style> out, const IndexType 
 PYBIND11_MODULE(_random_generator, m) {
   // m.def("rademacher_xoshiro256", &rademacher_xoshiro256);
   // m.def("rademacher_pcg", &rademacher_pcg);
-  m.def("rademacher_mt", &rademacher_mt, py::call_guard<py::gil_scoped_release>());
-  m.def("rademacher_sx", &rademacher_sx, py::call_guard<py::gil_scoped_release>());
-  m.def("rademacher_xs", &rademacher_xs, py::call_guard<py::gil_scoped_release>());
+  m.def("rademacher_mt", &rademacher_mt); // py::call_guard<py::gil_scoped_release>()
+  m.def("rademacher_sx", &rademacher_sx); // py::call_guard<py::gil_scoped_release>()
+  m.def("rademacher_xs", &rademacher_xs); //py::call_guard<py::gil_scoped_release>() 
   // m.def("rademacher", &rademacher, py::call_guard<py::gil_scoped_release>());
 }
