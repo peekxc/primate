@@ -54,7 +54,7 @@ def slq (
   assert isinstance(A, spmatrix), "A must be a sparse matrix, for now."
 
   # Since it's just unclear how to actually run simple openmp code with python 
-  num_threads = 1 
+  num_threads = 1 if (num_threads is None or num_threads == 0) else num_threads 
 
   # Check operator A, and convert to a linear operator (if not already)
   # Aop = get_operator(A)
