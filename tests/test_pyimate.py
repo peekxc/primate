@@ -13,11 +13,13 @@ def test_trace_estimator():
   from pyimate.trace import slq
   T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19))
   tr_est = slq(T, orthogonalize=20, confidence_level=0.99, error_atol=0.0, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
-  print(f"True: {np.sum(T.diagonal()):.8f}, Est: {np.mean(tr_est):.8f}")
+  tr_true = np.sum(T.diagonal())
+  assert np.isclose(np.float64(tr_est), tr_true, atol=50)
+  # print(f"True: {tr_true:.8f}, Est: {np.mean(tr_est):.8f}")
   
-  info['convergence']['samples'].mean(axis=1)
-  n_samples = int(info['convergence']['num_samples_used'])
-  np.cumsum(np.ravel(info['convergence']['samples']))/np.arange(1, n_samples+1)
+  # info['convergence']['samples'].mean(axis=1)
+  # n_samples = int(info['convergence']['num_samples_used'])
+  # np.cumsum(np.ravel(info['convergence']['samples']))/np.arange(1, n_samples+1)
   # imate.trace(T, method="slq")
   pass
 

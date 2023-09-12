@@ -37,6 +37,10 @@ _cpp_args = compiler.get_supported_arguments(
   '-fPIC'
 )
 
+## TODO: add sp.show_config()
+## or np.show_config()
+## or build with cmake...
+
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
 # incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
@@ -65,57 +69,76 @@ elif compiler.has_argument('-fopenmp')
     omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
     dependency_map += { 'OpenMP' : omp }
   endif
+else
+  message('NO OPENMP DETECTED; pyimate will be built for single-threaded only.')
 endif
 
 
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
 ## Otherwise BLAS must be linked and used
 env = environment()
-env.set('USE_CBLAS', '0') ## Turn off CBLAS
+# env.set('USE_CBLAS', '0') ## Turn off CBLAS
 
 ## Use SciPy-configured BLAS
-blas_incdir = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.blas_opt_info["include_dirs"]))'], check : true).stdout().strip()
-blas_libdirs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.blas_opt_info["library_dirs"]))'], check : true).stdout().strip()
-blas_libs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(["-l"+lib for lib in sp.__config__.blas_opt_info["libraries"]]))'], check : true).stdout().strip()
-message('SCIPY BLAS INFORMATION')
-message(blas_incdir)
-message(blas_libdirs)
-message(blas_libs)
+# scipy_blas_found = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["blas"]["found"]'], check : false).stdout().strip()
+# scipy_blas2_found = run_command(py, ['-c', 'import scipy; "blas_opt_info" in dir(scipy.__config__)'], check : false).stdout().strip()
+# message(scipy_blas_found)
+# message(scipy_blas2_found)
+
+# if scipy_blas_found == 'true'
+#   blas_incdir = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["blas"]["include directory"]))'], check : true).stdout().strip()
+#   blas_libdirs = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["blas"]["lib directory"]))'], check : true).stdout().strip()
+#   blas_libs = ['blas']
+#   message('SCIPY BLAS INFORMATION')
+#   message(blas_incdir)
+#   message(blas_libdirs)
+#   message(blas_libs)
+# elif scipy_blas2_found == 'true'
+#   blas_incdir = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.blas_opt_info["include_dirs"]))'], check : true).stdout().strip()
+#   blas_libdirs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.blas_opt_info["library_dirs"]))'], check : true).stdout().strip()
+#   blas_libs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(["-l"+lib for lib in sp.__config__.blas_opt_info["libraries"]]))'], check : true).stdout().strip()
+#   message('SCIPY BLAS INFORMATION')
+#   message(blas_incdir)
+#   message(blas_libdirs)
+#   message(blas_libs)
+# endif 
 
 ## Assemble the linker arguments for BLAS
-blas_link_args = []
-foreach libdir : blas_libdirs.split(' ')
-  blas_link_args += '-L' + libdir
-endforeach
-blas_link_args += blas_libs.split(' ')
-message(blas_link_args)
+# blas_link_args = []
+# foreach libdir : blas_libdirs.split(' ')
+#   blas_link_args += '-L' + libdir
+# endforeach
+# blas_link_args += blas_libs.split(' ')
+# message(blas_link_args)
+# blas = declare_dependency(
+#   link_args: blas_link_args,
+#   include_directories: include_directories(blas_incdir)
+# )
 
-blas = declare_dependency(
-  link_args: blas_link_args,
-  include_directories: include_directories(blas_incdir)
-)
+# scipy_lapack_found = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["lapack"]["found"]'], check : false).stdout().strip()
+# scipy_lapack2_found = run_command(py, ['-c', 'import scipy; "lapack_opt_info" in dir(scipy.__config__)'], check : false).stdout().strip()
 
 ## Use SciPy-configured LAPACK 
-lapack_incdir = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.lapack_opt_info["include_dirs"]))'], check : true).stdout().strip()
-lapack_libdirs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.lapack_opt_info["library_dirs"]))'], check : true).stdout().strip()
-lapack_libs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(["-l"+lib for lib in sp.__config__.lapack_opt_info["libraries"]]))'], check : true).stdout().strip()
-message('SCIPY LAPACK INFORMATION')
-message(lapack_incdir)
-message(lapack_libdirs)
-message(lapack_libs)
+# lapack_incdir = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.lapack_opt_info["include_dirs"]))'], check : true).stdout().strip()
+# lapack_libdirs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(sp.__config__.lapack_opt_info["library_dirs"]))'], check : true).stdout().strip()
+# lapack_libs = run_command(py, ['-c', 'import scipy as sp; print(" ".join(["-l"+lib for lib in sp.__config__.lapack_opt_info["libraries"]]))'], check : true).stdout().strip()
+# message('SCIPY LAPACK INFORMATION')
+# message(lapack_incdir)
+# message(lapack_libdirs)
+# message(lapack_libs)
 
 ## Assemble the linker arguments for LAPACK
-lapack_link_args = []
-foreach libdir : lapack_libdirs.split(' ')
-  lapack_link_args += '-L' + libdir
-endforeach
-lapack_link_args += lapack_libs.split(' ')
-message(lapack_link_args)
+# lapack_link_args = []
+# foreach libdir : lapack_libdirs.split(' ')
+#   lapack_link_args += '-L' + libdir
+# endforeach
+# lapack_link_args += lapack_libs.split(' ')
+# message(lapack_link_args)
 
-lapack = declare_dependency(
-  link_args: lapack_link_args,
-  include_directories: include_directories(lapack_incdir)
-)
+# lapack = declare_dependency(
+#   link_args: lapack_link_args,
+#   include_directories: include_directories(lapack_incdir)
+# )
 
 #inc_lapack = 
 # TODO: add scipy/numpy fallback
@@ -127,11 +150,11 @@ lapack = declare_dependency(
 ## BLAS / LAPACK
 ## see: https://github.com/mesonbuild/meson/issues/2835
 blas_options = ['mkl', 'blis', 'openblas', 'OpenBLAS', 'accelerate', 'atlas', 'netlib', 'blas']
-# lapack_options = ['mkl', 'openblas', 'libflame', 'accelerate', 'atlas', 'blas']
+lapack_options = ['mkl', 'openblas', 'libflame', 'accelerate', 'atlas', 'blas']
 
-# blas = dependency(blas_options, required: true )
+blas = dependency(blas_options, required: true )
 # cblas = dependency('cblas', required: true)
-# lapack = dependency(lapack_options, required: true)
+lapack = dependency(lapack_options, required: true)
 #blas_linker_flags = blas.get_variable(cmake: 'blas', default_value : '-lblas')
 
 
