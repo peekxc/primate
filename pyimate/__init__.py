@@ -2,7 +2,7 @@
 # from trace import *
 from .trace import slq 
 import _random_generator
-# import _diagonalize
+import _diagonalize
 # import _orthogonalize
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
