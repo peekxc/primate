@@ -149,10 +149,31 @@ env = environment()
 
 ## BLAS / LAPACK
 ## see: https://github.com/mesonbuild/meson/issues/2835
-blas_options = ['openblas', 'blis', 'OpenBLAS', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas']
-lapack_options = ['openblas', 'libflame', 'accelerate',  'mkl', 'atlas', 'blas']
+blas_options = get_option('blas') == '' ?  : [get_option('blas')]
+foreach blas_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+  if blas_imp not in blas_options
+    blas_options += [blas_imp]
+  endif
+endforeach
 
-blas = dependency(blas_options, required: true )
+lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
+foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+  if lapack_imp not in lapack_options
+    lapack_options += [lapack_imp]
+  endif
+endforeach
+
+# blas_preferred = 
+# lapack_preferred = 
+# if blas_preferred == '' 
+#   blas_options += 
+# else
+#   blas_options += ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas']
+# endif 
+# if lapack_preferred == '':
+# end
+
+blas = dependency(blas_options, required: true)
 # cblas = dependency('cblas', required: true)
 lapack = dependency(lapack_options, required: true)
 #blas_linker_flags = blas.get_variable(cmake: 'blas', default_value : '-lblas')
