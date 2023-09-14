@@ -1,6 +1,7 @@
 import base64
 import numpy as np 
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
+from scipy.sparse import csr_array
 
 def test_randomness():
   pass
@@ -8,14 +9,13 @@ def test_randomness():
 def test_blas():
   pass
 
-from scipy.sparse import csr_matrix
 def test_numerical_rank():
   from pyimate.trace import slq
   A = np.random.uniform(size=(100,100))
   A = A.T @ A
   u, s, vt = np.linalg.svd(A)
   B = u[:,:15] @ np.diag(s[:15]) @ vt[:15,:]
-  tr_est, info = slq(csr_matrix(B), matrix_function = "rank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
+  tr_est, info = slq(csr_array(B), matrix_function = "rank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
   tr_true = np.linalg.matrix_rank(B)
   # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.float64(tr_est), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
@@ -27,24 +27,24 @@ def test_trace_estimator():
   tr_est, info = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
   tr_true = np.sum(T.diagonal())
   # assert info['convergence']['converged'], "trace didn't converge"
-  assert np.isclose(np.float64(tr_est), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
+  assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
-def test_eigen():
-  # %% test lanczos tridiagonalization
-  import numpy as np 
-  import pyimate
-  from scipy.linalg import eigh_tridiagonal
-  from scipy.sparse.linalg import eigsh
-  from scipy.sparse import random
-  n = 30 
-  A = random(n,n,density=0.30**2)
-  A = A @ A.T
-  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
-  v0 = np.random.uniform(size=A.shape[1])
-  pyimate._sparse_eigen.lanczos_tridiagonalize(A, v0, 1e-9, n-1, alpha, beta)
-  ew_lanczos = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))[1:]
-  ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
-  assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
+# def test_eigen():
+#   # %% test lanczos tridiagonalization
+#   import numpy as np 
+#   import pyimate
+#   from scipy.linalg import eigh_tridiagonal
+#   from scipy.sparse.linalg import eigsh
+#   from scipy.sparse import random
+#   n = 30 
+#   A = random(n,n,density=0.30**2)
+#   A = A @ A.T
+#   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+#   v0 = np.random.uniform(size=A.shape[1])
+#   pyimate._sparse_eigen.lanczos_tridiagonalize(A, v0, 1e-9, n-1, alpha, beta)
+#   ew_lanczos = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))[1:]
+#   ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
+#   assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
 
 def test_lanczos():
   from scipy.sparse.linalg import eigsh
@@ -63,7 +63,7 @@ def test_lanczos():
     v0 = np.random.uniform(size=lo.shape[1])
     _diagonalize.lanczos_tridiagonalize(lo, v0, 1e-8, n-1, alpha, beta)
     ew = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))
-    tol[i] = np.mean(np.abs(ew - np.sort(eigsh(A, k=n, return_eigenvectors=False))))
+    tol[i] = np.mean(np.abs(ew[1:] - np.sort(eigsh(A, k=n-1, return_eigenvectors=False))))
   assert np.all(tol < 1e-5)
 
 # def test_operators():

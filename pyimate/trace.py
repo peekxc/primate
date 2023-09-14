@@ -7,19 +7,12 @@
 # directory of this source tree.
 
 import numpy as np
-from scipy.sparse import spmatrix
+from scipy.sparse import spmatrix, sparray
 from typing import * 
 
-# import time
 import _trace
 from imate._trace_estimator import trace_estimator_utilities as te_util 
 from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
-
-# from imate._trace_estimator.trace_estimator_utilities import get_operator_parameters, check_arguments
-# from imate.trace_estimator_plot_utilities import plot_convergence
-# from imate.trace_estimator_utilities import get_operator, \
-#         get_operator_parameters, check_arguments, get_machine_precision, \
-#         find_num_inquiries, print_summary
 
 def slq (
   A: spmatrix,
@@ -43,15 +36,13 @@ def slq (
 ):
   """Estimates the trace of a matrix function f(A) = U f(D) U^{-1} using the stochastic Lanczos quadrature (SLQ) method. 
 
-  If 
-
   Reference:
     `Ubaru, S., Chen, J., and Saad, Y. (2017)
     <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
     Fast Estimation of :math:`\\mathrm{tr}(F(A))` Via Stochastic Lanczos
     Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.
   """
-  assert isinstance(A, spmatrix), "A must be a sparse matrix, for now."
+  assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
 
   # Since it's just unclear how to actually run simple openmp code with python 
   num_threads = 1 if (num_threads is None or num_threads == 0) else num_threads 
@@ -127,14 +118,15 @@ def slq (
   else:
     raise NotImplementedError("Not done yet")
     
-  ## Matrix size info (if available)
+  ## If no information is require, just return the trace
+  if not(return_info): 
+    return trace
+  
+  ## Otherwise, collection runtime information + matrix size info (if available)
   matrix_size = A.shape[0]
   matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
   matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
   sparse = None if matrix_density is None else matrix_density <= 0.50
-
-  # Dictionary of output info
-  if not(return_info): return trace
   info = {
       'matrix':
       {

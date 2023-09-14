@@ -149,8 +149,8 @@ env = environment()
 
 ## BLAS / LAPACK
 ## see: https://github.com/mesonbuild/meson/issues/2835
-blas_options = ['mkl', 'blis', 'openblas', 'OpenBLAS', 'accelerate', 'atlas', 'netlib', 'blas']
-lapack_options = ['mkl', 'openblas', 'libflame', 'accelerate', 'atlas', 'blas']
+blas_options = ['openblas', 'blis', 'OpenBLAS', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas']
+lapack_options = ['openblas', 'libflame', 'accelerate',  'mkl', 'atlas', 'blas']
 
 blas = dependency(blas_options, required: true )
 # cblas = dependency('cblas', required: true)
