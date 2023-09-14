@@ -106,6 +106,9 @@ def slq (
       alg_wall_time = _trace.trace_eigen_pow(A, p, *trace_args)
     elif matrix_function == "exp":
       alg_wall_time = _trace.trace_eigen_exp(A, *trace_args)
+    elif matrix_function == "heat":
+      t = kwargs.get('t', 1.0)
+      alg_wall_time = _trace.trace_eigen_heat(A, t, *trace_args)
     elif matrix_function == "log":
       alg_wall_time = _trace.trace_eigen_log(A, *trace_args)
     elif matrix_function == "inv":

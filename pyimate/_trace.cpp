@@ -150,6 +150,10 @@ void eigen_trace(py::module &m){
     }; 
     return trace_eigen< F >(A, f, TRACE_ARGS);
   });
+  m.def("trace_eigen_heat", [](const Eigen::SparseMatrix< F >* A, const F t, TRACE_PARAMS){
+    const auto f = [t](F eigenvalue) -> F { return std::exp(-t*eigenvalue); }; 
+    return trace_eigen< F >(A, f, TRACE_ARGS);
+  });
 }
 
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
