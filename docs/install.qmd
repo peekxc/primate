@@ -1,0 +1,15 @@
+---
+title: "Installation"
+---
+
+`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package, and thus can be installed by cloning the repository and installing via `pip`: 
+
+```python
+pip install < primate source directory >
+```
+
+pypi support is planned. 
+
+## C++ installation 
+
+`primate`'s core C++ API is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only) and uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, one can easily import and extend the various linear algebra routines in other Python/C++ projects by just adding the right `#include`'s and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).

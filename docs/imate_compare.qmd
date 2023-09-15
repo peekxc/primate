@@ -1,0 +1,22 @@
+---
+title: "Comparison to `imate`"
+---
+
+Much of `primate`'s computational code was directly ported from the (excellent) [`imate` package](https://github.com/ameli/imate). 
+In general, if your matrix function / operator pair is supported by `imate`, you should prefer it over `primate`! 
+
+`primate` was developed with slightly different goals in mind than the `imate`, most of which have to do with integrability and the choice of FFI / build system. 
+
+Notable differences between the two packages include:  
+
+- `imate` offers a variety of options to compare trace estimates against alternative approaches, such as direct and exact methods. `primate` does not.  
+- `imate` supports both CPU parallelism (OpenMP) and GPU parallelism (CUDA), whereas `primate` is limited to CPU parallelism (OpenMP). 
+- `imate` builds [Cython](https://cython.org/) bindings (w/ [setuptools](https://setuptools.pypa.io/en/latest/index.html)); `primate` builds [pybind11](https://pybind11.readthedocs.io/en/stable/index.html) bindings (w/ [meson](https://meson-python.readthedocs.io/en/latest/#)) 
+- `imate`'s source files are dynamically linked, wheres `primate`'s are header-only ([comparison](https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries))
+- `imate` works with any standard C++ compiler, whereas `primate` requires C++20 support.
+- `imate` requires matrices as input, whereas `primate` allows arbitrary / user-supplied `LinearOperator`'s   
+- `imate` is optimized for a fixed set of matrix functions, whereas `primate` allows for arbitrary / user-supplied functions
+
+The primary motivation for the development of `primate` was to support implicit trace estimation for pure C++ operators that lie inside of other Python packages. If this fits your use case, consider giving `primate` a try!
+
+<!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->

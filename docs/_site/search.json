@@ -1,0 +1,52 @@
+[
+  {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
+    "section": "",
+    "text": "primate is a standard PEP-517 package, and thus can be installed by cloning the repository and installing via pip:\npypi support is planned.",
+    "crumbs": [
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "install.html#python-installation",
+    "href": "install.html#python-installation",
+    "title": "Installation",
+    "section": "",
+    "text": "The package can be installed by cloning the repository and then installing via standard PEP-517 package:\npip install &lt; primate source directory &gt;\npypi support is planned.",
+    "crumbs": [
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "install.html#c-installation",
+    "href": "install.html#c-installation",
+    "title": "Installation",
+    "section": "C++ installation",
+    "text": "C++ installation\nprimate’s core C++ API is exported as a header-only library and uses a generic template interface via C++20 Concepts—thus, one can easily import and extend the various linear algebra routines in other Python/C++ projects by just adding the right #include’s and supplying types fitting the constraints. This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).",
+    "crumbs": [
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Package overview",
+    "section": "",
+    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions:\n\\[ \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\\]\nTrace estimates are obtained in a randomized fashion using the stochastic Lanczos method (SLQ)1, making the package particularly well suited for very sparse or implicitly represented matrices whose quadratic forms are easy to compute.\nNotable features of primate include:\n\nSupport for arbitrary matrix functions, i.e. Callable’s (Python) and invocable’s2 (C++)\nSupport for arbitrary LinearOperator’s, e.g. those in SciPy or Pylops\nOrthogonalization routines, such as the Lanczos, Golub Kahan, and Gram Schmidt methods\nVarious distribution/engine choices for random vector generation (the stochastic part!)\n\nMuch of primate’s computational code was directly ported from the (excellent) imate package. In general, if your matrix function / operator combination is supported by imate, you should prefer it over primate! For more details on a comparison of the two, see here.\n\n\n\n\nFootnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
+    "crumbs": [
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "imate_compare.html",
+    "href": "imate_compare.html",
+    "title": "Comparison to imate",
+    "section": "",
+    "text": "Much of primate’s computational code was directly ported from the (excellent) imate package. In general, if your matrix function / operator pair is supported by imate, you should prefer it over primate!\nprimate was developed with slightly different goals in mind than the imate, most of which have to do with integrability and the choice of FFI / build system.\nNotable differences between the two packages include:\n\nimate offers a variety of options to compare trace estimates against alternative approaches, such as direct and exact methods. primate does not.\n\nimate supports both CPU parallelism (OpenMP) and GPU parallelism (CUDA), whereas primate is limited to CPU parallelism (OpenMP).\nimate builds Cython bindings (w/ setuptools); primate builds pybind11 bindings (w/ meson)\nimate’s source files are dynamically linked, wheres primate’s are header-only (comparison)\nimate works with any standard C++ compiler, whereas primate requires C++20 support.\nimate requires matrices as input, whereas primate allows arbitrary / user-supplied LinearOperator’s\n\nimate is optimized for a fixed set of matrix functions, whereas primate allows for arbitrary / user-supplied functions\n\nThe primary motivation for the development of primate was to support implicit trace estimation for pure C++ operators that lie inside of other Python packages. If this fits your use case, consider giving primate a try!",
+    "crumbs": [
+      "Comparison to *imate*"
+    ]
+  }
+]
