@@ -23,6 +23,6 @@ python_sources = [
 message('Source install dir = '+py.get_install_dir())
 py.install_sources(
   python_sources,
-  subdir: 'pyimate', 
+  subdir: 'primate', 
   pure: false                              # Will be installed next to binaries
 )

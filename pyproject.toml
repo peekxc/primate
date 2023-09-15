@@ -3,7 +3,7 @@ build-backend = 'mesonpy'
 requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "imate"]
 
 [project]
-name = "pyimate"
+name = "primate"
 version = '0.0.8'
 readme = "README.md"
 classifiers = [
@@ -17,14 +17,14 @@ authors = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-	"numpy", 
-	"scipy", 
+  "numpy", 
+  "scipy", 
   "imate"
 ]
 license = {file = "LICENSE"}
 include = [
-	{ path = "pyimate/**/*.so", format = "wheel" },
-	# { path = "pyimate/**/*.pyd", format = "wheel" },
+	{ path = "primate/**/*.so", format = "wheel" },
+	# { path = "primate/**/*.pyd", format = "wheel" },
 ]
 
 # [tool.meson-python.args]

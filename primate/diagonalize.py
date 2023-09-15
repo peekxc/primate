@@ -4,7 +4,7 @@ import _diagonalize
 from scipy.sparse import spmatrix
 from scipy.sparse.linalg import aslinearoperator, LinearOperator
 
-# from pyimate import _diagonalize
+# from primate import _diagonalize
 # from scipy.linalg import eigh_tridiagonal
 
 def lanczos(A: Union[LinearOperator, spmatrix], v0: Optional[np.ndarray] = None, tol: float = 1e-8, orth: int = 0, sparse_mat: bool = False):

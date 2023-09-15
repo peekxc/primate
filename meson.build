@@ -1,5 +1,5 @@
 project(
-  'pyimate', 'cpp', 
+  'primate', 'cpp', 
   license: 'Apache-2.0',
   meson_version: '>= 1.1.0',
   default_options : [
@@ -70,7 +70,7 @@ elif compiler.has_argument('-fopenmp')
     dependency_map += { 'OpenMP' : omp }
   endif
 else
-  message('NO OPENMP DETECTED; pyimate will be built for single-threaded only.')
+  message('NO OPENMP DETECTED; primate will be built for single-threaded only.')
 endif
 
 
@@ -235,7 +235,7 @@ dependency_map = {
 # endforeach
 
 ## Compile the package directory
-subdir('pyimate')
+subdir('primate')
 
 
 # py.install_sources(

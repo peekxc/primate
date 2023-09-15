@@ -3,12 +3,12 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "name": "pyimate._lapack",
+        "name": "primate._lapack",
         "sources": [
-            "/Users/mpiekenbrock/pyimate/pyimate/_lapack.pyx"
+            "/Users/mpiekenbrock/primate/primate/_lapack.pyx"
         ]
     },
-    "module_name": "pyimate._lapack"
+    "module_name": "primate._lapack"
 }
 END: Cython Metadata */
 
@@ -1155,8 +1155,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__pyimate___lapack
-#define __PYX_HAVE_API__pyimate___lapack
+#define __PYX_HAVE__primate___lapack
+#define __PYX_HAVE_API__primate___lapack
 /* Early includes */
 #ifdef _OPENMP
 #include <omp.h>
@@ -1935,18 +1935,18 @@ static void (*__pyx_f_5scipy_6linalg_13cython_lapack_dstev)(char *, int *, __pyx
 static void (*__pyx_f_5scipy_6linalg_13cython_lapack_sbdsdc)(char *, char *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *, int *); /*proto*/
 static void (*__pyx_f_5scipy_6linalg_13cython_lapack_sstev)(char *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *, __pyx_t_5scipy_6linalg_13cython_lapack_s *, int *); /*proto*/
 
-/* Module declarations from "pyimate._lapack" */
+/* Module declarations from "primate._lapack" */
 __PYX_EXTERN_C void lapack_sstev(char *, int *, float *, float *, float *, int *, float *, int *); /*proto*/
 __PYX_EXTERN_C void lapack_dstev(char *, int *, double *, double *, double *, int *, double *, int *); /*proto*/
 __PYX_EXTERN_C void lapack_sbdsdc(char *, char *, int *, float *, float *, float *, int *, float *, int *, float *, int *, float *, int *, int *); /*proto*/
 __PYX_EXTERN_C void lapack_dbdsdc(char *, char *, int *, double *, double *, double *, int *, double *, int *, double *, int *, double *, int *, int *); /*proto*/
 /* #### Code section: typeinfo ### */
 /* #### Code section: before_global_var ### */
-#define __Pyx_MODULE_NAME "pyimate._lapack"
-extern int __pyx_module_is_main_pyimate___lapack;
-int __pyx_module_is_main_pyimate___lapack = 0;
+#define __Pyx_MODULE_NAME "primate._lapack"
+extern int __pyx_module_is_main_primate___lapack;
+int __pyx_module_is_main_primate___lapack = 0;
 
-/* Implementation of "pyimate._lapack" */
+/* Implementation of "primate._lapack" */
 /* #### Code section: global_var ### */
 /* #### Code section: string_decls ### */
 static const char __pyx_k_[] = "?";
@@ -2102,7 +2102,7 @@ static int __pyx_m_traverse(PyObject *m, visitproc visit, void *arg) {
 #define __pyx_n_s_test __pyx_mstate_global->__pyx_n_s_test
 /* #### Code section: module_code ### */
 
-/* "pyimate/_lapack.pyx":22
+/* "primate/_lapack.pyx":22
  * # ============
  * 
  * cdef public void lapack_sstev(char* jobz, int* n, float* d, float* e, float* z,             # <<<<<<<<<<<<<<
@@ -2120,7 +2120,7 @@ void lapack_sstev(char *__pyx_v_jobz, int *__pyx_v_n, float *__pyx_v_d, float *_
   #endif
   __Pyx_RefNannySetupContext("lapack_sstev", 1);
 
-  /* "pyimate/_lapack.pyx":35
+  /* "primate/_lapack.pyx":35
  *     """
  * 
  *     sstev(jobz, n, d, e, z, ldz, work, info)             # <<<<<<<<<<<<<<
@@ -2129,7 +2129,7 @@ void lapack_sstev(char *__pyx_v_jobz, int *__pyx_v_n, float *__pyx_v_d, float *_
  */
   __pyx_f_5scipy_6linalg_13cython_lapack_sstev(__pyx_v_jobz, __pyx_v_n, __pyx_v_d, __pyx_v_e, __pyx_v_z, __pyx_v_ldz, __pyx_v_work, __pyx_v_info); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 35, __pyx_L1_error)
 
-  /* "pyimate/_lapack.pyx":22
+  /* "primate/_lapack.pyx":22
  * # ============
  * 
  * cdef public void lapack_sstev(char* jobz, int* n, float* d, float* e, float* z,             # <<<<<<<<<<<<<<
@@ -2143,7 +2143,7 @@ void lapack_sstev(char *__pyx_v_jobz, int *__pyx_v_n, float *__pyx_v_d, float *_
   #ifdef WITH_THREAD
   __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
-  __Pyx_AddTraceback("pyimate._lapack.lapack_sstev", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("primate._lapack.lapack_sstev", __pyx_clineno, __pyx_lineno, __pyx_filename);
   #ifdef WITH_THREAD
   __Pyx_PyGILState_Release(__pyx_gilstate_save);
   #endif
@@ -2151,7 +2151,7 @@ void lapack_sstev(char *__pyx_v_jobz, int *__pyx_v_n, float *__pyx_v_d, float *_
   __Pyx_RefNannyFinishContextNogil()
 }
 
-/* "pyimate/_lapack.pyx":42
+/* "primate/_lapack.pyx":42
  * # ============
  * 
  * cdef public void lapack_dstev(char* jobz, int* n, double* d, double* e,             # <<<<<<<<<<<<<<
@@ -2169,7 +2169,7 @@ void lapack_dstev(char *__pyx_v_jobz, int *__pyx_v_n, double *__pyx_v_d, double 
   #endif
   __Pyx_RefNannySetupContext("lapack_dstev", 1);
 
-  /* "pyimate/_lapack.pyx":56
+  /* "primate/_lapack.pyx":56
  *     """
  * 
  *     dstev(jobz, n, d, e, z, ldz, work, info)             # <<<<<<<<<<<<<<
@@ -2178,7 +2178,7 @@ void lapack_dstev(char *__pyx_v_jobz, int *__pyx_v_n, double *__pyx_v_d, double 
  */
   __pyx_f_5scipy_6linalg_13cython_lapack_dstev(__pyx_v_jobz, __pyx_v_n, __pyx_v_d, __pyx_v_e, __pyx_v_z, __pyx_v_ldz, __pyx_v_work, __pyx_v_info); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 56, __pyx_L1_error)
 
-  /* "pyimate/_lapack.pyx":42
+  /* "primate/_lapack.pyx":42
  * # ============
  * 
  * cdef public void lapack_dstev(char* jobz, int* n, double* d, double* e,             # <<<<<<<<<<<<<<
@@ -2192,7 +2192,7 @@ void lapack_dstev(char *__pyx_v_jobz, int *__pyx_v_n, double *__pyx_v_d, double 
   #ifdef WITH_THREAD
   __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
-  __Pyx_AddTraceback("pyimate._lapack.lapack_dstev", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("primate._lapack.lapack_dstev", __pyx_clineno, __pyx_lineno, __pyx_filename);
   #ifdef WITH_THREAD
   __Pyx_PyGILState_Release(__pyx_gilstate_save);
   #endif
@@ -2200,7 +2200,7 @@ void lapack_dstev(char *__pyx_v_jobz, int *__pyx_v_n, double *__pyx_v_d, double 
   __Pyx_RefNannyFinishContextNogil()
 }
 
-/* "pyimate/_lapack.pyx":63
+/* "primate/_lapack.pyx":63
  * # =============
  * 
  * cdef public void lapack_sbdsdc(char* uplo, char* compq, int* n, float* d,             # <<<<<<<<<<<<<<
@@ -2218,7 +2218,7 @@ void lapack_sbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, floa
   #endif
   __Pyx_RefNannySetupContext("lapack_sbdsdc", 1);
 
-  /* "pyimate/_lapack.pyx":78
+  /* "primate/_lapack.pyx":78
  *     """
  * 
  *     sbdsdc(uplo, compq, n, d, e, u, ldu, vt, ldvt, q, iq, work, iwork, info)             # <<<<<<<<<<<<<<
@@ -2227,7 +2227,7 @@ void lapack_sbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, floa
  */
   __pyx_f_5scipy_6linalg_13cython_lapack_sbdsdc(__pyx_v_uplo, __pyx_v_compq, __pyx_v_n, __pyx_v_d, __pyx_v_e, __pyx_v_u, __pyx_v_ldu, __pyx_v_vt, __pyx_v_ldvt, __pyx_v_q, __pyx_v_iq, __pyx_v_work, __pyx_v_iwork, __pyx_v_info); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 78, __pyx_L1_error)
 
-  /* "pyimate/_lapack.pyx":63
+  /* "primate/_lapack.pyx":63
  * # =============
  * 
  * cdef public void lapack_sbdsdc(char* uplo, char* compq, int* n, float* d,             # <<<<<<<<<<<<<<
@@ -2241,7 +2241,7 @@ void lapack_sbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, floa
   #ifdef WITH_THREAD
   __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
-  __Pyx_AddTraceback("pyimate._lapack.lapack_sbdsdc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("primate._lapack.lapack_sbdsdc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   #ifdef WITH_THREAD
   __Pyx_PyGILState_Release(__pyx_gilstate_save);
   #endif
@@ -2249,7 +2249,7 @@ void lapack_sbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, floa
   __Pyx_RefNannyFinishContextNogil()
 }
 
-/* "pyimate/_lapack.pyx":85
+/* "primate/_lapack.pyx":85
  * # =============
  * 
  * cdef public void lapack_dbdsdc(char* uplo, char* compq, int* n, double* d,             # <<<<<<<<<<<<<<
@@ -2267,14 +2267,14 @@ void lapack_dbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, doub
   #endif
   __Pyx_RefNannySetupContext("lapack_dbdsdc", 1);
 
-  /* "pyimate/_lapack.pyx":100
+  /* "primate/_lapack.pyx":100
  *     """
  * 
  *     dbdsdc(uplo, compq, n, d, e, u, ldu, vt, ldvt, q, iq, work, iwork, info)             # <<<<<<<<<<<<<<
  */
   __pyx_f_5scipy_6linalg_13cython_lapack_dbdsdc(__pyx_v_uplo, __pyx_v_compq, __pyx_v_n, __pyx_v_d, __pyx_v_e, __pyx_v_u, __pyx_v_ldu, __pyx_v_vt, __pyx_v_ldvt, __pyx_v_q, __pyx_v_iq, __pyx_v_work, __pyx_v_iwork, __pyx_v_info); if (unlikely(__Pyx_ErrOccurredWithGIL())) __PYX_ERR(0, 100, __pyx_L1_error)
 
-  /* "pyimate/_lapack.pyx":85
+  /* "primate/_lapack.pyx":85
  * # =============
  * 
  * cdef public void lapack_dbdsdc(char* uplo, char* compq, int* n, double* d,             # <<<<<<<<<<<<<<
@@ -2288,7 +2288,7 @@ void lapack_dbdsdc(char *__pyx_v_uplo, char *__pyx_v_compq, int *__pyx_v_n, doub
   #ifdef WITH_THREAD
   __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
-  __Pyx_AddTraceback("pyimate._lapack.lapack_dbdsdc", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("primate._lapack.lapack_dbdsdc", __pyx_clineno, __pyx_lineno, __pyx_filename);
   #ifdef WITH_THREAD
   __Pyx_PyGILState_Release(__pyx_gilstate_save);
   #endif
@@ -2679,14 +2679,14 @@ if (!__Pyx_RefNanny) {
   #if PY_MAJOR_VERSION < 3 && (__PYX_DEFAULT_STRING_ENCODING_IS_ASCII || __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT)
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
-  if (__pyx_module_is_main_pyimate___lapack) {
+  if (__pyx_module_is_main_primate___lapack) {
     if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "pyimate._lapack")) {
-      if (unlikely((PyDict_SetItemString(modules, "pyimate._lapack", __pyx_m) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "primate._lapack")) {
+      if (unlikely((PyDict_SetItemString(modules, "primate._lapack", __pyx_m) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   #endif
@@ -2707,7 +2707,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "pyimate/_lapack.pyx":1
+  /* "primate/_lapack.pyx":1
  * # cython: language_level=3, boundscheck=False, language='c++'             # <<<<<<<<<<<<<<
  * # SPDX-FileCopyrightText: Copyright 2021, Siavash Ameli <sameli@berkeley.edu>
  * # SPDX-License-Identifier: BSD-3-Clause
@@ -2724,7 +2724,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_d && stringtab_initialized) {
-      __Pyx_AddTraceback("init pyimate._lapack", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init primate._lapack", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     #if !CYTHON_USE_MODULE_STATE
     Py_CLEAR(__pyx_m);
@@ -2738,7 +2738,7 @@ if (!__Pyx_RefNanny) {
     }
     #endif
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init pyimate._lapack");
+    PyErr_SetString(PyExc_ImportError, "init primate._lapack");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();

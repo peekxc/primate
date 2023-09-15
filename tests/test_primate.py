@@ -10,7 +10,7 @@ def test_blas():
   pass
 
 def test_numerical_rank():
-  from pyimate.trace import slq
+  from primate.trace import slq
   A = np.random.uniform(size=(100,100))
   A = A.T @ A
   u, s, vt = np.linalg.svd(A)
@@ -22,7 +22,7 @@ def test_numerical_rank():
 
 def test_trace_estimator():
   import imate
-  from pyimate.trace import slq
+  from primate.trace import slq
   T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19), gram=True)
   tr_est, info = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
   tr_true = np.sum(T.diagonal())
@@ -32,7 +32,7 @@ def test_trace_estimator():
 # def test_eigen():
 #   # %% test lanczos tridiagonalization
 #   import numpy as np 
-#   import pyimate
+#   import primate
 #   from scipy.linalg import eigh_tridiagonal
 #   from scipy.sparse.linalg import eigsh
 #   from scipy.sparse import random
@@ -41,7 +41,7 @@ def test_trace_estimator():
 #   A = A @ A.T
 #   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
 #   v0 = np.random.uniform(size=A.shape[1])
-#   pyimate._sparse_eigen.lanczos_tridiagonalize(A, v0, 1e-9, n-1, alpha, beta)
+#   primate._sparse_eigen.lanczos_tridiagonalize(A, v0, 1e-9, n-1, alpha, beta)
 #   ew_lanczos = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))[1:]
 #   ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
 #   assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
@@ -49,7 +49,7 @@ def test_trace_estimator():
 def test_lanczos():
   from scipy.sparse.linalg import eigsh
   from scipy.linalg import eigh_tridiagonal
-  from pyimate import _diagonalize
+  from primate import _diagonalize
   np.random.seed(1234)
   n = 30
   A = np.random.uniform(size=(n, n)).astype(np.float32)
@@ -68,7 +68,7 @@ def test_lanczos():
 
 # def test_operators():
 #   # %% Test diagonal operator 
-#   from pyimate import _operators
+#   from primate import _operators
 #   y = np.random.uniform(size=10).astype(np.float32)
 #   op = _operators.PyDiagonalOperator(y)
 #   assert np.allclose(op.matvec(y), y * y)
@@ -86,7 +86,7 @@ def test_lanczos():
 
 #   # %% Test linear operator 
 #   # TODO: Implement matmat and rmatmat and maybe adjoint! Should fix the svd issue
-#   from pyimate import _operators
+#   from primate import _operators
 #   y = np.random.uniform(size=10).astype(np.float32)
 #   A = np.random.uniform(size=(10, 10)).astype(np.float32)
 #   A = A @ A.T
@@ -103,7 +103,7 @@ def test_lanczos():
 
 #   # %% Test adjoint operator 
 #   # TODO: Implement matmat and rmatmat and maybe adjoint! Should fix the svd issue
-#   from pyimate import _operators
+#   from primate import _operators
 #   y = np.random.uniform(size=10).astype(np.float32)
 #   A = np.random.uniform(size=(10, 10)).astype(np.float32)
 #   lo = aslinearoperator(A)
@@ -162,7 +162,7 @@ def test_lanczos():
 
 
 #   # %% test bidiagonalization
-#   from pyimate import _diagonalize
+#   from primate import _diagonalize
 #   v0 = np.random.uniform(size=op.shape[1])
 #   lanczos_tol = 0.01 
 #   orthogonalize = 3
@@ -170,7 +170,7 @@ def test_lanczos():
 #   _diagonalize.golub_kahan_bidiagonalize(op, v0, lanczos_tol, orthogonalize, alpha, beta)
 
 #   # %% Test Lanczos via Diagonal operator C++ 
-#   from pyimate import _diagonalize
+#   from primate import _diagonalize
 #   d = np.random.uniform(size=10, low=0, high=1).astype(np.float32)
 #   v0 = np.random.uniform(size=10, low=-1, high=1).astype(np.float32)
 #   alpha, beta = np.zeros(10, dtype=np.float32), np.zeros(10, dtype=np.float32)
