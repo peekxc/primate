@@ -6,19 +6,19 @@
 # under the terms of the license found in the LICENSE.txt file in the root
 # directory of this source tree.
 
+from typing import * 
 import numpy as np
 from scipy.sparse import spmatrix, sparray
-from typing import * 
+from scipy.sparse.linalg import LinearOperator
 
 import _trace
 from imate._trace_estimator import trace_estimator_utilities as te_util 
 from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
 
 def slq (
-  A: spmatrix,
+  A: Union[LinearOperator, spmatrix, np.ndarray],
   parameters: Iterable = None,
   matrix_function: Union[str, Callable] = "identity",
-  p: int = 1.0,
   min_num_samples: int = 10,
   max_num_samples: int = 50,
   error_atol: float = None,
@@ -36,26 +36,29 @@ def slq (
 ):
   """Estimates the trace of a matrix function f(A) = U f(D) U^{-1} using the stochastic Lanczos quadrature (SLQ) method. 
 
+  Parameters: 
+    min_num_samples: minimum number of parameter for lanczos. 
+
   Reference:
     `Ubaru, S., Chen, J., and Saad, Y. (2017)
     <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
     Fast Estimation of :math:`\\mathrm{tr}(F(A))` Via Stochastic Lanczos
     Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.
   """
-  assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
+  # assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
+  attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
+  assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
+  assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
+  
+  ## Get the dtype; infer it if it's not available
+  f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
+  i_dtype = np.int32
+  
+  ## Extract the machine precision for the given floating point type
+  lanczos_tol = np.finfo(f_dtype).eps if lanczos_tol is None else lanczos_tol
 
-  # Since it's just unclear how to actually run simple openmp code with python 
-  num_threads = 1 if (num_threads is None or num_threads == 0) else num_threads 
-
-  # Check operator A, and convert to a linear operator (if not already)
-  # Aop = get_operator(A)
-  i_dtype, f_dtype = np.int32, np.float32 
-  lanczos_tol = float(np.finfo(f_dtype).eps) if lanczos_tol is None else float(lanczos_tol)
-
-  # Validates operator size + initialize parameters array
-  # parameters, parameters_size = get_operator_parameters(parameters, f_dtype)
-  # parameters = parameters.astype(f_dtype)
-  parameters = np.array([0.0], dtype=f_dtype)
+  ## Validates operator size + initialize parameters array
+  parameters = np.array([0.0], dtype=f_dtype) if parameters is None else np.fromiter(iter(parameters), dtype=f_dtype)
 
   # Find number of inquiries, which is the number of batches of different set
   # of parameters to produce different linear operators. These batches are
@@ -64,7 +67,7 @@ def slq (
 
   ## Check input arguments have proper type and values
   error_atol, error_rtol = te_util.check_arguments(
-    False, p, min_num_samples, max_num_samples, error_atol,
+    False, 1.0, min_num_samples, max_num_samples, error_atol,
     error_rtol, confidence_level, outlier_significance_level,
     lanczos_degree, lanczos_tol, orthogonalize, num_threads,
     0, verbose, plot, False
@@ -77,45 +80,46 @@ def slq (
   num_samples_used = np.zeros((nq,), dtype=i_dtype)           # Store how many samples used for each inquiry till reaching convergence
   num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
-  # alg_wall_times = np.zeros((1, ), dtype=float)
+  alg_wall_time = np.zeros((1, ), dtype=f_dtype)              # Somewhat inaccurate measure of the total wall clock time taken 
 
   ## Parameterize the arguments
   trace_args = (parameters, num_inquiries, 
-    p, orthogonalize, lanczos_degree, lanczos_tol, 
+    orthogonalize, lanczos_degree, lanczos_tol, 
     min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level, 
     num_threads, 
     trace, error, samples, 
-    processed_samples_indices, num_samples_used, num_outliers, converged 
+    processed_samples_indices, num_samples_used, num_outliers, converged, alg_wall_time
   )
   if isinstance(matrix_function, str):
     if matrix_function == "identity":
-      alg_wall_time = _trace.trace_eigen_identity(A, *trace_args)
+      alg_wall_time = _trace.trace_identity(A, *trace_args)
     elif matrix_function == "sqrt":
-      alg_wall_time = _trace.trace_eigen_sqrt(A, *trace_args)
+      alg_wall_time = _trace.trace_sqrt(A, *trace_args)
     elif matrix_function == "smoothstep":
       a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
-      alg_wall_time = _trace.trace_eigen_smoothstep(A, a, b, *trace_args)
+      alg_wall_time = _trace.trace_smoothstep(A, a, b, *trace_args)
     elif matrix_function == "numerical_rank" or matrix_function == "rank":
       threshold = kwargs.get('threshold', None)
       if threshold is None:
         from scipy.sparse.linalg import eigsh
         s_max = A.dtype.type(eigsh(A, k=1, which="LM", return_eigenvectors=False))
         threshold = s_max * np.max(A.shape) * np.finfo(A.dtype).eps
-      alg_wall_time = _trace.trace_eigen_numrank(A, threshold, *trace_args)
+      alg_wall_time = _trace.trace_numrank(A, threshold, *trace_args)
     elif matrix_function == "pow":
-      alg_wall_time = _trace.trace_eigen_pow(A, p, *trace_args)
+      p = kwargs.get('p', 1.0)
+      alg_wall_time = _trace.trace_pow(A, p, *trace_args)
     elif matrix_function == "exp":
-      alg_wall_time = _trace.trace_eigen_exp(A, *trace_args)
+      alg_wall_time = _trace.trace_exp(A, *trace_args)
     elif matrix_function == "heat":
       t = kwargs.get('t', 1.0)
-      alg_wall_time = _trace.trace_eigen_heat(A, t, *trace_args)
+      alg_wall_time = _trace.trace_heat(A, t, *trace_args)
     elif matrix_function == "log":
-      alg_wall_time = _trace.trace_eigen_log(A, *trace_args)
+      alg_wall_time = _trace.trace_log(A, *trace_args)
     elif matrix_function == "inv":
-      alg_wall_time = _trace.trace_eigen_inv(A, *trace_args)
+      alg_wall_time = _trace.trace_inv(A, *trace_args)
     elif matrix_function == "gaussian":
       mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
-      alg_wall_time = _trace.trace_eigen_gaussian(A, mu, sigma, *trace_args)
+      alg_wall_time = _trace.trace_gaussian(A, mu, sigma, *trace_args)
     else:
       raise ValueError(f"Unknown matrix function '{matrix_function}'")
   else:
@@ -124,92 +128,92 @@ def slq (
   ## If no information is require, just return the trace
   if not(return_info): 
     return trace
-  
-  ## Otherwise, collection runtime information + matrix size info (if available)
-  matrix_size = A.shape[0]
-  matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
-  matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
-  sparse = None if matrix_density is None else matrix_density <= 0.50
-  info = {
-      'matrix':
-      {
-          'data_type': np.finfo(f_dtype).dtype.name.encode('utf-8'),
-          'gram': False,
-          'exponent': p,
-          'num_inquiries': num_inquiries,
-          'num_operator_parameters': 1, #Aop.get_num_parameters(),
-          'parameters': parameters, 
-          'size': matrix_size,               # legacy
-          'sparse': sparse,
-          'nnz': matrix_nnz,
-          'density': matrix_density  
-      },
-      'error':
-      {
-          'absolute_error': None,
-          'relative_error': None,
-          'error_atol': error_atol,
-          'error_rtol': error_rtol,
-          'confidence_level': confidence_level,
-          'outlier_significance_level': outlier_significance_level
-      },
-      'convergence':
-      {
-          'converged': converged,
-          'all_converged': np.all(converged),
-          'min_num_samples': min_num_samples,
-          'max_num_samples': max_num_samples,
-          'num_samples_used': None,
-          'num_outliers': None,
-          'samples': None,
-          'samples_mean': None,
-          'samples_processed_order': processed_samples_indices
-      },
-      'time':
-      {
-          'tot_wall_time': 0,
-          'alg_wall_time': alg_wall_time,
-          'cpu_proc_time': 0
-      },
-      'device': {
-          'num_cpu_threads': num_threads,
-          'num_gpu_devices': 0,
-          'num_gpu_multiprocessors': 0,
-          'num_gpu_threads_per_multiprocessor': 0
-      },
-      'solver':
-      {
-          'version': None,
-          'lanczos_degree': lanczos_degree,
-          'lanczos_tol': lanczos_tol,
-          'orthogonalize': orthogonalize,
-          'method': 'slq',
-      }
-  }
-
-  # Fill arrays of info depending on whether output is scalar or array
-  output_is_array = False if (parameters is None) or np.isscalar(parameters) else True
-  if output_is_array:
-    info['error']['absolute_error'] = error
-    info['error']['relative_error'] = error / np.abs(trace)
-    info['convergence']['converged'] = converged.astype(bool)
-    info['convergence']['num_samples_used'] = num_samples_used
-    info['convergence']['num_outliers'] = num_outliers
-    info['convergence']['samples'] = samples
-    info['convergence']['samples_mean'] = trace
   else:
-    info['error']['absolute_error'] = error[0]
-    info['error']['relative_error'] = error[0] / np.abs(trace[0])
-    info['convergence']['converged'] = bool(converged[0])
-    info['convergence']['num_samples_used'] = num_samples_used[0]
-    info['convergence']['num_outliers'] = num_outliers[0]
-    info['convergence']['samples'] = samples[:, 0]
-    info['convergence']['samples_mean'] = trace[0]
+    ## Otherwise, collection runtime information + matrix size info (if available)
+    matrix_size = A.shape[0]
+    matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
+    matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
+    sparse = None if matrix_density is None else matrix_density <= 0.50
+    info = {
+        'matrix':
+        {
+            'data_type': np.finfo(f_dtype).dtype.name.encode('utf-8'),
+            'gram': False,
+            'exponent': kwargs.get('p', 1.0),
+            'num_inquiries': num_inquiries,
+            'num_operator_parameters': 1, #Aop.get_num_parameters(),
+            'parameters': parameters, 
+            'size': matrix_size,               # legacy
+            'sparse': sparse,
+            'nnz': matrix_nnz,
+            'density': matrix_density  
+        },
+        'error':
+        {
+            'absolute_error': None,
+            'relative_error': None,
+            'error_atol': error_atol,
+            'error_rtol': error_rtol,
+            'confidence_level': confidence_level,
+            'outlier_significance_level': outlier_significance_level
+        },
+        'convergence':
+        {
+            'converged': converged,
+            'all_converged': np.all(converged),
+            'min_num_samples': min_num_samples,
+            'max_num_samples': max_num_samples,
+            'num_samples_used': None,
+            'num_outliers': None,
+            'samples': None,
+            'samples_mean': None,
+            'samples_processed_order': processed_samples_indices
+        },
+        'time':
+        {
+            'tot_wall_time': 0,
+            'alg_wall_time': alg_wall_time,
+            'cpu_proc_time': 0
+        },
+        'device': {
+            'num_cpu_threads': num_threads,
+            'num_gpu_devices': 0,
+            'num_gpu_multiprocessors': 0,
+            'num_gpu_threads_per_multiprocessor': 0
+        },
+        'solver':
+        {
+            'version': None,
+            'lanczos_degree': lanczos_degree,
+            'lanczos_tol': lanczos_tol,
+            'orthogonalize': orthogonalize,
+            'method': 'slq',
+        }
+    }
 
-  if verbose: te_util.print_summary(info)
-  if plot: te_plot.plot_convergence(info)
+    # Fill arrays of info depending on whether output is scalar or array
+    output_is_array = False if (parameters is None) or np.isscalar(parameters) else True
+    if output_is_array:
+      info['error']['absolute_error'] = error
+      info['error']['relative_error'] = error / np.abs(trace)
+      info['convergence']['converged'] = converged.astype(bool)
+      info['convergence']['num_samples_used'] = num_samples_used
+      info['convergence']['num_outliers'] = num_outliers
+      info['convergence']['samples'] = samples
+      info['convergence']['samples_mean'] = trace
+    else:
+      info['error']['absolute_error'] = error[0]
+      info['error']['relative_error'] = error[0] / np.abs(trace[0])
+      info['convergence']['converged'] = bool(converged[0])
+      info['convergence']['num_samples_used'] = num_samples_used[0]
+      info['convergence']['num_outliers'] = num_outliers[0]
+      info['convergence']['samples'] = samples[:, 0]
+      info['convergence']['samples_mean'] = trace[0]
 
-  return (trace, info) if output_is_array else (trace[0], info)
+    if verbose: te_util.print_summary(info)
+    if plot: te_plot.plot_convergence(info)
+
+    return (trace, info) if output_is_array else (trace[0], info)
 
 
 # def trace_est() -> int:

@@ -4,7 +4,7 @@ requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "ima
 
 [project]
 name = "primate"
-version = '0.0.8'
+version = '0.0.9'
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",

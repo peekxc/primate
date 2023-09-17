@@ -12,14 +12,14 @@
 #define _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 
 #include "../_definitions/types.h"  // IndexType, LongIndexType
-#include <random>   // uniform_random_bit_generator
+#include <random>   // uniform_random_bit_generator, normal_distribution
 #include "random_concepts.h" // ThreadSafeRBG
 #include <omp.h>  // omp_set_num_threads, omp_get_thread_num
 #include <cstdint>  // uint64_t
 #include <bitset>
 
-template < typename DataType >
-struct VectorGenerator {
+// template < std::floating_point DataType >
+// struct VectorGenerator {
 /// \brief      Generates a pseudo-random array with Rademacher distribution
 ///             where elements are either \c +1 or \c -1.
 ///
@@ -54,8 +54,8 @@ struct VectorGenerator {
 ///             then no paralel thread is created inside this function, rather
 ///             it is assumed that this functon is called inside a parallel
 ///             region from the caller.
-template< ThreadSafeRBG RBG > 
-static void generate_array(
+template< size_t Distr, std::floating_point DataType, ThreadSafeRBG RBG > 
+void generate_array(
         RBG& random_bit_generator,
         DataType* array,
         const LongIndexType array_size,
@@ -82,42 +82,76 @@ static void generate_array(
         thread_id = omp_get_thread_num();
     }
 
-    // Number of bits to generate in each call of the random generator. This is
-    // the number of bits in a uint64_t integer.
+    // Number of bits to generate in each call of the random generator. This is the number of bits in a uint64_t integer.
     const int bits_per_byte = 8;
     const int num_bits = sizeof(uint64_t) * bits_per_byte;
 
-    // Shared-memory parallelism over individual row vectors. The parallel
-    // section only works if num_threads is non-zero. Otherwise it runs in
-    // serial order.
-    #pragma omp parallel if (num_threads > 0)
-    {
-        // If num_threads is zero, the following thread_id is the thread id
-        // that the parent (caller) function created outside of this function.
-        // But, if num_thread is non-zero, the following thread id is the
-        // thread id that is created inside this parallel loop.
-        if (num_threads > 0) {
-            thread_id = omp_get_thread_num();
-        }
+    // Compile each distribution to generate individual row vectors in parallel 
+    // The parallel section only works if num_threads is non-zero. Otherwise it runs in serial order.
+    if constexpr(Distr == 0){ // Rademacher distribution 
+        #pragma omp parallel if (num_threads > 0)
+        {
+            thread_id = (num_threads > 0) ? omp_get_thread_num() : 0; // changed
 
-        #pragma omp for schedule(static)
-        for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
-            std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
-            for (IndexType j=0; j < num_bits; ++j) {
-                array[i*num_bits + j] = ubits[j] ? 1.0 : -1.0; //Shift checks the j-th bit (from right to left) is 1 or 0
+            #pragma omp for schedule(static)
+            for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+                std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+                for (IndexType j=0; j < num_bits; ++j) {
+                    array[i*num_bits + j] = ubits[j] ? 1.0 : -1.0; //Shift checks the j-th bit (from right to left) is 1 or 0
+                }
             }
         }
-    }
-    // This loop should have less than 64 iterations.
-    std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
-    for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
-        array[j] = ubits[i] ? 1.0 : -1.0;
-    }
-};
-};
+        // This loop should have less than 64 iterations.
+        std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+        for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+            array[j] = ubits[i] ? 1.0 : -1.0;
+        }
+    } else if constexpr(Distr == 1){
+        // Zero mean, unit variance gaussian
+        std::normal_distribution d {0.0, 1.0};
+        #pragma omp parallel if (num_threads > 0)
+        {
+            thread_id = (num_threads > 0) ? omp_get_thread_num() : 0;
 
-template struct VectorGenerator<float>;
-template struct VectorGenerator<double>;
-template struct VectorGenerator<long double>;
+            #pragma omp for schedule(static)
+            for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+                for (IndexType j=0; j < num_bits; ++j) {
+                    array[i*num_bits + j] = d(random_bit_generator.generators[thread_id]);
+                }
+            }
+        }
+        // This loop should have less than 64 iterations.
+        for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+            array[j] = d(random_bit_generator.generators[0]);
+        }
+    } else if constexpr(Distr == 2){
+        // rayleigh distribution
+        std::normal_distribution d{0.0, 1.0};
+        #pragma omp parallel if (num_threads > 0)
+        {
+            thread_id = (num_threads > 0) ? omp_get_thread_num() : 0;
+
+            #pragma omp for schedule(static)
+            for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+                for (IndexType j=0; j < num_bits; ++j) {
+                    array[i*num_bits + j] = d(random_bit_generator.generators[thread_id]);
+                }
+            }
+        }
+        // This loop should have less than 64 iterations.
+        for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+            array[j] = d(random_bit_generator.generators[0]);
+        }
+        
+        DataType sum = 0.0; 
+        #pragma omp parallel for reduction (+:sum)
+        for (auto i = LongIndexType(0); i < array_size; ++i){
+            sum = sum + array[i];
+        }
+        for (auto i = LongIndexType(0); i < array_size; ++i){
+            array[i] = array[i] / sum;
+        }
+    }
+}   
 
 #endif 

@@ -38,6 +38,8 @@
 /// \sa      Xoshiro256StarStar
 
 struct SplitMix64 {
+    // static constexpr typename result_type = uint64_t; 
+    using result_type = uint64_t;
     static constexpr size_t state_size = 2; // size of the entropy/state size, in units of 32-bits
     uint64_t state;
     SplitMix64(){
@@ -57,6 +59,8 @@ struct SplitMix64 {
         z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
         return z ^ (z >> 31);
     };
+    static constexpr uint64_t min(){ return std::numeric_limits< uint64_t >::min(); }
+    static constexpr uint64_t max(){ return std::numeric_limits< uint64_t >::max(); }
 };
 
 #endif  // _RANDOM_GENERATOR_SPLIT_MIX_64_H_

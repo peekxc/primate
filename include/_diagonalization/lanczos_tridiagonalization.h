@@ -124,19 +124,15 @@ IndexType lanczos_tridiagonalization(
 {
     // buffer_size is number of last orthogonal vectors to keep in the buffer V
     IndexType buffer_size;
-    if (orthogonalize == 0 || orthogonalize == 1)
-    {
+    if (orthogonalize == 0 || orthogonalize == 1) {
         // At least two vectors must be stored in buffer for Lanczos recursion
         buffer_size = 2;
     }
-    else if ((orthogonalize < 0) ||
-             (orthogonalize > static_cast<FlagType>(m)))
-    {
+    else if ((orthogonalize < 0) || (orthogonalize > static_cast<FlagType>(m))) {
         // Using full reorthogonalization, keep all of the m vectors in buffer
         buffer_size = m;
     }
-    else
-    {
+    else {
         // Orthogonalize with less than m vectors (0 < orthogonalize < m)
         buffer_size = orthogonalize;
     }
@@ -161,57 +157,39 @@ IndexType lanczos_tridiagonalization(
     IndexType num_ortho;
 
     // In the following, beta[j] means beta[j-1] in the Demmel text
-    for (j=0; j < m; ++j)
-    {
+    for (j=0; j < m; ++j) {
         // Update the size of Lanczos tridiagonal matrix
         ++lanczos_size;
 
         // Normalize r and copy to the j-th column of V
-        if (j == 0)
-        {
-            cVectorOperations<DataType>::copy_scaled_vector(
-                    r, n, 1.0/initial_beta, &V[(j % buffer_size)*n]);
+        if (j == 0){
+            cVectorOperations<DataType>::copy_scaled_vector(r, n, 1.0/initial_beta, &V[(j % buffer_size)*n]);
         }
-        else
-        {
-            cVectorOperations<DataType>::copy_scaled_vector(
-                    r, n, 1.0/beta[j-1], &V[(j % buffer_size)*n]);
+        else{
+            cVectorOperations<DataType>::copy_scaled_vector(r, n, 1.0/beta[j-1], &V[(j % buffer_size)*n]);
         }
 
         // Multiply A to the j-th column of V, write into r
         A->matvec(&V[(j % buffer_size)*n], r);
 
         // alpha[j] is V[:, j] dot r
-        alpha[j] = cVectorOperations<DataType>::inner_product(
-                &V[(j % buffer_size)*n], r, n);
+        alpha[j] = cVectorOperations<DataType>::inner_product(&V[(j % buffer_size)*n], r, n);
 
         // Subtract V[:,j] * alpha[j] from r
-        cVectorOperations<DataType>::subtract_scaled_vector(
-                &V[(j % buffer_size)*n], n, alpha[j], r);
+        cVectorOperations<DataType>::subtract_scaled_vector(&V[(j % buffer_size)*n], n, alpha[j], r);
 
         // Subtract V[:,j-1] * beta[j] from r
-        if (j > 0)
-        {
-            cVectorOperations<DataType>::subtract_scaled_vector(
-                    &V[((j-1) % buffer_size)*n], n, beta[j-1], r);
+        if (j > 0) {
+            cVectorOperations<DataType>::subtract_scaled_vector(&V[((j-1) % buffer_size)*n], n, beta[j-1], r);
         }
 
         // Gram-Schmidt process (full re-orthogonalization)
-        if (orthogonalize != 0)
-        {
+        if (orthogonalize != 0) {
             // Find how many column vectors are filled so far in the buffer V
-            if (j < buffer_size)
-            {
-                num_ortho = j+1;
-            }
-            else
-            {
-                num_ortho = buffer_size;
-            }
+            num_ortho = j < buffer_size ? j+1 : buffer_size;
 
             // Gram-Schmidt process
-            cOrthogonalization<DataType>::gram_schmidt_process(
-                    &V[0], n, buffer_size, j%buffer_size, num_ortho, r);
+            cOrthogonalization<DataType>::gram_schmidt_process(&V[0], n, buffer_size, j%buffer_size, num_ortho, r);
         }
 
         // beta is norm of r
@@ -220,8 +198,7 @@ IndexType lanczos_tridiagonalization(
         // Exit criterion when the vector r is zero. If each component of a
         // zero vector has the tolerance epsilon, (which is called lanczos_tol
         // here), the tolerance of norm of r is epsilon times sqrt of n.
-        if (beta[j] < lanczos_tol * sqrt(n))
-        {
+        if (beta[j] < lanczos_tol * sqrt(n)) {
             break;
         }
     }

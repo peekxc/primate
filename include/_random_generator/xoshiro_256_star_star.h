@@ -51,6 +51,7 @@
 
 
 struct Xoshiro256StarStar{
+    using result_type = uint64_t;
     static constexpr size_t state_size = 8;
     static inline uint64_t rotation_left( const uint64_t x, int k){
         return (x << k) | (x >> (64 - k));
@@ -140,6 +141,8 @@ struct Xoshiro256StarStar{
         state[2] = s2;
         state[3] = s3;
     };
+    static constexpr uint64_t min(){ return std::numeric_limits< uint64_t >::min(); }
+    static constexpr uint64_t max(){ return std::numeric_limits< uint64_t >::max(); }
 };
 
 

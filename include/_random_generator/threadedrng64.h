@@ -40,6 +40,7 @@ struct ThreadedRNG64 {
     auto next(int thread_id) -> std::uint_fast64_t {
         return generators[thread_id]();
     }
+
     void initialize(int num_threads_){
         assert(num_threads_ > 0);
         num_threads = num_threads_;
@@ -48,12 +49,20 @@ struct ThreadedRNG64 {
         // Seeds generators with sources of entropy from a RBG (e.g. random_device)
         // This seeds the entire state vector of the corresponding RNE's state size / entropy source using rd
         RBG rd;
-        std::uint_fast32_t seed_data[RNE::state_size];
-        for (int i = 0; i < num_threads; ++i) {
-            std::generate_n(seed_data, RNE::state_size, std::ref(rd)); // generate evenly-distributed 32-bit seeds
-            std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
-            generators[i].seed(seed_gen);
+        if constexpr(Random64Engine< RNE >){
+            std::uint_fast32_t seed_data[RNE::state_size];
+            for (int i = 0; i < num_threads; ++i) {
+                std::generate_n(seed_data, RNE::state_size, std::ref(rd)); // generate evenly-distributed 32-bit seeds
+                std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
+                generators[i].seed(seed_gen);
+            }
+        } else {
+            for (int i = 0; i < num_threads; ++i) {
+                uint64_t seed = (uint64_t(rd()) << 32) | rd();
+                generators[i].seed(seed);
+            }
         }
+        
     };
 };
 

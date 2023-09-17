@@ -9,13 +9,13 @@ struct SparseEigenLinearOperator {
   const Eigen::SparseMatrix< F > A;  
   SparseEigenLinearOperator(const Eigen::SparseMatrix< F >& _mat) : A(_mat){}
 
-  void matvec(const F* inp, F* out){
-    auto input = Eigen::Map< const Eigen::VectorXf >(inp, A.cols(), 1);
-    auto output = Eigen::Map< Eigen::VectorXf >(out, A.rows(), 1);
+  void matvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
+    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
     output = A * input; 
   }
 
-  auto shape() -> std::pair< size_t, size_t > {
+  auto shape() const noexcept -> std::pair< size_t, size_t > {
     return std::make_pair((size_t) A.rows(), (size_t) A.cols());
   }
 };
@@ -38,14 +38,14 @@ struct SparseEigenAffineOperator {
   }
 
   // Uses Eigen basically as a no-overhead call to BLAS: https://eigen.tuxfamily.org/dox/group__TutorialMapClass.html
-  void matvec(const F* inp, F* out) const {
-    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1);      // no-op
+  void matvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
+    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1);      // this should be a no-op
     output = A * input; // This is 100x faster than copying!
     n_matvecs++;
   }
 
-  auto shape() const -> std::pair< size_t, size_t > {
+  auto shape() const noexcept -> std::pair< size_t, size_t > {
     return std::make_pair((size_t) A.rows(), (size_t) A.cols());
   }
 
@@ -56,5 +56,4 @@ struct SparseEigenAffineOperator {
   auto get_num_parameters() const -> size_t {
     return _params.size();
   }
-
 };

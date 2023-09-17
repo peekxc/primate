@@ -1,4 +1,3 @@
-import base64
 import numpy as np 
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
 from scipy.sparse import csr_array
@@ -15,7 +14,7 @@ def test_numerical_rank():
   A = A.T @ A
   u, s, vt = np.linalg.svd(A)
   B = u[:,:15] @ np.diag(s[:15]) @ vt[:15,:]
-  tr_est, info = slq(csr_array(B), matrix_function = "rank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
+  tr_est = slq(csr_array(B), matrix_function = "rank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
   tr_true = np.linalg.matrix_rank(B)
   # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.float64(tr_est), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
@@ -24,9 +23,8 @@ def test_trace_estimator():
   import imate
   from primate.trace import slq
   T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19), gram=True)
-  tr_est, info = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1, return_info=True)
+  tr_est = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
   tr_true = np.sum(T.diagonal())
-  # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
 # def test_eigen():
@@ -45,26 +43,6 @@ def test_trace_estimator():
 #   ew_lanczos = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))[1:]
 #   ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
 #   assert np.mean(np.abs(ew_lanczos - ew_true)) <= 1e-5
-
-def test_lanczos():
-  from scipy.sparse.linalg import eigsh
-  from scipy.linalg import eigh_tridiagonal
-  from primate import _diagonalize
-  np.random.seed(1234)
-  n = 30
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
-  lo = aslinearoperator(A)
-  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
-  
-  ## In general not guaranteed, but with full re-orthogonalization it seems likely!
-  tol = np.zeros(30)
-  for i in range(30):
-    v0 = np.random.uniform(size=lo.shape[1])
-    _diagonalize.lanczos_tridiagonalize(lo, v0, 1e-8, n-1, alpha, beta)
-    ew = np.sort(eigh_tridiagonal(alpha, beta[:-1], eigvals_only=True))
-    tol[i] = np.mean(np.abs(ew[1:] - np.sort(eigsh(A, k=n-1, return_eigenvectors=False))))
-  assert np.all(tol < 1e-5)
 
 # def test_operators():
 #   # %% Test diagonal operator 

@@ -9,30 +9,41 @@
 #include "_orthogonalization/orthogonalization.h"
 
 namespace py = pybind11;
-using py_arr_f = py::array_t< float, py::array::c_style | py::array::forcecast >;
 
+template< std::floating_point F > 
+using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
+
+template< std::floating_point F >
 void gram_schmidt (
-  const py_arr_f& V, 
+  const py_array< F >& V, 
   const LongIndexType vector_size, 
   const IndexType num_vectors, 
   const IndexType last_vector, 
   const FlagType num_ortho, 
-  py_arr_f& v
+  py_array< F >& v
 ){
-  const float* V_data = static_cast< const float* >(V.request().ptr);
-  float* v_data = static_cast< float* >(v.request().ptr);
-  cOrthogonalization< float >::gram_schmidt_process(V_data, vector_size, num_vectors, last_vector, num_ortho, v_data);
+  const F* V_data = static_cast< const F* >(V.request().ptr);
+  F* v_data = static_cast< F* >(v.request().ptr);
+  cOrthogonalization< F >::gram_schmidt_process(V_data, vector_size, num_vectors, last_vector, num_ortho, v_data);
 }
 
-void orthogonalize_vectors (py_arr_f& V){
-  float* V_data = static_cast< float* >(V.request().ptr);
+template< std::floating_point F >
+void orthogonalize_vectors(py_array< F >& V){
+  F* V_data = static_cast< F* >(V.request().ptr);
   LongIndexType num_vectors = static_cast< LongIndexType >(V.shape(0));
   IndexType vector_size = static_cast< IndexType >(V.shape(1));
-  cOrthogonalization< float >::orthogonalize_vectors(V_data, vector_size, num_vectors);
+  cOrthogonalization< F >::orthogonalize_vectors(V_data, vector_size, num_vectors);
+}
+
+template< std::floating_point F >
+void _orthogonalize(py::module &m){
+  m.def("gram_schmidt", &gram_schmidt< F >);
+  m.def("orthogonalize_vectors", &orthogonalize_vectors< F >);
 }
 
 PYBIND11_MODULE(_orthogonalize, m) {
   m.doc() = "orthogonalization module"; 
-  m.def("gram_schmidt", &gram_schmidt);
-  m.def("orthogonalize_vectors", &orthogonalize_vectors);
+  _orthogonalize< float >(m);
+  _orthogonalize< double >(m);
+  _orthogonalize< long double >(m);
 }

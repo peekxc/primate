@@ -33,7 +33,8 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-conversion',
   '-Wno-misleading-indentation',
   '-std=c++20', 
-  '-fPIC'
+  '-fPIC', 
+  '-fvisibility=hidden'
 )
 
 ## TODO: add sp.show_config()

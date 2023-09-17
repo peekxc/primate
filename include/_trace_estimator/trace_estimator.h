@@ -77,10 +77,6 @@
     ///             * not Gramian, then, Golub-Kahn bidiagonalization method is
     ///               employed. This method requires both matrix and
     ///               transposed-matrix vector multiplications.
-    /// \param[in]  exponent
-    ///             The exponent parameter \c p in the trace of the expression
-    ///             \f$ f((\mathbf{A} + t \mathbf{B})^p) \f$. The exponent is a
-    ///             real number and by default it is set to \c 1.0.
     /// \param[in]  orthogonalize
     ///             Indicates whether to orthogonalize the orthogonal eigenvectors
     ///             during Lanczos recursive iterations.
@@ -181,29 +177,28 @@
     ///               least one of the trace inquiries.
     template< bool gramian, std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
     FlagType trace_estimator(
-            Matrix* A,
-            const DataType* parameters,
-            const IndexType num_inquiries,
-            Func&& matrix_function,
-            const DataType exponent,
-            const FlagType orthogonalize,
-            const IndexType lanczos_degree,
-            const DataType lanczos_tol,
-            const IndexType min_num_samples,
-            const IndexType max_num_samples,
-            const DataType error_atol,
-            const DataType error_rtol,
-            const DataType confidence_level,
-            const DataType outlier_significance_level,
-            const IndexType num_threads,
-            DataType* trace,
-            DataType* error,
-            DataType** samples,
-            IndexType* processed_samples_indices,
-            IndexType* num_samples_used,
-            IndexType* num_outliers,
-            FlagType* converged,
-            DataType& alg_wall_time)
+        Matrix* A,
+        const DataType* parameters,
+        const IndexType num_inquiries,
+        Func&& matrix_function,
+        const FlagType orthogonalize,
+        const IndexType lanczos_degree,
+        const DataType lanczos_tol,
+        const IndexType min_num_samples,
+        const IndexType max_num_samples,
+        const DataType error_atol,
+        const DataType error_rtol,
+        const DataType confidence_level,
+        const DataType outlier_significance_level,
+        const IndexType num_threads,
+        DataType* trace,
+        DataType* error,
+        DataType** samples,
+        IndexType* processed_samples_indices,
+        IndexType* num_samples_used,
+        IndexType* num_outliers,
+        FlagType* converged,
+        DataType& alg_wall_time)
     {
         IndexType matrix_size = static_cast< std::pair< size_t, size_t > >(A->shape()).first;
 
@@ -250,8 +245,8 @@
 
                 // Perform one Monte-Carlo sampling to estimate trace
                 stochastic_lanczos_quadrature< gramian >(
-                    A, parameters, num_inquiries, matrix_function,
-                    exponent, orthogonalize, lanczos_degree, lanczos_tol,
+                    A, parameters, num_inquiries, matrix_function, 
+                    orthogonalize, lanczos_degree, lanczos_tol,
                     rng,
                     &random_vectors[matrix_size*thread_id], converged,
                     samples[i]
@@ -340,10 +335,6 @@
     ///             * not Gramian, then, Golub-Kahn bidiagonalization method is
     ///               employed. This method requires both matrix and
     ///               transposed-matrix vector multiplications.
-    /// \param[in]  exponent
-    ///             The exponent parameter \c p in the trace of the expression
-    ///             \f$ f((\mathbf{A} + t \mathbf{B})^p) \f$. The exponent is a
-    ///             real number and by default it is set to \c 1.0.
     /// \param[in]  orthogonalize
     ///             Indicates whether to orthogonalize the orthogonal eigenvectors
     ///             during Lanczos recursive iterations.
@@ -394,13 +385,12 @@
     ///             Each element of \c trace_estimates is the estimated trace for
     ///             each parameter inquiry.
 
-    template < bool gramian, std::floating_point DataType, AffineOperator Matrix, std::invocable< DataType > Func, ThreadSafeRBG RBG >
+    template < bool gramian, std::floating_point DataType, LinearOperator Matrix, std::invocable< DataType > Func, ThreadSafeRBG RBG >
     void stochastic_lanczos_quadrature(
         Matrix* A,
         const DataType* parameters,
         const IndexType num_inquiries,
         Func&& matrix_function,
-        const DataType exponent,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
         const DataType lanczos_tol,
@@ -417,7 +407,7 @@
         // create any new threads in RandomNumbrGenerator since the current
         // function is inside a parallel thread.
         IndexType num_threads = 0;
-        VectorGenerator< DataType >::generate_array(
+        generate_array< 0, DataType >(
             rng, random_vector, matrix_size, num_threads
         ); 
 
@@ -431,7 +421,7 @@
         DataType* left_singularvectors = NULL;
         DataType* right_singularvectors_transposed = NULL;
 
-        // Actual number of inquiries
+        // Actual number of 0-mean vectors to sample 
         IndexType required_num_inquiries = num_inquiries;
         // if (A->is_eigenvalue_relation_known())
         // {
@@ -464,10 +454,13 @@
         IndexType* lanczos_size = new IndexType[num_inquiries];
 
         // Number of parameters of linear operator A
-        IndexType num_parameters = A->get_num_parameters();
+        IndexType num_parameters = 0;
+        if constexpr (AffineOperator< Matrix >){
+            num_parameters = A->get_num_parameters();
+        }
         // IndexType num_parameters = A->parameters.size();
 
-        if constexpr (gramian) {
+        if constexpr(gramian && AdjointOperator< Matrix >) {
             // Lanczos iterations for gramian, computes theta and tau for each inquiry parameter
             for (j=0; j < required_num_inquiries; ++j) {
                 // If trace is already converged, do not compute on the new sample.
@@ -479,7 +472,9 @@
                 }
 
                 // Set parameter of linear operator A
-                A->set_parameters(&parameters[j*num_parameters]);
+                if constexpr (AffineOperator< Matrix >){
+                    A->set_parameters(&parameters[j*num_parameters]);
+                }
 
                 // Use Golub-Kahn-Lanczos Bi-diagonalization
                 lanczos_size[j] = golub_kahn_bidiagonalization(
@@ -511,6 +506,10 @@
             eigenvectors = new DataType[lanczos_degree * lanczos_degree];
             for (j=0; j < required_num_inquiries; ++j) {
                 
+                if constexpr (AffineOperator< Matrix >){
+                    A->set_parameters(&parameters[j*num_parameters]);
+                }
+
                 // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
                 lanczos_size[j] = lanczos_tridiagonalization(
                     A, random_vector, matrix_size, lanczos_degree, lanczos_tol, orthogonalize, 
@@ -530,49 +529,11 @@
             }
         }
 
-        // If an eigenvalue relation is known, compute the rest of eigenvalues
-        // using the eigenvalue relation given in the operator A for its
-        // eigenvalues. If no eigenvalue relation is not known, the rest of
-        // eigenvalues were already computed in the above loop and no other
-        // computation is needed.
-        // if (A->is_eigenvalue_relation_known() && num_inquiries > 1) {
-        //     // When the code execution reaches this function, at least one of the
-        //     // inquiries is not converged, but some others might have been
-        //     // converged already. Here, we force-update those that are even
-        //     // converged already by setting converged to false. The extra update is
-        //     // free of charge when a relation for the eigenvalues are known.
-        //     for (j=0; j < num_inquiries; ++j)
-        //     {
-        //         converged[j] = 0;
-        //     }
-
-        //     // Compute theta and tau for the rest of inquiry parameters
-        //     for (j=1; j < num_inquiries; ++j)
-        //     {
-        //         // Only j=0 was iterated before. Set the same size for other j-s
-        //         lanczos_size[j] = lanczos_size[0];
-
-        //         for (i=0; i < lanczos_size[j]; ++i)
-        //         {
-        //             // Shift eigenvalues by the old and new parameters
-        //             theta[j][i] = A->get_eigenvalue(
-        //                     &parameters[0],
-        //                     theta[0][i],
-        //                     &parameters[j*num_parameters]);
-
-        //             // tau is the same (at least for the affine operator)
-        //             tau[j][i] = tau[0][i];
-        //         }
-        //     }
-        // }
-
         // Estimate trace using quadrature method
         DataType quadrature_sum;
         for (j=0; j < num_inquiries; ++j) {
             // If the j-th inquiry is already converged, skip.
-            if (converged[j] == 1) {
-                continue;
-            }
+            if (converged[j] == 1) { continue; }
 
             // Initialize sum for the integral of quadrature
             quadrature_sum = 0.0;
@@ -583,9 +544,8 @@
             // deficient. By using lanczos_size[j] instead of lanczos_degree, all
             // issues with special matrices will resolve.
             for (i=0; i < lanczos_size[j]; ++i) {
-                quadrature_sum += tau[j][i] * tau[j][i] * matrix_function(pow(theta[j][i], exponent));
+                quadrature_sum += tau[j][i] * tau[j][i] * matrix_function(theta[j][i]);
             }
-
             trace_estimate[j] = matrix_size * quadrature_sum;
         }
 
