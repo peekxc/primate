@@ -423,15 +423,6 @@
 
         // Actual number of 0-mean vectors to sample 
         IndexType required_num_inquiries = num_inquiries;
-        // if (A->is_eigenvalue_relation_known())
-        // {
-        //     // When a relation between eigenvalues and the parameters of the linear
-        //     // operator is known, to compute eigenvalues of for each inquiry, only
-        //     // computing one inquiry is enough. This is because an eigenvalue for
-        //     // one parameter setting is enough to compute eigenvalue of another set
-        //     // of parameters.
-        //     required_num_inquiries = 1;
-        // }
 
         // Allocate and initialize theta
         IndexType i;
@@ -460,7 +451,8 @@
         }
         // IndexType num_parameters = A->parameters.size();
 
-        if constexpr(gramian && AdjointOperator< Matrix >) {
+        if constexpr(gramian) {
+            static_assert(AdjointOperator< Matrix >);
             // Lanczos iterations for gramian, computes theta and tau for each inquiry parameter
             for (j=0; j < required_num_inquiries; ++j) {
                 // If trace is already converged, do not compute on the new sample.
@@ -473,7 +465,8 @@
 
                 // Set parameter of linear operator A
                 if constexpr (AffineOperator< Matrix >){
-                    A->set_parameters(&parameters[j*num_parameters]);
+                    // A->set_parameters(&parameters[j*num_parameters]); // I don't understand why an address was passed
+                    A->set_parameters(parameters[j]); 
                 }
 
                 // Use Golub-Kahn-Lanczos Bi-diagonalization

@@ -1,7 +1,5 @@
 ## Extension modules
-# inc_blas, inc_lapack, 
-extensions = [ '_random_generator', '_orthogonalize', '_diagonalize', '_trace']
-# extensions = [ '_random_generator' ]
+extensions = [ '_random', '_orthogonalize', '_diagonalize', '_trace']
 foreach ext: extensions
   py.extension_module(
     ext,
@@ -15,10 +13,10 @@ endforeach
 
 python_sources = [
   '__init__.py',
-  'trace.py', 
-  'ortho.py', 
   'random.py',
-  'diagonalize.py'
+  'ortho.py', 
+  'diagonalize.py',
+  'trace.py'
 ]
 
 ## Print install directory

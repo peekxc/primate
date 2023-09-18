@@ -160,17 +160,19 @@ void _trace(py::module& m, WrapperFunc wrap){
 template< std::floating_point F >
 auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
   return SparseEigenLinearOperator< F >(*A);
-  // auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
-  // B.setIdentity();
-  // return SparseEigenAffineOperator< F >(*A, B, 0.0);
+}
+
+// TODO: Support Adjoint and Affine Operators out of the box
+template< std::floating_point F >
+auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
+  auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
+  B.setIdentity();
+  return SparseEigenAffineOperator< F >(*A, B, 0.0);
 }
 
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  // eigen_trace< float >(m);
-  // eigen_trace< double >(m);
-  // eigen_trace< long double >(m);
   _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // symmetric version
   _trace< true, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);  // gramian version
 };

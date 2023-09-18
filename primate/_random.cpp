@@ -15,7 +15,7 @@ using py_array = py::array_t< F, py::array::c_style >;
 
 // Instantiates the function templates for generic generators
 template< LightRandom64Engine RNE, std::floating_point F >
-void _random_generator(py::module& m, std::string suffix){
+void _random(py::module& m, std::string suffix){
   m.def((std::string("rademacher") + suffix).c_str(), [](py_array< F >& out, const IndexType num_threads = 1){
     auto rbg = ThreadedRNG64< RNE >(num_threads);
     auto* data = static_cast< F *>(out.request().ptr);
@@ -42,10 +42,10 @@ void _random_generator(py::module& m, std::string suffix){
 // From: https://www.pcg-random.org/posts/cpp-seeding-surprises.html
 using knuth_lcg = std::linear_congruential_engine< uint64_t, 6364136223846793005U, 1442695040888963407U, 0U>;
 
-PYBIND11_MODULE(_random_generator, m) {
-  _random_generator< SplitMix64, float >(m, std::string("_sx")); 
-  _random_generator< Xoshiro256StarStar, float >(m, std::string("_xs")); 
-  _random_generator< std::mt19937_64, float >(m, std::string("_mt")); 
-  _random_generator< pcg64, float >(m, std::string("_pcg")); 
-  _random_generator< knuth_lcg, float >(m, std::string("_lcg")); 
+PYBIND11_MODULE(_random, m) {
+  _random< SplitMix64, float >(m, std::string("_sx")); 
+  _random< Xoshiro256StarStar, float >(m, std::string("_xs")); 
+  _random< std::mt19937_64, float >(m, std::string("_mt")); 
+  _random< pcg64, float >(m, std::string("_pcg")); 
+  _random< knuth_lcg, float >(m, std::string("_lcg")); 
 }

@@ -13,9 +13,12 @@ using std::vector;
 template <typename T>
 struct TypeString;
 
-template <>
-struct TypeString< float > {
+template <> struct TypeString< float > {
   static constexpr const char* value = "float32";
+};
+
+template <> struct TypeString< double > {
+  static constexpr const char* value = "float64";
 };
 
 // Generalizes concepts from: https://ameli.github.io/imate/generated/imate.Matrix.html#imate-matrix

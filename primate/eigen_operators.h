@@ -3,6 +3,7 @@
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
+// TODO: store only lower/upper part for symmetric? http://www.eigen.tuxfamily.org/dox/group__TutorialSparse.html
 template< std::floating_point F >
 struct SparseEigenLinearOperator {
   using value_type = F;
@@ -13,6 +14,12 @@ struct SparseEigenLinearOperator {
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
     auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
     output = A * input; 
+  }
+
+  void rmatvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
+    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+    output = A.adjoint() * input; 
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {

@@ -15,8 +15,11 @@ import _trace
 from imate._trace_estimator import trace_estimator_utilities as te_util 
 from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
 
-def slq (
+_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "gaussian"]
+
+def slq(
   A: Union[LinearOperator, spmatrix, np.ndarray],
+  gram: bool = False, 
   parameters: Iterable = None,
   matrix_function: Union[str, Callable] = "identity",
   min_num_samples: int = 10,
@@ -82,7 +85,7 @@ def slq (
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
   alg_wall_time = np.zeros((1, ), dtype=f_dtype)              # Somewhat inaccurate measure of the total wall clock time taken 
 
-  ## Parameterize the arguments
+  ## Collect the arguments processed so far 
   trace_args = (parameters, num_inquiries, 
     orthogonalize, lanczos_degree, lanczos_tol, 
     min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level, 
@@ -90,42 +93,40 @@ def slq (
     trace, error, samples, 
     processed_samples_indices, num_samples_used, num_outliers, converged, alg_wall_time
   )
+
+  ## Parameterize the matrix function and trace call
   if isinstance(matrix_function, str):
-    if matrix_function == "identity":
-      alg_wall_time = _trace.trace_identity(A, *trace_args)
-    elif matrix_function == "sqrt":
-      alg_wall_time = _trace.trace_sqrt(A, *trace_args)
-    elif matrix_function == "smoothstep":
+    assert matrix_function in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+    matrix_func_id = _builtin_matrix_functions.index(matrix_function)
+    method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_sym")
+    inputs = [A]
+    if matrix_function == "smoothstep":
       a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
-      alg_wall_time = _trace.trace_smoothstep(A, a, b, *trace_args)
+      inputs += [a, b]
     elif matrix_function == "numerical_rank" or matrix_function == "rank":
       threshold = kwargs.get('threshold', None)
       if threshold is None:
         from scipy.sparse.linalg import eigsh
         s_max = A.dtype.type(eigsh(A, k=1, which="LM", return_eigenvectors=False))
         threshold = s_max * np.max(A.shape) * np.finfo(A.dtype).eps
-      alg_wall_time = _trace.trace_numrank(A, threshold, *trace_args)
+      inputs += [threshold]
     elif matrix_function == "pow":
-      p = kwargs.get('p', 1.0)
-      alg_wall_time = _trace.trace_pow(A, p, *trace_args)
-    elif matrix_function == "exp":
-      alg_wall_time = _trace.trace_exp(A, *trace_args)
+      inputs += [kwargs.get('p', 1.0)]
     elif matrix_function == "heat":
-      t = kwargs.get('t', 1.0)
-      alg_wall_time = _trace.trace_heat(A, t, *trace_args)
-    elif matrix_function == "log":
-      alg_wall_time = _trace.trace_log(A, *trace_args)
-    elif matrix_function == "inv":
-      alg_wall_time = _trace.trace_inv(A, *trace_args)
+      inputs += [kwargs.get('t', 1.0)]
     elif matrix_function == "gaussian":
       mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
-      alg_wall_time = _trace.trace_gaussian(A, mu, sigma, *trace_args)
+      inputs += [mu, sigma]
     else:
       raise ValueError(f"Unknown matrix function '{matrix_function}'")
   else:
     raise NotImplementedError("Not done yet")
-    
-  ## If no information is require, just return the trace
+  
+  ## Make the actual call
+  trace_f = getattr(_trace, method_name)
+  trace_f(*inputs, *trace_args)
+
+  ## If no information is required, just return the trace estimate 
   if not(return_info): 
     return trace
   else:
