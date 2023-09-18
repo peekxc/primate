@@ -169,8 +169,7 @@ static void gram_schmidt_process(
     DataType distance;
 
     // Iterate over vectors
-    for (IndexType step=0; step < num_steps; ++step)
-    {
+    for (IndexType step=0; step < num_steps; ++step) {
         // i is the index of a column vector in V to orthogonalize v against it
         if ((last_vector % num_vectors) >= step)
         {
@@ -196,34 +195,27 @@ static void gram_schmidt_process(
         }
 
         // Projection
-        inner_prod = cVectorOperations<DataType>::inner_product(
-                &V[vector_size*i], v, vector_size);
+        inner_prod = cVectorOperations<DataType>::inner_product(&V[vector_size*i], v, vector_size);
 
         // scale for subtraction
         DataType scale = inner_prod / (norm * norm);
 
-        // If scale is is 1, it is possible that vector v and j-th vector are
-        // identical (or close).
-        if (std::abs(scale - 1.0) <= 2.0 * epsilon)
-        {
+        // If scale is is 1, it is possible that vector v and j-th vector are identical (or close).
+        if (std::abs(scale - 1.0) <= 2.0 * epsilon) {
             // Norm of the vector v
-            norm_v = cVectorOperations<DataType>::euclidean_norm(
-                    v, vector_size);
+            norm_v = cVectorOperations<DataType>::euclidean_norm(v, vector_size);
 
             // Compute distance between the j-th vector and vector v
             distance = sqrt(norm_v*norm_v - 2.0*inner_prod + norm*norm);
 
-            // If distance is zero, do not reorthogonalize i-th against
-            // the j-th vector.
-            if (distance < 2.0 * epsilon * sqrt(vector_size))
-            {
+            // If distance is zero, do not reorthogonalize i-th against the j-th vector.
+            if (distance < 2.0 * epsilon * sqrt(vector_size)) {
                 continue;
             }
         }
 
         // Subtraction
-        cVectorOperations<DataType>::subtract_scaled_vector(
-                &V[vector_size*i], vector_size, scale, v);
+        cVectorOperations<DataType>::subtract_scaled_vector(&V[vector_size*i], vector_size, scale, v);
     }
 }
 
@@ -275,8 +267,7 @@ static void orthogonalize_vectors(
         const IndexType num_vectors)
 {
     // Do nothing if there is only one vector
-    if (num_vectors < 2)
-    {
+    if (num_vectors < 2) {
         return;
     }
 
@@ -294,10 +285,8 @@ static void orthogonalize_vectors(
     IndexType num_threads = 1;
     auto random_number_generator = ThreadedRNG64(num_threads);
 
-    while (i < num_vectors)
-    {
-        if ((success == 0) && (num_trials >= max_num_trials))
-        {
+    while (i < num_vectors) {
+        if ((success == 0) && (num_trials >= max_num_trials)) {
             std::cerr << "ERROR: Cannot orthogonalize vectors after " \
                       << num_trials << " trials. Aborting." \
                       << std::endl;
@@ -308,22 +297,18 @@ static void orthogonalize_vectors(
         success = 1;
 
         // j iterates on previous vectors in a window of at most vector_size
-        if (static_cast<LongIndexType>(i) > vector_size)
-        {
+        if (static_cast<LongIndexType>(i) > vector_size) {
             // When vector_size is smaller than i, it is fine to cast to signed
             start = i - static_cast<IndexType>(vector_size);
         }
 
         // Reorthogonalize against previous vectors
-        for (j=start; j < i; ++j)
-        {
+        for (j=start; j < i; ++j) {
             // Norm of the j-th vector
-            norm = cVectorOperations<DataType>::euclidean_norm(
-                    &vectors[j*vector_size], vector_size);
+            norm = cVectorOperations<DataType>::euclidean_norm(&vectors[j*vector_size], vector_size);
 
             // Check norm
-            if (norm < epsilon * sqrt(vector_size))
-            {
+            if (norm < epsilon * sqrt(vector_size)) {
                 std::cerr << "WARNING: norm of the given vector is too " \
                           << " small. Cannot reorthogonalize against zero" \
                           << "vector. Skipping."
@@ -342,8 +327,7 @@ static void orthogonalize_vectors(
             // If scale is is 1, it is possible that i-th and j-th vectors are
             // identical (or close). So, instead of subtracting them,
             // regenerate new i-th vector.
-            if (std::abs(scale - 1.0) <= 2.0 * epsilon)
-            {
+            if (std::abs(scale - 1.0) <= 2.0 * epsilon) {
                 // Norm of the i-th vector
                 norm_i = cVectorOperations<DataType>::euclidean_norm(
                         &vectors[i*vector_size], vector_size);
@@ -379,8 +363,7 @@ static void orthogonalize_vectors(
                     &vectors[i*vector_size], vector_size);
 
             // If the norm is too small, regenerate the i-th vector randomly
-            if (norm_i < epsilon * sqrt(vector_size))
-            {
+            if (norm_i < epsilon * sqrt(vector_size)) {
                 // Regenerate new random vector for i-th vector
                 generate_array< 0, DataType >(
                         random_number_generator, &vectors[i*vector_size],
@@ -395,12 +378,9 @@ static void orthogonalize_vectors(
             }
         }
 
-        if (success == 1)
-        {
+        if (success == 1) {
             ++i;
-
-            // Reset if num_trials was incremented before.
-            num_trials = 0;
+            num_trials = 0; // Reset if num_trials was incremented before.
         }
     }
 }

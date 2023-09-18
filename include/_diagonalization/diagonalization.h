@@ -108,24 +108,24 @@
 
 template <typename DataType>
 int eigh_tridiagonal(
-				DataType* diagonals,
-				DataType* subdiagonals,
-				DataType* eigenvectors,
-				IndexType matrix_size) 
-{
-		char jobz = 'V';                                  // 'V' computes both eigenvalues and eigenvectors
-		DataType* work = new DataType[2*matrix_size - 2]; // Workspace array
-		int ldz = matrix_size;                            // Leading dimension of 2D eigenvectors array
-		int n = static_cast<int>(matrix_size);            // matrix size
-		int info;                                         // Error code output
+	DataType* diagonals,
+	DataType* subdiagonals,
+	DataType* eigenvectors,
+	IndexType matrix_size
+	) {
+	char jobz = 'V';                                  // 'V' computes both eigenvalues and eigenvectors
+	DataType* work = new DataType[2*matrix_size - 2]; // Workspace array
+	int ldz = matrix_size;                            // Leading dimension of 2D eigenvectors array
+	int n = static_cast<int>(matrix_size);            // matrix size
+	int info;                                         // Error code output
 
-		// Calling Fortran subroutine
-		lapack_xstev(&jobz, &n, diagonals, subdiagonals, eigenvectors, &ldz, work, &info);
-		
-		// Cleanup 
-		delete[] work;
-		assert((info == 0, "?stev subroutine returned non-zero status."));
-		return info;
+	// Calling Fortran subroutine
+	lapack_xstev(&jobz, &n, diagonals, subdiagonals, eigenvectors, &ldz, work, &info);
+	
+	// Cleanup 
+	delete[] work;
+	assert((info == 0, "?stev subroutine returned non-zero status."));
+	return info;
 }
 
 
@@ -230,8 +230,7 @@ int svd_bidiagonal(
 		int info;
 
 		// Calling Fortran subroutine
-		lapack_xbdsdc(&UPLO, &COMPQ, &n, diagonals, supdiagonals, U, &LDU, Vt,
-						&LDVT, Q, IQ, work, iwork, &info);
+		lapack_xbdsdc(&UPLO, &COMPQ, &n, diagonals, supdiagonals, U, &LDU, Vt, &LDVT, Q, IQ, work, iwork, &info);
 
 		delete[] work;
 		delete[] iwork;

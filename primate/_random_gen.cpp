@@ -42,7 +42,7 @@ void _random(py::module& m, std::string suffix){
 // From: https://www.pcg-random.org/posts/cpp-seeding-surprises.html
 using knuth_lcg = std::linear_congruential_engine< uint64_t, 6364136223846793005U, 1442695040888963407U, 0U>;
 
-PYBIND11_MODULE(_random, m) {
+PYBIND11_MODULE(_random_gen, m) {
   _random< SplitMix64, float >(m, std::string("_sx")); 
   _random< Xoshiro256StarStar, float >(m, std::string("_xs")); 
   _random< std::mt19937_64, float >(m, std::string("_mt")); 

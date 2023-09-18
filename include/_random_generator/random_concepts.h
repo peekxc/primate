@@ -13,7 +13,7 @@ concept LightRandom64Engine = requires(T rne, std::seed_seq& S) {
 
 template < typename T >
 concept Random64Engine = requires(T rne) {
-  T::state_size > 0;                            // has a known state size, in terms of number 32 unsigned integers NOTE: not required
+  T::state_size > 0;                            // has a known positive state size, in terms of number 32 unsigned integers
 } && LightRandom64Engine< T >;
 
 

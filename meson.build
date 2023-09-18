@@ -34,7 +34,8 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-misleading-indentation',
   '-std=c++20', 
   '-fPIC', 
-  '-fvisibility=hidden'
+  '-fvisibility=hidden',
+  '-flto=thin'  # LTO optimization only for release builds
 )
 
 ## TODO: add sp.show_config()

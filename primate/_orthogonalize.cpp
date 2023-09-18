@@ -10,12 +10,13 @@
 
 namespace py = pybind11;
 
+// Note we enforce fortran style ordering here
 template< std::floating_point F > 
-using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
+using py_array = py::array_t< F, py::array::f_style | py::array::forcecast >;
 
 template< std::floating_point F >
 void gram_schmidt (
-  const py_array< F >& V, 
+  const py_array< F >& V,  // note this should be in Fortran / column-major order
   const LongIndexType vector_size, 
   const IndexType num_vectors, 
   const IndexType last_vector, 

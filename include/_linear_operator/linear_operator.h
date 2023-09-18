@@ -53,9 +53,10 @@ concept Operator =
 
 // Represents the operator (A + tB) for parameter T = { t1, t2, ..., tn }
 template < typename T, typename F = typename T::value_type >
-concept AffineOperator = requires(T op, F* params) {
-  { op.set_parameters(params) };
-  { op.get_num_parameters() } -> std::convertible_to< size_t >;
+concept AffineOperator = requires(T op, F t) {
+  T::relation_known; // -> std::convertible_to< bool >;
+  { op.set_parameter(t) };
+  // { op.get_num_parameters() } -> std::convertible_to< size_t >;
 } && Operator< T, F >;
 
 #endif

@@ -1,5 +1,5 @@
 ## Extension modules
-extensions = [ '_random', '_orthogonalize', '_diagonalize', '_trace']
+extensions = [ '_random_gen', '_orthogonalize', '_diagonalize', '_trace']
 foreach ext: extensions
   py.extension_module(
     ext,

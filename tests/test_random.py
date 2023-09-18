@@ -30,8 +30,8 @@ def plot_estimates():
   from bokeh.plotting import show, figure
   from bokeh.models import Span
   output_notebook()
-  #counts = np.array([np.sum(random.rademacher(100)) for _ in range(5000)])
-  counts = np.array([np.sum(random.normal(100, engine="lcg")) for _ in range(5000)])
+  counts = np.array([np.sum(random.rademacher(100)) for _ in range(5000)])
+  # counts = np.array([np.sum(random.normal(100, engine="lcg")) for _ in range(5000)])
   # counts = np.array([np.sum(random.rayleigh(100, engine="lcg")) for _ in range(5000)])
   p = figure(width=200, height=150)
   p.vbar(x=np.arange(len(counts)), top=counts, color="navy")

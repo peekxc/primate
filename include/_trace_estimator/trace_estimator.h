@@ -179,7 +179,7 @@
     FlagType trace_estimator(
         Matrix* A,
         const DataType* parameters,
-        const IndexType num_inquiries,
+        const IndexType num_parameters,
         Func&& matrix_function,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
@@ -245,7 +245,7 @@
 
                 // Perform one Monte-Carlo sampling to estimate trace
                 stochastic_lanczos_quadrature< gramian >(
-                    A, parameters, num_inquiries, matrix_function, 
+                    A, parameters, num_parameters, matrix_function, 
                     orthogonalize, lanczos_degree, lanczos_tol,
                     rng,
                     &random_vectors[matrix_size*thread_id], converged,
@@ -262,7 +262,7 @@
                     // This check can also be done after another parallel thread
                     // set all_converged to "1", but we continue to update error.
                     all_converged = ConvergenceTools< DataType >::check_convergence(
-                        samples, min_num_samples, num_inquiries,
+                        samples, min_num_samples, num_parameters,
                         processed_samples_indices, num_processed_samples,
                         confidence_level, error_atol, error_rtol, error,
                         num_samples_used, converged
@@ -277,7 +277,7 @@
 
         // Remove outliers from trace estimates and average trace estimates
         ConvergenceTools<DataType>::average_estimates(
-            confidence_level, outlier_significance_level, num_inquiries,
+            confidence_level, outlier_significance_level, num_parameters,
             max_num_samples, num_samples_used, processed_samples_indices,
             samples, num_outliers, trace, error
         );
@@ -389,7 +389,7 @@
     void stochastic_lanczos_quadrature(
         Matrix* A,
         const DataType* parameters,
-        const IndexType num_inquiries,
+        const IndexType num_parameters,
         Func&& matrix_function,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
@@ -399,7 +399,6 @@
         FlagType* converged,
         DataType* trace_estimate)
     {
-        // Matrix size
         IndexType matrix_size = static_cast< std::pair< size_t, size_t > >(A->shape()).first;
 
         // Fill random vectors with Rademacher distribution (+1, -1), normalized
@@ -421,15 +420,17 @@
         DataType* left_singularvectors = NULL;
         DataType* right_singularvectors_transposed = NULL;
 
-        // Actual number of 0-mean vectors to sample 
-        IndexType required_num_inquiries = num_inquiries;
+        IndexType required_num_inquiries = num_parameters;
+        if constexpr(AffineOperator< Matrix >){
+            // Special case where, given eig(A), the values eig(A + tB) are known for any t
+            required_num_inquiries = Matrix::relation_known ? 1 : num_parameters; 
+        }
 
         // Allocate and initialize theta
-        IndexType i;
-        IndexType j;
-        DataType** theta = new DataType*[num_inquiries];
-        DataType** tau = new DataType*[num_inquiries];
-        for (j=0; j < num_inquiries; ++j) {
+        IndexType i, j;
+        DataType** theta = new DataType*[num_parameters];
+        DataType** tau = new DataType*[num_parameters];
+        for (j=0; j < num_parameters; ++j) {
             theta[j] = new DataType[lanczos_degree];
             tau[j] = new DataType[lanczos_degree];
             for (i=0; i < lanczos_degree; ++i) {
@@ -438,19 +439,11 @@
             }
         }
 
-        // Allocate lanczos size for each inquiry. This variable keeps the non-zero
-        // size of the tri-diagonal (or bi-diagonal) matrix. Ideally, this matrix
-        // is of the size lanczos_degree. But, due to the early termination, this
-        // size might be smaller.
-        IndexType* lanczos_size = new IndexType[num_inquiries];
+        // Non-zero size of the tri-diagonal (or bi-diagonal) matrix. Ideally, this matrix
+        // is of the size lanczos_degree. But, due to the early termination, it might be smaller.
+        IndexType* lanczos_size = new IndexType[num_parameters];
 
-        // Number of parameters of linear operator A
-        IndexType num_parameters = 0;
-        if constexpr (AffineOperator< Matrix >){
-            num_parameters = A->get_num_parameters();
-        }
-        // IndexType num_parameters = A->parameters.size();
-
+        // MJP: Choosing between gramian / bidiagonal matrix should be zero-cost, so we use constexpr!
         if constexpr(gramian) {
             static_assert(AdjointOperator< Matrix >);
             // Lanczos iterations for gramian, computes theta and tau for each inquiry parameter
@@ -459,14 +452,14 @@
                 // However, exclude the case where required_num_inquiries is not the
                 // same as num_inquiries, since in this case, we compute one inquiry
                 // for multiple parameters.
-                if ((converged[j] == 1) && (required_num_inquiries == num_inquiries)) {
+                if ((converged[j] == 1) && (required_num_inquiries == num_parameters)) {
                     continue; // MJP: why isn't this a break?
                 }
 
                 // Set parameter of linear operator A
                 if constexpr (AffineOperator< Matrix >){
                     // A->set_parameters(&parameters[j*num_parameters]); // I don't understand why an address was passed
-                    A->set_parameters(parameters[j]); 
+                    A->set_parameter(parameters[j]); 
                 }
 
                 // Use Golub-Kahn-Lanczos Bi-diagonalization
@@ -500,7 +493,7 @@
             for (j=0; j < required_num_inquiries; ++j) {
                 
                 if constexpr (AffineOperator< Matrix >){
-                    A->set_parameters(&parameters[j*num_parameters]);
+                    A->set_parameter(parameters[j]);
                 }
 
                 // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
@@ -524,18 +517,15 @@
 
         // Estimate trace using quadrature method
         DataType quadrature_sum;
-        for (j=0; j < num_inquiries; ++j) {
+        for (j=0; j < num_parameters; ++j) {
             // If the j-th inquiry is already converged, skip.
             if (converged[j] == 1) { continue; }
 
             // Initialize sum for the integral of quadrature
             quadrature_sum = 0.0;
 
-            // Important: This loop should iterate till lanczos_size[j], but not
-            // lanczos_degree. Otherwise the computation is wrong for certain
-            // matrices, such as if the input matrix is identity, or rank
-            // deficient. By using lanczos_size[j] instead of lanczos_degree, all
-            // issues with special matrices will resolve.
+            // Important: This loop should iterate till lanczos_size[j], not lanczos_degree. 
+            // Otherwise, if the input matrix is identity, or rank deficient, the computation is wrong. 
             for (i=0; i < lanczos_size[j]; ++i) {
                 quadrature_sum += tau[j][i] * tau[j][i] * matrix_function(theta[j][i]);
             }
