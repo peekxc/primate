@@ -38,8 +38,7 @@ struct SparseEigenAffineOperator {
 
   SparseEigenAffineOperator(
     const Eigen::SparseMatrix< F >& _A,
-    const Eigen::SparseMatrix< F >& _B,
-    const size_t num_params 
+    const Eigen::SparseMatrix< F >& _B 
   ) : A(_A), B(_B), n_matvecs(0) {
     _param = 0.0f;
   }
