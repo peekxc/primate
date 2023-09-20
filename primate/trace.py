@@ -19,7 +19,7 @@ _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank",
 
 def slq(
   A: Union[LinearOperator, spmatrix, np.ndarray],
-  gram: bool = False, 
+  gram: bool = True, 
   parameters: Iterable = None,
   matrix_function: Union[str, Callable] = "identity",
   min_num_samples: int = 10,
@@ -71,7 +71,7 @@ def slq(
 
   ## Check input arguments have proper type and values
   error_atol, error_rtol = te_util.check_arguments(
-    False, 1.0, min_num_samples, max_num_samples, error_atol,
+    gram, 1.0, min_num_samples, max_num_samples, error_atol,
     error_rtol, confidence_level, outlier_significance_level,
     lanczos_degree, lanczos_tol, orthogonalize, num_threads,
     0, verbose, plot, False
@@ -122,6 +122,7 @@ def slq(
     raise NotImplementedError("Not done yet")
   
   ## Make the actual call
+  assert gram, "gramians only supported for now "
   trace_f = getattr(_trace, method_name)
   trace_f(*inputs, *trace_args)
 

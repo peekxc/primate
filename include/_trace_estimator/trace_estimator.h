@@ -214,6 +214,7 @@
         DataType* random_vectors = new DataType[random_vectors_size];
 
         // Thread-safe random bit generator
+        std::cout << "Spinning up RNG" << std::endl;
         auto rng = ThreadedRNG64(num_threads);
 
         // The counter of filled size of processed_samples_indices array
@@ -232,6 +233,7 @@
             chunk_size = 1;
         }
 
+        std::cout << "timer started: Starting SLQ" << std::endl;
         // Timing elapsed time of algorithm
         Timer timer;
         timer.start();
@@ -275,6 +277,7 @@
         timer.stop();
         alg_wall_time = timer.elapsed();
 
+        std::cout << "timer ended: averaging estimates" << std::endl;
         // Remove outliers from trace estimates and average trace estimates
         ConvergenceTools<DataType>::average_estimates(
             confidence_level, outlier_significance_level, num_parameters,
@@ -405,6 +408,7 @@
         // but not orthogonalized. Settng num_threads to zero indicates to not
         // create any new threads in RandomNumbrGenerator since the current
         // function is inside a parallel thread.
+        std::cout << "Generating random vector" << std::endl;
         IndexType num_threads = 0;
         generate_array< 0, DataType >(
             rng, random_vector, matrix_size, num_threads
@@ -425,6 +429,7 @@
             // Special case where, given eig(A), the values eig(A + tB) are known for any t
             required_num_inquiries = Matrix::relation_known ? 1 : num_parameters; 
         }
+        std::cout << "Setting req. # inqueries to " << required_num_inquiries << std::endl;
 
         // Allocate and initialize theta
         IndexType i, j;
@@ -449,25 +454,30 @@
             // MJP: Moved eigenvector to a pre-allocation model of size (lanczos_degree * lanczos_degree) 
             // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe
             // eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
+            std::cout << "Proceeeding with sampling" << std::endl;
             eigenvectors = new DataType[lanczos_degree * lanczos_degree];
             for (j=0; j < required_num_inquiries; ++j) {
                 
+                std::cout << "Setting affine parameter" << std::endl;
                 if constexpr (AffineOperator< Matrix >){
                     A->set_parameter(parameters[j]);
                 }
 
                 // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
+                std::cout << "Tridiagonalizing" << std::endl;
                 lanczos_size[j] = lanczos_tridiagonalization(
                     A, random_vector, matrix_size, lanczos_degree, lanczos_tol, orthogonalize, 
                     alpha, beta
                 );
 
                 // Note: alpha is written in-place with eigenvalues
+                std::cout << "Eigen-decomposing tridiagonal" << std::endl;
                 eigh_tridiagonal< DataType >(
                     alpha, beta, eigenvectors, lanczos_size[j]
                 );
 
                 // theta and tau from singular values and vectors
+                std::cout << "Computing the quadrature rule" << std::endl;
                 for (i=0; i < lanczos_size[j]; ++i) {
                     theta[j][i] = alpha[i];
                     tau[j][i] = eigenvectors[i * lanczos_size[j]];
@@ -487,11 +497,14 @@
 
                 // Set parameter of linear operator A
                 if constexpr (AffineOperator< Matrix >){
-                    // A->set_parameters(&parameters[j*num_parameters]); // I don't understand why an address was passed
+                    // I don't understand why an address was passed; also isn't parameters just a single dimensional array?
+                    // Why is j multiplied by num_parameters?
+                    // A->set_parameters(&parameters[j*num_parameters]); 
                     A->set_parameter(parameters[j]); 
                 }
 
                 // Use Golub-Kahn-Lanczos Bi-diagonalization
+                std::cout << "Bidiagonalizing" << std::endl;
                 lanczos_size[j] = golub_kahn_bidiagonalization(
                     A, random_vector, matrix_size, lanczos_degree, lanczos_tol,
                     orthogonalize, alpha, beta

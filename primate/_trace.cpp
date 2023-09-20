@@ -98,9 +98,10 @@ template< bool gramian, std::floating_point F, class Matrix, typename WrapperFun
 void _trace(py::module& m, WrapperFunc wrap){
   std::string suffix = gramian ? "_gram" : "_rect";
   m.def((std::string("trace_identity") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
-    const auto op = wrap(A); // this fails
-    // const auto f = std::identity();
-    // trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
+    const auto op = SparseEigenLinearOperator< F >(*A);
+    // const auto op = wrap(A); // this fails
+    const auto f = std::identity();
+    trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS); // this does too
     return 0; 
   });
   m.def((std::string("trace_smoothstep") + suffix).c_str(), [&wrap](const Matrix* A, const F a, const F b, TRACE_PARAMS){
@@ -174,6 +175,6 @@ auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
+  // _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
   _trace< true, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);  // gramian version
 };
