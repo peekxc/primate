@@ -78,7 +78,7 @@ endif
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
 ## Otherwise BLAS must be linked and used
 env = environment()
-# env.set('USE_CBLAS', '0') ## Turn off CBLAS
+env.set('USE_CBLAS', '1') ## Turn off CBLAS
 
 ## Use SciPy-configured BLAS
 # scipy_blas_found = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["blas"]["found"]'], check : false).stdout().strip()

@@ -45,7 +45,7 @@ IndexType lanczos_tridiagonalize_api(Matrix* op, const py_array< F >& v, const f
   if (alpha.shape(0) < m || beta.shape(0) < m){
     throw std::invalid_argument("Output arrays 'alpha' / 'beta' must at least match the number of columns.");
   }
-  lanczos_tridiagonalization< Matrix, F >(op, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
+  lanczos_tridiagonalization< F, Matrix >(op, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
   return 0; 
 }
 
@@ -62,7 +62,7 @@ IndexType lanczos_tridiagonalize_py(const py::object& op, const py_array< F >& v
   if (alpha.shape(0) < m || beta.shape(0) < m){
     throw std::invalid_argument("Ouputs arrays 'alpha' / 'beta' must ");
   }
-  lanczos_tridiagonalization< PyLinearOperator< F >, F >(&lo, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
+  lanczos_tridiagonalization< F, PyLinearOperator< F > >(&lo, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
   return 0; 
 }
 
@@ -73,7 +73,7 @@ IndexType golub_kahan_bidiagonalize_py(PyAdjointOperator< F >* op, const py_arra
   auto m = static_cast< int >(shape.second);
   auto alpha_out = static_cast< F* >(alpha.request().ptr);
   auto beta_out = static_cast< F* >(beta.request().ptr);
-  golub_kahn_bidiagonalization< PyAdjointOperator< F >, F >(op, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
+  golub_kahn_bidiagonalization< F, PyAdjointOperator< F > >(op, v.data(), n, m, lanczos_tol, orthogonalize, alpha_out, beta_out);
   return 0; 
 }
 

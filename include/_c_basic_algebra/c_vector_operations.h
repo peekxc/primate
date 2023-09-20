@@ -99,8 +99,7 @@ static void copy_scaled_vector(
     #else
 
     // Not using OpenBlas
-    for (LongIndexType i=0; i < vector_size; ++i)
-    {
+    for (LongIndexType i=0; i < vector_size; ++i) {
         output_vector[i] = scale * input_vector[i];
     }
 
@@ -287,7 +286,7 @@ static DataType euclidean_norm(
 
     DataType norm = cblas_interface::xnrm2(vector_size, vector, incx);
 
-    return norm;
+    return std::isnan(norm) ? 0.0 : norm; // mjp 
 
     #else
 
@@ -296,8 +295,7 @@ static DataType euclidean_norm(
     LongIndexType chunk = 5;
     LongIndexType vector_size_chunked = vector_size - (vector_size % chunk);
 
-    for (LongIndexType i=0; i < vector_size_chunked; i += chunk)
-    {
+    for (LongIndexType i=0; i < vector_size_chunked; i += chunk){
         norm2 += vector[i] * vector[i] +
                  vector[i+1] * vector[i+1] +
                  vector[i+2] * vector[i+2] +
@@ -305,15 +303,14 @@ static DataType euclidean_norm(
                  vector[i+4] * vector[i+4];
     }
 
-    for (LongIndexType i=vector_size_chunked; i < vector_size; ++i)
-    {
+    for (LongIndexType i=vector_size_chunked; i < vector_size; ++i){
         norm2 += vector[i] * vector[i];
     }
 
     // Norm
     DataType norm = sqrt(static_cast<DataType>(norm2));
 
-    return norm;
+    return std::isnan(norm) ? 0.0 : norm; // mjp 
 
     #endif
 }
@@ -339,28 +336,26 @@ static DataType normalize_vector_in_place(
     #if (USE_CBLAS == 1)
 
     // Norm of vector
-    DataType norm = euclidean_norm(
-            vector, vector_size);
+    DataType norm = euclidean_norm(vector, vector_size);
 
     // Normalize in place
-    DataType scale = 1.0 / norm;
+    DataType scale = 1.0 / (std::isnan(norm) ? 1.0 : norm);
     int incx = 1;
     cblas_interface::xscal(vector_size, scale, vector, incx);
 
-    return norm;
+    return std::isnan(norm) ? 0.0 : norm;
 
     #else
 
     // Norm of vector
-    DataType norm = euclidean_norm(vector,
-                                                                vector_size);
+    DataType norm = euclidean_norm(vector, vector_size);
 
     // Normalize in place
-    for (LongIndexType i=0; i < vector_size; ++i)
-    {
-        vector[i] /= norm;
+    if (norm > std::numeric_limits< DataType >::epsilon()){
+        for (LongIndexType i=0; i < vector_size; ++i) {
+            vector[i] /= norm;
+        }
     }
-
     return norm;
 
     #endif
@@ -403,13 +398,13 @@ static DataType normalize_vector_and_copy(
     #else
 
     // Norm of vector
-    DataType norm = euclidean_norm(vector,
-                                                                vector_size);
+    DataType norm = euclidean_norm(vector,vector_size);
 
     // Normalize to output
-    for (LongIndexType i=0; i < vector_size; ++i)
-    {
-        output_vector[i] = vector[i] / norm;
+    if (norm > std::numeric_limits< DataType >::epsilon()){
+        for (LongIndexType i=0; i < vector_size; ++i) {
+            output_vector[i] = vector[i] / norm;
+        }
     }
 
     return norm;

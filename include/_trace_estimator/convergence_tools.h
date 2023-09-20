@@ -140,11 +140,9 @@ struct ConvergenceTools {
         // If number of processed samples are not enough, set to not converged yet.
         // This is essential since in the first few iterations, the standard
         // deviation of the cumulative averages are still too small.
-        if (num_processed_samples < min_num_samples)
-        {
+        if (num_processed_samples < min_num_samples) {
             // Skip computing error. Fill outputs with trivial initial values
-            for (j=0; j < num_inquiries; j++)
-            {
+            for (j=0; j < num_inquiries; j++) {
                 error[j] = INFINITY;
                 converged[j] = 0;
                 num_samples_used[j] = num_processed_samples;
@@ -164,32 +162,33 @@ struct ConvergenceTools {
             static_cast<DataType>(erf_inv(static_cast<double>(confidence_level)));
 
         // For each column of samples, compute error of all processed rows
-        for (j=0; j < num_inquiries; ++j)
-        {
+        DataType sample_val;
+        IndexType num_non_nan = 0; 
+        for (j=0; j < num_inquiries; ++j) {
             // Do not check convergence if j-th column already converged
-            if (converged[j] == 0)
-            {
+            if (converged[j] == 0) {
                 // mean of j-th column using all processed rows of j-th column
                 summand = 0.0;
-                for (i=0; i < num_processed_samples; ++i)
-                {
-                    summand += samples[processed_samples_indices[i]][j];
+                for (i=0; i < num_processed_samples; ++i) {
+                    sample_val = samples[processed_samples_indices[i]][j];
+                    summand += std::isnan(sample_val) ? 0 : sample_val; 
+                    num_non_nan += std::isnan(sample_val) ? 1 : 0;
                 }
-                mean = summand / num_processed_samples;
+                mean = summand / num_non_nan;
 
                 // std of j-th column using all processed rows of j-th column
-                if (num_processed_samples > 1)
-                {
+                if (num_processed_samples > 1) {
                     summand = 0.0;
-                    for (i=0; i < num_processed_samples; ++i)
-                    {
+                    for (i=0; i < num_processed_samples; ++i) {
                         data = samples[processed_samples_indices[i]][j];
-                        summand += (data - mean) * (data - mean);
+                        if (!std::isnan(data)){
+                            summand += (data - mean) * (data - mean);
+                        }
                     }
                     std = sqrt(summand / (num_processed_samples - 1.0));
+                    std = std::isnan(std) ? INFINITY : std;
                 }
-                else
-                {
+                else {
                     std = INFINITY;
                 }
 
@@ -197,8 +196,7 @@ struct ConvergenceTools {
                 error[j] = standard_z_score * std / sqrt(num_processed_samples);
 
                 // Check error with atol and rtol to find if j-th column converged
-                if (error[j] < std::max(error_atol, error_rtol*mean))
-                {
+                if (error[j] < std::max(error_atol, error_rtol*mean)) {
                     converged[j] = 1;
                 }
 
@@ -209,10 +207,8 @@ struct ConvergenceTools {
 
         // Check convergence is reached for all columns (all inquiries)
         all_converged = 1;
-        for (j=0; j < num_inquiries; ++j)
-        {
-            if (converged[j] == 0)
-            {
+        for (j=0; j < num_inquiries; ++j) {
+            if (converged[j] == 0) {
                 // The j-th column not converged.
                 all_converged = 0;
                 break;
@@ -312,8 +308,7 @@ struct ConvergenceTools {
         // Quantile of normal distribution area where is not considered as outlier
         DataType outlier_z_score = sqrt(2.0) * erf_inv(outlier_confidence_level);
 
-        for (j=0; j < num_inquiries; ++j)
-        {
+        for (j=0; j < num_inquiries; ++j){
             // Initialize outlier indices for each column of samples
             for (i=0; i < max_num_samples; ++i)
             {

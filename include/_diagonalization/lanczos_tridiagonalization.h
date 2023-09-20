@@ -111,7 +111,7 @@
 ///             smaller. This counter keeps track of the *non-zero* size of \c
 ///             alpha and \c beta.
 
-template < LinearOperator Matrix, typename DataType = typename Matrix::value_type  >
+template < std::floating_point DataType, LinearOperator Matrix >
 IndexType lanczos_tridiagonalization(
     Matrix* A,
     const DataType* v,

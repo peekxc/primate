@@ -8,16 +8,20 @@
 #include <_trace_estimator/trace_estimator.h>
 #include <_timer/timer.h>
 #include "eigen_operators.h"
+#include <iostream>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
+
+template< std::floating_point F >
+using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
 
 // For passing by reference, see: https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html#pass-by-reference
 template< bool gramian, std::floating_point F, Operator Matrix, std::invocable< F > Func > 
 void trace_estimator_slq_py(
   const Matrix* matrix, 
   Func&& matrix_function, 
-  const py::array_t< F >& parameters, 
+  const py_array< F >& parameters, 
   const size_t num_inqueries,
   const int orthogonalize, 
   const size_t lanczos_degree, 
@@ -29,13 +33,13 @@ void trace_estimator_slq_py(
   const F confidence, 
   const F outlier,
   const int num_threads, 
-  py::array_t< F >& trace,
-  py::array_t< F >& error,
-  py::array_t< F >& samples,
-  py::array_t< int >& processed_samples_indices,
-  py::array_t< int >& num_samples_used,
-  py::array_t< int >& num_outliers,
-  py::array_t< int >& converged, 
+  py_array< F >& trace,
+  py_array< F >& error,
+  py_array< F >& samples,
+  py::array_t< int32_t >& processed_samples_indices,
+  py::array_t< int32_t >& num_samples_used,
+  py::array_t< int32_t >& num_outliers,
+  py::array_t< int32_t >& converged, 
   F& alg_wall_time
 ){
   // Set the number of threads based on user input
@@ -58,7 +62,7 @@ void trace_estimator_slq_py(
   ssize_t s_cols = samples.shape(1);
   F** samples_out = new F*[s_rows];
   for (ssize_t i = 0; i < s_rows; ++i) {
-    samples_out[i] = samples_ptr + i * s_cols;
+    samples_out[i] = new F[s_cols];
   }
   
   // Call the trace estimators
@@ -74,16 +78,24 @@ void trace_estimator_slq_py(
     );
   }
 
+  // Copy the samples
+  // std::cout << "copying the samples over" << std::endl;
+  for (ssize_t i = 0; i < s_rows; ++i) {
+    for (ssize_t j = 0; j < s_cols; ++j) {
+      samples_ptr[i * s_cols + j] = samples_out[i][j];
+      // std::cout << "sample: " << samples_out[i][j] << std::endl;
+    }
+  }
   delete[] samples_out;
 }
 
 #define TRACE_PARAMS \
-  const py::array_t< F >& parameters, const size_t num_inqueries, \
+  const py_array< F >& parameters, const size_t num_inqueries, \
   const int orthogonalize, const size_t lanczos_degree, const F lanczos_tol, const size_t min_num_samples, const size_t max_num_samples, \
   const F error_atol,  const F error_rtol, const F confidence, const F outlier, \
   const int num_threads, \
-  py::array_t< F >& trace, py::array_t< F >& error, py::array_t< F >& samples, \
-  py::array_t< int >& processed_samples_indices, py::array_t< int >& num_samples_used, py::array_t< int >& num_outliers, py::array_t< int >& converged, F& alg_wall_time
+  py_array< F >& trace, py_array< F >& error, py_array< F >& samples, \
+  py::array_t< int32_t >& processed_samples_indices, py::array_t< int32_t >& num_samples_used, py::array_t< int32_t >& num_outliers, py::array_t< int32_t >& converged, F& alg_wall_time
 
 #define TRACE_ARGS \
   parameters, num_inqueries, \
@@ -93,18 +105,26 @@ void trace_estimator_slq_py(
   trace, error, samples, \
   processed_samples_indices, num_samples_used, num_outliers, converged, alg_wall_time
 
+#define TRACE_PYBIND_PARAMS \
+  py::arg("parameters"), py::arg("num_inqueries"), \
+  py::arg("orthogonalize"), py::arg("lanczos_degree"), py::arg("lanczos_tol"), py::arg("min_num_samples"), py::arg("max_num_samples"), \
+  py::arg("error_atol"), py::arg("error_rtol"), py::arg("confidence"), py::arg("outlier"), \
+  py::arg("num_threads"), \
+  py::arg("trace").noconvert(), py::arg("error").noconvert(), py::arg("samples").noconvert(), \
+  py::arg("processed_samples_indices").noconvert(), py::arg("num_samples_used").noconvert(), py::arg("num_outliers").noconvert(), py::arg("converged").noconvert(), py::arg("alg_wall_time")
+
 // Instantiates the function templates for generic matrices types (which may need wrapped)
 template< bool gramian, std::floating_point F, class Matrix, typename WrapperFunc >
 void _trace(py::module& m, WrapperFunc wrap){
   std::string suffix = gramian ? "_gram" : "_rect";
-  m.def((std::string("trace_identity") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
-    const auto op = SparseEigenLinearOperator< F >(*A);
-    // const auto op = wrap(A); // this fails
+  // std::cout << "type id: " << typeid(wrap).name() << std::endl;
+  // std::cout << "Wrapper is nullptr? " << (wrap == nullptr) << std::endl;
+  m.def((std::string("trace_identity") + suffix).c_str(), [wrap](const Matrix* A, TRACE_PARAMS){ // keep wrap pass by value!
+    const auto op = wrap(A);
     const auto f = std::identity();
-    trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS); // this does too
-    return 0; 
-  });
-  m.def((std::string("trace_smoothstep") + suffix).c_str(), [&wrap](const Matrix* A, const F a, const F b, TRACE_PARAMS){
+    trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS); 
+  }, py::arg("A"), TRACE_PYBIND_PARAMS);
+  m.def((std::string("trace_smoothstep") + suffix).c_str(), [wrap](const Matrix* A, const F a, const F b, TRACE_PARAMS){
     const auto op = wrap(A);
     const F d = (b-a);
     const auto f = [a, d](F eigenvalue) -> F { 
@@ -112,32 +132,32 @@ void _trace(py::module& m, WrapperFunc wrap){
     }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_sqrt") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
+  m.def((std::string("trace_sqrt") + suffix).c_str(), [wrap](const Matrix* A, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [](F eigenvalue) -> F {  return std::sqrt(eigenvalue); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_inv") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
+  m.def((std::string("trace_inv") + suffix).c_str(), [wrap](const Matrix* A, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [](F eigenvalue) -> F {  return (F(1.0)/eigenvalue); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_log") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
+  m.def((std::string("trace_log") + suffix).c_str(), [wrap](const Matrix* A, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [](F eigenvalue) -> F { return std::log(eigenvalue); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_exp") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
+  m.def((std::string("trace_exp") + suffix).c_str(), [wrap](const Matrix* A, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [](F eigenvalue) -> F { return std::exp(eigenvalue); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_pow") + suffix).c_str(), [&wrap](const Matrix* A, const F p, TRACE_PARAMS){
+  m.def((std::string("trace_pow") + suffix).c_str(), [wrap](const Matrix* A, const F p, TRACE_PARAMS){
     const auto op = wrap(A);
      const auto f = [p](F eigenvalue) -> F { return std::pow(eigenvalue, p); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_gaussian") + suffix).c_str(), [&wrap](const Matrix* A, const F mu, const F sigma, TRACE_PARAMS){
+  m.def((std::string("trace_gaussian") + suffix).c_str(), [wrap](const Matrix* A, const F mu, const F sigma, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [mu, sigma](F eigenvalue) -> F {  
       auto x = (eigenvalue - mu) / sigma;
@@ -145,14 +165,14 @@ void _trace(py::module& m, WrapperFunc wrap){
     }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_numrank") + suffix).c_str(), [&wrap](const Matrix* A, const F threshold, TRACE_PARAMS){
+  m.def((std::string("trace_numrank") + suffix).c_str(), [wrap](const Matrix* A, const F threshold, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [threshold](F eigenvalue) -> F {  
       return eigenvalue > threshold ? F(1.0) : F(0.0);
     };  
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
   });
-  m.def((std::string("trace_heat") + suffix).c_str(), [&wrap](const Matrix* A, const F t, TRACE_PARAMS){
+  m.def((std::string("trace_heat") + suffix).c_str(), [wrap](const Matrix* A, const F t, TRACE_PARAMS){
     const auto op = wrap(A);
     const auto f = [t](F eigenvalue) -> F { return std::exp(-t*eigenvalue); }; 
     trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
@@ -175,6 +195,8 @@ auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  // _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
+  _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
+  _trace< false, double, Eigen::SparseMatrix< double > >(m, eigen_sparse_wrapper< double >); // rectangular version
   _trace< true, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);  // gramian version
+  _trace< true, double, Eigen::SparseMatrix< double > >(m, eigen_sparse_wrapper< double >);
 };

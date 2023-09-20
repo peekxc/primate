@@ -111,7 +111,7 @@
 ///             smaller. This counter keeps track of the *non-zero* size of \c
 ///             alpha and \c beta.
 
-template < AdjointOperator Matrix, typename DataType = typename Matrix::value_type >
+template< std::floating_point DataType, AdjointOperator Matrix >
 IndexType golub_kahn_bidiagonalization(
         Matrix* A,
         const DataType* v,
@@ -124,19 +124,15 @@ IndexType golub_kahn_bidiagonalization(
 {
     // buffer_size is number of last orthogonal vectors to keep in buffers U, V
     IndexType buffer_size;
-    if (orthogonalize == 0)
-    {
+    if (orthogonalize == 0) {
         // At least two vectors must be stored in buffer for Lanczos recursion
         buffer_size = 2;
     }
-    else if ((orthogonalize < 0) ||
-             (orthogonalize > static_cast<FlagType>(m) - 1))
-    {
+    else if ((orthogonalize < 0) || (orthogonalize > static_cast<FlagType>(m) - 1)) {
         // Using full reorthogonalization, keep all of the m vectors in buffer
         buffer_size = m;
     }
-    else
-    {
+    else {
         // Orthogonalize with less than m vectors (0 < orthogonalize < m-1)
         // plus one vector for the latest (the j-th) vector
         buffer_size = orthogonalize + 1;
@@ -157,8 +153,7 @@ IndexType golub_kahn_bidiagonalization(
     IndexType num_ortho;
 
     // Golub-Kahn iteration
-    for (j=0; j < m; ++j)
-    {
+    for (j=0; j < m; ++j) {
         // Counter for the non-zero size of alpha and beta
         ++lanczos_size;
 
@@ -166,29 +161,19 @@ IndexType golub_kahn_bidiagonalization(
         A->matvec(&V[(j % buffer_size)*n], &U[(j % buffer_size)*n]);
 
         // Performing: u_new[i] = u_new[i] - beta[j] * u_old[i]
-        if (j > 0)
-        {
+        if (j > 0){
             cVectorOperations<DataType>::subtract_scaled_vector(
                     &U[((j-1) % buffer_size)*n], n, beta[j-1],
                     &U[(j % buffer_size)*n]);
         }
 
         // orthogonalize u_new against previous vectors
-        if (orthogonalize != 0)
-        {
+        if (orthogonalize != 0) {
             // Find how many column vectors are filled so far in the buffer V
-            if (j < buffer_size)
-            {
-                num_ortho = j;
-            }
-            else
-            {
-                num_ortho = buffer_size - 1;
-            }
+            num_ortho = j < buffer_size ? j : buffer_size - 1;
 
             // Gram-Schmidt process
-            if (j > 0)
-            {
+            if (j > 0) {
                 cOrthogonalization<DataType>::gram_schmidt_process(
                         &U[0], n, buffer_size, (j-1)%buffer_size, num_ortho,
                         &U[(j % buffer_size)*n]);
@@ -196,8 +181,7 @@ IndexType golub_kahn_bidiagonalization(
         }
 
         // Normalize u_new and set its norm to alpha[j]
-        alpha[j] = cVectorOperations<DataType>::normalize_vector_in_place(
-                &U[(j % buffer_size)*n], n);
+        alpha[j] = cVectorOperations<DataType>::normalize_vector_in_place(&U[(j % buffer_size)*n], n);
 
         // Performing: v_new = A.T.dot(u_new) - alpha[j] * v_old
         A->rmatvec(&U[(j % buffer_size)*n], &V[((j+1) % buffer_size)*n]);
@@ -208,22 +192,19 @@ IndexType golub_kahn_bidiagonalization(
                 &V[((j+1) % buffer_size)*n]);
 
         // orthogonalize v_new against previous vectors
-        if (orthogonalize != 0)
-        {
+        if (orthogonalize != 0) {
             cOrthogonalization<DataType>::gram_schmidt_process(
                     &V[0], n, buffer_size, j%buffer_size, num_ortho,
                     &V[((j+1) % buffer_size)*n]);
         }
 
         // Update beta as the norm of v_new
-        beta[j] = cVectorOperations<DataType>::normalize_vector_in_place(
-                &V[((j+1) % buffer_size)*n], n);
+        beta[j] = cVectorOperations<DataType>::normalize_vector_in_place(&V[((j+1) % buffer_size)*n], n);
 
         // Exit criterion when the vector r is zero. If each component of a
         // zero vector has the tolerance epsilon, (which is called lanczos_tol
         // here), the tolerance of norm of r is epsilon times sqrt of n.
-        if (beta[j] < lanczos_tol * sqrt(n))
-        {
+        if (beta[j] < lanczos_tol * sqrt(n)){
             break;
         }
     }

@@ -59,7 +59,7 @@ def slq(
   i_dtype = np.int32
   
   ## Extract the machine precision for the given floating point type
-  lanczos_tol = np.finfo(f_dtype).eps if lanczos_tol is None else lanczos_tol
+  lanczos_tol = np.finfo(f_dtype).eps if lanczos_tol is None else f_dtype.type(lanczos_tol)
 
   ## Validates operator size + initialize parameters array
   parameters = np.array([0.0], dtype=f_dtype) if parameters is None else np.fromiter(iter(parameters), dtype=f_dtype)
@@ -70,12 +70,14 @@ def slq(
   num_inquiries = 1 #find_num_inquiries(Aop, parameters_size)
 
   ## Check input arguments have proper type and values
-  error_atol, error_rtol = te_util.check_arguments(
-    gram, 1.0, min_num_samples, max_num_samples, error_atol,
-    error_rtol, confidence_level, outlier_significance_level,
-    lanczos_degree, lanczos_tol, orthogonalize, num_threads,
-    0, verbose, plot, False
-  )
+  error_atol = f_dtype.type(1e-2) if error_atol is None else f_dtype.type(error_atol)
+  error_rtol = f_dtype.type(error_rtol)
+  # te_util.check_arguments(
+  #   gram, 1.0, min_num_samples, max_num_samples, error_atol,
+  #   error_rtol, confidence_level, outlier_significance_level,
+  #   lanczos_degree, lanczos_tol, orthogonalize, num_threads,
+  #   0, verbose, plot, False
+  # )
   nq, ns = num_inquiries, max_num_samples                     # num queries, num samples 
   trace = np.empty((nq,), dtype=f_dtype)                      # Allocate output trace as array of size num_inquiries
   error = np.empty((nq,), dtype=f_dtype)                      # Error of computing trace within a confidence interval
@@ -84,7 +86,7 @@ def slq(
   num_samples_used = np.zeros((nq,), dtype=i_dtype)           # Store how many samples used for each inquiry till reaching convergence
   num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
-  alg_wall_time = np.zeros((1, ), dtype=f_dtype)              # Somewhat inaccurate measure of the total wall clock time taken 
+  alg_wall_time = f_dtype.type(0.0)                     # Somewhat inaccurate measure of the total wall clock time taken 
 
   ## Collect the arguments processed so far 
   trace_args = (parameters, num_inquiries, 
@@ -122,7 +124,7 @@ def slq(
     raise NotImplementedError("Not done yet")
   
   ## Make the actual call
-  assert gram, "gramians only supported for now "
+  assert gram, "Gramians only supported for now, as GK doesn't work"
   trace_f = getattr(_trace, method_name)
   trace_f(*inputs, *trace_args)
 
