@@ -12,7 +12,7 @@ Notable differences between the two packages include:
 - `imate` offers a variety of options to compare trace estimates against alternative approaches, such as direct and exact methods. `primate` does not.  
 - `imate` supports both CPU parallelism (OpenMP) and GPU parallelism (CUDA), whereas `primate` is limited to CPU parallelism (OpenMP). 
 - `imate` builds [Cython](https://cython.org/) bindings (w/ [setuptools](https://setuptools.pypa.io/en/latest/index.html)); `primate` builds [pybind11](https://pybind11.readthedocs.io/en/stable/index.html) bindings (w/ [meson](https://meson-python.readthedocs.io/en/latest/#)) 
-- `imate`'s source files are dynamically linked, wheres `primate`'s are header-only ([comparison](https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries))
+- `imate`'s uses runtime-linked shared libraries, wheres `primate`'s is mostly header-only ([comparison](https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries))
 - `imate` works with any standard C++ compiler, whereas `primate` requires C++20 support.
 - `imate` requires matrices as input, whereas `primate` allows arbitrary / user-supplied `LinearOperator`'s   
 - `imate` is optimized for a fixed set of matrix functions, whereas `primate` allows for arbitrary / user-supplied functions

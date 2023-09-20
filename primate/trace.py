@@ -52,7 +52,8 @@ def slq(
   attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
   assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
   assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
-  
+  if gram: assert A.shape[0] == A.shape[1], "If A is a gramian matrix, it must be square!"
+
   ## Get the dtype; infer it if it's not available
   f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
   i_dtype = np.int32
@@ -98,7 +99,7 @@ def slq(
   if isinstance(matrix_function, str):
     assert matrix_function in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
     matrix_func_id = _builtin_matrix_functions.index(matrix_function)
-    method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_sym")
+    method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_rect")
     inputs = [A]
     if matrix_function == "smoothstep":
       a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
@@ -117,8 +118,6 @@ def slq(
     elif matrix_function == "gaussian":
       mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
       inputs += [mu, sigma]
-    else:
-      raise ValueError(f"Unknown matrix function '{matrix_function}'")
   else:
     raise NotImplementedError("Not done yet")
   

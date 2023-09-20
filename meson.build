@@ -35,7 +35,7 @@ _cpp_args = compiler.get_supported_arguments(
   '-std=c++20', 
   '-fPIC', 
   '-fvisibility=hidden',
-  '-flto=thin'  # LTO optimization only for release builds
+  # '-flto=thin'  # LTO optimization only for release builds
 )
 
 ## TODO: add sp.show_config()

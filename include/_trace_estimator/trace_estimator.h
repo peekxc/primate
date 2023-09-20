@@ -445,8 +445,37 @@
 
         // MJP: Choosing between gramian / bidiagonal matrix should be zero-cost, so we use constexpr!
         if constexpr(gramian) {
+            // Allocate eigenvectors matrix (1D array with Fortran ordering)
+            // MJP: Moved eigenvector to a pre-allocation model of size (lanczos_degree * lanczos_degree) 
+            // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe
+            // eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
+            eigenvectors = new DataType[lanczos_degree * lanczos_degree];
+            for (j=0; j < required_num_inquiries; ++j) {
+                
+                if constexpr (AffineOperator< Matrix >){
+                    A->set_parameter(parameters[j]);
+                }
+
+                // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
+                lanczos_size[j] = lanczos_tridiagonalization(
+                    A, random_vector, matrix_size, lanczos_degree, lanczos_tol, orthogonalize, 
+                    alpha, beta
+                );
+
+                // Note: alpha is written in-place with eigenvalues
+                eigh_tridiagonal< DataType >(
+                    alpha, beta, eigenvectors, lanczos_size[j]
+                );
+
+                // theta and tau from singular values and vectors
+                for (i=0; i < lanczos_size[j]; ++i) {
+                    theta[j][i] = alpha[i];
+                    tau[j][i] = eigenvectors[i * lanczos_size[j]];
+                }
+            }
+        } else {
+            // Use Golub Kahan Bidiagonalization
             static_assert(AdjointOperator< Matrix >);
-            // Lanczos iterations for gramian, computes theta and tau for each inquiry parameter
             for (j=0; j < required_num_inquiries; ++j) {
                 // If trace is already converged, do not compute on the new sample.
                 // However, exclude the case where required_num_inquiries is not the
@@ -482,35 +511,6 @@
                 for (i=0; i < lanczos_size[j]; ++i) {
                     theta[j][i] = alpha[i] * alpha[i];
                     tau[j][i] = right_singularvectors_transposed[i];
-                }
-            }
-        } else {
-            // Allocate eigenvectors matrix (1D array with Fortran ordering)
-            // MJP: Moved eigenvector to a pre-allocation model of size (lanczos_degree * lanczos_degree) 
-            // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe
-            // eigenvectors = new DataType[lanczos_size[j] * lanczos_size[j]];
-            eigenvectors = new DataType[lanczos_degree * lanczos_degree];
-            for (j=0; j < required_num_inquiries; ++j) {
-                
-                if constexpr (AffineOperator< Matrix >){
-                    A->set_parameter(parameters[j]);
-                }
-
-                // Triadiagonalizes A into output arrays 'alpha' (diagonals) and 'beta' (subdiagonals)
-                lanczos_size[j] = lanczos_tridiagonalization(
-                    A, random_vector, matrix_size, lanczos_degree, lanczos_tol, orthogonalize, 
-                    alpha, beta
-                );
-
-                // Note: alpha is written in-place with eigenvalues
-                eigh_tridiagonal< DataType >(
-                    alpha, beta, eigenvectors, lanczos_size[j]
-                );
-
-                // theta and tau from singular values and vectors
-                for (i=0; i < lanczos_size[j]; ++i) {
-                    theta[j][i] = alpha[i];
-                    tau[j][i] = eigenvectors[i * lanczos_size[j]];
                 }
             }
         }

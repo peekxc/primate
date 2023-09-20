@@ -14,6 +14,6 @@ pypi support is planned.
 
 `primate`'s C++ API is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only) one can easily import and extend the various linear algebra routines in other Python/C++ projects by just adding the right `#include`'s 
 
-
+https://stackoverflow.com/questions/12290639/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041
 
 and uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).

@@ -96,11 +96,12 @@ void trace_estimator_slq_py(
 // Instantiates the function templates for generic matrices types (which may need wrapped)
 template< bool gramian, std::floating_point F, class Matrix, typename WrapperFunc >
 void _trace(py::module& m, WrapperFunc wrap){
-  std::string suffix = gramian ? "_gram" : "_sym";
+  std::string suffix = gramian ? "_gram" : "_rect";
   m.def((std::string("trace_identity") + suffix).c_str(), [&wrap](const Matrix* A, TRACE_PARAMS){
-    const auto op = wrap(A);
-    const auto f = std::identity();
-    trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
+    const auto op = wrap(A); // this fails
+    // const auto f = std::identity();
+    // trace_estimator_slq_py< gramian, F >(&op, f, TRACE_ARGS);
+    return 0; 
   });
   m.def((std::string("trace_smoothstep") + suffix).c_str(), [&wrap](const Matrix* A, const F a, const F b, TRACE_PARAMS){
     const auto op = wrap(A);
@@ -167,12 +168,12 @@ template< std::floating_point F >
 auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
   auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
   B.setIdentity();
-  return SparseEigenAffineOperator< F >(*A, B, 0.0);
+  return SparseEigenAffineOperator< F >(*A, B);
 }
 
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
-  _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // symmetric version
+  _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
   _trace< true, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);  // gramian version
 };

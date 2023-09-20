@@ -2,11 +2,14 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
 from scipy.sparse import csr_array
 
-def test_randomness():
-  pass
+def test_trace_estimator():
+  import imate
+  from primate.trace import slq
+  T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19), gram=True)
+  tr_est = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
+  tr_true = np.sum(T.diagonal())
+  assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
-def test_blas():
-  pass
 
 def test_numerical_rank():
   from primate.trace import slq
@@ -19,13 +22,6 @@ def test_numerical_rank():
   # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.float64(tr_est), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
-def test_trace_estimator():
-  import imate
-  from primate.trace import slq
-  T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19), gram=True)
-  tr_est = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
-  tr_true = np.sum(T.diagonal())
-  assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
 # def test_eigen():
 #   # %% test lanczos tridiagonalization

@@ -1,4 +1,6 @@
-# primate 
+~ Under Construction ~ 
+
+<!-- # primate 
 
 `primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package for randomized matrix trace estimation. The package contains a variety of functions largely geared towards implicit trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix#Classes_of_matrix_functions) vis-a-vi the _stochastic Lanczos method_[^1]. In particular, `primate` offers:
 
@@ -22,6 +24,6 @@ Some notable differences between the two packages:
 In general, if your needs are satisfied by `imate`, you should prefer it! However, if you need support for one of the things mentioned above, perhaps try `primate`!
 
 [1]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
-
+ -->
 
 
