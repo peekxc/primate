@@ -23,12 +23,12 @@ Notable differences between the two packages include:
 | Function support | Fixed | Arbitrary |
 | Operator support | Matrix-derived | Arbitrary |
 | Linking strategy | Shared libraries | Header only |
-| C++ version | Any | >= C++20 |
+| C++ version | Any | $\geq$ C++20 |
 | FFI  | Cython | Pybind11 |
 | Build tool | CMake | Meson |
 
-The primary motivation for the development of `primate` was to simplify implicit trace estimation for pure C++ operators that lie inside of other Python packages, and to extend support for Python types implementing [SciPys `LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface that.
+The primary motivation for the development of `primate` was to simplify implicit trace estimation for pure C++ operators that lie inside of _external_ (i.e. dependent) Python packages, and to extend support for Python types implementing [SciPys `LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface.
 
- If this fits your use case, consider giving `primate` a try!
+If this fits your use case, consider giving `primate` a try!
 
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->

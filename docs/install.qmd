@@ -13,8 +13,9 @@ Currently the package must be built from source via cloning the repository. PYPI
 ## Usage with C++ 
 
 `primate`'s core C++ interface is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only), making it easy to compile custom extension modules 
-in a separate package using `primate`'s API. The simplest way is to do this is to add `primate` as a dependency to your package and use the `get_include()` function to include the header files
-(this is similar to how [NumPy is exported](https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html)).
+in a separate package against `primate`'s API. 
+
+The simplest way is to do this is to add `primate` as a [dependency to your package](https://peps.python.org/pep-0631/) and use the `get_include()` function to include the header files (this is similar to how [NumPy is exported](https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html)).
 
 For example, with `setuptools`/`distutils`, in `setup.py` you might use:
 ```python
@@ -29,7 +30,7 @@ Or, with [meson-python](https://github.com/mesonbuild/meson-python), in `meson.b
 ```python
 ...
 primate_include_dirs = run_command(py, 
-  ['-c', 'import primate as pyim; print(pyim.get_include())']
+  ['-c', 'import primate as pm; print(pm.get_include())']
 ).stdout().strip()
 ...
 ```

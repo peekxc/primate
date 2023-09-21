@@ -65,6 +65,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -216,7 +218,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="even">
 <td>C++ version</td>
 <td>Any</td>
-<td>&gt;= C++20</td>
+<td><span class="math inline">\(\geq\)</span> C++20</td>
 </tr>
 <tr class="odd">
 <td>FFI</td>
@@ -230,7 +232,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p>The primary motivation for the development of <code>primate</code> was to simplify implicit trace estimation for pure C++ operators that lie inside of other Python packages, and to extend support for Python types implementing <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPys <code>LinearOperator</code></a> abstract interface that.</p>
+<p>The primary motivation for the development of <code>primate</code> was to simplify implicit trace estimation for pure C++ operators that lie inside of <em>external</em> (i.e.&nbsp;dependent) Python packages, and to extend support for Python types implementing <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPys <code>LinearOperator</code></a> abstract interface.</p>
 <p>If this fits your use case, consider giving <code>primate</code> a try!</p>
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 
