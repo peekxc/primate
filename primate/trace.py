@@ -15,7 +15,7 @@ import _trace
 from imate._trace_estimator import trace_estimator_utilities as te_util 
 from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
 
-_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "gaussian"]
+_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "heat", "numrank", "smoothstep", "gaussian"]
 
 def slq(
   A: Union[LinearOperator, spmatrix, np.ndarray],
@@ -106,7 +106,7 @@ def slq(
     if matrix_function == "smoothstep":
       a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
       inputs += [a, b]
-    elif matrix_function == "numerical_rank" or matrix_function == "rank":
+    elif matrix_function == "numrank":
       threshold = kwargs.get('threshold', None)
       if threshold is None:
         from scipy.sparse.linalg import eigsh

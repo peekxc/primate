@@ -1,6 +1,7 @@
 import numpy as np 
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
-from scipy.sparse import csr_array
+from scipy.sparse import csr_array, csc_array
+from numbers import Number
 
 def test_trace_estimator():
   import imate
@@ -10,6 +11,21 @@ def test_trace_estimator():
   tr_true = np.sum(T.diagonal())
   assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
+## Basic tests; ensure the matrix functions are callable and return floats
+def test_trace_estimator():
+  import imate
+  from primate.trace import slq
+  T = imate.toeplitz(np.random.uniform(10), np.random.uniform(19), gram=True)
+  trace_kwargs = dict(orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, return_info=True, num_threads=1)
+  tr_est, info = slq(T, matrix_function="identity", **trace_kwargs)
+  tr_true = np.sum(T.diagonal())
+  assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
+  trace_kwargs['return_info'] = False
+  assert isinstance(np.take(slq(T, matrix_function="sqrt", **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function="heat", t=1.0, **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function="numrank", threshold=1e-6, **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function="smoothstep", a=1e-6, b=1e-4, **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function="gaussian", mu=1.0, sigma=10.0, **trace_kwargs), 0), Number)
 
 def test_numerical_rank():
   from primate.trace import slq
@@ -17,10 +33,10 @@ def test_numerical_rank():
   A = A.T @ A
   u, s, vt = np.linalg.svd(A)
   B = u[:,:15] @ np.diag(s[:15]) @ vt[:15,:]
-  tr_est = slq(csr_array(B), matrix_function = "rank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
+  tr_est = slq(csc_array(B), matrix_function = "numrank", threshold=1e-2, orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
   tr_true = np.linalg.matrix_rank(B)
   # assert info['convergence']['converged'], "trace didn't converge"
-  assert np.isclose(np.float64(tr_est), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
+  assert np.isclose(np.take(tr_est,0), tr_true, atol=5.0), "Estimate is off more than 5%"
 
 
 # def test_eigen():

@@ -6,15 +6,15 @@ from primate.random import _engines, _engine_prefixes
 def test_rademacher():
   assert np.all([r in [-1.0, +1.0] for r in random.rademacher(100)]), "Basic rademacher test failed"
   for engine in _engine_prefixes:
-    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(500)])
+    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(1500)])
     cum_counts = np.cumsum(counts) / np.arange(1, len(counts)+1)
-    assert abs(cum_counts[-1]) <= 1.0, "Rademacher random number generator biased more than 1%"
+    assert abs(cum_counts[-1]) <= 1.0, f"Rademacher random number generator biased more than 1% (for engine {engine})"
 
 def test_normal():
   for engine in _engine_prefixes:
-    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(500)])
+    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(1500)])
     cum_counts = np.cumsum(counts) / np.arange(1, len(counts)+1)
-    assert abs(cum_counts[-1]) <= 1.0, "Normal random number generator biased more than 1%"
+    assert abs(cum_counts[-1]) <= 1.0, f"Normal random number generator biased more than 1% (for engine {engine})"
 
 # def test_rayleigh():
 #   for engine in _engine_prefixes:
