@@ -171,17 +171,18 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is Python package that performs randomized matrix trace estimation of <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix#Classes_of_matrix_functions">matrix functions</a>:</p>
+<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is Python package that performs randomized matrix trace estimation of <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>—that is, matrices parameterized by functions:</p>
 <p><span class="math display">\[ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}\]</span></p>
-<p>Trace estimates are obtained in a randomized fashion using the <em>stochastic Lanczos method</em> (SLQ)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, making the package particularly well suited for very sparse or implicitly represented matrices whose <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a> are easy to compute.</p>
+<p>Trace estimates are obtained in a Monte-Carlo fashion via the <em>stochastic Lanczos method</em> (SLQ)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This method is useful for sparse or highly structured matrices with efficiently computable <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a>.</p>
 <p>Notable features of <code>primate</code> include:</p>
 <ul>
-<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> (C++)</li>
-<li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in SciPy or Pylops</li>
+<li>A highly-parametrizable trace estimator (see SLQ)</li>
+<li>Various distribution / engine choices for random vector generation (the stochastic part!)</li>
 <li>Orthogonalization routines, such as the <em>Lanczos</em>, <em>Golub Kahan</em>, and <em>Gram Schmidt</em> methods</li>
-<li>Various distribution/engine choices for random vector generation (the stochastic part!)</li>
+<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> (C++)</li>
+<li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator">SciPy</a> or <a href="https://pylops.readthedocs.io/en/stable/index.html">Pylops</a></li>
 </ul>
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>. In general, if your matrix function / operator combination is supported by <code>imate</code>, you should prefer it over <code>primate</code>! For more details on a comparison of the two, see <a href="./imate_compare.html">here</a>.</p>
+<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>; for a a comparison of the two, see <a href="./imate_compare.html">here</a>.</p>
 
 
 

@@ -169,21 +169,69 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>. In general, if your matrix function / operator pair is supported by <code>imate</code>, you should prefer it over <code>primate</code>!</p>
-<p><code>primate</code> was developed with slightly different goals in mind than the <code>imate</code>, most of which have to do with integrability and the choice of FFI / build system.</p>
+<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>. <code>primate</code> was developed with slightly different goals in mind than <code>imate</code>, most of which have to do with integrability and the choice of FFI / build system.</p>
 <p>Notable differences between the two packages include:</p>
-<ul>
-<li><code>imate</code> offers a variety of options to compare trace estimates against alternative approaches, such as direct and exact methods. <code>primate</code> does not.<br>
-</li>
-<li><code>imate</code> supports both CPU parallelism (OpenMP) and GPU parallelism (CUDA), whereas <code>primate</code> is limited to CPU parallelism (OpenMP).</li>
-<li><code>imate</code> builds <a href="https://cython.org/">Cython</a> bindings (w/ <a href="https://setuptools.pypa.io/en/latest/index.html">setuptools</a>); <code>primate</code> builds <a href="https://pybind11.readthedocs.io/en/stable/index.html">pybind11</a> bindings (w/ <a href="https://meson-python.readthedocs.io/en/latest/#">meson</a>)</li>
-<li><code>imate</code>’s source files are dynamically linked, wheres <code>primate</code>’s are header-only (<a href="https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries">comparison</a>)</li>
-<li><code>imate</code> works with any standard C++ compiler, whereas <code>primate</code> requires C++20 support.</li>
-<li><code>imate</code> requires matrices as input, whereas <code>primate</code> allows arbitrary / user-supplied <code>LinearOperator</code>’s<br>
-</li>
-<li><code>imate</code> is optimized for a fixed set of matrix functions, whereas <code>primate</code> allows for arbitrary / user-supplied functions</li>
-</ul>
-<p>The primary motivation for the development of <code>primate</code> was to support implicit trace estimation for pure C++ operators that lie inside of other Python packages. If this fits your use case, consider giving <code>primate</code> a try!</p>
+<!-- - `imate` supports multiple trace estimation approaches, e.g. decompositional methods. `primate` only supports the SLQ method.  
+- `imate` supports both CPU parallelism and GPU parallelism. `primate` only supports CPU parallelism.
+- `imate` builds [Cython](https://cython.org/) bindings (w/ [setuptools](https://setuptools.pypa.io/en/latest/index.html)); `primate` builds [pybind11](https://pybind11.readthedocs.io/en/stable/index.html) bindings (w/ [meson](https://meson-python.readthedocs.io/en/latest/#))
+- `imate`'s uses traditional runtime-linking shared libraries, wheres `primate`'s external API is header-only ([comparison](https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries))
+- `imate` works with any standard C++ compiler, whereas `primate` requires (some) compiler support for C++20.
+- `imate` is optimized for a fixed set of matrix functions, whereas `primate` allows for arbitrary / user-supplied functions
+- `imate` requires matrices as input, whereas `primate` allows arbitrary / user-supplied `LinearOperator`'s   
+- `imate` works with any standard C++ compiler, whereas `primate` requires C++20 support. -->
+<table class="table">
+<thead>
+<tr class="header">
+<th><strong>Feature</strong></th>
+<th><code>imate</code></th>
+<th><code>primate</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Trace methods</td>
+<td>Multiple</td>
+<td>SLQ only</td>
+</tr>
+<tr class="even">
+<td>Parallel support</td>
+<td>CPU &amp; GPU</td>
+<td>CPU only</td>
+</tr>
+<tr class="odd">
+<td>Function support</td>
+<td>Fixed</td>
+<td>Arbitrary</td>
+</tr>
+<tr class="even">
+<td>Operator support</td>
+<td>Matrix-derived</td>
+<td>Arbitrary</td>
+</tr>
+<tr class="odd">
+<td>Linking strategy</td>
+<td>Shared libraries</td>
+<td>Header only</td>
+</tr>
+<tr class="even">
+<td>C++ version</td>
+<td>Any</td>
+<td>&gt;= C++20</td>
+</tr>
+<tr class="odd">
+<td>FFI</td>
+<td>Cython</td>
+<td>Pybind11</td>
+</tr>
+<tr class="even">
+<td>Build tool</td>
+<td>CMake</td>
+<td>Meson</td>
+</tr>
+</tbody>
+</table>
+<p>The primary motivation for the development of <code>primate</code> was to simplify implicit trace estimation for pure C++ operators that lie inside of other Python packages, and to extend support for Python types implementing <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPys <code>LinearOperator</code></a> abstract interface that.</p>
+<p>If this fits your use case, consider giving <code>primate</code> a try!</p>
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 
 

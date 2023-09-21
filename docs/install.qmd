@@ -2,18 +2,43 @@
 title: "Installation"
 ---
 
-`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package, and thus can be installed by cloning the repository and installing via `pip`: 
+`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package, and thus can be installed via `pip`: 
 
 ```python
 pip install < primate source directory >
 ```
 
-pypi support is planned. 
+Currently the package must be built from source via cloning the repository. PYPI support is planned. 
 
 ## Usage with C++ 
 
-`primate`'s C++ API is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only) one can easily import and extend the various linear algebra routines in other Python/C++ projects by just adding the right `#include`'s 
+`primate`'s core C++ interface is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only), making it easy to compile custom extension modules 
+in a separate package using `primate`'s API. The simplest way is to do this is to add `primate` as a dependency to your package and use the `get_include()` function to include the header files
+(this is similar to how [NumPy is exported](https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html)).
 
-https://stackoverflow.com/questions/12290639/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041
+For example, with `setuptools`/`distutils`, in `setup.py` you might use:
+```python
+import primate as pm
+...
+Extension('extension_name', ..., include_dirs=[pm.get_include()])
+...
+```
 
-and uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).
+Or, with [meson-python](https://github.com/mesonbuild/meson-python), in `meson.build`:
+
+```python
+...
+primate_include_dirs = run_command(py, 
+  ['-c', 'import primate as pyim; print(pyim.get_include())']
+).stdout().strip()
+...
+```
+
+In general, other methods could be used, e.g. using git submodules (as in [pybind11's installation guide](https://pybind11.readthedocs.io/en/stable/installing.html#include-as-a-submodule)) or just manually copying over the header files. 
+<!-- However, specifying `primate` as a dependency as is preferred, as then the source files are version controlled.   -->
+
+### Integration 
+
+`primate` uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).
+<!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
+

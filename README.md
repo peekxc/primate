@@ -1,5 +1,6 @@
 ~ Under Construction ~ 
 
+
 <!-- # primate 
 
 `primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package for randomized matrix trace estimation. The package contains a variety of functions largely geared towards implicit trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix#Classes_of_matrix_functions) vis-a-vi the _stochastic Lanczos method_[^1]. In particular, `primate` offers:

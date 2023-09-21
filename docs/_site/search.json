@@ -1,32 +1,12 @@
 [
   {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Installation",
+    "objectID": "imate_compare.html",
+    "href": "imate_compare.html",
+    "title": "Comparison to imate",
     "section": "",
-    "text": "primate is a standard PEP-517 package, and thus can be installed by cloning the repository and installing via pip:\npypi support is planned.",
+    "text": "Much of primate’s computational code was directly ported from the (excellent) imate package. primate was developed with slightly different goals in mind than imate, most of which have to do with integrability and the choice of FFI / build system.\nNotable differences between the two packages include:\n\n\n\n\nFeature\nimate\nprimate\n\n\n\n\nTrace methods\nMultiple\nSLQ only\n\n\nParallel support\nCPU & GPU\nCPU only\n\n\nFunction support\nFixed\nArbitrary\n\n\nOperator support\nMatrix-derived\nArbitrary\n\n\nLinking strategy\nShared libraries\nHeader only\n\n\nC++ version\nAny\n&gt;= C++20\n\n\nFFI\nCython\nPybind11\n\n\nBuild tool\nCMake\nMeson\n\n\n\nThe primary motivation for the development of primate was to simplify implicit trace estimation for pure C++ operators that lie inside of other Python packages, and to extend support for Python types implementing SciPys LinearOperator abstract interface that.\nIf this fits your use case, consider giving primate a try!",
     "crumbs": [
-      "Installation"
-    ]
-  },
-  {
-    "objectID": "install.html#python-installation",
-    "href": "install.html#python-installation",
-    "title": "Installation",
-    "section": "",
-    "text": "The package can be installed by cloning the repository and then installing via standard PEP-517 package:\npip install &lt; primate source directory &gt;\npypi support is planned.",
-    "crumbs": [
-      "Installation"
-    ]
-  },
-  {
-    "objectID": "install.html#c-installation",
-    "href": "install.html#c-installation",
-    "title": "Installation",
-    "section": "C++ installation",
-    "text": "C++ installation\nprimate’s core C++ API is exported as a header-only library and uses a generic template interface via C++20 Concepts—thus, one can easily import and extend the various linear algebra routines in other Python/C++ projects by just adding the right #include’s and supplying types fitting the constraints. This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).",
-    "crumbs": [
-      "Installation"
+      "Comparison to *imate*"
     ]
   },
   {
@@ -34,19 +14,29 @@
     "href": "index.html",
     "title": "Package overview",
     "section": "",
-    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions:\n\\[ \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\\]\nTrace estimates are obtained in a randomized fashion using the stochastic Lanczos method (SLQ)1, making the package particularly well suited for very sparse or implicitly represented matrices whose quadratic forms are easy to compute.\nNotable features of primate include:\n\nSupport for arbitrary matrix functions, i.e. Callable’s (Python) and invocable’s2 (C++)\nSupport for arbitrary LinearOperator’s, e.g. those in SciPy or Pylops\nOrthogonalization routines, such as the Lanczos, Golub Kahan, and Gram Schmidt methods\nVarious distribution/engine choices for random vector generation (the stochastic part!)\n\nMuch of primate’s computational code was directly ported from the (excellent) imate package. In general, if your matrix function / operator combination is supported by imate, you should prefer it over primate! For more details on a comparison of the two, see here.\n\n\n\n\nFootnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
+    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions—that is, matrices parameterized by functions:\n\\[ \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\\]\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\n\nA highly-parametrizable trace estimator (see SLQ)\nVarious distribution / engine choices for random vector generation (the stochastic part!)\nOrthogonalization routines, such as the Lanczos, Golub Kahan, and Gram Schmidt methods\nSupport for arbitrary matrix functions, i.e. Callable’s (Python) and invocable’s2 (C++)\nSupport for arbitrary LinearOperator’s, e.g. those in SciPy or Pylops\n\nMuch of primate’s computational code was directly ported from the (excellent) imate package; for a a comparison of the two, see here.\n\n\n\n\nFootnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
     "crumbs": [
       "Overview"
     ]
   },
   {
-    "objectID": "imate_compare.html",
-    "href": "imate_compare.html",
-    "title": "Comparison to imate",
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
     "section": "",
-    "text": "Much of primate’s computational code was directly ported from the (excellent) imate package. In general, if your matrix function / operator pair is supported by imate, you should prefer it over primate!\nprimate was developed with slightly different goals in mind than the imate, most of which have to do with integrability and the choice of FFI / build system.\nNotable differences between the two packages include:\n\nimate offers a variety of options to compare trace estimates against alternative approaches, such as direct and exact methods. primate does not.\n\nimate supports both CPU parallelism (OpenMP) and GPU parallelism (CUDA), whereas primate is limited to CPU parallelism (OpenMP).\nimate builds Cython bindings (w/ setuptools); primate builds pybind11 bindings (w/ meson)\nimate’s source files are dynamically linked, wheres primate’s are header-only (comparison)\nimate works with any standard C++ compiler, whereas primate requires C++20 support.\nimate requires matrices as input, whereas primate allows arbitrary / user-supplied LinearOperator’s\n\nimate is optimized for a fixed set of matrix functions, whereas primate allows for arbitrary / user-supplied functions\n\nThe primary motivation for the development of primate was to support implicit trace estimation for pure C++ operators that lie inside of other Python packages. If this fits your use case, consider giving primate a try!",
+    "text": "primate is a standard PEP-517 package, and thus can be installed via pip:\nCurrently the package must be built from source via cloning the repository. PYPI support is planned.",
     "crumbs": [
-      "Comparison to *imate*"
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "install.html#usage-with-c",
+    "href": "install.html#usage-with-c",
+    "title": "Installation",
+    "section": "Usage with C++",
+    "text": "Usage with C++\nprimate’s core C++ interface is exported as a header-only library, making it easy to compile custom extension modules in a separate package using primate’s API. The simplest way is to do this is to add primate as a dependency to your package and use the get_include() function to include the header files (this is similar to how NumPy is exported).\nFor example, with setuptools/distutils, in setup.py you might use:\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\nOr, with meson-python, in meson.build:\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pyim; print(pyim.get_include())']\n).stdout().strip()\n...\nIn general, other methods could be used, e.g. using git submodules (as in pybind11’s installation guide) or just manually copying over the header files. \n\nIntegration\nprimate uses a generic template interface via C++20 Concepts—thus, and supplying types fitting the constraints. This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).",
+    "crumbs": [
+      "Installation"
     ]
   }
 ]
