@@ -129,7 +129,7 @@ def slq(
   trace_f(*inputs, *trace_args)
 
   ## If no information is required, just return the trace estimate 
-  if not(return_info): 
+  if not(return_info) and not(plot) and not(verbose): 
     return trace
   else:
     ## Otherwise, collection runtime information + matrix size info (if available)

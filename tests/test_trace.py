@@ -11,6 +11,21 @@ def test_trace_estimator():
   tr_true = np.sum(T.diagonal())
   assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
+def test_input_types():
+  from scipy.linalg import toeplitz
+  from primate.trace import slq
+  slq_params = dict(gram=True, orthogonalize=10, confidence_level=0.95, error_atol=1e-6, min_num_samples=150, max_num_samples=200, num_threads=1)
+  np.random.seed(1234)
+  X = toeplitz(np.random.uniform(size=50))
+  A = X.T @ X
+  tr_true = np.sum(A.diagonal())
+  tr_est_1 = slq(A, **slq_params)
+  tr_est_2 = slq(csc_array(A), **slq_params)
+  tr_est_3 = slq(aslinearoperator(A), **slq_params)
+  assert np.isclose(np.take(tr_est_1,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
+  assert np.isclose(np.take(tr_est_2,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
+  assert np.isclose(np.take(tr_est_3,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
+
 ## Basic tests; ensure the matrix functions are callable and return floats
 def test_trace_estimator():
   import imate

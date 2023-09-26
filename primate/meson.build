@@ -4,7 +4,7 @@ foreach ext: extensions
   py.extension_module(
     ext,
     ext + '.cpp',
-    include_directories: [inc_pkg, incdir_numpy, inc_pybind11, inc_eigen],
+    include_directories: [inc_pkg, inc_numpy, inc_pybind11, inc_eigen], # inc_pybind11, inc_nanobind
     dependencies: [lapack, blas, omp],
     install: true, 
     cpp_args: _cpp_args

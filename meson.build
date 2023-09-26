@@ -19,6 +19,7 @@ py_dep = py.dependency()
 message('Python path =' + py.full_path())
 message('Numpy version =' + run_command(py, ['-c', 'import numpy; print(numpy.__version__)'], check: true).stdout().strip())
 
+
 ## Check the python version
 if py.language_version().version_compare('< 3.8')
   error('Invalid Python version, only >= 3.8 is supported.')
@@ -46,9 +47,12 @@ _cpp_args = compiler.get_supported_arguments(
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
 # incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
 
+# incdir_nanobind = run_command(py, ['-c', 'import os; os.chdir(".."); import nanobind; print(nanobind.include_dir())'], check : true).stdout().strip()
+
 ## Header includes
-inc_np = include_directories(incdir_numpy)
+inc_numpy = include_directories(incdir_numpy)
 inc_pybind11 = include_directories('extern' / 'pybind11' / 'include')
+# inc_nanobind = include_directories(incdir_nanobind) # nanobind.include_dir()
 inc_eigen = include_directories('extern' / 'eigen')
 # inc_imate = include_directories(incdir_imate)
 inc_pkg = include_directories('include')

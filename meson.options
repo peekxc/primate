@@ -1,2 +1,3 @@
 option('blas', type: 'string', value: 'accelerate', description: 'option for BLAS library switching')
 option('lapack', type: 'string', value: 'accelerate', description: 'option for LAPACK library switching')
+option('use_nanobind', type: 'boolean', value: 'false', description: 'whether to create the bindings with nanobind')

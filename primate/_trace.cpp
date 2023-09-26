@@ -7,6 +7,8 @@
 #include <_definitions/definitions.h>
 #include <_trace_estimator/trace_estimator.h>
 #include <_timer/timer.h>
+
+#include "pylinops.h"
 #include "eigen_operators.h"
 #include <iostream>
 
@@ -192,11 +194,29 @@ auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
   return SparseEigenAffineOperator< F >(*A, B);
 }
 
+template< std::floating_point F >
+auto eigen_dense_wrapper(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >* A){
+  return DenseEigenLinearOperator< F >(*A);
+}
+
+template< std::floating_point F >
+auto linearoperator_wrapper(const py::object* A){
+  return PyLinearOperator< F >(*A);
+}
+
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
   _trace< false, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >); // rectangular version
   _trace< false, double, Eigen::SparseMatrix< double > >(m, eigen_sparse_wrapper< double >); // rectangular version
   _trace< true, float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);  // gramian version
-  _trace< true, double, Eigen::SparseMatrix< double > >(m, eigen_sparse_wrapper< double >);
+  _trace< true, double, Eigen::SparseMatrix< double > >(m, eigen_sparse_wrapper< double >); // gramian version
+  
+  // Dense exports
+  _trace< true, float, Eigen::MatrixXf >(m, eigen_dense_wrapper< float >);
+  _trace< true, double, Eigen::MatrixXd >(m, eigen_dense_wrapper< double >);
+
+  // LinearOperator exports
+  _trace< true, float, py::object >(m, linearoperator_wrapper< float >);
+  _trace< true, double, py::object >(m, linearoperator_wrapper< double >);
 };

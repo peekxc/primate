@@ -3,6 +3,30 @@
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
+
+template< std::floating_point F >
+struct DenseEigenLinearOperator {
+  using value_type = F;
+  const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic > A;  
+  DenseEigenLinearOperator(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >& _mat) : A(_mat){}
+
+  void matvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
+    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
+    output = A * input; 
+  }
+
+  void rmatvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
+    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+    output = A.adjoint() * input; 
+  }
+
+  auto shape() const noexcept -> std::pair< size_t, size_t > {
+    return std::make_pair((size_t) A.rows(), (size_t) A.cols());
+  }
+};
+
 // TODO: store only lower/upper part for symmetric? http://www.eigen.tuxfamily.org/dox/group__TutorialSparse.html
 template< std::floating_point F >
 struct SparseEigenLinearOperator {

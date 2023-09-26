@@ -1,10 +1,10 @@
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', "wheel", "ninja", "cmake", "pybind11", "numpy", "imate"]
+requires = ['meson-python', "wheel", "ninja", "nanobind", "cmake", "pybind11", "numpy", "imate"]
 
 [project]
 name = "primate"
-version = '0.1.0'
+version = '0.1.1'
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",
@@ -27,5 +27,5 @@ include = [
 	# { path = "primate/**/*.pyd", format = "wheel" },
 ]
 
-# [tool.meson-python.args]
-# setup = ['--default-library=static']
+[tool.meson-python.args]
+setup = ['--default-library=static']
