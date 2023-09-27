@@ -68,13 +68,13 @@
     ///             An instance of \c Function class which has the function
     ///             \c function. This function defines the matrix function, and
     ///             operates on scalar eigenvalues of the matrix.
-    /// \param[in]  gram
-    ///             Flag indicating whether the linear operator \c A is Gramian.
-    ///             If the linear operator is:
-    ///             * Gramian, then, Lanczos tridiagonalization method is
+    /// \param[in]  gramian
+    ///             Flag indicating whether to compute the gramian of A.
+    ///             The flag semantics is as follows:
+    ///             * I false, then Lanczos tridiagonalization method is
     ///               employed. This method requires only matrix-vector
     ///               multiplication.
-    ///             * not Gramian, then, Golub-Kahn bidiagonalization method is
+    ///             * If true, then Golub-Kahn bidiagonalization method is
     ///               employed. This method requires both matrix and
     ///               transposed-matrix vector multiplications.
     /// \param[in]  orthogonalize
@@ -175,12 +175,14 @@
     ///               \c convergence_rtol times \c trace.
     ///             * \c 0 indicates the convergence criterion was not met for at
     ///               least one of the trace inquiries.
-    template< bool gramian, std::floating_point DataType, Operator Matrix, std::invocable< DataType > Func > 
+    template< bool gramian, std::floating_point DataType, Operator Matrix, ThreadSafeRBG RBG, std::invocable< DataType > Func > 
     FlagType trace_estimator(
         Matrix* A,
         const DataType* parameters,
         const IndexType num_parameters,
         Func&& matrix_function,
+        RBG& rng,
+        const IndexType distr,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
         const DataType lanczos_tol,
@@ -215,7 +217,7 @@
 
         // Thread-safe random bit generator
         // std::cout << "Spinning up RNG" << std::endl;
-        auto rng = ThreadedRNG64(num_threads);
+        rng.initialize(num_threads);
 
         // The counter of filled size of processed_samples_indices array
         // This scalar variable is defined as array to be shared among al threads
@@ -249,7 +251,7 @@
                 stochastic_lanczos_quadrature< gramian >(
                     A, parameters, num_parameters, matrix_function, 
                     orthogonalize, lanczos_degree, lanczos_tol,
-                    rng,
+                    rng, distr, 
                     &random_vectors[matrix_size*thread_id], converged,
                     samples[i]
                 );
@@ -403,6 +405,7 @@
         const IndexType lanczos_degree,
         const DataType lanczos_tol,
         RBG& rng,
+        const IndexType distr,
         DataType* random_vector,
         FlagType* converged,
         DataType* trace_estimate)
@@ -415,11 +418,15 @@
         // function is inside a parallel thread.
         // std::cout << "Generating random vector" << std::endl;
         IndexType num_threads = 0;
-        generate_array< 0, DataType >(
-            rng, random_vector, matrix_size, num_threads
-        ); 
-        // std::cout << "Vector contents: " << random_vector[0] << ", " << random_vector[1] << ", ..." << std::endl;
-
+        switch(distr){
+            case 0: // rademacher
+                generate_array< 0, DataType >(rng, random_vector, matrix_size, num_threads);
+                break; 
+            default: // normal 
+                generate_array< 1, DataType >(rng, random_vector, matrix_size, num_threads);
+                break;
+        }
+        
         // Allocate diagonals (alpha) and supdiagonals (beta) of Lanczos matrix
         DataType* alpha = new DataType[lanczos_degree];
         DataType* beta = new DataType[lanczos_degree];
@@ -458,7 +465,7 @@
         IndexType* lanczos_size = new IndexType[num_parameters];
 
         // MJP: Choosing between gramian / bidiagonal matrix should be zero-cost, so we use constexpr!
-        if constexpr(gramian) {
+        if constexpr(!gramian) {
             // Allocate eigenvectors matrix (1D array with Fortran ordering)
             // MJP: Moved eigenvector to a pre-allocation model of size (lanczos_degree * lanczos_degree) 
             // The lanczos_size[j] should never exceed lanczos_degree, and given to eigh_tridiagonal should be safe

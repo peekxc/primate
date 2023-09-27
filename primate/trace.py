@@ -14,16 +14,18 @@ from scipy.sparse.linalg import LinearOperator
 import _trace
 from imate._trace_estimator import trace_estimator_utilities as te_util 
 from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
+from .random import _engine_prefixes, _engines
 
-_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "heat", "numrank", "smoothstep", "gaussian"]
+_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
 
 def slq(
   A: Union[LinearOperator, spmatrix, np.ndarray],
-  gram: bool = True, 
   parameters: Iterable = None,
   matrix_function: Union[str, Callable] = "identity",
   min_num_samples: int = 10,
   max_num_samples: int = 50,
+  distribution: str = "rademacher",
+  rng_engine: str = "mt",
   error_atol: float = None,
   error_rtol: float = 1e-2,
   confidence_level: float = 0.95,
@@ -40,7 +42,9 @@ def slq(
   """Estimates the trace of a matrix function f(A) = U f(D) U^{-1} using the stochastic Lanczos quadrature (SLQ) method. 
 
   Parameters: 
+    A: real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
     min_num_samples: minimum number of parameter for lanczos. 
+    distribution: the distribution to sample random vectors from. 
 
   Reference:
     `Ubaru, S., Chen, J., and Saad, Y. (2017)
@@ -52,12 +56,21 @@ def slq(
   attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
   assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
   assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
-  if gram: assert A.shape[0] == A.shape[1], "If A is a gramian matrix, it must be square!"
+  assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
+  
+  ## Choose the random number engine 
+  assert rng_engine in _engine_prefixes or rng_engine in _engines, f"Invalid pseudo random number engine supplied '{str(rng_engine)}'"
+  engine_id = _engine_prefixes.index(rng_engine) if rng_engine in _engine_prefixes else _engines.index(rng_engine)
+
+  ## Choose the distribution to sample random vectors from 
+  assert distribution in [ "rademacher", "normal"], f"Invalid distribution '{distribution}'; Must be one of 'rademacher' or 'normal'."
+  distr_id = [ "rademacher", "normal"].index(distribution)
 
   ## Get the dtype; infer it if it's not available
   f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
   i_dtype = np.int32
-  
+  assert f_dtype.type == np.float32 or f_dtype.type == np.float64, "Only 32- or 64-bit floating point numbers are supported."
+
   ## Extract the machine precision for the given floating point type
   lanczos_tol = np.finfo(f_dtype).eps if lanczos_tol is None else f_dtype.type(lanczos_tol)
 
@@ -87,11 +100,13 @@ def slq(
   num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
   alg_wall_time = f_dtype.type(0.0)                     # Somewhat inaccurate measure of the total wall clock time taken 
+  distr, engine_id = 0, 0         # 0-mean distribution to sample from + RNE to use
 
   ## Collect the arguments processed so far 
   trace_args = (parameters, num_inquiries, 
     orthogonalize, lanczos_degree, lanczos_tol, 
-    min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level, 
+    min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
+    distr_id, engine_id,  
     num_threads, 
     trace, error, samples, 
     processed_samples_indices, num_samples_used, num_outliers, converged, alg_wall_time
@@ -100,33 +115,39 @@ def slq(
   ## Parameterize the matrix function and trace call
   if isinstance(matrix_function, str):
     assert matrix_function in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
-    matrix_func_id = _builtin_matrix_functions.index(matrix_function)
-    method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_rect")
-    inputs = [A]
-    if matrix_function == "smoothstep":
-      a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
-      inputs += [a, b]
-    elif matrix_function == "numrank":
-      threshold = kwargs.get('threshold', None)
-      if threshold is None:
-        from scipy.sparse.linalg import eigsh
-        s_max = A.dtype.type(eigsh(A, k=1, which="LM", return_eigenvectors=False))
-        threshold = s_max * np.max(A.shape) * np.finfo(A.dtype).eps
-      inputs += [threshold]
-    elif matrix_function == "pow":
-      inputs += [kwargs.get('p', 1.0)]
-    elif matrix_function == "heat":
-      inputs += [kwargs.get('t', 1.0)]
-    elif matrix_function == "gaussian":
-      mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
-      inputs += [mu, sigma]
-  else:
-    raise NotImplementedError("Not done yet")
+    #matrix_func_id = _builtin_matrix_functions.index(matrix_function)
+    kwargs["function"] = matrix_function
+  elif isinstance(matrix_function, Callable):
+    kwargs["function"] = "generic"
+    kwargs["matrix_func"] = matrix_function
+  else: 
+    raise ValueError(f"Invalid matrix function type '{type(matrix_function)}'")
+  #   method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_rect")
+  #   inputs = [A]
+  #   if matrix_function == "smoothstep":
+  #     a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
+  #     inputs += [a, b]
+  #   elif matrix_function == "numrank":
+  #     threshold = kwargs.get('threshold', None)
+  #     if threshold is None:
+  #       from scipy.sparse.linalg import eigsh
+  #       s_max = A.dtype.type(eigsh(A, k=1, which="LM", return_eigenvectors=False))
+  #       threshold = s_max * np.max(A.shape) * np.finfo(A.dtype).eps
+  #     inputs += [threshold]
+  #   elif matrix_function == "pow":
+  #     inputs += [kwargs.get('p', 1.0)]
+  #   elif matrix_function == "heat":
+  #     inputs += [kwargs.get('t', 1.0)]
+  #   elif matrix_function == "gaussian":
+  #     mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
+  #     inputs += [mu, sigma]
+  # else:
+  #   raise NotImplementedError("Not done yet")
   
   ## Make the actual call
-  assert gram, "Gramians only supported for now, as GK doesn't work"
-  trace_f = getattr(_trace, method_name)
-  trace_f(*inputs, *trace_args)
+  # assert gram, "Gramians only supported for now, as GK doesn't work"
+  # trace_f = getattr(_trace, method_name)
+  _trace.trace(A, *trace_args, **kwargs)
 
   ## If no information is required, just return the trace estimate 
   if not(return_info) and not(plot) and not(verbose): 

@@ -19,7 +19,6 @@ py_dep = py.dependency()
 message('Python path =' + py.full_path())
 message('Numpy version =' + run_command(py, ['-c', 'import numpy; print(numpy.__version__)'], check: true).stdout().strip())
 
-
 ## Check the python version
 if py.language_version().version_compare('< 3.8')
   error('Invalid Python version, only >= 3.8 is supported.')

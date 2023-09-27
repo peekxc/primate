@@ -42,7 +42,8 @@ struct ThreadedRNG64 {
     }
 
     void initialize(int num_threads_){
-        assert(num_threads_ > 0);
+        // assert(num_threads_ > 0);
+        if (num_threads_ == 0){ return; }
         num_threads = num_threads_;
         generators = std::vector< RNE >(num_threads);
 

@@ -16,11 +16,11 @@ struct DenseEigenLinearOperator {
     output = A * input; 
   }
 
-  void rmatvec(const F* inp, F* out) const noexcept {
-    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
-    output = A.adjoint() * input; 
-  }
+  // void rmatvec(const F* inp, F* out) const noexcept {
+  //   auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
+  //   auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+  //   output = A.adjoint() * input; 
+  // }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
     return std::make_pair((size_t) A.rows(), (size_t) A.cols());

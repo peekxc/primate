@@ -2,12 +2,14 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
 from scipy.sparse import csr_array, csc_array
 from numbers import Number
+import primate
 
 def test_trace_estimator():
   import imate
   from primate.trace import slq
   T = imate.toeplitz(np.random.uniform(20), np.random.uniform(19), gram=True)
-  tr_est = slq(T, orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
+  slq_params = dict(orthogonalize=0, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
+  tr_est = slq(T, **slq_params)
   tr_true = np.sum(T.diagonal())
   assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
@@ -37,10 +39,11 @@ def test_trace_estimator():
   assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
   trace_kwargs['return_info'] = False
   assert isinstance(np.take(slq(T, matrix_function="sqrt", **trace_kwargs), 0), Number)
-  assert isinstance(np.take(slq(T, matrix_function="heat", t=1.0, **trace_kwargs), 0), Number)
-  assert isinstance(np.take(slq(T, matrix_function="numrank", threshold=1e-6, **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function="exp", t=1.0, **trace_kwargs), 0), Number)
   assert isinstance(np.take(slq(T, matrix_function="smoothstep", a=1e-6, b=1e-4, **trace_kwargs), 0), Number)
   assert isinstance(np.take(slq(T, matrix_function="gaussian", mu=1.0, sigma=10.0, **trace_kwargs), 0), Number)
+
+  assert isinstance(np.take(slq(T, matrix_function="numrank", threshold=1e-6, **trace_kwargs), 0), Number)
 
 def test_numerical_rank():
   from primate.trace import slq
