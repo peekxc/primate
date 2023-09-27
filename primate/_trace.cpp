@@ -149,10 +149,10 @@ void _trace_param_f(const Matrix* matrix, TRACE_PARAMS, const py::kwargs& kwargs
         return std::min(std::max((eigenvalue-a)/d, F(0.0)), F(1.0)); 
       }; 
     } else if (matrix_func == "gaussian"){
-      // F mu = kwargs_map.contains("mu") ? kwargs_map["mu"].cast< F >() : 0.0;
+      F mu = kwargs_map.contains("mu") ? kwargs_map["mu"].cast< F >() : 0.0;
       F sigma = kwargs_map.contains("sigma") ? kwargs_map["sigma"].cast< F >() : 1.0;
-      f = [sigma](F eigenvalue) -> F {  
-        auto x = (eigenvalue - eigenvalue) / sigma;
+      f = [mu, sigma](F eigenvalue) -> F {  
+        auto x = (mu - eigenvalue) / sigma;
         return (0.5 * M_SQRT1_2 * M_2_SQRTPI / sigma) * exp(-0.5 * x * x); 
       }; 
     } else if (matrix_func == "numrank"){

@@ -35,17 +35,13 @@ _cpp_args = compiler.get_supported_arguments(
   '-std=c++20', 
   '-fPIC', 
   '-fvisibility=hidden',
-  # '-flto=thin'  # LTO optimization only for release builds
+  # '-flto=thin'        # LTO optimization only for release builds
+  # '-flto'             # monolithic LTO 
 )
-
-## TODO: add sp.show_config()
-## or np.show_config()
-## or build with cmake...
 
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
 # incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
-
 # incdir_nanobind = run_command(py, ['-c', 'import os; os.chdir(".."); import nanobind; print(nanobind.include_dir())'], check : true).stdout().strip()
 
 ## Header includes

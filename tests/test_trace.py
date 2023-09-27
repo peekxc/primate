@@ -42,8 +42,8 @@ def test_trace_estimator():
   assert isinstance(np.take(slq(T, matrix_function="exp", t=1.0, **trace_kwargs), 0), Number)
   assert isinstance(np.take(slq(T, matrix_function="smoothstep", a=1e-6, b=1e-4, **trace_kwargs), 0), Number)
   assert isinstance(np.take(slq(T, matrix_function="gaussian", mu=1.0, sigma=10.0, **trace_kwargs), 0), Number)
-
   assert isinstance(np.take(slq(T, matrix_function="numrank", threshold=1e-6, **trace_kwargs), 0), Number)
+  assert isinstance(np.take(slq(T, matrix_function=lambda x: 10*x, **trace_kwargs), 0), Number)
 
 def test_numerical_rank():
   from primate.trace import slq
@@ -56,6 +56,15 @@ def test_numerical_rank():
   # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.take(tr_est,0), tr_true, atol=5.0), "Estimate is off more than 5%"
 
+# def test_imate_compare():
+#   import imate
+#   from primate.trace import slq
+#   np.random.seed(1234)
+#   T = imate.toeplitz(np.random.uniform(10), np.random.uniform(19), gram=True)
+#   trace_true = np.sum(T.diagonal())
+#   # imate.trace(T, gram=False, method="slq", plot=True)
+#   slq(T, plot=True)
+  
 
 # def test_eigen():
 #   # %% test lanczos tridiagonalization
