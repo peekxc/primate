@@ -64,7 +64,7 @@ def slq(
 
   ## Choose the distribution to sample random vectors from 
   assert distribution in [ "rademacher", "normal"], f"Invalid distribution '{distribution}'; Must be one of 'rademacher' or 'normal'."
-  distr_id = [ "rademacher", "normal"].index(distribution)
+  distr_id = ["rademacher", "normal"].index(distribution)
 
   ## Get the dtype; infer it if it's not available
   f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
@@ -100,8 +100,7 @@ def slq(
   num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
   alg_wall_time = f_dtype.type(0.0)                     # Somewhat inaccurate measure of the total wall clock time taken 
-  distr, engine_id = 0, 0         # 0-mean distribution to sample from + RNE to use
-
+  
   ## Collect the arguments processed so far 
   trace_args = (parameters, num_inquiries, 
     orthogonalize, lanczos_degree, lanczos_tol, 
@@ -122,31 +121,8 @@ def slq(
     kwargs["matrix_func"] = matrix_function
   else: 
     raise ValueError(f"Invalid matrix function type '{type(matrix_function)}'")
-  #   method_name = "trace_" + _builtin_matrix_functions[matrix_func_id] + ("_gram" if gram else "_rect")
-  #   inputs = [A]
-  #   if matrix_function == "smoothstep":
-  #     a, b = kwargs.get('a', 0.0), kwargs.get('b', 1e-6)
-  #     inputs += [a, b]
-  #   elif matrix_function == "numrank":
-  #     threshold = kwargs.get('threshold', None)
-  #     if threshold is None:
-  #       from scipy.sparse.linalg import eigsh
-  #       s_max = A.dtype.type(eigsh(A, k=1, which="LM", return_eigenvectors=False))
-  #       threshold = s_max * np.max(A.shape) * np.finfo(A.dtype).eps
-  #     inputs += [threshold]
-  #   elif matrix_function == "pow":
-  #     inputs += [kwargs.get('p', 1.0)]
-  #   elif matrix_function == "heat":
-  #     inputs += [kwargs.get('t', 1.0)]
-  #   elif matrix_function == "gaussian":
-  #     mu, sigma = kwargs.get('mu', 0.0), kwargs.get('sigma', 1.0)
-  #     inputs += [mu, sigma]
-  # else:
-  #   raise NotImplementedError("Not done yet")
   
   ## Make the actual call
-  # assert gram, "Gramians only supported for now, as GK doesn't work"
-  # trace_f = getattr(_trace, method_name)
   _trace.trace(A, *trace_args, **kwargs)
 
   ## If no information is required, just return the trace estimate 

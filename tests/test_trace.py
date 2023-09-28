@@ -56,6 +56,18 @@ def test_numerical_rank():
   # assert info['convergence']['converged'], "trace didn't converge"
   assert np.isclose(np.take(tr_est,0), tr_true, atol=5.0), "Estimate is off more than 5%"
 
+def test_distr():
+  from primate.trace import slq
+  np.random.seed(1234)
+  X = np.random.uniform(size=(100,100))
+  A = X.T @ X
+  trace_kwargs = dict(orthogonalize=3, confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=200, num_threads=1)
+  tr_true = np.sum(np.sqrt(np.abs(np.linalg.svd(A)[1])))
+  tr_est1 = slq(A, matrix_function = "sqrt", distribution="normal", **trace_kwargs)
+  tr_est2 = slq(A, matrix_function = "sqrt", distribution="rademacher", **trace_kwargs)
+  assert np.isclose(np.take(tr_est1,0), tr_true, atol=tr_true*0.15), "Estimate is off more than 15%"
+  assert np.isclose(np.take(tr_est2,0), tr_true, atol=tr_true*0.15), "Estimate is off more than 15%"
+
 # def test_imate_compare():
 #   import imate
 #   from primate.trace import slq
@@ -196,5 +208,3 @@ def test_numerical_rank():
 #   _diagonalize.eigh_tridiagonal(alpha, beta, V) # note this replaces alphas
 #   np.allclose(np.sort(d), np.sort(alpha), atol=1e-6) 
 
-# def test_
-# %%
