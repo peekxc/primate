@@ -51,11 +51,11 @@ template<
   std::invocable< DataType > Func 
 > FlagType trace_estimator(
     Matrix* A,
-    const DataType* parameters,
-    const IndexType num_parameters,
     Func&& matrix_function,
     RBG& rng,
     const IndexType distr,
+    const DataType* parameters,
+    const IndexType num_parameters,
     const FlagType orthogonalize,
     const IndexType lanczos_degree,
     const DataType lanczos_tol,
@@ -75,4 +75,11 @@ template<
     FlagType* converged,
     DataType& alg_wall_time
   )
-  ```
+```
+
+<!-- The parameters to the function can effectively be grouped as follows: 
+
+#### Inputs 
+
+Base 
+Affine parameters: `parameters`, `num_parameters` -->

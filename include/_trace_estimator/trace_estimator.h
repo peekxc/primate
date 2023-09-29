@@ -178,11 +178,11 @@
     template< bool gramian, std::floating_point DataType, Operator Matrix, ThreadSafeRBG RBG, std::invocable< DataType > Func > 
     FlagType trace_estimator(
         Matrix* A,
-        const DataType* parameters,
-        const IndexType num_parameters,
         Func&& matrix_function,
         RBG& rng,
         const IndexType distr,
+        const DataType* parameters,
+        const IndexType num_parameters,
         const FlagType orthogonalize,
         const IndexType lanczos_degree,
         const DataType lanczos_tol,
