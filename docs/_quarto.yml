@@ -16,6 +16,8 @@ website:
         text: Overview
       - href: install.qmd
         text: Installation
+      - href: integration.qmd
+        text: Integration
       - href: imate_compare.qmd
         text: Comparison to *imate*
     collapse-level: 3

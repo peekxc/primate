@@ -1,12 +1,9 @@
-~ Under Construction ~ 
-
-
-<!-- # primate 
+# primate 
 
 `primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package for randomized matrix trace estimation. The package contains a variety of functions largely geared towards implicit trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix#Classes_of_matrix_functions) via the _stochastic Lanczos method_[^1]. In particular, `primate` offers:
 
 - Trace estimation for _arbitrary_ matrix functions, supplied as `Callables` (via Python) or `std::invocable`'s (via C++) (see details)
-- Support for _arbitrary_ `LinearOperator`'s, e.g. those in SciPy or Pylops 
+- Support for _arbitrary_ `LinearOperator`'s, e.g. those in [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) or [Pylops](https://pylops.readthedocs.io/en/stable/index.html)
 - Diagonalization and orthogonalization routines, such as the _Lanczos_ and _Gram Schmidt_ methods
 - Various distribution/engine choices for random vector generation (the stochastic part!)
 

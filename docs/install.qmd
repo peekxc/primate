@@ -10,24 +10,27 @@ pip install < primate source directory >
 
 Currently the package must be built from source via cloning the repository. PYPI support is planned. 
 
-## Usage with C++ 
+### Compiling extension modules
 
-`primate`'s core C++ interface is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only), making it easy to compile custom extension modules 
-in a separate package against `primate`'s API. 
+`primate`'s C++ interface is exported as a [header-only library](https://en.wikipedia.org/wiki/Header-only), making it easy to compile your own [extension modules](https://docs.python.org/3/extending/extending.html) using `primate`'s API. 
 
-The simplest way is to do this is to add `primate` as a [dependency to your package](https://peps.python.org/pep-0631/) and use the `get_include()` function to include the header files (this is similar to how [NumPy is exported](https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html)).
+The simplest way to link to these headers is to include `primate` as a [dependency](https://peps.python.org/pep-0631/) to your package and use the `get_include()` function to find the appropriate directory (this is how [NumPy is exported](https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html)).
 
-For example, with `setuptools`/`distutils`, in `setup.py` you might use:
+::: {.panel-tabset}
+## setuptools 
+
 ```python
+# setup.py
 import primate as pm
 ...
 Extension('extension_name', ..., include_dirs=[pm.get_include()])
 ...
 ```
 
-Or, with [meson-python](https://github.com/mesonbuild/meson-python), in `meson.build`:
+## meson-python
 
 ```python
+# meson.build
 ...
 primate_include_dirs = run_command(py, 
   ['-c', 'import primate as pm; print(pm.get_include())']
@@ -35,11 +38,29 @@ primate_include_dirs = run_command(py,
 ...
 ```
 
-In general, other methods could be used, e.g. using git submodules (as in [pybind11's installation guide](https://pybind11.readthedocs.io/en/stable/installing.html#include-as-a-submodule)) or just manually copying over the header files. 
-<!-- However, specifying `primate` as a dependency as is preferred, as then the source files are version controlled.   -->
+## git submodule 
 
-### Integration 
+Assuming your headers are located in `extern`, from your git repository, you can use: 
 
-`primate` uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). This makes it incredibly easy to e.g. add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this).
+```bash
+git submodule add https://github.com/peekxc/primate extern/primate
+git submodule update --init
+```
+
+From here, you can now include `extern/primate/include` into your C++ source files, or you can add this directory to the search path used other various build tools, such as [CMake](https://cmake.org/) or [Meson](https://mesonbuild.com/).
+
+::: 
+
+### C++ Integration 
+
+`primate` uses a generic template interface via [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints); thus, and supplying types [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49). 
+
+For example, 
+
+```cpp
+PYBIND11_MODULE(_custom_ext_module, m) {
+  _trace< false, float, Eigen::SparseMatrix< float > >(m); // < symmetric >
+}
+```
 <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
 

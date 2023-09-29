@@ -171,8 +171,63 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>. <code>primate</code> was developed with slightly different goals in mind than <code>imate</code>, most of which have to do with integrability and the choice of FFI / build system.</p>
+<p>Much of <code>primate</code>’s computational code was ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>, prompting questions about their differences.</p>
+<p>In general, <code>primate</code> was developed with slightly different goals in mind than <code>imate</code>, most of which have to do with integrability and the choice of FFI / build system.</p>
 <p>Notable differences between the two packages include:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th><strong>Feature</strong></th>
+<th><code>primate</code></th>
+<th><code>imate</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Trace methods</td>
+<td>SLQ only</td>
+<td>Multiple</td>
+</tr>
+<tr class="even">
+<td>Parallel support</td>
+<td>CPU only</td>
+<td>CPU &amp; GPU</td>
+</tr>
+<tr class="odd">
+<td>Function support</td>
+<td>Arbitrary</td>
+<td>Package supported<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></td>
+</tr>
+<tr class="even">
+<td>Operator support</td>
+<td>Arbitrary</td>
+<td>Matrix-derived</td>
+</tr>
+<tr class="odd">
+<td>Linking strategy</td>
+<td>Header only</td>
+<td>Shared libraries</td>
+</tr>
+<tr class="even">
+<td>C++ version</td>
+<td><span class="math inline">\(\geq\)</span> C++20</td>
+<td>Any</td>
+</tr>
+<tr class="odd">
+<td>FFI</td>
+<td>Pybind11</td>
+<td>Cython</td>
+</tr>
+<tr class="even">
+<td>Build tool</td>
+<td>Meson</td>
+<td>CMake</td>
+</tr>
+</tbody>
+</table>
+<p>One of the primary motivations for developing <code>primate</code> was to streamline access to SLQ method from <em>user</em> (i.e.&nbsp;dependent) packages, as well as to extend native support for types adhering to SciPys <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html"><code>LinearOperator</code></a> abstract interface.</p>
+<p>If this fits your use case, consider giving <code>primate</code> a try!</p>
+<!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 <!-- - `imate` supports multiple trace estimation approaches, e.g. decompositional methods. `primate` only supports the SLQ method.  
 - `imate` supports both CPU parallelism and GPU parallelism. `primate` only supports CPU parallelism.
 - `imate` builds [Cython](https://cython.org/) bindings (w/ [setuptools](https://setuptools.pypa.io/en/latest/index.html)); `primate` builds [pybind11](https://pybind11.readthedocs.io/en/stable/index.html) bindings (w/ [meson](https://meson-python.readthedocs.io/en/latest/#))
@@ -181,64 +236,16 @@ ul.task-list li input[type="checkbox"] {
 - `imate` is optimized for a fixed set of matrix functions, whereas `primate` allows for arbitrary / user-supplied functions
 - `imate` requires matrices as input, whereas `primate` allows arbitrary / user-supplied `LinearOperator`'s   
 - `imate` works with any standard C++ compiler, whereas `primate` requires C++20 support. -->
-<table class="table">
-<thead>
-<tr class="header">
-<th><strong>Feature</strong></th>
-<th><code>imate</code></th>
-<th><code>primate</code></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Trace methods</td>
-<td>Multiple</td>
-<td>SLQ only</td>
-</tr>
-<tr class="even">
-<td>Parallel support</td>
-<td>CPU &amp; GPU</td>
-<td>CPU only</td>
-</tr>
-<tr class="odd">
-<td>Function support</td>
-<td>Fixed</td>
-<td>Arbitrary</td>
-</tr>
-<tr class="even">
-<td>Operator support</td>
-<td>Matrix-derived</td>
-<td>Arbitrary</td>
-</tr>
-<tr class="odd">
-<td>Linking strategy</td>
-<td>Shared libraries</td>
-<td>Header only</td>
-</tr>
-<tr class="even">
-<td>C++ version</td>
-<td>Any</td>
-<td><span class="math inline">\(\geq\)</span> C++20</td>
-</tr>
-<tr class="odd">
-<td>FFI</td>
-<td>Cython</td>
-<td>Pybind11</td>
-</tr>
-<tr class="even">
-<td>Build tool</td>
-<td>CMake</td>
-<td>Meson</td>
-</tr>
-</tbody>
-</table>
-<p>The primary motivation for the development of <code>primate</code> was to simplify implicit trace estimation for pure C++ operators that lie inside of <em>external</em> (i.e.&nbsp;dependent) Python packages, and to extend support for Python types implementing <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPys <code>LinearOperator</code></a> abstract interface.</p>
-<p>If this fits your use case, consider giving <code>primate</code> a try!</p>
-<!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 
 
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>See <a href="https://ameli.github.io/imate/api.html#functions">imates documentation</a> for the list of supported functions.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

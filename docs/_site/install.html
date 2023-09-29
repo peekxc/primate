@@ -170,6 +170,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Integration</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
@@ -184,10 +190,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#usage-with-c" id="toc-usage-with-c" class="nav-link active" data-scroll-target="#usage-with-c">Usage with C++</a>
-  <ul class="collapse">
-  <li><a href="#integration" id="toc-integration" class="nav-link" data-scroll-target="#integration">Integration</a></li>
-  </ul></li>
+  <li><a href="#compiling-extension-modules" id="toc-compiling-extension-modules" class="nav-link active" data-scroll-target="#compiling-extension-modules">Compiling extension modules</a></li>
+  <li><a href="#c-integration" id="toc-c-integration" class="nav-link" data-scroll-target="#c-integration">C++ Integration</a></li>
   </ul>
 </nav>
     </div>
@@ -215,28 +219,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><code>primate</code> is a standard <a href="https://peps.python.org/pep-0517/">PEP-517</a> package, and thus can be installed via <code>pip</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">&lt;</span> primate source directory <span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Currently the package must be built from source via cloning the repository. PYPI support is planned.</p>
-<section id="usage-with-c" class="level2">
-<h2 class="anchored" data-anchor-id="usage-with-c">Usage with C++</h2>
-<p><code>primate</code>’s core C++ interface is exported as a <a href="https://en.wikipedia.org/wiki/Header-only">header-only library</a>, making it easy to compile custom extension modules in a separate package against <code>primate</code>’s API.</p>
-<p>The simplest way is to do this is to add <code>primate</code> as a <a href="https://peps.python.org/pep-0631/">dependency to your package</a> and use the <code>get_include()</code> function to include the header files (this is similar to how <a href="https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html">NumPy is exported</a>).</p>
-<p>For example, with <code>setuptools</code>/<code>distutils</code>, in <code>setup.py</code> you might use:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> primate <span class="im">as</span> pm</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Extension(<span class="st">'extension_name'</span>, ..., include_dirs<span class="op">=</span>[pm.get_include()])</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Or, with <a href="https://github.com/mesonbuild/meson-python">meson-python</a>, in <code>meson.build</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>primate_include_dirs <span class="op">=</span> run_command(py, </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'-c'</span>, <span class="st">'import primate as pm; print(pm.get_include())'</span>]</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>).stdout().strip()</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>In general, other methods could be used, e.g.&nbsp;using git submodules (as in <a href="https://pybind11.readthedocs.io/en/stable/installing.html#include-as-a-submodule">pybind11’s installation guide</a>) or just manually copying over the header files. <!-- However, specifying `primate` as a dependency as is preferred, as then the source files are version controlled.   --></p>
-<section id="integration" class="level3">
-<h3 class="anchored" data-anchor-id="integration">Integration</h3>
-<p><code>primate</code> uses a generic template interface via <a href="https://en.cppreference.com/w/cpp/language/constraints">C++20 Concepts</a>—thus, and supplying types <a href="https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49">fitting the constraints</a>. This makes it incredibly easy to e.g.&nbsp;add a non-standard matrix function or compile the trace estimator with custom linear operator (todo: document this). <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 --></p>
-
-
+<section id="compiling-extension-modules" class="level3">
+<h3 class="anchored" data-anchor-id="compiling-extension-modules">Compiling extension modules</h3>
+<p><code>primate</code>’s C++ interface is exported as a <a href="https://en.wikipedia.org/wiki/Header-only">header-only library</a>, making it easy to compile your own <a href="https://docs.python.org/3/extending/extending.html">extension modules</a> using <code>primate</code>’s API.</p>
+<p>The simplest way to link to these headers is to include <code>primate</code> as a <a href="https://peps.python.org/pep-0631/">dependency</a> to your package and use the <code>get_include()</code> function to find the appropriate directory (this is how <a href="https://numpy.org/doc/1.26/reference/generated/numpy.get_include.html">NumPy is exported</a>).</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">setuptools</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">meson-python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">git submodule</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setup.py</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> primate <span class="im">as</span> pm</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Extension(<span class="st">'extension_name'</span>, ..., include_dirs<span class="op">=</span>[pm.get_include()])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># meson.build</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>primate_include_dirs <span class="op">=</span> run_command(py, </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'-c'</span>, <span class="st">'import primate as pm; print(pm.get_include())'</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>).stdout().strip()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Assuming your headers are located in <code>extern</code>, from your git repository, you can use:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule add https://github.com/peekxc/primate extern/primate</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From here, you can now include <code>extern/primate/include</code> into your C++ source files, or you can add this directory to the search path used other various build tools, such as <a href="https://cmake.org/">CMake</a> or <a href="https://mesonbuild.com/">Meson</a>.</p>
+</div>
+</div>
+</div>
 </section>
+<section id="c-integration" class="level3">
+<h3 class="anchored" data-anchor-id="c-integration">C++ Integration</h3>
+<p><code>primate</code> uses a generic template interface via <a href="https://en.cppreference.com/w/cpp/language/constraints">C++20 Concepts</a>; thus, and supplying types <a href="https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49">fitting the constraints</a>.</p>
+<p>For example,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>PYBIND11_MODULE<span class="op">(</span>_custom_ext_module<span class="op">,</span> m<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  _trace<span class="op">&lt;</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">float</span><span class="op">,</span> Eigen<span class="op">::</span>SparseMatrix<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;</span> <span class="op">&gt;(</span>m<span class="op">);</span> <span class="co">// &lt; symmetric &gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
+
+
 </section>
 
 </main> <!-- /main -->
