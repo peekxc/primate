@@ -2,7 +2,7 @@
 title: "Integration"
 ---
 
-`primate` supports calling the SLQ trace estimator directly from C++ using any matrix function and any linear operator having the preqrequisite member functions. For explanatory purposes, the following code outline how to call the trace estimator to compute teh log determinant using a custom user-implemented operator `LinOp`: 
+`primate` supports calling the SLQ trace estimator directly from C++ using any matrix function and any linear operator having the preqrequisite member functions. For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
 
 ```cpp
 #include <cmath>                              // std::log
@@ -83,3 +83,5 @@ template<
 
 Base 
 Affine parameters: `parameters`, `num_parameters` -->
+
+

@@ -181,6 +181,7 @@
         Func&& matrix_function,
         RBG& rng,
         const IndexType distr,
+        const int seed, 
         const DataType* parameters,
         const IndexType num_parameters,
         const FlagType orthogonalize,
@@ -217,7 +218,7 @@
 
         // Thread-safe random bit generator
         // std::cout << "Spinning up RNG" << std::endl;
-        rng.initialize(num_threads);
+        rng.initialize(num_threads, seed);
 
         // The counter of filled size of processed_samples_indices array
         // This scalar variable is defined as array to be shared among al threads

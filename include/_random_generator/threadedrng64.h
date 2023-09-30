@@ -17,6 +17,7 @@
 #include <cassert>  // assert
 #include <cstdlib>  // NULL
 #include <random>   // uniform_random_bit_generator, mt19937_64
+#include <functional> // std::function 
 #include "random_concepts.h" // LightRandom64Engine
 // #include "./xoshiro_256_star_star.h"  // Xoshiro256StarStar
 // #include "./pcg_random.h" // PCG 
@@ -26,22 +27,23 @@
 // different seed sequences (seed_seq's) generated from the std::random_device, such that one can safely call ThreadedRNG64.next(tid) with the 
 // give thread id (tid) and obtain a uniformly random unsigned integer with at least 64-bits. 
 // NOTE: RandomNumberEngine == UniformRandomBitGenerator + has .seed(), default constructible, and other things
-template< LightRandom64Engine RNE = std::mt19937_64, std::uniform_random_bit_generator RBG = std::random_device >
+template< LightRandom64Engine RNE = std::mt19937_64 >
 struct ThreadedRNG64 {
     int num_threads;
     std::vector< RNE > generators;
     ThreadedRNG64(){
+        // std::uniform_random_bit_generator RBG = std::random_device;
         int num_threads_ = 1;
         initialize(num_threads_);
     };
-    explicit ThreadedRNG64(int num_threads_){
-        initialize(num_threads_);
+    explicit ThreadedRNG64(int num_threads_, int seed = -1){
+        initialize(num_threads_, seed);
     };
     auto next(int thread_id) -> std::uint_fast64_t {
         return generators[thread_id]();
     }
 
-    void initialize(int num_threads_){
+    void initialize(int num_threads_, int seed = -1){
         // assert(num_threads_ > 0);
         if (num_threads_ == 0){ return; }
         num_threads = num_threads_;
@@ -49,11 +51,18 @@ struct ThreadedRNG64 {
 
         // Seeds generators with sources of entropy from a RBG (e.g. random_device)
         // This seeds the entire state vector of the corresponding RNE's state size / entropy source using rd
-        RBG rd;
+        auto rdev = std::random_device();
+        auto mt = std::mt19937(seed);
+        std::function< std::uint_fast32_t() > rd;
+        if (seed == -1){
+            rd = [&rdev](){ return rdev(); };
+        } else {
+            rd = [&mt](){ return mt(); };
+        } 
         if constexpr(Random64Engine< RNE >){
             std::uint_fast32_t seed_data[RNE::state_size];
             for (int i = 0; i < num_threads; ++i) {
-                std::generate_n(seed_data, RNE::state_size, std::ref(rd)); // generate evenly-distributed 32-bit seeds
+                std::generate_n(seed_data, RNE::state_size, rd); // generate evenly-distributed 32-bit seeds
                 std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
                 generators[i].seed(seed_gen);
             }

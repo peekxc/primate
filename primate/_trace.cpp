@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include <binders/pb11_trace_wrapper.h>
+#include <binders/pb11_trace_bind.h>
 #include "pylinops.h"
 #include "eigen_operators.h"
 

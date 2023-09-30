@@ -27,6 +27,31 @@ website:
     type: textbox
     copy-button: true
 
+metadata-files:
+  - _sidebar.yml
+
+quartodoc: 
+  package: primate
+  title: API Reference    # API only 
+  dir: _site/reference    # API only 
+  style: pkgdown          # API only
+  sidebar: _sidebar.yml 
+  
+  # renderer: 
+  #   # style: _renderer.py
+  #   show_signature: true
+  #   show_signature_annotations: true
+  #   display_name: name 
+  
+  # ## NOTE: THIS IS NOT THE SIDEBAR 
+  # sections: 
+  #   - title: Simplex Tree 
+  #     contents: 
+  #       - SimplexTree
+  #   - title: Union Find
+  #     contents: 
+  #       - UnionFind
+
 format:
   html:
     theme: 

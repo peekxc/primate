@@ -20,16 +20,17 @@ _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank",
 
 def slq(
   A: Union[LinearOperator, spmatrix, np.ndarray],
+  matrix_function: Union[str, Callable] = "identity", 
   parameters: Iterable = None,
-  matrix_function: Union[str, Callable] = "identity",
   min_num_samples: int = 10,
   max_num_samples: int = 50,
-  distribution: str = "rademacher",
-  rng_engine: str = "mt",
   error_atol: float = None,
   error_rtol: float = 1e-2,
   confidence_level: float = 0.95,
   outlier_significance_level: float = 0.001,
+  distribution: str = "rademacher",
+  rng_engine: str = "pcg",
+  seed: int = -1,
   lanczos_degree: int = 20,
   lanczos_tol: int = None,
   orthogonalize: int = 0,
@@ -39,16 +40,35 @@ def slq(
   return_info: bool = False, 
   **kwargs
 ):
-  """Estimates the trace of a matrix function f(A) = U f(D) U^{-1} using the stochastic Lanczos quadrature (SLQ) method. 
+  """Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method. 
 
-  Parameters: 
-    A: real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
-    min_num_samples: minimum number of parameter for lanczos. 
-    distribution: the distribution to sample random vectors from. 
+  Parameters
+  ----------
+  A : ndarray, sparse matrix, or LinearOperator
+      real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
+  matrix_function : str or Callable, default="identity"
+      float-valued function defined on the spectrum of A. 
+  parameters : Iterable, default = None
+      translates 't' for the affine operator A + t*B (see details). 
+  distribution : { 'rademacher', 'normal' }, default = "rademacher"
+      zero-centered distribution to sample random vectors from.
+  **kwargs : dict, optional 
+      additional key-values to parameterize the chosen 'matrix_function'.
+      
+  Returns
+  -------
+  trace_estimate : float 
+      Estimate of the trace of the matrix function $f(A)$.
+  info : dict, optional 
+      If 'return_info = True', additional information about the computation. 
 
-  Reference:
-    `Ubaru, S., Chen, J., and Saad, Y. (2017)
-    <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
+  See Also
+  --------
+  lanczos : the lanczos algorithm. 
+
+  Reference
+  ---------
+    .. [1] `Ubaru, S., Chen, J., and Saad, Y. (2017) <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
     Fast Estimation of :math:`\\mathrm{tr}(F(A))` Via Stochastic Lanczos
     Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.
   """
@@ -105,7 +125,7 @@ def slq(
   trace_args = (parameters, num_inquiries, 
     orthogonalize, lanczos_degree, lanczos_tol, 
     min_num_samples, max_num_samples, error_atol, error_rtol, confidence_level, outlier_significance_level,
-    distr_id, engine_id,  
+    distr_id, engine_id, seed, 
     num_threads, 
     trace, error, samples, 
     processed_samples_indices, num_samples_used, num_outliers, converged, alg_wall_time
@@ -123,7 +143,7 @@ def slq(
     raise ValueError(f"Invalid matrix function type '{type(matrix_function)}'")
   
   ## Make the actual call
-  _trace.trace(A, *trace_args, **kwargs)
+  _trace.trace_slq(A, *trace_args, **kwargs)
 
   ## If no information is required, just return the trace estimate 
   if not(return_info) and not(plot) and not(verbose): 
@@ -134,61 +154,52 @@ def slq(
     matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
     matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
     sparse = None if matrix_density is None else matrix_density <= 0.50
-    info = {
-        'matrix':
-        {
-            'data_type': np.finfo(f_dtype).dtype.name.encode('utf-8'),
-            'gram': False,
-            'exponent': kwargs.get('p', 1.0),
-            'num_inquiries': num_inquiries,
-            'num_operator_parameters': 1, #Aop.get_num_parameters(),
-            'parameters': parameters, 
-            'size': matrix_size,               # legacy
-            'sparse': sparse,
-            'nnz': matrix_nnz,
-            'density': matrix_density  
-        },
-        'error':
-        {
-            'absolute_error': None,
-            'relative_error': None,
-            'error_atol': error_atol,
-            'error_rtol': error_rtol,
-            'confidence_level': confidence_level,
-            'outlier_significance_level': outlier_significance_level
-        },
-        'convergence':
-        {
-            'converged': converged,
-            'all_converged': np.all(converged),
-            'min_num_samples': min_num_samples,
-            'max_num_samples': max_num_samples,
-            'num_samples_used': None,
-            'num_outliers': None,
-            'samples': None,
-            'samples_mean': None,
-            'samples_processed_order': processed_samples_indices
-        },
-        'time':
-        {
-            'tot_wall_time': 0,
-            'alg_wall_time': alg_wall_time,
-            'cpu_proc_time': 0
-        },
-        'device': {
-            'num_cpu_threads': num_threads,
-            'num_gpu_devices': 0,
-            'num_gpu_multiprocessors': 0,
-            'num_gpu_threads_per_multiprocessor': 0
-        },
-        'solver':
-        {
-            'version': None,
-            'lanczos_degree': lanczos_degree,
-            'lanczos_tol': lanczos_tol,
-            'orthogonalize': orthogonalize,
-            'method': 'slq',
-        }
+    info = { }
+    info['error'] = dict(
+      absolute_error=None, relative_error=None, error_atol=error_atol, error_rtol=error_rtol, 
+      confidence_level=confidence_level, outlier_significance_level=outlier_significance_level
+    )
+    info['matrix'] = dict(
+      data_type = np.finfo(f_dtype).dtype.name.encode('utf-8'), gram=False, exponent=kwargs.get('p', 1.0),
+      num_inquiries=num_inquiries, num_operator_parameters=1, parameters=parameters,
+      size=matrix_size, sparse=sparse, nnz=matrix_nnz, density=matrix_density
+    ),
+    info['error'] = {
+      'absolute_error': None,
+      'relative_error': None,
+      'error_atol': error_atol,
+      'error_rtol': error_rtol,
+      'confidence_level': confidence_level,
+      'outlier_significance_level': outlier_significance_level
+    }
+    info['convergence'] = {
+      'converged': converged,
+      'all_converged': np.all(converged),
+      'min_num_samples': min_num_samples,
+      'max_num_samples': max_num_samples,
+      'num_samples_used': None,
+      'num_outliers': None,
+      'samples': None,
+      'samples_mean': None,
+      'samples_processed_order': processed_samples_indices
+    }
+    info['time'] = {
+      'tot_wall_time': 0,
+      'alg_wall_time': alg_wall_time,
+      'cpu_proc_time': 0
+    }
+    info['device'] = {
+      'num_cpu_threads': num_threads,
+      'num_gpu_devices': 0,
+      'num_gpu_multiprocessors': 0,
+      'num_gpu_threads_per_multiprocessor': 0
+    }
+    info['solver'] = {
+      'version': None,
+      'lanczos_degree': lanczos_degree,
+      'lanczos_tol': lanczos_tol,
+      'orthogonalize': orthogonalize,
+      'method': 'slq',
     }
 
     # Fill arrays of info depending on whether output is scalar or array

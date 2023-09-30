@@ -3,6 +3,15 @@ from typing import *
 from primate import random
 from primate.random import _engines, _engine_prefixes
 
+def test_seeding():
+  s1 = random.rademacher(250, seed = -1)
+  s2 = random.rademacher(250, seed = -1)
+  assert any(s1 != s2), "random device not working"
+  for i in np.random.choice(range(1000), size=10):
+    s1 = random.rademacher(250, seed = i)
+    s2 = random.rademacher(250, seed = i)
+    assert all(s1 == s2), "seeding doesnt work"
+
 def test_rademacher():
   assert np.all([r in [-1.0, +1.0] for r in random.rademacher(100)]), "Basic rademacher test failed"
   for engine in _engine_prefixes:

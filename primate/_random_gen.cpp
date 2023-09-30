@@ -28,14 +28,14 @@
 // Instantiates the function templates for generic generators
 template< LightRandom64Engine RNE, std::floating_point F >
 void _random(py_module& m, std::string suffix){
-  m.def((std::string("rademacher") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1){
-    auto rbg = ThreadedRNG64< RNE >(num_threads);
+  m.def((std::string("rademacher") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
+    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     generate_array< 0, F >(rbg, data, array_sz, num_threads); 
   });
-  m.def((std::string("normal") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1){
-    auto rbg = ThreadedRNG64< RNE >(num_threads);
+  m.def((std::string("normal") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
+    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     generate_array< 1, F >(rbg, data, array_sz, num_threads); 
