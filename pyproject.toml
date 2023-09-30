@@ -1,10 +1,10 @@
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', "wheel", "ninja", "nanobind", "cmake", "pybind11", "numpy", "imate"]
+requires = ['meson-python', "wheel", "ninja", "pybind11", "numpy"] #  "cmake". nanobind
 
 [project]
 name = "primate"
-version = '0.1.1'
+version = '0.1.2'
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",
@@ -18,8 +18,8 @@ authors = [
 requires-python = ">=3.8"
 dependencies = [
   "numpy", 
-  "scipy", 
-  "imate"
+  "scipy"
+  # "imate"
 ]
 license = {file = "LICENSE"}
 include = [

@@ -13,10 +13,51 @@ A = B.T @ B
 
 slq_params = dict(
   matrix_function = "sqrt",
-  orthogonalize=10, lanczos_degree=20, 
+  orthogonalize=0, lanczos_degree=20, 
   confidence_level=0.95, error_rtol=1e-2, min_num_samples=150, max_num_samples=180, 
-  num_threads=1
+  num_threads=1, seed=0
 )
+slq(A, **slq_params)
+```
+
+```{python}
+import optuna
+default_params = dict(
+  matrix_function = "sqrt",
+  orthogonalize=10, lanczos_degree=20, 
+  min_num_samples=200, max_num_samples=200, 
+  seed = 0
+)
+
+nuclear_norm_truth = np.sum(np.sqrt(np.abs(np.linalg.eigvalsh(A))))
+wut = {}
+def objective(trial):
+  # print(trial)
+  params = default_params.copy()
+  # trial.suggest_int("orthogonalize", low=0, high=30)
+  params['orthogonalize'] = trial.suggest_int("orthogonalize", 0, 20, log=False)
+  # params['lanczos_degree'] = trial.suggest_int("lanczos_degree", 0, 99, log=False)
+
+  tr_est, info = slq(A, return_info = True, **params)
+  slq_samples = np.squeeze(info['convergence']['samples'])
+  slq_averages = np.cumsum(slq_samples)/(np.arange(len(slq_samples))+1)
+  return np.linalg.norm(slq_averages - np.repeat(nuclear_norm_truth, len(slq_averages)))
+
+study = optuna.create_study()
+study.optimize(objective, n_trials=250)
+
+
+from optuna.visualization import plot_optimization_history
+from optuna.visualization import plot_parallel_coordinate
+
+plot_optimization_history(study)
+plot_parallel_coordinate(study)
+study.best_params
+``` 
+
+
+
+```{python}
 
 det_est, info = slq(A, plot=False, return_info=True, **slq_params)
 
@@ -37,41 +78,3 @@ tr_true = np.sum(T.diagonal())
 assert np.isclose(np.take(tr_est,0), tr_true, atol=np.abs(tr_true)*0.05), "Estimate is off more than 5%"
 
 ```
-
-```{python}
-import optuna
-default_params = dict(
-  matrix_function = "sqrt",
-  orthogonalize=10, lanczos_degree=20, 
-  min_num_samples=200, max_num_samples=180
-)
-
-nuclear_norm_truth = np.sum(np.sqrt(np.abs(np.linalg.eigvalsh(A))))
-wut = {}
-def objective(trial):
-  # print(trial)
-  params = default_params.copy()
-  # trial.suggest_int("orthogonalize", low=0, high=30)
-  orthogonalize = trial.suggest_int("orthogonalize", 0, 30, log=False)
-  wut['orth'] = orthogonalize
-  wut['trial'] = trial
-  # params['lanczos_tol'] = trial.suggest_float("lanczos_tol", 1e-6, 1e-2, log=False)
-  params['orthogonalize'] = orthogonalize
-  tr_est, info = slq(A, return_info = True, **params)
-  slq_samples = np.squeeze(info['convergence']['samples'])
-  slq_averages = np.cumsum(slq_samples)/(np.arange(len(slq_samples))+1)
-  return np.linalg.norm(slq_averages - np.repeat(nuclear_norm_truth, len(slq_averages)))
-
-study = optuna.create_study()
-study.optimize(objective, n_trials=150)
-
-
-from optuna.visualization import plot_optimization_history
-from optuna.visualization import plot_parallel_coordinate
-
-plot_optimization_history(study)
-study.best_params
-``` 
-
-
-
