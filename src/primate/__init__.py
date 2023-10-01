@@ -1,9 +1,8 @@
+from . import trace
+from . import plotting 
+from . import ortho
 
-# from trace import *
-from .trace import slq 
-# import _diagonalize
-# import _random
-# import _orthogonalize
+__version__ = '0.1.3'
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
 def get_include():
@@ -28,6 +27,5 @@ def get_include():
       ```
   """
   import os 
-  # import primate
   d = os.path.join(os.path.dirname(__file__), 'include')
   return d

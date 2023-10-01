@@ -1,0 +1,44 @@
+# trace { #primate.trace }
+
+`trace`
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [slq](#primate.trace.slq) | Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method.  |
+
+### slq { #primate.trace.slq }
+
+`trace.slq(A, matrix_function='identity', parameters=None, min_num_samples=10, max_num_samples=50, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)`
+
+Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method. 
+
+#### Parameters
+
+| Name              | Type                                      | Description                                                                                | Default         |
+|-------------------|-------------------------------------------|--------------------------------------------------------------------------------------------|-----------------|
+| `A`               | ndarray, sparse matrix, or LinearOperator | real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. | _required_      |
+| `matrix_function` | str or Callable                           | float-valued function defined on the spectrum of A.                                        | `"identity"`    |
+| `parameters`      | Iterable                                  | translates 't' for the affine operator A + t*B (see details).                              | `= None`        |
+| `distribution`    | str                                       | zero-centered distribution to sample random vectors from.                                  | ` 'rademacher'` |
+| `**kwargs`        | dict, optional                            | additional key-values to parameterize the chosen 'matrix_function'.                        | `{}`            |
+
+#### Returns
+
+| Type           | Description                                                            |
+|----------------|------------------------------------------------------------------------|
+| float          | Estimate of the trace of the matrix function $f(A)$.                   |
+| dict, optional | If 'return_info = True', additional information about the computation. |
+
+#### See Also
+
+lanczos : the lanczos algorithm. 
+
+
+
+#### Reference
+
+  .. [1] `Ubaru, S., Chen, J., and Saad, Y. (2017) <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
+  Fast Estimation of :math:`\mathrm{tr}(F(A))` Via Stochastic Lanczos
+  Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.

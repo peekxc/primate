@@ -235,7 +235,7 @@ dependency_map = {
 # endforeach
 
 ## Compile the package directory
-subdir('primate')
+subdir('src' / 'primate')
 
 
 # py.install_sources(

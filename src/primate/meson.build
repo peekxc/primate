@@ -16,6 +16,7 @@ python_sources = [
   'random.py',
   'ortho.py', 
   'diagonalize.py',
+  'plotting.py',
   'trace.py'
 ]
 
@@ -24,5 +25,5 @@ message('Source install dir = '+py.get_install_dir())
 py.install_sources(
   python_sources,
   subdir: 'primate', 
-  pure: false                              # Will be installed next to binaries
+  pure: false       # Will be installed next to binaries
 )

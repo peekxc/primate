@@ -20,6 +20,8 @@ website:
         text: Integration
       - href: imate_compare.qmd
         text: Comparison to *imate*
+      - href: reference/slq.qmd
+        text: SLQ
     collapse-level: 3
     pinned: false
   search:
@@ -32,26 +34,18 @@ metadata-files:
 
 quartodoc: 
   package: primate
-  title: API Reference    # API only 
-  dir: _site/reference    # API only 
-  style: pkgdown          # API only
+  dir: reference
   sidebar: _sidebar.yml 
-  
-  # renderer: 
-  #   # style: _renderer.py
-  #   show_signature: true
-  #   show_signature_annotations: true
-  #   display_name: name 
-  
-  # ## NOTE: THIS IS NOT THE SIDEBAR 
-  # sections: 
-  #   - title: Simplex Tree 
-  #     contents: 
-  #       - SimplexTree
-  #   - title: Union Find
-  #     contents: 
-  #       - UnionFind
-
+  style: single-page # pkgdown
+  sections:
+    - title: Trace module
+      desc: ""
+      contents:
+        - trace
+    - title: Random module
+      desc: ""
+      contents:
+        - random.rademacher
 format:
   html:
     theme: 
@@ -61,7 +55,7 @@ format:
     toc: true
     margin-left: 0em
     # highlight-style: a11y
-    # mainfont: "Atkinson Hyperlegible"
+    mainfont: "Atkinson Hyperlegible"
     code-copy: true
     code-overflow: wrap
 

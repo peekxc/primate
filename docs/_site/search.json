@@ -64,7 +64,7 @@
     "href": "integration.html",
     "title": "Integration",
     "section": "",
-    "text": "primate supports calling the SLQ trace estimator directly from C++ using any matrix function and any linear operator having the preqrequisite member functions. For explanatory purposes, the following code outline how to call the trace estimator to compute teh log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_trace_estimator/trace_estimator.h&gt; // trace_estimator\n#include \"LinOp.h\"                            // custom LinOp class\n\nvoid slq_log_det(LinOp A, ...){ // LinOp must support .matvec() and .shape()\n  static_assert(LinearOperator&lt; LinOp &gt;);  // compile-time constraint check\n  static constexpr bool gramian = false;   // whether to compute the gramian\n  using float_t = A::value_type;           // the value type of the vectors\n  const auto matrix_func = std::log;       // any invocable will due\n  trace_estimator&lt; gramian, float_t &gt;(\n    A, matrix_func, ...                    // for ..., see arguments below\n  ) \n}\nAny object respecting the LinearOperator concept can be given to the trace estimator; in words, the requirements are that the custom type LinOp have the following member functions:\n\nA matvec function A.matvec(const float_t* v, float_t* o) implementing \\(Av \\mapsto o\\)\nA shape function A.shape() returning the (output, input) dimensions\n\nFor example, in the matrix setting, shape() should yield a pair (r,c) where r and c indicates the number of rows and columns, respectively.\nMore concretely, the actual C++ concept itself is given as follows:\ntemplate &lt; typename T, typename F = typename T::value_type &gt;\nconcept LinearOperator = requires(T op, const F* input, F* output) {\n  { op.matvec(input, output) }; // o = A v\n  { op.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nOther concepts must be met depending on the parameter choices and template specializations. For example, the boolean gramian determines whether to compute \\(\\mathrm{tr}(f(A^T A))\\) [true] or \\(\\mathrm{tr}(f(A))\\) [false]—if gramian = true, then A must also implement rmatvec(...) method, satisfying \\(A^T v \\mapsto o\\).\nThe trace estimator is fully configurable and thus has many parameters, both compile-time and run-time. It’s full signature is given below:\ntemplate&lt; \n  bool gramian, \n  std::floating_point DataType, \n  Operator Matrix, \n  ThreadSafeRBG RBG, \n  std::invocable&lt; DataType &gt; Func \n&gt; FlagType trace_estimator(\n    Matrix* A,\n    const DataType* parameters,\n    const IndexType num_parameters,\n    Func&& matrix_function,\n    RBG& rng,\n    const IndexType distr,\n    const FlagType orthogonalize,\n    const IndexType lanczos_degree,\n    const DataType lanczos_tol,\n    const IndexType min_num_samples,\n    const IndexType max_num_samples,\n    const DataType error_atol,\n    const DataType error_rtol,\n    const DataType confidence_level,\n    const DataType outlier_significance_level,\n    const IndexType num_threads,\n    DataType* trace,\n    DataType* error,\n    DataType** samples,\n    IndexType* processed_samples_indices,\n    IndexType* num_samples_used,\n    IndexType* num_outliers,\n    FlagType* converged,\n    DataType& alg_wall_time\n  )",
+    "text": "primate supports calling the SLQ trace estimator directly from C++ using any matrix function and any linear operator having the preqrequisite member functions. For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_trace_estimator/trace_estimator.h&gt; // trace_estimator\n#include \"LinOp.h\"                            // custom LinOp class\n\nvoid slq_log_det(LinOp A, ...){ // LinOp must support .matvec() and .shape()\n  static_assert(LinearOperator&lt; LinOp &gt;);  // compile-time constraint check\n  static constexpr bool gramian = false;   // whether to compute the gramian\n  using float_t = A::value_type;           // the value type of the vectors\n  const auto matrix_func = std::log;       // any invocable will due\n  trace_estimator&lt; gramian, float_t &gt;(\n    A, matrix_func, ...                    // for ..., see arguments below\n  ) \n}\nAny object respecting the LinearOperator concept can be given to the trace estimator; in words, the requirements are that the custom type LinOp have the following member functions:\n\nA matvec function A.matvec(const float_t* v, float_t* o) implementing \\(Av \\mapsto o\\)\nA shape function A.shape() returning the (output, input) dimensions\n\nFor example, in the matrix setting, shape() should yield a pair (r,c) where r and c indicates the number of rows and columns, respectively.\nMore concretely, the actual C++ concept itself is given as follows:\ntemplate &lt; typename T, typename F = typename T::value_type &gt;\nconcept LinearOperator = requires(T op, const F* input, F* output) {\n  { op.matvec(input, output) }; // o = A v\n  { op.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nOther concepts must be met depending on the parameter choices and template specializations. For example, the boolean gramian determines whether to compute \\(\\mathrm{tr}(f(A^T A))\\) [true] or \\(\\mathrm{tr}(f(A))\\) [false]—if gramian = true, then A must also implement rmatvec(...) method, satisfying \\(A^T v \\mapsto o\\).\nThe trace estimator is fully configurable and thus has many parameters, both compile-time and run-time. It’s full signature is given below:\ntemplate&lt; \n  bool gramian, \n  std::floating_point DataType, \n  Operator Matrix, \n  ThreadSafeRBG RBG, \n  std::invocable&lt; DataType &gt; Func \n&gt; FlagType trace_estimator(\n    Matrix* A,\n    Func&& matrix_function,\n    RBG& rng,\n    const IndexType distr,\n    const DataType* parameters,\n    const IndexType num_parameters,\n    const FlagType orthogonalize,\n    const IndexType lanczos_degree,\n    const DataType lanczos_tol,\n    const IndexType min_num_samples,\n    const IndexType max_num_samples,\n    const DataType error_atol,\n    const DataType error_rtol,\n    const DataType confidence_level,\n    const DataType outlier_significance_level,\n    const IndexType num_threads,\n    DataType* trace,\n    DataType* error,\n    DataType** samples,\n    IndexType* processed_samples_indices,\n    IndexType* num_samples_used,\n    IndexType* num_outliers,\n    FlagType* converged,\n    DataType& alg_wall_time\n  )",
     "crumbs": [
       "Integration"
     ]
@@ -78,5 +78,118 @@
     "crumbs": [
       "Integration"
     ]
+  },
+  {
+    "objectID": "pybind11_integration.html",
+    "href": "pybind11_integration.html",
+    "title": "pybind11 Integration",
+    "section": "",
+    "text": "If you’re using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using primates binding headers. The idea as follows: let’s suppose you have your own LinearOperator class called LinOp, which defined as follows:\nclass LinOp {\n  int nrow, ncol;\n  \n  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}\n  \n  void matvec(const float* input, float* output) const {\n    ... // implementation details \n  }\n\n  void shape() const { return std::make_pair(nrow, ncol); }\n}\nThis class is a pure C++ class, though one could easily expose the type for construction on the Python side using pybind11’s class-binding code. This part is optional.\nSuppose you want to create an extension module that calls primate’s SLQ trace estimator with your custom operator LinOp. Since LinOp already satisfies the LinearOperator constraints, this is achieved by calling the _trace_wrapper function:\n#include &lt;binders/pb11_trace_bind.h&gt;  // _trace_wrapper binding  \n#include \"LinOp.h\"                    // custom LinOp class  \n\nPYBIND11_MODULE(_custom_trace, m) {   \n  // m is the actual py::module (exported as _custom_trace)\n  m.doc() = \"custom trace estimator module\";\n  _trace_wrapper&lt; false, float, LinOp &gt;(m); \n}\nThe final extension module _custom_trace will have a method trace_slq as an attribute that can be called from Python to initiate the SLQ method with the corresponding LineOp type. If you’re trying to create bindings for a class that doesn’t natively support the matvec and shape constraints, you can optionally provide a wrapper function to the last template parameter:\nstruct WrappedLinOp {\n  LinOp op;\n\n  void WrappedLinOp(LinOp& _op) : op(_op){ }\n\n  void matvec(const float* input, float* output){\n    ... // implementation details, e.g. op.dot(input, output)\n  }\n\n  void shape() { ... }\n}\n\nvoid linop_wrapper(LinOp* op){\n  return WrappedLinOp(*op);\n}\n\nPYBIND11_MODULE(_custom_trace, m) {   \n  // m is the actual py::module (exported as _custom_trace)\n  m.doc() = \"custom trace estimator module\";\n  _trace_wrapper&lt; false, float, LinOp, linop_wrapper &gt;(m); \n}\nAs a final example, here’s what the code might look like for wrapping a Eigen SparseMatrix for use with primate’s underlying trace estimator.\ntemplate&lt; std::floating_point F &gt;\nstruct SparseEigenLinearOperator {\n  using value_type = F;\n  using float_vec = Eigen::Matrix&lt; F, Eigen::Dynamic, 1 &gt;;\n\n  const Eigen::SparseMatrix&lt; F &gt; A;  \n  SparseEigenLinearOperator(const Eigen::SparseMatrix&lt; F &gt;& _mat) : A(_mat){}\n\n  void matvec(const F* inp, F* out) const noexcept {\n    auto input = Eigen::Map&lt; const float_vec &gt;(inp, A.cols(), 1); \n    auto output = Eigen::Map&lt; float_vec &gt;(out, A.rows(), 1);\n    output = A * input; \n  }\n\n  auto shape() const noexcept -&gt; std::pair&lt; size_t, size_t &gt; {\n    return std::make_pair((size_t) A.rows(), (size_t) A.cols());\n  }\n};\n\ntemplate&lt; std::floating_point F &gt;\nauto eigen_sparse_wrapper(const Eigen::SparseMatrix&lt; F &gt;* A){\n  return SparseEigenLinearOperator&lt; F &gt;(*A);\n}\n\nPYBIND11_MODULE(_custom_trace, m) {\n  m.doc() = \"custom trace estimator module\";\n  _trace_wrapper&lt; false, float, Eigen::SparseMatrix&lt; float &gt; &gt;(m, eigen_sparse_wrapper&lt; float &gt;); \n}"
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "API Reference",
+    "section": "",
+    "text": "SLQ method`\n\n\n\ntrace\n\n\n\n\n\n\n\n\n\n\nrandom"
+  },
+  {
+    "objectID": "reference/index.html#slq",
+    "href": "reference/index.html#slq",
+    "title": "API Reference",
+    "section": "",
+    "text": "slq\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method."
+  },
+  {
+    "objectID": "reference/slq.html",
+    "href": "reference/slq.html",
+    "title": "slq",
+    "section": "",
+    "text": "slq(A, matrix_function='identity', parameters=None, min_num_samples=10, max_num_samples=50, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nmatrix_function\nstr or Callable\nfloat-valued function defined on the spectrum of A.\n\"identity\"\n\n\nparameters\nIterable\ntranslates ‘t’ for the affine operator A + t*B (see details).\n= None\n\n\ndistribution\nstr\nzero-centered distribution to sample random vectors from.\n'rademacher'\n\n\n**kwargs\ndict, optional\nadditional key-values to parameterize the chosen ‘matrix_function’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\ndict, optional\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., and Saad, Y. (2017) &lt;https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf&gt;_, Fast Estimation of :math:\\mathrm{tr}(F(A)) Via Stochastic Lanczos Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.",
+    "crumbs": [
+      "SLQ"
+    ]
+  },
+  {
+    "objectID": "reference/slq.html#parameters",
+    "href": "reference/slq.html#parameters",
+    "title": "slq",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nmatrix_function\nstr or Callable\nfloat-valued function defined on the spectrum of A.\n\"identity\"\n\n\nparameters\nIterable\ntranslates ‘t’ for the affine operator A + t*B (see details).\n= None\n\n\ndistribution\nstr\nzero-centered distribution to sample random vectors from.\n'rademacher'\n\n\n**kwargs\ndict, optional\nadditional key-values to parameterize the chosen ‘matrix_function’.\n{}",
+    "crumbs": [
+      "SLQ"
+    ]
+  },
+  {
+    "objectID": "reference/slq.html#returns",
+    "href": "reference/slq.html#returns",
+    "title": "slq",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\ndict, optional\nIf ‘return_info = True’, additional information about the computation.",
+    "crumbs": [
+      "SLQ"
+    ]
+  },
+  {
+    "objectID": "reference/slq.html#see-also",
+    "href": "reference/slq.html#see-also",
+    "title": "slq",
+    "section": "",
+    "text": "lanczos : the lanczos algorithm.",
+    "crumbs": [
+      "SLQ"
+    ]
+  },
+  {
+    "objectID": "reference/slq.html#reference",
+    "href": "reference/slq.html#reference",
+    "title": "slq",
+    "section": "",
+    "text": ".. [1] Ubaru, S., Chen, J., and Saad, Y. (2017) &lt;https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf&gt;_, Fast Estimation of :math:\\mathrm{tr}(F(A)) Via Stochastic Lanczos Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.",
+    "crumbs": [
+      "SLQ"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#stochastic-lanczos-quadrature",
+    "href": "reference/index.html#stochastic-lanczos-quadrature",
+    "title": "API Reference",
+    "section": "",
+    "text": "SLQ method`\n\n\n\ntrace"
+  },
+  {
+    "objectID": "reference/trace.html",
+    "href": "reference/trace.html",
+    "title": "trace",
+    "section": "",
+    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nslq\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method.\n\n\n\n\n\ntrace.slq(A, matrix_function='identity', parameters=None, min_num_samples=10, max_num_samples=50, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nmatrix_function\nstr or Callable\nfloat-valued function defined on the spectrum of A.\n\"identity\"\n\n\nparameters\nIterable\ntranslates ‘t’ for the affine operator A + t*B (see details).\n= None\n\n\ndistribution\nstr\nzero-centered distribution to sample random vectors from.\n'rademacher'\n\n\n**kwargs\ndict, optional\nadditional key-values to parameterize the chosen ‘matrix_function’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\ndict, optional\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., and Saad, Y. (2017) &lt;https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf&gt;_, Fast Estimation of :math:\\mathrm{tr}(F(A)) Via Stochastic Lanczos Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099."
+  },
+  {
+    "objectID": "reference/trace.html#functions",
+    "href": "reference/trace.html#functions",
+    "title": "trace",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nslq\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method.\n\n\n\n\n\ntrace.slq(A, matrix_function='identity', parameters=None, min_num_samples=10, max_num_samples=50, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A) = U f(D) U^{-1}\\) using the stochastic Lanczos quadrature (SLQ) method.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nmatrix_function\nstr or Callable\nfloat-valued function defined on the spectrum of A.\n\"identity\"\n\n\nparameters\nIterable\ntranslates ‘t’ for the affine operator A + t*B (see details).\n= None\n\n\ndistribution\nstr\nzero-centered distribution to sample random vectors from.\n'rademacher'\n\n\n**kwargs\ndict, optional\nadditional key-values to parameterize the chosen ‘matrix_function’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\ndict, optional\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., and Saad, Y. (2017) &lt;https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf&gt;_, Fast Estimation of :math:\\mathrm{tr}(F(A)) Via Stochastic Lanczos Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099."
+  },
+  {
+    "objectID": "reference/index.html#random",
+    "href": "reference/index.html#random",
+    "title": "API Reference",
+    "section": "",
+    "text": "random"
+  },
+  {
+    "objectID": "reference/random.html",
+    "href": "reference/random.html",
+    "title": "random",
+    "section": "",
+    "text": "random\n\n\n\n\n\nName\nDescription\n\n\n\n\nrademacher\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\nrandom.rademacher(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nthe output shape to generate\nrequired"
+  },
+  {
+    "objectID": "reference/random.html#functions",
+    "href": "reference/random.html#functions",
+    "title": "random",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nrademacher\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\nrandom.rademacher(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nthe output shape to generate\nrequired"
   }
 ]

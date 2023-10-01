@@ -1,0 +1,9 @@
+# Function reference
+
+## Random vector generation
+
+
+
+| | |
+| --- | --- |
+| [slq](slq.qmd#primate.slq) | Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method.  |

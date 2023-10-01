@@ -12,8 +12,8 @@ from scipy.sparse import spmatrix, sparray
 from scipy.sparse.linalg import LinearOperator
 
 import _trace
-from imate._trace_estimator import trace_estimator_utilities as te_util 
-from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
+# from imate._trace_estimator import trace_estimator_utilities as te_util 
+# from imate._trace_estimator import trace_estimator_plot_utilities as te_plot
 from .random import _engine_prefixes, _engines
 
 _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
@@ -50,6 +50,18 @@ def slq(
       float-valued function defined on the spectrum of A. 
   parameters : Iterable, default = None
       translates 't' for the affine operator A + t*B (see details). 
+  min_num_samples : int, default = 10
+      Minimum number of random vectors to sample for the trace estimate. 
+  max_num_samples : int, default = 50
+      Maximum number of random vectors to sample for the trace estimate. 
+  error_atol : float, default = None
+      Absolute tolerance governing convergence. 
+  error_rtol : float, default = 1e-2
+      Relative tolerance governing convergence. 
+  confidence_level : float, default = 0.95
+      Confidence level before converging. 
+  outlier_significance_level: float, default = 0.001
+      Outliers to ignore in trace estimation. 
   distribution : { 'rademacher', 'normal' }, default = "rademacher"
       zero-centered distribution to sample random vectors from.
   **kwargs : dict, optional 
@@ -221,8 +233,12 @@ def slq(
       info['convergence']['samples'] = samples[:, 0]
       info['convergence']['samples_mean'] = trace[0]
 
-    if verbose: te_util.print_summary(info)
-    if plot: te_plot.plot_convergence(info)
+    # if verbose: te_util.print_summary(info)
+    # if plot: te_plot.plot_convergence(info)
+    if plot: 
+      from bokeh.plotting import show
+      from .plotting import figure_trace
+      show(figure_trace(info))
 
     return (trace, info) if output_is_array else (trace[0], info)
 
