@@ -1,8 +1,9 @@
-from . import trace
+__version__ = '0.1.3'
+
 from . import plotting 
 from . import ortho
+from . import trace
 
-__version__ = '0.1.3'
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
 def get_include():

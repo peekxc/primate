@@ -4,12 +4,20 @@ from more_itertools import unique_everseen
 from quartodoc import get_object, Builder, preview, blueprint, collect, MdRenderer
 from quartodoc.builder.blueprint import BlueprintTransformer
 from quartodoc.layout import Auto
+import primate
 
 ## quartodoc not respecting virtualenv
 mod = get_object('primate')
+
 mod = get_object(path='/Users/mpiekenbrock/opt/miniconda3/envs/spri/lib/python3.11/site-packages/', object_name='primate')
 print(list(mod.members.keys()))
 
+mod['__file__'].value
+
+# %% 
+mod = get_object('primate')
+
+# %% 
 ## Configure builder 
 cfg = yaml.safe_load(open("_quarto.yml", "r"))
 builder = Builder.from_quarto_config(cfg)
