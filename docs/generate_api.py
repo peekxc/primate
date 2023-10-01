@@ -5,7 +5,9 @@ from quartodoc import get_object, Builder, preview, blueprint, collect, MdRender
 from quartodoc.builder.blueprint import BlueprintTransformer
 from quartodoc.layout import Auto
 
+## quartodoc not respecting virtualenv
 mod = get_object('primate')
+mod = get_object(path='/Users/mpiekenbrock/opt/miniconda3/envs/spri/lib/python3.11/site-packages/', object_name='primate')
 print(list(mod.members.keys()))
 
 ## Configure builder 

@@ -4,7 +4,7 @@ foreach ext: extensions
   py.extension_module(
     ext,
     ext + '.cpp',
-    include_directories: [inc_pkg, inc_numpy, inc_pybind11, inc_eigen], # inc_pybind11, inc_nanobind
+    include_directories: [inc_pkg, inc_numpy, inc_eigen, inc_pybind11], # inc_pybind11, inc_nanobind
     dependencies: [lapack, blas, omp],
     install: true, 
     cpp_args: _cpp_args
@@ -12,12 +12,12 @@ foreach ext: extensions
 endforeach
 
 python_sources = [
-  '__init__.py',
   'random.py',
   'ortho.py', 
   'diagonalize.py',
   'plotting.py',
-  'trace.py'
+  'trace.py',
+  '__init__.py'
 ]
 
 ## Print install directory

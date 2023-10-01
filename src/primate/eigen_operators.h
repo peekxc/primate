@@ -1,6 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
-#include <Eigen/SparseCore> // SparseMatrix, Matrix
+// #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
 
