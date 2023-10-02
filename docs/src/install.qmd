@@ -1,0 +1,64 @@
+---
+title: "Installation"
+---
+
+`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package, and thus can be installed via `pip`: 
+
+```python
+pip install < primate source directory >
+```
+
+Currently the package must be built from source via cloning the repository. PYPI support is planned. 
+
+### Compiling extension modules
+
+`primate`'s C++ interface is [header-only](https://en.wikipedia.org/wiki/Header-only), making it easy to compile your own [extension modules](https://docs.python.org/3/extending/extending.html). The simplest way to link these headers is to add `primate` as a [dependency](https://peps.python.org/pep-0631/) to your package and use the `get_include()` function to find the appropriate directory.
+
+::: {.panel-tabset}
+## setuptools 
+
+```python
+# setup.py
+import primate as pm
+...
+Extension('extension_name', ..., include_dirs=[pm.get_include()])
+...
+```
+
+## meson-python
+
+```python
+# meson.build
+...
+primate_include_dirs = run_command(py, 
+  ['-c', 'import primate as pm; print(pm.get_include())']
+).stdout().strip()
+...
+```
+
+## git submodule 
+
+Assuming your headers are located in `extern`, from your git repository, you can use: 
+
+```bash
+git submodule add https://github.com/peekxc/primate extern/primate
+git submodule update --init
+```
+
+From here, you can now include `extern/primate/include` into your C++ source files, or you can add this directory to the search path used other various build tools, such as [CMake](https://cmake.org/) or [Meson](https://mesonbuild.com/).
+
+::: 
+
+### Integration 
+
+On the Python side, `primate` uses a supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), and any [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html). 
+
+In general, `primate` supports _any_ operator posessing the following methods: 
+
+1. A method `A.matvec(input: ndarray) -> ndarray` implementing $v \mapsto Av$
+2. A method `A.shape() -> tuple` yielding the matrix dimensions `(A.nrow(), A.ncol())`
+
+This support extends to the C++ side as well---see the [C++ integration guide](integration.qmd). If you're using pybind11 and you want to be able to create your own trace estimator from Python, see the [pybind11 integration guide](pybind11_integration.qmd). 
+
+<!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
+

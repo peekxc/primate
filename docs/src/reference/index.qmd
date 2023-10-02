@@ -1,0 +1,18 @@
+# Function reference
+
+## `primate.trace`
+
+Trace estimation module
+
+| | |
+| --- | --- |
+| [trace.slq](trace.slq.qmd#primate.trace.slq) | Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method.  |
+
+## `primate.random`
+
+Randomized module
+
+| | |
+| --- | --- |
+| [random.rademacher](random.rademacher.qmd#primate.random.rademacher) | Generates random vectors from the rademacher distribution.  |
+| [random.normal](random.normal.qmd#primate.random.normal) |  |

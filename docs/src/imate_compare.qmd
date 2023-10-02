@@ -1,0 +1,35 @@
+---
+title: "Comparison to `imate`"
+---
+
+Much of `primate`'s computational code was ported from the (excellent) [`imate` package](https://github.com/ameli/imate), prompting questions about their differences. In general, `primate` was developed with slightly different goals in mind than `imate`, most of which have to do with integrability and the choice of FFI / build system.
+
+Notable differences between the two packages include:
+
+| **Feature**      | `primate`             | `imate`                |
+|------------------|-----------------------|------------------------|
+| Trace methods    | SLQ only              | Multiple               |
+| Parallel support | CPU only              | CPU & GPU              |
+| Function support | Arbitrary             | Package supported[^1]  |
+| Operator support | Arbitrary             | Matrix-derived         |
+| Linking strategy | Header only           | Shared libraries       |
+| C++ version      | $\geq$ C++20          | Any                    |
+| FFI              | Pybind11              | Cython                 |
+| Build tool       | Meson                 | CMake                  |
+
+[^1]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
+
+One of the primary motivations for developing `primate` was to streamline access to SLQ method from *user* (i.e. dependent) packages, as well as to extend native support for types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. If this fits your use case, consider giving `primate` a try!
+
+<!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
+
+```{=html}
+<!-- - `imate` supports multiple trace estimation approaches, e.g. decompositional methods. `primate` only supports the SLQ method.  
+- `imate` supports both CPU parallelism and GPU parallelism. `primate` only supports CPU parallelism.
+- `imate` builds [Cython](https://cython.org/) bindings (w/ [setuptools](https://setuptools.pypa.io/en/latest/index.html)); `primate` builds [pybind11](https://pybind11.readthedocs.io/en/stable/index.html) bindings (w/ [meson](https://meson-python.readthedocs.io/en/latest/#))
+- `imate`'s uses traditional runtime-linking shared libraries, wheres `primate`'s external API is header-only ([comparison](https://stackoverflow.com/questions/12671383/benefits-of-header-only-libraries))
+- `imate` works with any standard C++ compiler, whereas `primate` requires (some) compiler support for C++20.
+- `imate` is optimized for a fixed set of matrix functions, whereas `primate` allows for arbitrary / user-supplied functions
+- `imate` requires matrices as input, whereas `primate` allows arbitrary / user-supplied `LinearOperator`'s   
+- `imate` works with any standard C++ compiler, whereas `primate` requires C++20 support. -->
+```

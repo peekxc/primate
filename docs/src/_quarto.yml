@@ -1,0 +1,73 @@
+project:
+  type: website
+  output-dir: ../
+
+website:
+  title: "primate"
+  navbar: 
+    title: PRIMATE
+    right:
+      - icon: github
+        href: https://github.com/peekxc/primate
+        aria-label: GitHub
+  sidebar:
+    search: true 
+    contents:
+      - href: index.qmd
+        text: Overview
+      - href: install.qmd
+        text: Installation
+      - href: integration.qmd
+        text: Usage with C++
+      - href: pybind11_integration.qmd
+        text: Usage with pybind11
+      - href: imate_compare.qmd
+        text: Comparison to *imate*
+      - section: API Reference 
+        href: api_index.qmd
+        contents: reference/*
+      
+    collapse-level: 3
+    pinned: false
+  search:
+    location: sidebar
+    type: textbox
+    copy-button: true
+
+# metadata-files:
+#   - _sidebar.yml
+
+quartodoc: 
+  package: primate
+  dir: reference
+  out_index: index.qmd
+  # sidebar: _sidebar.yml 
+  style: pkgdown # pkgdown,single-page
+  sections:
+    - title: "`primate.trace`"
+      desc: "Trace estimation module"
+      contents:
+        - trace.slq
+    - title: "`primate.random`"
+      desc: "Randomized module"
+      contents:
+        - random.rademacher
+        - random.normal
+  # renderer:
+  #   style: CustomRenderer.py
+
+format:
+  html:
+    theme: 
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+    margin-left: 0em
+    # highlight-style: a11y
+    # mainfont: "Atkinson Hyperlegible"
+    code-copy: true
+    code-overflow: wrap
+
+
+

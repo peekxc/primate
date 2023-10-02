@@ -40,7 +40,7 @@ def slq (
   return_info: bool = False, 
   **kwargs
 ):
-  """Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method. 
+  """Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). 
 
   Parameters
   ----------
@@ -132,6 +132,7 @@ def slq (
   num_outliers = np.zeros((nq,), dtype=i_dtype)               # Number of outliers that is removed from num_samples_used in averaging
   converged = np.zeros((nq,), dtype=i_dtype)                  # Flag indicating which of the inquiries were converged below the tolerance
   alg_wall_time = f_dtype.type(0.0)                     # Somewhat inaccurate measure of the total wall clock time taken 
+  lanczos_degree = max(lanczos_degree, 2)               # should be at least two 
   
   ## Collect the arguments processed so far 
   trace_args = (parameters, num_inquiries, 
