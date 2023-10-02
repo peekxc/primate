@@ -1,8 +1,8 @@
 # primate 
 
-`primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package that performs randomized matrix trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix).
-<!-- ---that is, matrices parameterized by functions: -->
-<!-- $$ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}$$ -->
+`primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package that performs randomized matrix trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix); that is, matrices parameterized by functions:
+
+$$ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}$$
 
 Trace estimates are obtained in a Monte-Carlo fashion via the _stochastic Lanczos method_ (SLQ)[^1]. This method is useful for sparse or highly structured matrices with efficiently computable [quadratic forms](https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix).
 
