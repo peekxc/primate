@@ -19,7 +19,7 @@ Notable features of `primate` include:
 
 Much of `primate`'s computational code was directly ported from the (excellent) [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](https://peekxc.github.io/primate/imate_compare.html).
 
-[^1]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications.
+[^1]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.
 [^2]: This includes [std::function](https://en.cppreference.com/w/cpp/utility/functional/function)'s, C-style function pointers, [functors](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses), and [lambda expressions](https://en.cppreference.com/w/cpp/language/lambda).
 
 
