@@ -24,7 +24,7 @@ def lanczos(A: Union[LinearOperator, sparray], v0: Optional[np.ndarray] = None, 
 
   Description
   -----------
-  This function implements the Lanczos method, or as he called it, the method of minimized iterations. 
+  This function implements the Lanczos method, or as Lanczos called it, the _method of minimized iterations_. 
 
   """
   v0 = np.random.uniform(size=A.shape[1], low=-1.0, high=+1.0) if v0 is None else np.array(v0)

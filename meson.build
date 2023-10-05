@@ -37,8 +37,10 @@ _cpp_args = compiler.get_supported_arguments(
   '-fvisibility=hidden',
   # '-flto=thin'        # LTO optimization only for release builds
   # '-flto'             # monolithic LTO 
-  '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
+  '-Wno-deprecated-anon-enum-enum-conversion', # to silence Eigen 3.4 warnings
+  '-fopenmp' # will need openmp
 )
+
 
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
@@ -151,7 +153,7 @@ env.set('USE_CBLAS', '1') ## Turn off CBLAS
 # blas_incdir = run_command(py, ['-c', 'import scipy as sp; print(sp.__config__.blas_opt_info[\'include_dirs\'])'], check : true).stdout().strip()
 # inc_blas = include_directories(blas_incdir)
 
-## BLAS / LAPACK
+## Add BLAS
 ## see: https://github.com/mesonbuild/meson/issues/2835
 blas_options = get_option('blas') == '' ?  : [get_option('blas')]
 foreach blas_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
@@ -159,13 +161,18 @@ foreach blas_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atla
     blas_options += [blas_imp]
   endif
 endforeach
+blas = dependency(blas_options, required: true)
+dependency_map += {'BLAS' : blas }
 
+## Add LAPACK
 lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
 foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
   if lapack_imp not in lapack_options
     lapack_options += [lapack_imp]
   endif
 endforeach
+lapack = dependency(lapack_options, required: true)
+dependency_map += {'LAPACK' : lapack }
 
 # blas_preferred = 
 # lapack_preferred = 
@@ -177,9 +184,9 @@ endforeach
 # if lapack_preferred == '':
 # end
 
-blas = dependency(blas_options, required: true)
+
+
 # cblas = dependency('cblas', required: true)
-lapack = dependency(lapack_options, required: true)
 #blas_linker_flags = blas.get_variable(cmake: 'blas', default_value : '-lblas')
 
 
@@ -220,10 +227,7 @@ lapack = dependency(lapack_options, required: true)
 #   lapack = dependency(lapack_name, required: true)
 # endif
 
-dependency_map = {
-  'BLAS': blas,
-  'LAPACK': lapack
-}
+
 
 ## Dependencies information
 # foreach name, dep : dependency_map
