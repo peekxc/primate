@@ -34,15 +34,15 @@ def test_normal():
 
 
 ## For interactive verification only 
-def plot_estimates():
-  from bokeh.io import output_notebook
-  from bokeh.plotting import show, figure
-  from bokeh.models import Span
-  output_notebook()
-  counts = np.array([np.sum(random.rademacher(100)) for _ in range(5000)])
-  # counts = np.array([np.sum(random.normal(100, engine="lcg")) for _ in range(5000)])
-  # counts = np.array([np.sum(random.rayleigh(100, engine="lcg")) for _ in range(5000)])
-  p = figure(width=200, height=150)
-  p.vbar(x=np.arange(len(counts)), top=counts, color="navy")
-  p.line(np.arange(1, len(counts)+1), np.cumsum(counts) / np.arange(1, len(counts)+1), color='red')
-  show(p)
+# def plot_estimates():
+#   from bokeh.io import output_notebook
+#   from bokeh.plotting import show, figure
+#   from bokeh.models import Span
+#   output_notebook()
+#   counts = np.array([np.sum(random.rademacher(100)) for _ in range(5000)])
+#   # counts = np.array([np.sum(random.normal(100, engine="lcg")) for _ in range(5000)])
+#   # counts = np.array([np.sum(random.rayleigh(100, engine="lcg")) for _ in range(5000)])
+#   p = figure(width=200, height=150)
+#   p.vbar(x=np.arange(len(counts)), top=counts, color="navy")
+#   p.line(np.arange(1, len(counts)+1), np.cumsum(counts) / np.arange(1, len(counts)+1), color='red')
+#   show(p)
