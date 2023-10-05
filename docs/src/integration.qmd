@@ -2,9 +2,11 @@
 title: "Integration"
 ---
 
-`primate` relies on the use of C++20's [concepts](https://en.cppreference.com/w/cpp/language/constraints) to support calling the SLQ trace estimator using _any_ matrix function and _any_ linear operator having the preqrequisite member functions. To understand this more in detail, examples are given below. 
+`primate` relies on the use of C++20's [concepts](https://en.cppreference.com/w/cpp/language/constraints) to support calling the SLQ trace estimator using _any_ matrix function and _any_ linear operator having the prerequisite member functions. 
 
-## the `LinearOperator` concept
+To understand this more in detail, it is imperative to understand the `LinearOperator` concept.
+
+## `LinearOperator`
 
 Any class respecting the `LinearOperator` _concept_ can be given to the trace estimator. 
 
@@ -25,7 +27,7 @@ For example, in the matrix setting, `shape()` should yield a pair `(r,c)` where 
 
 ## Example: the LinOp class 
 
-Here's the declarations for a bare-bones C++ class respecting the concept: 
+Here's the declarations for a bare-bones C++ class that respects the `LinearOperator` concept: 
 
 ```cpp
 class LinOp {
@@ -50,16 +52,16 @@ Depending on the parameter choices and particular template specializations, the 
 
 | Concept                   | Supports     | Signature           | Requires |
 |---------------------------|-------------------------|------------------------------|------------------------|
-| `LinearOperator`          | $o = o + A v$           | `A.matvec(v, o)`            | NA                     |
-| `AdjointOperator`         | $o = o + A^T v$         | `A.rmatvec(v, o)`           | `LinearOperator` |
-| `LinearAdditiveOperator`  | $o \gets o + \alpha Av$ | `A.matvec_add(v, alpha, o)` | `LinearOperator` |
+| `LinearOperator`          | $A v \mapsto o$           | `A.matvec(v, o)`            | NA                     |
+| `AdjointOperator`         | $A^T v \mapsto o$         | `A.rmatvec(v, o)`           | `LinearOperator` |
+| `AdditiveOperator`        | $o \gets o + \alpha Av$ | `A.matvec_add(v, alpha, o)` | `LinearOperator` |
 | `AffineOperator`          | Sets $t$ s.t. $A + tB$  | `A.set_parameter(t)`        | `LinearOperator` |
 
 Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the _Lanczos_ method, then any satisfying the `LinearOperator` concept is sufficient. However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h]().
 
 ## SLQ parameters
 
-The trace estimator is fully configurable and thus has many parameters, both compile-time and run-time. It's full signature is given below: 
+The trace estimator has many parameters, both compile-time and run-time. It's full signature is given below: 
 
 ```cpp
 template< 
@@ -96,6 +98,9 @@ template<
   )
 ```
 
+Other than the templated arguments, in general, `const` parameters represent inputs and non-`const` parameters represent outputs. 
+
+
 ## Example: Log determinant
 
 For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
@@ -109,10 +114,9 @@ For explanatory purposes, the following code outline how to call the trace estim
 void slq_log_det(LinOp A, ...){ // LinOp must support .matvec() and .shape()
   static_assert(LinearOperator< LinOp >);  // compile-time constraint check
   static constexpr bool gramian = false;   // whether to compute the gramian
-  using float_t = A::value_type;           // the value type of the vectors
   const auto matrix_func = std::log;       // any invocable will due
-  trace_estimator< gramian, float_t >(
-    A, matrix_func, ...                    // See SLQ parameters
+  trace_estimator< gramian, float >(       // compile-time arguments
+    A, matrix_func, ...                    // run-time arguments 
   ) 
 }
 ```

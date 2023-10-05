@@ -3,6 +3,7 @@ build
 examples
 trash 
 **/**/*.pyd
+profiling
 # todo 
 
 # Byte-compiled / optimized / DLL files

@@ -5,7 +5,28 @@ from scipy.sparse.linalg import LinearOperator
 import _diagonalize
 
 def lanczos(A: Union[LinearOperator, sparray], v0: Optional[np.ndarray] = None, max_steps: int = None, tol: float = 1e-8, orth: int = 0, sparse_mat: bool = False):
-  """Lanczos method of minimized iterations."""
+  """Lanczos method of minimized iterations.
+
+  Parameters
+  ----------
+  A : LinearOperator | sparray
+    Symmetric operator to tridiagonalize. 
+  v0 : ndarray, default = None
+    Initial vector to orthogonalize against.
+  max_steps : int, default = None
+    Maximum number of iterations to perform. 
+  tol : float
+    convergence tolerance. 
+  orth : int
+    maximum number of Lanczos vectors to orthogonalize vectors against.
+  sparse_mat : bool, default = False 
+    Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output. 
+
+  Description
+  -----------
+  This function implements the Lanczos method, or as he called it, the method of minimized iterations. 
+
+  """
   v0 = np.random.uniform(size=A.shape[1], low=-1.0, high=+1.0) if v0 is None else np.array(v0)
   assert len(v0) == A.shape[1], "Invalid starting vector; must match the number of columns of A."
   n = A.shape[0]
