@@ -26,12 +26,10 @@ extern "C" {
              int* iwork, int* info) noexcept;
 }
 
-// lapack xstev (float overload)
 template <typename DataType>
 void lapack_xstev(char* jobz, int* n, DataType* d, DataType* e, DataType* z,
         int* ldz, DataType* work, int* info);
 
-// lapack xbdsdc (float overload)
 template <typename DataType>
 void lapack_xbdsdc(char* uplo, char* compq, int* n, DataType* d, DataType *e,
         DataType* u, int* ldu, DataType* vt, int* ldvt, DataType* q,

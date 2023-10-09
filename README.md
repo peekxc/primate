@@ -25,3 +25,8 @@ Much of `primate`'s computational code was directly ported from the (excellent) 
 
 
 
+## Compilation & Development 
+
+`primate` relies on BLAS libraries
+
+> pipx run cibuildwheel --platform linux
