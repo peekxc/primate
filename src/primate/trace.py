@@ -8,7 +8,7 @@
 
 from typing import * 
 import numpy as np
-from scipy.sparse import spmatrix, sparray
+from scipy.sparse import issparse
 from scipy.sparse.linalg import LinearOperator
 
 import _trace
@@ -19,7 +19,7 @@ from .random import _engine_prefixes, _engines
 _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
 
 def slq (
-  A: Union[LinearOperator, spmatrix, np.ndarray],
+  A: Union[LinearOperator, np.ndarray],
   matrix_function: Union[str, Callable] = "identity", 
   parameters: Iterable = None,
   min_num_samples: int = 10,

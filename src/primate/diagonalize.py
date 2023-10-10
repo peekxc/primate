@@ -1,10 +1,10 @@
 import numpy as np 
 from typing import *
-from scipy.sparse import sparray
+from scipy.sparse import issparse
 from scipy.sparse.linalg import LinearOperator
 import _diagonalize
 
-def lanczos(A: Union[LinearOperator, sparray], v0: Optional[np.ndarray] = None, max_steps: int = None, tol: float = 1e-8, orth: int = 0, sparse_mat: bool = False):
+def lanczos(A: LinearOperator, v0: Optional[np.ndarray] = None, max_steps: int = None, tol: float = 1e-8, orth: int = 0, sparse_mat: bool = False):
   """Lanczos method of minimized iterations.
 
   Parameters
