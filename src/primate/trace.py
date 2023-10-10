@@ -237,10 +237,9 @@ def slq (
     # if verbose: te_util.print_summary(info)
     # if plot: te_plot.plot_convergence(info)
     if plot: 
-      from bokeh.plotting import show
-      from .plotting import figure_trace
-      show(figure_trace(info))
-
+      from .plotting import plot_trace
+      plot_trace(info)
+    
     return (trace, info) if output_is_array else (trace[0], info)
 
 

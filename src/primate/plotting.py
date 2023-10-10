@@ -1,14 +1,13 @@
 import numpy as np
-
-import bokeh 
-from bokeh.models import Span, Scatter, LinearAxis, Range1d, BoxAnnotation, Legend, Band, ColumnDataSource
-from bokeh.plotting import figure
-from bokeh.layouts import row
-from bokeh.models import NumeralTickFormatter
 from scipy.special import erfinv
 
-def figure_trace(info: dict, real_trace: float = None, **kwargs) -> figure:
+def figure_trace(info: dict, real_trace: float = None, **kwargs):
   """Plots the trace estimates """
+  import bokeh 
+  from bokeh.models import Span, Scatter, LinearAxis, Range1d, BoxAnnotation, Legend, Band, ColumnDataSource
+  from bokeh.plotting import figure
+  from bokeh.layouts import row
+  from bokeh.models import NumeralTickFormatter
 
   samples = np.ravel(info['convergence']['samples'])
   sample_index = np.arange(1, len(samples)+1)
@@ -75,3 +74,6 @@ def figure_trace(info: dict, real_trace: float = None, **kwargs) -> figure:
   q.add_layout(legend, "center")
   return row([p,q])
     
+def plot_trace(info: dict, real_trace: float = None, **kwargs) -> None:
+  from bokeh.plotting import show
+  show(figure_trace(info, real_trace, **kwargs))
