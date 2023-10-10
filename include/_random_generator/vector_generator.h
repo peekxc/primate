@@ -11,10 +11,7 @@
 #ifndef _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 #define _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 
-#ifdef _OPENMP
 #include <omp.h>   // omp_set_num_threads, omp_get_thread_num
-#endif 
-
 #include "../_definitions/types.h"  // IndexType, LongIndexType
 #include <random>   // uniform_random_bit_generator, normal_distribution
 #include "random_concepts.h" // ThreadSafeRBG

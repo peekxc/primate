@@ -1,5 +1,6 @@
 project(
-  'primate', 'cpp', 
+  'primate', 'cpp',
+  version: '0.1.4',
   license: 'Apache-2.0',
   meson_version: '>= 1.1.0',
   default_options : [
@@ -68,6 +69,7 @@ if omp.found()
   # _cpp_args += compiler.get_supported_arguments('-fopenmp')
   openmp_flags = compiler.get_supported_arguments('-fopenmp')
   openmp_flags += compiler.get_supported_arguments('/openmp') # windows
+  openmp_flags += compiler.get_supported_arguments('-lomp') # link
   add_project_link_arguments(openmp_flags, language : 'cpp')
   dependency_map += { 'OpenMP' : omp }
 elif compiler.has_argument('-fopenmp')
@@ -78,7 +80,12 @@ elif compiler.has_argument('-fopenmp')
     dependency_map += { 'OpenMP' : omp }
   endif
 else
-  message('NO OPENMP DETECTED; primate will be built for single-threaded only.')
+  if meson.get_compiler('cpp').get_id() == 'clang'
+    dependency_map += { 'OpenMP' : declare_dependency(compile_args : ['-Xpreprocessor', '-fopenmp']) }
+  else
+    dependency_map += { 'OpenMP' : dependency('openmp', required: true) }
+  endif
+  # message('NO OPENMP DETECTED; primate will be built for single-threaded only.')
 endif
 
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
@@ -165,26 +172,26 @@ env.set('USE_CBLAS', '1') ## Turn off CBLAS
 # dependency_map += {'BLAS' : blas }
 
 ## Statically link pythran-openblas
-incdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.include_dirs[0])'], check : true).stdout().strip()
-libdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.library_dir)'], check : true).stdout().strip()
-inc_blas = include_directories(incdir_blas)
-lib_blas = static_library('openblas', objects: [libdir_blas / 'libopenblas.a'], include_directories : libdir_blas)
-blas = declare_dependency(
-  include_directories : incdir_blas,
-  link_with : lib_blas
-)
-dependency_map += {'BLAS' : blas }
-message('BLAS linking with pythran static: ' + blas.found().to_string())
+# incdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.include_dirs[0])'], check : true).stdout().strip()
+# libdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.library_dir)'], check : true).stdout().strip()
+# inc_blas = include_directories(incdir_blas)
+# lib_blas = static_library('openblas', objects: [libdir_blas / 'libopenblas.a'], include_directories : libdir_blas)
+# blas = declare_dependency(
+#   include_directories : incdir_blas,
+#   link_with : lib_blas
+# )
+# dependency_map += {'BLAS' : blas }
+# message('BLAS linking with pythran static: ' + blas.found().to_string())
 
-## Add LAPACK
-# lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
-# foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
-#   if lapack_imp not in lapack_options
-#     lapack_options += [lapack_imp]
-#   endif
-# endforeach
-# lapack = dependency(lapack_options, required: true)
-# dependency_map += {'LAPACK' : lapack }
+## Add BLAS/LAPACK
+lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
+foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+  if lapack_imp not in lapack_options
+    lapack_options += [lapack_imp]
+  endif
+endforeach
+lapack = dependency(lapack_options, required: true)
+dependency_map += {'LAPACK' : lapack }
 
 # blas_preferred = 
 # lapack_preferred = 
