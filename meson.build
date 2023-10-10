@@ -40,6 +40,8 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
 
+## Add Xclang 
+_cpp_args += compiler.get_supported_arguments('-Xclang')
 
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
@@ -65,6 +67,7 @@ omp = dependency('openmp', required: false)
 if omp.found()
   # _cpp_args += compiler.get_supported_arguments('-fopenmp')
   openmp_flags = compiler.get_supported_arguments('-fopenmp')
+  openmp_flags += compiler.get_supported_arguments('/openmp') # windows
   add_project_link_arguments(openmp_flags, language : 'cpp')
   dependency_map += { 'OpenMP' : omp }
 elif compiler.has_argument('-fopenmp')

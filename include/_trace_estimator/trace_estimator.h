@@ -11,7 +11,10 @@
 #ifndef _TRACE_ESTIMATOR_TRACE_ESTIMATOR_H_
 #define _TRACE_ESTIMATOR_TRACE_ESTIMATOR_H_
 
+#ifdef _OPENMP
 #include <omp.h>  // omp_set_num_threads
+#endif 
+
 #include <cmath>  // sqrt, pow
 #include <cstddef>  // NULL
 #include <concepts>     // invocable 
