@@ -30,6 +30,13 @@ jobs:
       with:
         version: latest
         platform: x64
+    - name: Install OpenBLAS # from: https://github.com/scipy/scipy/blob/main/.github/workflows/windows.yml
+      shell: bash
+      run: |
+        # same OpenBLAS install method as cibuildwheel
+        set -xe
+        bash tools/wheels/cibw_before_build_win.sh .
+        echo "PKG_CONFIG_PATH=c:\opt\64\lib\pkgconfig;" >> $GITHUB_ENV
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:

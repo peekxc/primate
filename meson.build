@@ -78,7 +78,6 @@ else
   message('NO OPENMP DETECTED; primate will be built for single-threaded only.')
 endif
 
-
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
 ## Otherwise BLAS must be linked and used
 env = environment()
@@ -152,26 +151,37 @@ env.set('USE_CBLAS', '1') ## Turn off CBLAS
 # blas_incdir = run_command(py, ['-c', 'import scipy as sp; print(sp.__config__.blas_opt_info[\'include_dirs\'])'], check : true).stdout().strip()
 # inc_blas = include_directories(blas_incdir)
 
-## Add BLAS
 ## see: https://github.com/mesonbuild/meson/issues/2835
-blas_options = get_option('blas') == '' ?  : [get_option('blas')]
-foreach blas_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
-  if blas_imp not in blas_options
-    blas_options += [blas_imp]
-  endif
-endforeach
-blas = dependency(blas_options, required: true)
+# blas_options = [get_option('blas')]
+# foreach blas_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate', 'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+#   if blas_imp not in blas_options
+#     blas_options += [blas_imp]
+#   endif
+# endforeach
+# blas = dependency(blas_options, required: true)
+# dependency_map += {'BLAS' : blas }
+
+## Statically link pythran-openblas
+incdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.include_dirs[0])'], check : true).stdout().strip()
+libdir_blas = run_command(py, ['-c', 'import pythran_openblas as openblas; print(openblas.library_dir)'], check : true).stdout().strip()
+inc_blas = include_directories(incdir_blas)
+lib_blas = static_library('openblas', objects: [libdir_blas / 'libopenblas.a'], include_directories : libdir_blas)
+blas = declare_dependency(
+  include_directories : incdir_blas,
+  link_with : lib_blas
+)
 dependency_map += {'BLAS' : blas }
+message('BLAS linking with pythran static: ' + blas.found().to_string())
 
 ## Add LAPACK
-lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
-foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
-  if lapack_imp not in lapack_options
-    lapack_options += [lapack_imp]
-  endif
-endforeach
-lapack = dependency(lapack_options, required: true)
-dependency_map += {'LAPACK' : lapack }
+# lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
+# foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+#   if lapack_imp not in lapack_options
+#     lapack_options += [lapack_imp]
+#   endif
+# endforeach
+# lapack = dependency(lapack_options, required: true)
+# dependency_map += {'LAPACK' : lapack }
 
 # blas_preferred = 
 # lapack_preferred = 

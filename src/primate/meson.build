@@ -1,3 +1,9 @@
+## Create a list of the final dependency objects
+deps = []
+foreach dep_name: dependency_map.keys()
+  deps += [dependency_map.get(dep_name)]
+endforeach
+
 ## Extension modules
 extensions = [ '_random_gen', '_orthogonalize', '_diagonalize', '_trace']
 foreach ext: extensions
@@ -5,7 +11,7 @@ foreach ext: extensions
     ext,
     ext + '.cpp',
     include_directories: [inc_pkg, inc_numpy, inc_eigen, inc_pybind11], # inc_pybind11, inc_nanobind
-    dependencies: [lapack, blas, omp],
+    dependencies: deps,
     install: true, 
     cpp_args: _cpp_args
   )
