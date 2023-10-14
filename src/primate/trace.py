@@ -22,8 +22,8 @@ def slq (
   A: Union[LinearOperator, np.ndarray],
   matrix_function: Union[str, Callable] = "identity", 
   parameters: Iterable = None,
-  min_num_samples: int = 10,
-  max_num_samples: int = 50,
+  min_num_samples: int = 150,
+  max_num_samples: int = 250,
   error_atol: float = None,
   error_rtol: float = 1e-2,
   confidence_level: float = 0.95,
@@ -64,6 +64,22 @@ def slq (
       Outliers to ignore in trace estimation. 
   distribution : { 'rademacher', 'normal' }, default = "rademacher"
       zero-centered distribution to sample random vectors from.
+  rng_engine : str, default = "pcg"
+      Random number engine to use.
+  seed : int, default = -1
+      Seed to initialize the entropy source. Use non-negative integers for reproducibility.
+  lanczos_degree  : int, default = 20
+      Degree of the quadrature approximation. 
+  lanczos_tol : int, default = None
+      Acceptable residual tolerance to prematurely stop the lanczos iteration. 
+  orthogonalize: int, default = 0,
+      Number of lanczos vectors to orthogonalize the Krylov basis. 
+  num_threads: int, default = 0
+      Number of threads to use in the trace estimates. 
+  plot : bool, default = False
+      If true, plots the samples of the trace estimate along with their convergence characteristics. 
+  return_info : bool, default = False
+      whether to return a dictionary containing all the relevent details of the computation.
   **kwargs : dict, optional 
       additional key-values to parameterize the chosen 'matrix_function'.
       
@@ -80,9 +96,8 @@ def slq (
 
   Reference
   ---------
-    .. [1] `Ubaru, S., Chen, J., and Saad, Y. (2017) <https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf>`_,
-    Fast Estimation of :math:`\\mathrm{tr}(F(A))` Via Stochastic Lanczos
-    Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.
+    .. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
+    SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
   """
   # assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
   attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]

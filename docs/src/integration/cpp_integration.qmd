@@ -1,5 +1,5 @@
 ---
-title: "Integration"
+title: "C++ Integration"
 ---
 
 `primate` relies on the use of C++20's [concepts](https://en.cppreference.com/w/cpp/language/constraints) to support calling the SLQ trace estimator using _any_ matrix function and _any_ linear operator having the prerequisite member functions. 

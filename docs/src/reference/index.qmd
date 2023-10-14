@@ -6,7 +6,7 @@ Trace estimation module
 
 | | |
 | --- | --- |
-| [trace.slq](trace.slq.qmd#primate.trace.slq) | Estimates the trace of a matrix function $f(A) = U f(D) U^{-1}$ using the stochastic Lanczos quadrature (SLQ) method.  |
+| [trace.slq](trace.slq.qmd#primate.trace.slq) | Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ).  |
 
 ## `primate.random`
 

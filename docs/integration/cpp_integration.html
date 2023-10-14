@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate – random.rademacher</title>
+<title>primate - C++ Integration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -65,6 +99,8 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -102,7 +138,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">random.rademacher</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">C++ Integration</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -169,7 +205,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">random.rademacher</span></a>
   </div>
 </li>
@@ -191,45 +227,176 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#primate.random.rademacher" id="toc-primate.random.rademacher" class="nav-link active" data-scroll-target="#primate.random.rademacher">random.rademacher</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
+  <li><a href="#linearoperator" id="toc-linearoperator" class="nav-link active" data-scroll-target="#linearoperator"><code>LinearOperator</code></a></li>
+  <li><a href="#example-the-linop-class" id="toc-example-the-linop-class" class="nav-link" data-scroll-target="#example-the-linop-class">Example: the LinOp class</a></li>
+  <li><a href="#other-concepts" id="toc-other-concepts" class="nav-link" data-scroll-target="#other-concepts">Other Concepts</a></li>
+  <li><a href="#slq-parameters" id="toc-slq-parameters" class="nav-link" data-scroll-target="#slq-parameters">SLQ parameters</a></li>
+  <li><a href="#example-log-determinant" id="toc-example-log-determinant" class="nav-link" data-scroll-target="#example-log-determinant">Example: Log determinant</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">C++ Integration</h1>
+</div>
 
 
-<section id="primate.random.rademacher" class="level1">
-<h1>random.rademacher</h1>
-<p><code>random.rademacher(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)</code></p>
-<p>Generates random vectors from the rademacher distribution.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+<p><code>primate</code> relies on the use of C++20’s <a href="https://en.cppreference.com/w/cpp/language/constraints">concepts</a> to support calling the SLQ trace estimator using <em>any</em> matrix function and <em>any</em> linear operator having the prerequisite member functions.</p>
+<p>To understand this more in detail, it is imperative to understand the <code>LinearOperator</code> concept.</p>
+<section id="linearoperator" class="level2">
+<h2 class="anchored" data-anchor-id="linearoperator"><code>LinearOperator</code></h2>
+<p>Any class respecting the <code>LinearOperator</code> <em>concept</em> can be given to the trace estimator.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span> <span class="kw">typename</span> T<span class="op">,</span> <span class="kw">typename</span> F <span class="op">=</span> <span class="kw">typename</span> T<span class="op">::</span><span class="dt">value_type</span> <span class="op">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">concept</span> LinearOperator <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T op<span class="op">,</span> <span class="at">const</span> F<span class="op">*</span> v<span class="op">,</span> F<span class="op">*</span> o<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> op<span class="op">.</span>matvec<span class="op">(</span>v<span class="op">,</span> o<span class="op">)</span> <span class="op">};</span> <span class="co">// o = A v</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> op<span class="op">.</span>shape<span class="op">()</span> <span class="op">}</span> <span class="op">-&gt;</span> <span class="bu">std::</span>convertible_to<span class="op">&lt;</span> <span class="bu">std::</span>pair<span class="op">&lt;</span> <span class="dt">size_t</span><span class="op">,</span> <span class="dt">size_t</span> <span class="op">&gt;</span> <span class="op">&gt;;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Thus, a given instance <code>A</code> must support member functions:</p>
+<ol type="1">
+<li>A method <span class="math inline">\(Av \mapsto o\)</span>, with signature <code>A.matvec(const float_t* v, float_t* o)</code></li>
+<li>A method yielding <span class="math inline">\((\mathrm{card}(o), \mathrm{card}(v))\)</span>, with signature<code>A.shape() -&gt; pair&lt; ... &gt;</code></li>
+</ol>
+<p>For example, in the matrix setting, <code>shape()</code> should yield a pair <code>(r,c)</code> where <code>r</code> and <code>c</code> indicates the number of rows and columns, respectively.</p>
+</section>
+<section id="example-the-linop-class" class="level2">
+<h2 class="anchored" data-anchor-id="example-the-linop-class">Example: the LinOp class</h2>
+<p>Here’s the declarations for a bare-bones C++ class that respects the <code>LinearOperator</code> concept:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  LinOp<span class="op">(</span><span class="dt">int</span> nr<span class="op">,</span> <span class="dt">int</span> nc<span class="op">)</span> <span class="op">:</span> nrow<span class="op">(</span>nr<span class="op">),</span> ncol<span class="op">(</span>nc<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> <span class="dt">float</span><span class="op">*</span> input<span class="op">,</span> <span class="dt">float</span><span class="op">*</span> output<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// implementation details </span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">(</span>nrow<span class="op">,</span> ncol<span class="op">);</span> <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that it is up to the user to ensure <code>shape()</code> yields the correct size sizes. <code>primate</code> only guarentees the pointer to the <code>output</code> will be at least as large as the size reported by the first parameter of <code>shape()</code>.</p>
+</section>
+<section id="other-concepts" class="level2">
+<h2 class="anchored" data-anchor-id="other-concepts">Other Concepts</h2>
+<p>Depending on the parameter choices and particular template specializations, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:</p>
 <table class="table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 23%">
+<col style="width: 28%">
+<col style="width: 22%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
+<th>Concept</th>
+<th>Supports</th>
+<th>Signature</th>
+<th>Requires</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>size</code></td>
-<td>int or tuple</td>
-<td>the output shape to generate</td>
-<td><em>required</em></td>
+<td><code>LinearOperator</code></td>
+<td><span class="math inline">\(A v \mapsto o\)</span></td>
+<td><code>A.matvec(v, o)</code></td>
+<td>NA</td>
+</tr>
+<tr class="even">
+<td><code>AdjointOperator</code></td>
+<td><span class="math inline">\(A^T v \mapsto o\)</span></td>
+<td><code>A.rmatvec(v, o)</code></td>
+<td><code>LinearOperator</code></td>
+</tr>
+<tr class="odd">
+<td><code>AdditiveOperator</code></td>
+<td><span class="math inline">\(o \gets o + \alpha Av\)</span></td>
+<td><code>A.matvec_add(v, alpha, o)</code></td>
+<td><code>LinearOperator</code></td>
+</tr>
+<tr class="even">
+<td><code>AffineOperator</code></td>
+<td>Sets <span class="math inline">\(t\)</span> s.t. <span class="math inline">\(A + tB\)</span></td>
+<td><code>A.set_parameter(t)</code></td>
+<td><code>LinearOperator</code></td>
 </tr>
 </tbody>
 </table>
-
-
+<p>Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the <em>Lanczos</em> method, then any satisfying the <code>LinearOperator</code> concept is sufficient. However, if you e.g.&nbsp;want to compute the trace of the <em>gramian</em> <span class="math inline">\(f(A^T A)\)</span> of a given operator via <em>Golub-Kahan</em>,the operator must also satisfy the <code>AdjointOperator</code> concept. For a full list of the supported concepts, see <a href="">linearoperator.h</a>.</p>
 </section>
+<section id="slq-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="slq-parameters">SLQ parameters</h2>
+<p>The trace estimator has many parameters, both compile-time and run-time. It’s full signature is given below:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> gramian<span class="op">,</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>floating_point DataType<span class="op">,</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  Operator Matrix<span class="op">,</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  ThreadSafeRBG RBG<span class="op">,</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>invocable<span class="op">&lt;</span> DataType <span class="op">&gt;</span> Func </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> FlagType trace_estimator<span class="op">(</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    Matrix<span class="op">*</span> A<span class="op">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    Func<span class="op">&amp;&amp;</span> matrix_function<span class="op">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    RBG<span class="op">&amp;</span> rng<span class="op">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType distr<span class="op">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType<span class="op">*</span> parameters<span class="op">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType num_parameters<span class="op">,</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> FlagType orthogonalize<span class="op">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType lanczos_degree<span class="op">,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType lanczos_tol<span class="op">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType min_num_samples<span class="op">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType max_num_samples<span class="op">,</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType error_atol<span class="op">,</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType error_rtol<span class="op">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType confidence_level<span class="op">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> DataType outlier_significance_level<span class="op">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">const</span> IndexType num_threads<span class="op">,</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    DataType<span class="op">*</span> trace<span class="op">,</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    DataType<span class="op">*</span> error<span class="op">,</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    DataType<span class="op">**</span> samples<span class="op">,</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    IndexType<span class="op">*</span> processed_samples_indices<span class="op">,</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    IndexType<span class="op">*</span> num_samples_used<span class="op">,</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    IndexType<span class="op">*</span> num_outliers<span class="op">,</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    FlagType<span class="op">*</span> converged<span class="op">,</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    DataType<span class="op">&amp;</span> alg_wall_time</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Other than the templated arguments, in general, <code>const</code> parameters represent inputs and non-<code>const</code> parameters represent outputs.</p>
+</section>
+<section id="example-log-determinant" class="level2">
+<h2 class="anchored" data-anchor-id="example-log-determinant">Example: Log determinant</h2>
+<p>For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator <code>LinOp</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cmath&gt;</span><span class="pp">                              </span><span class="co">// std::log</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;_linear_operator/linear_operator.h&gt;</span><span class="pp"> </span><span class="co">// LinearOperator</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;_trace_estimator/trace_estimator.h&gt;</span><span class="pp"> </span><span class="co">// trace_estimator</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"LinOp.h"</span><span class="pp">                            </span><span class="co">// custom LinOp class</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> slq_log_det<span class="op">(</span>LinOp A<span class="op">,</span> <span class="op">...){</span> <span class="co">// LinOp must support .matvec() and .shape()</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">static_assert</span><span class="op">(</span>LinearOperator<span class="op">&lt;</span> LinOp <span class="op">&gt;);</span>  <span class="co">// compile-time constraint check</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">static</span> <span class="kw">constexpr</span> <span class="dt">bool</span> gramian <span class="op">=</span> <span class="kw">false</span><span class="op">;</span>   <span class="co">// whether to compute the gramian</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="kw">auto</span> matrix_func <span class="op">=</span> <span class="bu">std::</span>log<span class="op">;</span>       <span class="co">// any invocable will due</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  trace_estimator<span class="op">&lt;</span> gramian<span class="op">,</span> <span class="dt">float</span> <span class="op">&gt;(</span>       <span class="co">// compile-time arguments</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    A<span class="op">,</span> matrix_func<span class="op">,</span> <span class="op">...</span>                    <span class="co">// run-time arguments </span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="op">)</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- The parameters to the function can effectively be grouped as follows: 
+
+#### Inputs 
+
+Base 
+Affine parameters: `parameters`, `num_parameters` -->
+
+
 </section>
 
 </main> <!-- /main -->

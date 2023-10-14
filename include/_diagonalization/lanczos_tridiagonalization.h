@@ -123,19 +123,10 @@ IndexType lanczos_tridiagonalization(
     DataType* beta)
 {
     // buffer_size is number of last orthogonal vectors to keep in the buffer V
-    IndexType buffer_size;
-    if (orthogonalize == 0 || orthogonalize == 1) {
-        // At least two vectors must be stored in buffer for Lanczos recursion
-        buffer_size = 2;
-    }
-    else if ((orthogonalize < 0) || (orthogonalize > static_cast<FlagType>(m))) {
-        // Using full reorthogonalization, keep all of the m vectors in buffer
-        buffer_size = m;
-    }
-    else {
-        // Orthogonalize with less than m vectors (0 < orthogonalize < m)
-        buffer_size = orthogonalize;
-    }
+    const IndexType buffer_size = 
+        (orthogonalize == 0 || orthogonalize == 1) ? 2 :                          // Minimum orthogonalization
+        ((orthogonalize < 0) || (orthogonalize > static_cast<FlagType>(m))) ? m : // Full reorthogonalization
+        orthogonalize;                                                            // Partial orthogonalization (0 < orthogonalize < m)
 
     // Allocate 2D array (as 1D array, and coalesced row-wise) to store
     // the last buffer_size of orthogonalized vectors of length n. New vectors
@@ -155,6 +146,9 @@ IndexType lanczos_tridiagonalization(
     IndexType j;
     IndexType lanczos_size = 0;
     IndexType num_ortho;
+
+    // Constants
+    const DataType sqrt_n = sqrt(n);
 
     // In the following, beta[j] means beta[j-1] in the Demmel text
     for (j=0; j < m; ++j) {
@@ -198,7 +192,7 @@ IndexType lanczos_tridiagonalization(
         // Exit criterion when the vector r is zero. If each component of a
         // zero vector has the tolerance epsilon, (which is called lanczos_tol
         // here), the tolerance of norm of r is epsilon times sqrt of n.
-        if (beta[j] < lanczos_tol * sqrt(n)) {
+        if (beta[j] < lanczos_tol * sqrt_n) {
             break;
         }
     }

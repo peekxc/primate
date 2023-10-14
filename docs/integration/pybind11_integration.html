@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate – random.rademacher</title>
+<title>primate - pybind11 Integration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -102,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">random.rademacher</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">pybind11 Integration</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -169,7 +203,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">random.rademacher</span></a>
   </div>
 </li>
@@ -191,45 +225,121 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#primate.random.rademacher" id="toc-primate.random.rademacher" class="nav-link active" data-scroll-target="#primate.random.rademacher">random.rademacher</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
+  <li><a href="#native-pybind11-types" id="toc-native-pybind11-types" class="nav-link active" data-scroll-target="#native-pybind11-types">Native pybind11 types</a></li>
+  <li><a href="#wrapping-types" id="toc-wrapping-types" class="nav-link" data-scroll-target="#wrapping-types">Wrapping types</a></li>
+  <li><a href="#full-example-using-eigen" id="toc-full-example-using-eigen" class="nav-link" data-scroll-target="#full-example-using-eigen">Full Example using Eigen</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">pybind11 Integration</h1>
+</div>
 
 
-<section id="primate.random.rademacher" class="level1">
-<h1>random.rademacher</h1>
-<p><code>random.rademacher(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)</code></p>
-<p>Generates random vectors from the rademacher distribution.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>size</code></td>
-<td>int or tuple</td>
-<td>the output shape to generate</td>
-<td><em>required</em></td>
-</tr>
-</tbody>
-</table>
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
+</header>
+
+<p>If you’re using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using <code>primate</code>s <em>binding</em> headers.</p>
+<section id="native-pybind11-types" class="level3">
+<h3 class="anchored" data-anchor-id="native-pybind11-types">Native pybind11 types</h3>
+<p>Suppose you have a custom class <code>LinOp</code> <a href="https://pybind11.readthedocs.io/en/stable/classes.html#object-oriented-code">understood by pybind11</a>, which looks something like:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  LinOp<span class="op">(</span><span class="dt">int</span> nr<span class="op">,</span> <span class="dt">int</span> nc<span class="op">)</span> <span class="op">:</span> nrow<span class="op">(</span>nr<span class="op">),</span> ncol<span class="op">(</span>nc<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> <span class="dt">float</span><span class="op">*</span> input<span class="op">,</span> <span class="dt">float</span><span class="op">*</span> output<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// implementation details </span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">(</span>nrow<span class="op">,</span> ncol<span class="op">);</span> <span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Since pybind11 understands how to pass a pointer to this type natively, creating an extension module that calls <code>primate</code>’s SLQ trace estimator with <code>LinOp</code> can be done by just calling the <code>_trace_wrapper</code> function:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;binders/pb11_trace_bind.h&gt;</span><span class="pp">  </span><span class="co">// _trace_wrapper binding  </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"LinOp.h"</span><span class="pp">                    </span><span class="co">// custom LinOp class  </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>PYBIND11_MODULE<span class="op">(</span>_custom_trace<span class="op">,</span> m<span class="op">)</span> <span class="op">{</span>   </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">// m is the actual py::module (exported as _custom_trace)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  m<span class="op">.</span>doc<span class="op">()</span> <span class="op">=</span> <span class="st">"custom trace estimator module"</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  _trace_wrapper<span class="op">&lt;</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">float</span><span class="op">,</span> LinOp <span class="op">&gt;(</span>m<span class="op">);</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The final extension module <code>_custom_trace</code> will have a method <code>trace_slq</code> as an attribute that can be called from Python to initiate the SLQ method with the corresponding <code>LineOp</code> type.</p>
 </section>
+<section id="wrapping-types" class="level3">
+<h3 class="anchored" data-anchor-id="wrapping-types">Wrapping types</h3>
+<p>If you’re trying to create bindings for a class that isn’t known to pybind11, or it doesn’t natively support the <code>matvec</code> and <code>shape</code> constraints, you can optionally provide a wrapper function to the last template parameter of <code>_trace_wrapper</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> WrappedLinOp <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  LinOp op<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> WrappedLinOp<span class="op">(</span>LinOp<span class="op">&amp;</span> _op<span class="op">)</span> <span class="op">:</span> op<span class="op">(</span>_op<span class="op">){</span> <span class="op">}</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> <span class="dt">float</span><span class="op">*</span> input<span class="op">,</span> <span class="dt">float</span><span class="op">*</span> output<span class="op">){</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// implementation details, e.g. op.dot(input, output)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="op">{</span> <span class="op">...</span> <span class="op">}</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> linop_wrapper<span class="op">(</span>LinOp<span class="op">*</span> op<span class="op">){</span> <span class="co">// or py::object, for non-native types</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> WrappedLinOp<span class="op">(*</span>op<span class="op">);</span> </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>PYBIND11_MODULE<span class="op">(</span>_custom_trace<span class="op">,</span> m<span class="op">)</span> <span class="op">{</span>   </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">// m is the actual py::module (exported as _custom_trace)</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  m<span class="op">.</span>doc<span class="op">()</span> <span class="op">=</span> <span class="st">"custom trace estimator module"</span><span class="op">;</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  _trace_wrapper<span class="op">&lt;</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">float</span><span class="op">,</span> LinOp<span class="op">,</span> linop_wrapper <span class="op">&gt;(</span>m<span class="op">);</span> </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As a side effect, this also enables full access to matrix types that implement matrix-vector multiplication but don’t have the matching method names / signatures available needed to match the underlying <code>LinearOperaor</code> concept.</p>
+</section>
+<section id="full-example-using-eigen" class="level3">
+<h3 class="anchored" data-anchor-id="full-example-using-eigen">Full Example using Eigen</h3>
+<p>Here’s a real example of what simple code might look like that wraps a <a href="https://eigen.tuxfamily.org/">Eigen</a> SparseMatrix for use with <code>primate</code>. <code>Eigen</code> supports matrix-vector multiplication out of the box with the overloaded <code>operator*()</code> and <a href="https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html">is understood natively by pybind11</a>, thus it suffices to define wrapper class that respects the <code>LinearOperator</code> concept:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> <span class="bu">std::</span>floating_point F <span class="op">&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> SparseEigenLinearOperator <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">using</span> <span class="dt">value_type</span> <span class="op">=</span> F<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="kw">using</span> float_vec <span class="op">=</span> Eigen<span class="op">::</span>Matrix<span class="op">&lt;</span> F<span class="op">,</span> Eigen<span class="op">::</span>Dynamic<span class="op">,</span> <span class="dv">1</span> <span class="op">&gt;;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Eigen<span class="op">::</span>SparseMatrix<span class="op">&lt;</span> F <span class="op">&gt;</span> A<span class="op">;</span>  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  SparseEigenLinearOperator<span class="op">(</span><span class="at">const</span> Eigen<span class="op">::</span>SparseMatrix<span class="op">&lt;</span> F <span class="op">&gt;&amp;</span> _mat<span class="op">)</span> <span class="op">:</span> A<span class="op">(</span>_mat<span class="op">){}</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> F<span class="op">*</span> inp<span class="op">,</span> F<span class="op">*</span> out<span class="op">)</span> <span class="at">const</span> <span class="kw">noexcept</span> <span class="op">{</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> input <span class="op">=</span> Eigen<span class="op">::</span>Map<span class="op">&lt;</span> <span class="at">const</span> float_vec <span class="op">&gt;(</span>inp<span class="op">,</span> A<span class="op">.</span>cols<span class="op">(),</span> <span class="dv">1</span><span class="op">);</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">auto</span> output <span class="op">=</span> Eigen<span class="op">::</span>Map<span class="op">&lt;</span> float_vec <span class="op">&gt;(</span>out<span class="op">,</span> A<span class="op">.</span>rows<span class="op">(),</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> A <span class="op">*</span> input<span class="op">;</span> </span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="kw">auto</span> shape<span class="op">()</span> <span class="at">const</span> <span class="kw">noexcept</span> <span class="op">-&gt;</span> <span class="bu">std::</span>pair<span class="op">&lt;</span> <span class="dt">size_t</span><span class="op">,</span> <span class="dt">size_t</span> <span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">((</span><span class="dt">size_t</span><span class="op">)</span> A<span class="op">.</span>rows<span class="op">(),</span> <span class="op">(</span><span class="dt">size_t</span><span class="op">)</span> A<span class="op">.</span>cols<span class="op">());</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then, simply write a quick wrapper function that converts a <code>Eigen::SparseMatrix&lt; F &gt;*</code> type to a <code>SparseEigenLinearOperator&lt; F &gt;</code> types and incorporate with <code>_trace_wrapper</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> <span class="bu">std::</span>floating_point F <span class="op">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">auto</span> eigen_sparse_wrapper<span class="op">(</span><span class="at">const</span> Eigen<span class="op">::</span>SparseMatrix<span class="op">&lt;</span> F <span class="op">&gt;*</span> A<span class="op">){</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> SparseEigenLinearOperator<span class="op">&lt;</span> F <span class="op">&gt;(*</span>A<span class="op">);</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>PYBIND11_MODULE<span class="op">(</span>_custom_trace<span class="op">,</span> m<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  m<span class="op">.</span>doc<span class="op">()</span> <span class="op">=</span> <span class="st">"custom trace estimator module"</span><span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  _trace_wrapper<span class="op">&lt;</span> <span class="kw">false</span><span class="op">,</span> <span class="dt">float</span><span class="op">,</span> Eigen<span class="op">::</span>SparseMatrix<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;</span> <span class="op">&gt;(</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    m<span class="op">,</span> eigen_sparse_wrapper<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="op">);</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>That’s it. The module <code>_custom_trace</code> will now have an exported <code>trace_slq</code> method that you can call from Python. For a list of arguments, it’s recommended to see the <code>slq</code> declaration in <a href="https://github.com/peekxc/primate/blob/main/src/primate/trace.py">trace.py</a>.</p>
+
+
 </section>
 
 </main> <!-- /main -->

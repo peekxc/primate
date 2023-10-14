@@ -1,6 +1,6 @@
 project(
   'primate', 'cpp',
-  version: '0.1.4',
+  version: run_command(['src/primate/__version__.py'], check: true).stdout().strip(),
   license: 'Apache-2.0',
   meson_version: '>= 1.1.0',
   default_options : [

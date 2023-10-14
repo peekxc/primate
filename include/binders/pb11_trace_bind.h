@@ -16,7 +16,7 @@ using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
   const py_array< F >& parameters, const size_t num_inqueries, \
   const int orthogonalize, const size_t lanczos_degree, const F lanczos_tol, const size_t min_num_samples, const size_t max_num_samples, \
   const F error_atol, const F error_rtol, const F confidence, const F outlier, \
-  const size_t distr, const size_t engine_id, const int seed, \
+  const size_t distr, [[maybe_unused]] const size_t engine_id, const int seed, \
   const int num_threads, \
   py_array< F >& trace, py_array< F >& error, py_array< F >& samples, \
   py::array_t< int32_t >& processed_samples_indices, py::array_t< int32_t >& num_samples_used, py::array_t< int32_t >& num_outliers, py::array_t< int32_t >& converged, F& alg_wall_time

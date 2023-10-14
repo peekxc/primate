@@ -138,13 +138,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../cpp_integration.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with C++</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../pybind11_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../pybind11_integration.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with pybind11</span></a>
   </div>
 </li>
@@ -210,15 +210,15 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="primate.trace.slq" class="level1">
 <h1>trace.slq</h1>
-<p><code>trace.slq(A, matrix_function='identity', parameters=None, min_num_samples=10, max_num_samples=50, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)</code></p>
-<p>Estimates the trace of a matrix function <span class="math inline">\(f(A) = U f(D) U^{-1}\)</span> using the stochastic Lanczos quadrature (SLQ) method.</p>
+<p><code>trace.slq(A, matrix_function='identity', parameters=None, min_num_samples=150, max_num_samples=250, error_atol=None, error_rtol=0.01, confidence_level=0.95, outlier_significance_level=0.001, distribution='rademacher', rng_engine='pcg', seed=-1, lanczos_degree=20, lanczos_tol=None, orthogonalize=0, num_threads=0, verbose=False, plot=False, return_info=False, **kwargs)</code></p>
+<p>Estimates the trace of a matrix function <span class="math inline">\(f(A)\)</span> using stochastic Lanczos quadrature (SLQ).</p>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
 <col style="width: 16%">
 <col style="width: 23%">
-<col style="width: 50%">
+<col style="width: 51%">
 <col style="width: 9%">
 </colgroup>
 <thead>
@@ -291,6 +291,54 @@ ul.task-list li input[type="checkbox"] {
 <td><code>'rademacher'</code></td>
 </tr>
 <tr class="odd">
+<td><code>rng_engine</code></td>
+<td>str</td>
+<td>Random number engine to use.</td>
+<td><code>= "pcg"</code></td>
+</tr>
+<tr class="even">
+<td><code>seed</code></td>
+<td>int</td>
+<td>Seed to initialize the entropy source. Use non-negative integers for reproducibility.</td>
+<td><code>= -1</code></td>
+</tr>
+<tr class="odd">
+<td><code>lanczos_degree</code></td>
+<td>int</td>
+<td>Degree of the quadrature approximation.</td>
+<td><code>20</code></td>
+</tr>
+<tr class="even">
+<td><code>lanczos_tol</code></td>
+<td>int</td>
+<td>Acceptable residual tolerance to prematurely stop the lanczos iteration.</td>
+<td><code>= None</code></td>
+</tr>
+<tr class="odd">
+<td><code>orthogonalize</code></td>
+<td>int</td>
+<td>Number of lanczos vectors to orthogonalize the Krylov basis.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>num_threads</code></td>
+<td>int</td>
+<td>Number of threads to use in the trace estimates.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>plot</code></td>
+<td>bool</td>
+<td>If true, plots the samples of the trace estimate along with their convergence characteristics.</td>
+<td><code>= False</code></td>
+</tr>
+<tr class="even">
+<td><code>return_info</code></td>
+<td>bool</td>
+<td>whether to return a dictionary containing all the relevent details of the computation.</td>
+<td><code>= False</code></td>
+</tr>
+<tr class="odd">
 <td><code>**kwargs</code></td>
 <td>(dict, optional)</td>
 <td>additional key-values to parameterize the chosen ‘matrix_function’.</td>
@@ -330,7 +378,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="reference" class="level2">
 <h2 class="anchored" data-anchor-id="reference">Reference</h2>
-<p>.. [1] <code>Ubaru, S., Chen, J., and Saad, Y. (2017) &lt;https://www-users.cs.umn.edu/~saad/PDF/ys-2016-04.pdf&gt;</code>_, Fast Estimation of :math:<code>\mathrm{tr}(F(A))</code> Via Stochastic Lanczos Quadrature, SIAM J. Matrix Anal. Appl., 38(4), 1075-1099.</p>
+<p>.. [1] Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</p>
 
 
 </section>

@@ -17,7 +17,7 @@ website:
         text: Overview
       - href: install.qmd
         text: Installation
-      - href: integration.qmd
+      - href: cpp_integration.qmd
         text: Usage with C++
       - href: pybind11_integration.qmd
         text: Usage with pybind11
