@@ -12,6 +12,7 @@ project(
     'pkgconfig.relocatable=true'
   ]
 )
+env = environment()
 
 ## Import python kernel 
 py_mod = import('python')
@@ -62,6 +63,7 @@ inc_pkg = include_directories('include')
 
 ## Add dependencies, if they are available
 dependency_map = {}
+subdir('blas') # Configure BLAS / LAPACK 
 
 ## Include OpenMP, if possible
 omp = dependency('openmp', required: false)
@@ -90,8 +92,8 @@ endif
 
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
 ## Otherwise BLAS must be linked and used
-env = environment()
-env.set('USE_CBLAS', '1') ## Turn off CBLAS
+# env = environment()
+# env.set('USE_CBLAS', '1') ## Turn off CBLAS
 
 ## Use SciPy-configured BLAS
 # scipy_blas_found = run_command(py, ['-c', 'import scipy; scipy.__config__.CONFIG["Build Dependencies"]["blas"]["found"]'], check : false).stdout().strip()
@@ -184,14 +186,14 @@ env.set('USE_CBLAS', '1') ## Turn off CBLAS
 # message('BLAS linking with pythran static: ' + blas.found().to_string())
 
 ## Add BLAS/LAPACK
-lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
-foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
-  if lapack_imp not in lapack_options
-    lapack_options += [lapack_imp]
-  endif
-endforeach
-lapack = dependency(lapack_options, required: true)
-dependency_map += {'LAPACK' : lapack }
+# lapack_options = get_option('lapack') == '' ? [] : [get_option('lapack')]
+# foreach lapack_imp : ['openblas',  'OpenBLAS', 'blis', 'accelerate',  'mkl', 'atlas', 'netlib', 'blas', 'BLAS']
+#   if lapack_imp not in lapack_options
+#     lapack_options += [lapack_imp]
+#   endif
+# endforeach
+# lapack = dependency(lapack_options, required: true)
+# dependency_map += {'LAPACK' : lapack }
 
 # blas_preferred = 
 # lapack_preferred = 
