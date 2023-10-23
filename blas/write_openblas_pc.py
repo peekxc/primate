@@ -7,7 +7,7 @@ if __name__ == '__main__':
   basedir = os.getcwd()
   openblas_dir = os.path.join(basedir, ".openblas")
   pkg_config_fname = os.path.join(openblas_dir, "scipy-openblas.pc")
-  blas_variant = '64'
+  blas_variant = '32'
   module_name = f"scipy_openblas{blas_variant}"
   try:
     openblas = importlib.import_module(module_name)

@@ -27,15 +27,15 @@
 // https://scicomp.stackexchange.com/questions/26395/how-to-start-using-lapack-in-c
 // needs: _dstev, _sstev, _dbdsdc, _sbdsdc
 // extern "C" {
-// 	 void _dstev(char* jobz, int* n, double* d, double* e, double* z, int* ldz, double* work, int* info);
-//     void _sstev(char* jobz, int* n, float* d, float* e, float* z, int* ldz, float* work, int* info);
-//     void _dbdsdc(char* uplo, char* compq, int* n, double* d,
-//                  double *e, double* u, int* ldu, double* vt, int* ldvt,
-//                  double* q, int* iq, double* work, int* iwork,
-//                  int* info);
-//     void _sbdsdc(char* uplo, char* compq, int* n, float* d, float *e,
-//                  float* u, int* ldu, float* vt, int* ldvt, float* q,
-//                  int* iq, float* work, int* iwork, int* info);
+// 	void _dstev(char* jobz, int* n, double* d, double* e, double* z, int* ldz, double* work, int* info);
+// 	void _sstev(char* jobz, int* n, float* d, float* e, float* z, int* ldz, float* work, int* info);
+// 	void _dbdsdc(char* uplo, char* compq, int* n, double* d,
+// 								double *e, double* u, int* ldu, double* vt, int* ldvt,
+// 								double* q, int* iq, double* work, int* iwork,
+// 								int* info);
+// 	void _sbdsdc(char* uplo, char* compq, int* n, float* d, float *e,
+// 								float* u, int* ldu, float* vt, int* ldvt, float* q,
+// 								int* iq, float* work, int* iwork, int* info);
 // }
 
 

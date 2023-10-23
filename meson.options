@@ -5,9 +5,9 @@ option('lapack', type: 'string', value: 'auto',
 option('allow-noblas', type: 'boolean', value: false,
         description: 'If set to true, allow building with (slow!) internal fallback routines')
 option('blas-order', type: 'array',
-        value: ['mkl', 'accelerate', 'openblas', 'flexiblas', 'blis', 'blas'])
+        value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'blis', 'blas'])
 option('lapack-order', type: 'array',
-        value: ['mkl', 'accelerate', 'openblas', 'flexiblas', 'lapack'])
+        value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'lapack'])
 option('blas-symbol-suffix', type: 'string', value: 'auto',
         description: 'BLAS and LAPACK symbol suffix to use, if any')
 option('use-ilp64', type: 'boolean', value: false,

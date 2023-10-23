@@ -7,8 +7,8 @@ project(
     'buildtype=debugoptimized', 
     'cpp_std=c++20', 
     'warning_level=2', 
-    'blas=openblas',
-    'lapack=openblas', 
+    # 'blas=openblas',
+    # 'lapack=openblas', 
     'pkgconfig.relocatable=true'
   ]
 )

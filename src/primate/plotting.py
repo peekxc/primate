@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.special import erfinv
+from typing import Union
 
-def figure_trace(info: dict, real_trace: float = None, **kwargs):
+def figure_trace(samples: Union[np.ndarray, dict], real_trace: float = None, **kwargs):
   """Plots the trace estimates """
   import bokeh 
   from bokeh.models import Span, Scatter, LinearAxis, Range1d, BoxAnnotation, Legend, Band, ColumnDataSource
@@ -10,30 +11,34 @@ def figure_trace(info: dict, real_trace: float = None, **kwargs):
   from bokeh.models import NumeralTickFormatter
 
   main_title = "Stochastic trace estimates"
-  if isinstance(info, dict):
-    samples = np.ravel(info['convergence']['samples'])
-    sample_index = np.arange(1, len(samples)+1)
-    min_samples = info['convergence']['min_num_samples']
-    sample_avgs = np.cumsum(samples)/sample_index
+  extra_titles = []
+  if isinstance(samples, dict):
+    min_samples = samples['convergence']['min_num_samples']
     extra_titles = []
-    if 'solver' in info:
-      lanczos_degree = info['solver'].get('lanczos_degree', np.nan)
-      lanczos_orthogonalize = info['solver'].get('orthogonalize', np.nan) 
+    if 'solver' in samples:
+      lanczos_degree = samples['solver'].get('lanczos_degree', np.nan)
+      lanczos_orthogonalize = samples['solver'].get('orthogonalize', np.nan) 
       extra_titles += [""] if np.isnan(lanczos_degree) else [f"degree={lanczos_degree}"]
       extra_titles += [""] if np.isnan(lanczos_orthogonalize) else [f"orth={lanczos_orthogonalize}"]
-    else:
-      extra_titles = []
-    main_title += ' (' + ', '.join(extra_titles) + ')' if len(extra_titles) > 0 else ''
+
+  ## Extract samples and take averages
+  sample_vals = np.ravel(samples['convergence']['samples']) if isinstance(samples, dict) else samples 
+  sample_index = np.arange(1, len(sample_vals)+1)
+  sample_avgs = np.cumsum(sample_vals)/sample_index
+  main_title += ' (' + ', '.join(extra_titles) + ')' if len(extra_titles) > 0 else ''
 
   ## uncertainty estimation (todo)
   quantile = 1.959963984540054 # np.sqrt(2) * erfinv(0.95)
-  std_dev = np.nanstd(samples) 
+  std_dev = np.nanstd(sample_vals) 
   cumulative_abs_error = quantile * std_dev / np.sqrt(sample_index)
   cumulative_rel_error = (cumulative_abs_error / sample_avgs)
 
-  p = figure(width=450, height=300, title=f"Stochastic trace estimates (degree={lanczos_degree}, orth={lanczos_orthogonalize})", **kwargs)
+  fig_title = "Stochastic trace estimates"
+  if isinstance(samples, dict):
+    fig_title += f" (degree={lanczos_degree}, orth={lanczos_orthogonalize})"
+  p = figure(width=450, height=300, title=fig_title, **kwargs)
   p.toolbar_location = None
-  p.scatter(sample_index, samples, size=4.0, color="gray", legend_label="samples")
+  p.scatter(sample_index, sample_vals, size=4.0, color="gray", legend_label="samples")
   p.legend.location = "top_left"
   p.yaxis.axis_label = "Trace estimates"
   p.xaxis.axis_label = "Sample index"
@@ -48,7 +53,9 @@ def figure_trace(info: dict, real_trace: float = None, **kwargs):
   p.add_layout(conf_band)
 
   ## Error plot
-  error_title = f"Error (converged: {np.take(info['convergence']['converged'], 0)})"
+  error_title = "Error" 
+  if isinstance(samples, dict):
+    error_title += f" (converged: {np.take(samples['convergence']['converged'], 0)})"
   q1 = figure(width=400, height=150, y_axis_location="left", title = error_title)
   q2 = figure(width=400, height=150, y_axis_location="left")
   q1.toolbar_location = None
@@ -59,8 +66,9 @@ def figure_trace(info: dict, real_trace: float = None, **kwargs):
   q1.yaxis.formatter = NumeralTickFormatter(format='0%')
   q1.y_range = Range1d(0, np.ceil(max(cumulative_rel_error)*100)/100, bounds = (0, 1))
   q2.x_range = q1.x_range = Range1d(0, len(sample_index))
-  q1.add_layout(BoxAnnotation(top=100, bottom=0, left=0, right=min_samples, fill_alpha=0.4, fill_color='#d3d3d3'))
-  q2.add_layout(BoxAnnotation(top=100, bottom=0, left=0, right=min_samples, fill_alpha=0.4, fill_color='#d3d3d3'))
+  if isinstance(samples, dict):
+    q1.add_layout(BoxAnnotation(top=100, bottom=0, left=0, right=min_samples, fill_alpha=0.4, fill_color='#d3d3d3'))
+    q2.add_layout(BoxAnnotation(top=100, bottom=0, left=0, right=min_samples, fill_alpha=0.4, fill_color='#d3d3d3'))
 
   ## Plot the relative error
   rel_error_line = q1.line(sample_index, cumulative_rel_error, line_width=2.5, line_color="gray")
@@ -71,12 +79,14 @@ def figure_trace(info: dict, real_trace: float = None, **kwargs):
   # q.yaxis[1].axis_label = "absolute error"
   abs_error_line = q2.line(sample_index, cumulative_abs_error, line_color="black")
 
-  ## Shwo the thresholds for convergence
-  rel_error = np.take(info['error']['relative_error'], 0)
-  abs_error = np.take(info['error']['absolute_error'], 0)
-  rel_error_threshold = q1.line(x=[0, sample_index[-1]], y=[rel_error, rel_error], line_dash = "dotted", line_color='gray', line_width=1.0)
-  abs_error_threshold = q2.line(x=[0, sample_index[-1]], y=[abs_error, abs_error], line_dash = "dashed", line_color='darkgray', line_width=1.0)
-
+  ## Show the thresholds for convergence towards the thresholds
+  if isinstance(samples, dict):
+    rel_error = np.take(samples['error']['relative_error'], 0)
+    abs_error = np.take(samples['error']['absolute_error'], 0)
+    rel_error_threshold = q1.line(x=[0, sample_index[-1]], y=[rel_error, rel_error], line_dash = "dotted", line_color='gray', line_width=1.0)
+    abs_error_threshold = q2.line(x=[0, sample_index[-1]], y=[abs_error, abs_error], line_dash = "dashed", line_color='darkgray', line_width=1.0)
+  
+  ## Add the legend
   legend_items = [('error (abs)', [abs_error_line]), ('error (rel)', [rel_error_line])]
   # legend_items += [('abs threshold', [abs_error_threshold])] + [('rel threshold', [rel_error_threshold])]
   legend = Legend(items=legend_items, location="top_right", orientation="horizontal", border_line_color="black")

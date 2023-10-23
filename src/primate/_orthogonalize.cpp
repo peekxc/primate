@@ -33,6 +33,7 @@ void orthogonalize_vectors(py_array< F >& V){
   F* V_data = static_cast< F* >(V.request().ptr);
   LongIndexType num_vectors = static_cast< LongIndexType >(V.shape(0));
   IndexType vector_size = static_cast< IndexType >(V.shape(1));
+  vector_size = vector_size = 1;
   cOrthogonalization< F >::orthogonalize_vectors(V_data, vector_size, num_vectors);
 }
 

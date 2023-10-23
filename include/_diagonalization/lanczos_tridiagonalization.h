@@ -204,40 +204,102 @@ IndexType lanczos_tridiagonalization(
     return lanczos_size;
 }
 
+template < std::floating_point DataType, LinearOperator Matrix >
+IndexType lanczos_tridiagonalize_Q(
+    Matrix* A,
+    const DataType* v,
+    const LongIndexType n,
+    const IndexType m,
+    const DataType lanczos_tol,
+    const FlagType orthogonalize,
+    DataType* alpha,
+    DataType* beta, 
+    DataType* Q 
+){
+    // buffer_size is number of last orthogonal vectors to keep in the buffer V
+    const IndexType buffer_size = 
+        (orthogonalize == 0 || orthogonalize == 1) ? 2 :                          // Minimum orthogonalization
+        ((orthogonalize < 0) || (orthogonalize > static_cast<FlagType>(m))) ? m : // Full reorthogonalization
+        orthogonalize;                                                            // Partial orthogonalization (0 < orthogonalize < m)
 
-// ===============================
-// Explicit template instantiation
-// ===============================
+    // Allocate 2D array (as 1D array, and coalesced row-wise) to store
+    // the last buffer_size of orthogonalized vectors of length n. New vectors
+    // are stored by cycling through the buffer to replace with old ones.
+    DataType* V = new DataType[n * buffer_size];
 
-// lanczos tridiagonalization
-// template IndexType c_lanczos_tridiagonalization<float>(
-//         cLinearOperator<float>* A,
-//         const float* v,
-//         const LongIndexType n,
-//         const IndexType m,
-//         const float lanczos_tol,
-//         const FlagType orthogonalize,
-//         float* alpha,
-//         float* beta);
+    // Allocate vector r
+    DataType* r = new DataType[n];
 
-// template IndexType c_lanczos_tridiagonalization<double>(
-//         cLinearOperator<double>* A,
-//         const double* v,
-//         const LongIndexType n,
-//         const IndexType m,
-//         const double lanczos_tol,
-//         const FlagType orthogonalize,
-//         double* alpha,
-//         double* beta);
+    // Copy v into r
+    cVectorOperations<DataType>::copy_vector(v, n, r);
 
-// template IndexType c_lanczos_tridiagonalization<long double>(
-//         cLinearOperator<long double>* A,
-//         const long double* v,
-//         const LongIndexType n,
-//         const IndexType m,
-//         const long double lanczos_tol,
-//         const FlagType orthogonalize,
-//         long double* alpha,
-//         long double* beta);
+    // Initial beta
+    DataType initial_beta = cVectorOperations<DataType>::euclidean_norm(r, n);
+
+    // Declare iterators
+    IndexType j;
+    IndexType lanczos_size = 0;
+    IndexType num_ortho;
+
+    // Constants
+    const DataType sqrt_n = sqrt(n);
+
+    // In the following, beta[j] means beta[j-1] in the Demmel text
+    for (j=0; j < m; ++j) {
+        // Update the size of Lanczos tridiagonal matrix
+        ++lanczos_size;
+
+        // Normalize r and copy to the j-th column of V
+        if (j == 0){
+            cVectorOperations<DataType>::copy_scaled_vector(r, n, 1.0/initial_beta, &V[(j % buffer_size)*n]);
+        }
+        else{
+            cVectorOperations<DataType>::copy_scaled_vector(r, n, 1.0/beta[j-1], &V[(j % buffer_size)*n]);
+        }
+
+        // Multiply A to the j-th column of V, write into r
+        A->matvec(&V[(j % buffer_size)*n], r);
+
+        // alpha[j] is V[:, j] dot r
+        alpha[j] = cVectorOperations<DataType>::inner_product(&V[(j % buffer_size)*n], r, n);
+
+        // Subtract V[:,j] * alpha[j] from r
+        cVectorOperations<DataType>::subtract_scaled_vector(&V[(j % buffer_size)*n], n, alpha[j], r);
+
+        // Subtract V[:,j-1] * beta[j] from r
+        if (j > 0) {
+            cVectorOperations<DataType>::subtract_scaled_vector(&V[((j-1) % buffer_size)*n], n, beta[j-1], r);
+        }
+
+        // Gram-Schmidt process (full re-orthogonalization)
+        if (orthogonalize != 0) {
+            // Find how many column vectors are filled so far in the buffer V
+            num_ortho = j < buffer_size ? j+1 : buffer_size;
+
+            // Gram-Schmidt process
+            cOrthogonalization<DataType>::gram_schmidt_process(&V[0], n, buffer_size, j%buffer_size, num_ortho, r);
+        }
+
+        // beta is norm of r
+        beta[j] = cVectorOperations<DataType>::euclidean_norm(r, n);
+
+        // Copy into the jth column of Q (assumes fortran/column-major ordering)
+        cVectorOperations<DataType>::copy_vector(r, n, &Q[j*n]);
+
+        // Exit criterion when the vector r is zero. If each component of a
+        // zero vector has the tolerance epsilon, (which is called lanczos_tol
+        // here), the tolerance of norm of r is epsilon times sqrt of n.
+        if (beta[j] < lanczos_tol * sqrt_n) {
+            break;
+        }
+    }
+
+    // Free dynamic memory
+    delete[] V;
+    delete[] r;
+
+    return lanczos_size;
+}
+
 
 #endif 
