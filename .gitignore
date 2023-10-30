@@ -1,6 +1,5 @@
 build 
 .vscode 
-examples
 trash 
 **/**/*.pyd
 profiling
