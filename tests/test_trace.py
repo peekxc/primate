@@ -16,7 +16,7 @@ def test_trace_estimator():
 def test_input_types():
   from scipy.linalg import toeplitz
   from primate.trace import slq
-  slq_params = dict(gram=True, orthogonalize=10, confidence_level=0.95, error_atol=1e-6, min_num_samples=150, max_num_samples=200, num_threads=1)
+  slq_params = dict(gram=True, orthogonalize=10, confidence_level=0.95, error_atol=1e-6, min_num_samples=150, max_num_samples=200, num_threads=1, plot=True)
   np.random.seed(1234)
   X = toeplitz(np.random.uniform(size=50))
   A = X.T @ X

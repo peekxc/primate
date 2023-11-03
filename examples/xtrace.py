@@ -52,7 +52,6 @@ def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method:
 	if not method == 'improved':
 	  scale = np.ones(m)[:,np.newaxis] # this is a column vector
 	else:
-	  ## This ends up being a square matrix
 	  col_norm = lambda X: np.linalg.norm(X, axis=0)
 	  c = n - m + 1
 	  scale = c / (n - (col_norm(W_proj)[:,np.newaxis])**2 + (diag_prod(S,W_proj) * col_norm(S)[:,np.newaxis])**2)

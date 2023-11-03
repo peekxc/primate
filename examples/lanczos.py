@@ -36,10 +36,11 @@ def matrix_function_lanczos(A, f: Callable, v: np.ndarray, k: int = 15):
   """Approximates the action v -> f(A)v via the Lanczos method"""
   assert len(v) == A.shape[0], "Dimension mismatch"
   k = min(k, A.shape[0])
-  a,b = lanczos(A, v, max_steps=k)
-  rr, V = eigh_tridiagonal(a,b[:-1])
-  z = V @ (f(rr) * V[0,:])  ## Compute < f(T), e_1 >
-  return np.linalg.norm(v)*lanczos_action(z, A, a, b, v)
+  a, b = lanczos(A, v, max_steps=k)  # diagonal and subdiagonal entries of T 
+  rr, V = eigh_tridiagonal(a,b[:-1]) # Rayleigh-Ritz values + eigenvectors V of T
+  z = V @ (f(rr) * V[0,:])           # Compute < f(T), e_1 >
+  y = lanczos_action(z, A, a, b, v)
+  return np.linalg.norm(v) * y
 
 identity = lambda x: x
 truth_Av = A @ v0
