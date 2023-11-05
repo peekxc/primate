@@ -104,9 +104,14 @@ show(figure_trace(np.ravel(info['convergence']['samples'])))
 
 
 
-
-
 # %% 
-import numpy as np 
-
-x = np.random.uniform(size=10)
+# def lanczos(A, v, k: int):
+#   v /= np.linalg.norm(v)
+#   u = A @ v
+#   alpha, beta = np.zeros(A.shape[0]), np.zeros(A.shape[0])
+#   for i in range(k):
+#     alpha[i] = np.dot(v, u)
+#     w = u - alpha[i] * v
+#     beta[i+1] = np.linalg.norm(w)
+#     vn = w / beta[i+1]
+#     u

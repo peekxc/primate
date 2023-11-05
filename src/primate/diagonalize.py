@@ -3,6 +3,8 @@ from typing import *
 from scipy.sparse import issparse
 from scipy.sparse.linalg import LinearOperator
 import _diagonalize
+import _lanczos 
+
 
 def lanczos(A: LinearOperator, v0: Optional[np.ndarray] = None, max_steps: int = None, tol: float = 1e-8, orth: int = 0, sparse_mat: bool = False):
   """Lanczos method of minimized iterations.

@@ -45,7 +45,7 @@ def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method:
 	## Invert R
 	n, m = W.shape
 	W_proj = Q.T @ W
-	R_inv = solve_triangular(R, np.identity(m)).T
+	R_inv = solve_triangular(R, np.identity(m)).T # to replace with dtrtri
 	S = (R_inv / np.linalg.norm(R_inv, axis=0)) # this is cnormc
 
 	## Handle the scale
