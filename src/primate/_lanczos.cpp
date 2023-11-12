@@ -23,68 +23,16 @@ using RowVector = Eigen::Matrix< F, 1, Dynamic >;
 template< typename F >
 using DenseMatrix = Eigen::Matrix< F, Dynamic, Dynamic >;
 
-// Emulate python modulus behavior since % is not a true modulus
+// Emulate python modulus behavior since C++ '%' is not a true modulus
 constexpr inline auto mod(int a, int b) noexcept -> int {
   return (b + (a % b)) % b; 
 }
 
-
-// Orthogonalize a vector v against a matrix V
-template< std::floating_point F >
-void gram_schmidt_process(
-  const Eigen::Matrix< F, Dynamic, Dynamic >& V,  // Column vectors to orthogonalize v against. Need not necessarily be orthogonal. 
-  const size_t j,                                 // Column index in V indicating vectors to orthogonalize against
-  const size_t num_ortho,                         // Number of vectors to be orthogonalized starting from j
-  F* v)
-{
-  // No orthogonalization is performed
-  const size_t nv = static_cast< size_t >(V.cols());
-  if ((num_ortho == 0) || (nv < 2)) { return; }
-  const size_t J = j % nv; 
-  
-  // Figure out actual number of vectors to orthogonalize against
-  size_t num_steps = (num_ortho < 0 || num_ortho > nv) ? nv : num_ortho;
-  num_steps = std::max(num_steps, static_cast< size_t >(V.rows()));
-
-  // Setup the column-vector like translation for input vector v
-  auto v_col = Eigen::Map< Eigen::Matrix< F, Dynamic, 1 > >(v, V.rows(), 1); // no-op
-
-  // Iterate over vectors
-  const auto epsilon = std::numeric_limits< F >::epsilon();
-  const auto sqrt_n = std::sqrt(nv); 
-  for (size_t step = 0; step < num_steps; ++step) {
-    // i is the index of a column vector in V to orthogonalize v against it
-    // Wrap around negative indices from the end of column index
-    auto i = J >= step ? J - step : nv - step - J;
-    // i = i >= step ? i - step : i - step + nv;
-    // i = (J + step >= nv) ? (J - num_ortho + step) : (j);
-
-    auto norm = V.col(i).norm(); 
-    if (norm < epsilon * sqrt_n) { continue; }
-
-    // Project v onto the i'th column of V
-    auto inner_prod = V.col(i).dot(v_col);
-    auto scale = inner_prod / std::pow(norm, 2);
-
-    // If scale is is 1, it is possible that vector v and j-th vector are identical (or close).
-    if (std::abs(scale - 1.0) <= 2.0 * epsilon) {
-      auto norm_v = std::pow(v_col.norm(), 2);
-      auto distance = std::sqrt(norm_v - 2.0*inner_prod + norm_v); // distance between the j-th vector and vector v
-
-      // If distance is zero, do not reorthogonalize i-th against the j-th vector.
-      if (distance < 2.0 * epsilon * sqrt_n) {
-        continue;
-      }
-    }
-    v_col -= scale * V.col(i);
-  }
-}
-
-// Orthogonalizes v with respect to U via modified gram schmidt
-// Projects v onto the columns U[:,i:(i+p)] = u_i, u_{i+1}, ..., u_{i+p}, removing from v the components 
-// in the direction of the vector projections. If any index i, ..., i+p exceeds the number of columns of U, the 
-// indices are cycled. Near-zero projections are ignored, as are columns of U with near-zero norms.
-// https://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class
+// Orthogonalizes v with respect to columns in U via modified gram schmidt
+// Cyclically projects v onto the columns U[:,i:(i+p)] = u_i, u_{i+1}, ..., u_{i+p}, removing from v the components 
+// of the vector projections. If any index i, ..., i+p exceeds the number of columns of U, the indices are cycled. 
+// Both near-zero projections and columns of U with near-zero norm are ignored to avoid collapsing v to the trivial vector.
+// Eigen::Ref use based on: https://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class
 template< std::floating_point F >
 void orth_vector(
   Ref< ColVector< F > > v,                  // input/output vector
@@ -101,8 +49,8 @@ void orth_vector(
   // If projection or the target vector is near-zero, ignore and continue, as numerical orthogonality is already met
   const int diff = reverse ? -1 : 1; 
   for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
-    const auto u_norm = U.col(i).squaredNorm();
-    const auto proj_len = v.dot(U.col(i));
+    const auto u_norm = U.col(i).squaredNorm();     // norm of u_i
+    const auto proj_len = v.dot(U.col(i));          // < v, u_i > 
     if (std::min(std::abs(proj_len), u_norm) > tol){
       v -= (proj_len / u_norm) * U.col(i);
     }
@@ -171,6 +119,11 @@ void lanczos(
   }
 }
 
+
+// Lanczos FA-1 
+
+
+
 // Modified Gram-Schmidt in-place
 // G. W. Stewart, "Matrix Algorithms, Volume 1", SIAM, 1998.
 template< std::floating_point F >
@@ -191,10 +144,10 @@ void modified_gram_schmidt(Ref< DenseMatrix< F > > U, const int s = 0){
 
 PYBIND11_MODULE(_lanczos, m) {
   // m.def("orthogonalize", &orthogonalize< float >);
+  m.def("orth_vector", &orth_vector< float >);
   m.def("lanczos", [](const Eigen::SparseMatrix< float >& mat, py_array< float >& v, const int num_steps, const float lanczos_tol, const int orthogonalize, py_array< float >& alpha, py_array< float >& beta){
     const auto lo = SparseEigenLinearOperator(mat);
     lanczos< float >(lo, v.mutable_data(), num_steps, lanczos_tol, orthogonalize, alpha.mutable_data(), beta.mutable_data());
   });
   m.def("mgs", &modified_gram_schmidt< float >);
-  m.def("orth_vector", &orth_vector< float >);
 }
