@@ -103,13 +103,13 @@ void orth_vector(
   for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
     const auto u_norm = U.col(i).squaredNorm();
     const auto proj_len = v.dot(U.col(i));
-    // std::cout << "i: " << i << ", u norm: " << u_norm << ", proj len: " << proj_len << ", tol: " << tol << std::endl; 
     if (std::min(std::abs(proj_len), u_norm) > tol){
       v -= (proj_len / u_norm) * U.col(i);
     }
   }
 }
 
+// Paige's A1 variant of the Lanczos method
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
 template< std::floating_point F, LinearOperator Matrix >
 void lanczos(
@@ -125,9 +125,9 @@ void lanczos(
   
   // Number of Lanczos vectors to keep in memory
   const size_t ncv = 
-    (orthogonalize == 0 || orthogonalize == 1) ? 2 :                        // Minimum orthogonalization
-    (orthogonalize < 0 || orthogonalize > k) ? static_cast< size_t >(k) :   // Full reorthogonalization
-    static_cast< size_t >(orthogonalize);                                   // Partial orthogonalization (0 < orthogonalize < m)
+    (orthogonalize == 0 || orthogonalize == 1) ? 2 :         // Minimum orthogonalization
+    (orthogonalize < 0 || orthogonalize > k) ? size_t(k) :   // Full reorthogonalization
+    static_cast< size_t >(orthogonalize);                    // Partial orthogonalization (0 < orthogonalize < m)
 
   // Constants `
   const auto A_shape = A.shape();
@@ -171,55 +171,6 @@ void lanczos(
   }
 }
 
-
-//   // Setup the vectors to orthonormalize
-//   auto qp = (ColVectorF) ColVectorF::Zero(m, 1); // prev
-//   auto qn = (ColVectorF) ColVectorF::Zero(m, 1); // next 
-//   Eigen::Map< ColVectorF > qc(q, m, 1);
-//   qc.normalize();
-//   beta[0] = 0; 
-
-//   // Orthogonalize
-//   const size_t k_ = std::min(size_t(k), m);
-//   for (size_t i = 0; i < k_; ++i){
-//     A.matvec(qc.data(), qn.data());
-//     qn -= beta[i] * qp;
-//     alpha[i] = qn.dot(qc);
-//     qn -= alpha[i] * qc;
-//     beta[i+1] = qn.norm();
-//     if (beta[i+1] <= lanczos_tol){
-//       break;
-//     }
-//     qn.normalize();
-//     qp = qc;
-//     qc = qn;    
-//   }
-// }
-
-// Orthogonalizes a set of vectors in-place using Modified Gram Schmidt
-// template< std::floating_point F >
-// void orthogonalize(Eigen::Ref< Eigen::Matrix< F, Dynamic, Dynamic > > U, Eigen::Ref< Eigen::Matrix< F, Dynamic, 1 > > q, const py_array< int >& ind){
-//   // std::vector< size_t > vind(ind.shape(0), ind.data());
-//   // auto ind_ptr = (int*) ind.data();
-//   // auto ind_sz = static_cast< int >(ind.shape(0));
-//   // // Eigen::Map< const Eigen::VectorXi > indices(ind.data(), ind.shape(0), 1); // no-op 
-//   // // const auto indices = Eigen::Map< const Eigen::VectorXi >(ind_ptr, ind_sz, 1);
-//   // Eigen::VectorXi indices(ind_sz, 1);
-//   q.normalize(); // in-place
-//   auto ind_access = ind.unchecked< 1 >();
-//   const size_t n_ind = static_cast< size_t >(ind.shape(0));
-//   for (size_t i = 0; i < n_ind; ++i){
-//     int k = ind_access(i);
-//     U.col(k) -= q.dot(U.col(k)) * q;
-//   }
-
-
-//   // auto block_U = U(Eigen::placeholders::all, indices);
-//   // auto U_qr = Eigen::HouseholderQR(block_U);
-//   // auto det = U(Eigen::placeholders::all, indices).householderQr().logAbsDeterminant();
-//   // py::print(det);
-// }
-
 // Modified Gram-Schmidt in-place
 // G. W. Stewart, "Matrix Algorithms, Volume 1", SIAM, 1998.
 template< std::floating_point F >
@@ -230,7 +181,6 @@ void modified_gram_schmidt(Ref< DenseMatrix< F > > U, const int s = 0){
   auto R = DenseMatrix< F >(m, m);
   for (int k = 0; k < m; ++k){
     for (int i = 0; i < k; ++i){
-      // std::cout << "i " << i << ", k " << k << std::endl;
       R(i,k) = U.col(i).dot(U.col(k));
       U.col(k) -= R(i,k) * U.col(i);
     }
