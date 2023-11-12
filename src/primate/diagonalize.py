@@ -35,7 +35,8 @@ def lanczos(A: LinearOperator, v0: Optional[np.ndarray] = None, max_steps: int =
   max_steps = A.shape[1] if max_steps is None else min(max_steps, A.shape[1])
   assert max_steps > 0, "Number of steps must be positive!"
   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
-  _diagonalize.lanczos_tridiagonalize(A, v0, max_steps, tol, orth, alpha, beta)
+  # _diagonalize.lanczos_tridiagonalize(A, v0, max_steps, tol, orth, alpha, beta)
+  _lanczos.lanczos(A, v0, max_steps, tol, orth, alpha, beta)
   if sparse_mat:
     from scipy.sparse import spdiags
     T = spdiags(data=[beta, alpha, np.roll(beta,1)], diags=(-1,0,+1), m=n, n=n)

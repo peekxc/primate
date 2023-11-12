@@ -23,6 +23,12 @@ using RowVector = Eigen::Matrix< F, 1, Dynamic >;
 template< typename F >
 using DenseMatrix = Eigen::Matrix< F, Dynamic, Dynamic >;
 
+// Emulate python modulus behavior since % is not a true modulus
+constexpr inline auto mod(int a, int b) noexcept -> int {
+  return (b + (a % b)) % b; 
+}
+
+
 // Orthogonalize a vector v against a matrix V
 template< std::floating_point F >
 void gram_schmidt_process(
@@ -74,6 +80,36 @@ void gram_schmidt_process(
   }
 }
 
+// Orthogonalizes v with respect to U via modified gram schmidt
+// Projects v onto the columns U[:,i:(i+p)] = u_i, u_{i+1}, ..., u_{i+p}, removing from v the components 
+// in the direction of the vector projections. If any index i, ..., i+p exceeds the number of columns of U, the 
+// indices are cycled. Near-zero projections are ignored, as are columns of U with near-zero norms.
+// https://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class
+template< std::floating_point F >
+void orth_vector(
+  Ref< ColVector< F > > v,                  // input/output vector
+  const Ref< const DenseMatrix< F > >& U,   // matrix of vectors to project onto
+  const int start_idx,                      // starting column index
+  const int p,                              // number of projections
+  const bool reverse = false                // whether to cycle through the columns of U backwards
+) {
+  const int n = (int) U.rows(); 
+  const int m = (int) U.cols(); 
+  const auto tol = 2 * std::numeric_limits< F >::epsilon() * std::sqrt(n); // numerical tolerance for orthogonality
+
+  // Successively subtracting the projection of v onto the first p columns starting at start_idx
+  // If projection or the target vector is near-zero, ignore and continue, as numerical orthogonality is already met
+  const int diff = reverse ? -1 : 1; 
+  for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
+    const auto u_norm = U.col(i).squaredNorm();
+    const auto proj_len = v.dot(U.col(i));
+    // std::cout << "i: " << i << ", u norm: " << u_norm << ", proj len: " << proj_len << ", tol: " << tol << std::endl; 
+    if (std::min(std::abs(proj_len), u_norm) > tol){
+      v -= (proj_len / u_norm) * U.col(i);
+    }
+  }
+}
+
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
 template< std::floating_point F, LinearOperator Matrix >
 void lanczos(
@@ -82,96 +118,58 @@ void lanczos(
   const int k,                // Dimension of the Krylov subspace to capture
   const F lanczos_tol,        // Tolerance of residual error for early-stopping the iteration.
   const int orthogonalize,    // Number of lanczos vectors to keep numerically orthonormal in-memory
-  F* alpha,                   // Output diagonal elements of T of size A.shape[1]
-  F* beta                     // Output subdiagonal elements of T of size A.shape[1]
+  F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
+  F* beta                     // Output subdiagonal elements of T of size A.shape[1]+1
 ){
   using ColVectorF = Eigen::Matrix< F, Dynamic, 1 >;
   
-  // buffer_size is number of last orthogonal vectors to keep in the buffer V
-  const size_t buffer_size = 
+  // Number of Lanczos vectors to keep in memory
+  const size_t ncv = 
     (orthogonalize == 0 || orthogonalize == 1) ? 2 :                        // Minimum orthogonalization
     (orthogonalize < 0 || orthogonalize > k) ? static_cast< size_t >(k) :   // Full reorthogonalization
     static_cast< size_t >(orthogonalize);                                   // Partial orthogonalization (0 < orthogonalize < m)
 
-  // Get number of rows and columns of A
+  // Constants `
   const auto A_shape = A.shape();
   const size_t n = A_shape.first;
   const size_t m = A_shape.second;
+  const F residual_tol = std::sqrt(n) * lanczos_tol;
 
-  // Allocate 2D array to store orthogonalized vectors of length n.
-  // New vectorsare stored by cycling through columns, replacing old with new.
-  auto V = Eigen::Matrix< F, Dynamic, Dynamic >(n, buffer_size);
-  
-  // Assign initial vector 
-  Eigen::Map< ColVectorF > v(q, m, 1);
- 
-  // Scalars 
-  const F sqrt_n = std::sqrt(n);
+  // Allocation / views
+  auto Q = (DenseMatrix< F >) DenseMatrix< F >::Zero(n, ncv);   // Lanczos vectors (zero-initialized to prevent branching below)
+  Eigen::Map< ColVectorF > v(q, m, 1);                          // map initial vector (no-op)
+  Q.col(0) = v.normalized();                                    // load normalized v0 into Q  
 
   // In the following, beta[j] means beta[j-1] in the Demmel text
-  size_t j = 0;                 // to track size of lanczos
-  for (size_t i; j < size_t(k); ++j) {
+  std::array< int, 3 > pos = { static_cast< int >(ncv - 1), 0, 1 };
+  for (int j = 0; j < k; ++j) {
 
-    // column to orthogonalize against
-    i = j % buffer_size; 
+    // Apply the three-term recurrence
+    auto [p,c,n] = pos;                  // previous, current, next
+    A.matvec(Q.col(c).data(), v.data()); // v = A q_c
+    Q.col(n) = v - beta[j] * Q.col(p);   // q_n = v - b q_p
+    alpha[j] = Q.col(c).dot(Q.col(n));   // projection size of < qc, qn > 
+    Q.col(n) -= alpha[j] * Q.col(c);     // subtract projected components
 
-    // Copy normalized v to the j-th column of V
-    V.col(i) = v.normalized(); // Note V is column-major
-
-    // v <- A @ V[:,i]
-    A.matvec(V.col(i).data(), v.data());
-
-    // Subtract V[:,j-1] * beta[j] from v
-    if (j > 0) {
-      v -= beta[j-1] * V.col((j - 1) % buffer_size);
+    // Re-orthogonalize against previous ncv-1 lanczos vectors
+    if (ncv > 2) {
+      auto qn = Eigen::Ref< ColVector< F > >(Q.col(n));          
+      const auto Q_ref = Eigen::Ref< const DenseMatrix< F > >(Q); 
+      orth_vector(qn, Q_ref, c, ncv-1, true);
     }
 
-    // Save alpha[j]    
-    alpha[j] = V.col(i).dot(v);
-
-    // Subtract V[:,j] * alpha[j] from v
-    v -= alpha[j] * V.col(i);
-    
-    // Optionally orthogonalize against 
-    // if (orthogonalize != 0) {
-    //   gram_schmidt_process(V, i, j < buffer_size ? j+1 : buffer_size, v.data());
-    // }
-
-    // Early-stop criterion when v is within tolerance of zero, signaling invariant subspace.
-    beta[j] = v.norm();
-    if (beta[j] < lanczos_tol * sqrt_n) {
+    // Early-stop criterion is when K_j(A, v) is near invariant subspace.
+    beta[j+1] = Q.col(n).norm();
+    if (beta[j+1] < residual_tol) {
       break;
     }
+    Q.col(n) /= beta[j+1]; // normalize such that Q stays orthonormal
+    
+    // Cyclic left-rotate to update the working column indices
+    std::rotate(pos.begin(), pos.begin() + 1, pos.end());
+    pos[2] = mod(j+2, ncv);
   }
 }
-//         // Subtract V[:,j] * alpha[j] from r
-//         cVectorOperations<DataType>::subtract_scaled_vector(&V[(j % buffer_size)*n], n, alpha[j], r);
-
-//         // Subtract V[:,j-1] * beta[j] from r
-//         if (j > 0) {
-//             cVectorOperations<DataType>::subtract_scaled_vector(&V[((j-1) % buffer_size)*n], n, beta[j-1], r);
-//         }
-
-//         // Gram-Schmidt process (full re-orthogonalization)
-//         if (orthogonalize != 0) {
-//             // Find how many column vectors are filled so far in the buffer V
-//             num_ortho = j < buffer_size ? j+1 : buffer_size;
-
-//             // Gram-Schmidt process
-//             cOrthogonalization<DataType>::gram_schmidt_process(&V[0], n, buffer_size, j%buffer_size, num_ortho, r);
-//         }
-
-//         // beta is norm of r
-//         beta[j] = cVectorOperations<DataType>::euclidean_norm(r, n);
-
-//         // Exit criterion when the vector r is zero. If each component of a
-//         // zero vector has the tolerance epsilon, (which is called lanczos_tol
-//         // here), the tolerance of norm of r is epsilon times sqrt of n.
-//         if (beta[j] < lanczos_tol * sqrt_n) {
-//             break;
-//         }
-// }
-
 
 
 //   // Setup the vectors to orthonormalize
@@ -222,46 +220,13 @@ void lanczos(
 //   // py::print(det);
 // }
 
-constexpr auto mod(int a, int b) noexcept -> int {
-  return (b + (a % b)) % b; 
-}
-
-
-// Orthogonalizes v with respect to U via modified gram schmidt
-// https://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class
-template< std::floating_point F >
-void orth_vector(
-  Ref< ColVector< F > > v, 
-  const Ref< const DenseMatrix< F > >& U, 
-  const int start_idx,                      // starting column index
-  const int p,                              // number of projections
-  const bool reverse = false                // whether to cycle through the columns of U backwards
-) {
-  const int n = (int) U.rows(); 
-  const int m = (int) U.cols(); 
-  const auto tol = 2 * std::numeric_limits< F >::epsilon() * std::sqrt(n); // numerical tolerance for orthogonality
-
-  // Successively subtracting the projection of v onto the first p columns starting at start_idx
-  // If projection or the target vector is near-zero, ignore and continue, as numerical orthogonality is already met
-  const int diff = reverse ? -1 : 1; 
-  for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
-    const auto u_norm = U.col(i).squaredNorm();
-    const auto proj_len = v.dot(U.col(i));
-    // std::cout << "i: " << i << ", u norm: " << u_norm << ", proj len: " << proj_len << ", tol: " << tol << std::endl; 
-    if (std::min(std::abs(proj_len), u_norm) > tol){
-      v -= (proj_len / u_norm) * U.col(i);
-    }
-  }
-  v.normalize(); // in-place
-}
-
 // Modified Gram-Schmidt in-place
 // G. W. Stewart, "Matrix Algorithms, Volume 1", SIAM, 1998.
 template< std::floating_point F >
 void modified_gram_schmidt(Ref< DenseMatrix< F > > U, const int s = 0){
-  const size_t n = U.rows();
-  const size_t m = U.cols();
-  auto i = mod(s, m);
+  // const int n = static_cast< const int >(U.rows());
+  const int m = static_cast< const int >(U.cols());
+  // auto i = mod(s, m);
   auto R = DenseMatrix< F >(m, m);
   for (int k = 0; k < m; ++k){
     for (int i = 0; i < k; ++i){
@@ -278,7 +243,7 @@ PYBIND11_MODULE(_lanczos, m) {
   // m.def("orthogonalize", &orthogonalize< float >);
   m.def("lanczos", [](const Eigen::SparseMatrix< float >& mat, py_array< float >& v, const int num_steps, const float lanczos_tol, const int orthogonalize, py_array< float >& alpha, py_array< float >& beta){
     const auto lo = SparseEigenLinearOperator(mat);
-    lanczos(lo, v.mutable_data(), num_steps, lanczos_tol, orthogonalize, alpha.mutable_data(), beta.mutable_data());
+    lanczos< float >(lo, v.mutable_data(), num_steps, lanczos_tol, orthogonalize, alpha.mutable_data(), beta.mutable_data());
   });
   m.def("mgs", &modified_gram_schmidt< float >);
   m.def("orth_vector", &orth_vector< float >);
