@@ -1,25 +1,47 @@
 import numpy as np 
+from primate.diagonalize import lanczos
+from scipy.linalg import eigh_tridiagonal
 
 # %% 
 np.random.seed(1234)
-ew = np.random.uniform(size=15, low=0, high=2)
+# ew = np.random.uniform(size=15, low=0, high=2)
+ew = 0.2 + 1.5*np.linspace(0, 5, 15)
 Q,R = np.linalg.qr(np.random.uniform(size=(15,15)))
 A = Q @ np.diag(ew) @ Q.T
 A = (A + A.T) / 2
 assert np.all(A == A.T)
-# from numpy.polynomial.polynomial import polyfit
-# polyfit()
+assert np.allclose(np.linalg.eigvalsh(A) - ew, 0.0)
 
+from primate.random import rademacher
+np.random.seed(1234)
+# v0 = np.array(np.random.uniform(size=A.shape[0]))
+v0 = rademacher(A.shape[1])
+(a,b), Q = lanczos(A, v0, max_steps=A.shape[1], orth=0, return_basis=True)
+
+assert np.linalg.norm(Q[:,0] - (v0/np.linalg.norm(v0))) <= 1e-6
+
+rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
+y = np.linalg.norm(v0) * (Q @ V @ (V[0,:] * rw))
+
+## We did it! 
+assert np.linalg.norm((A @ v0) - y) <= 1e-5
+
+
+## Now try a matrix function -- it works!
+from primate.random import rademacher
+np.random.seed(1234)
+v0 = rademacher(A.shape[1])
+(a,b), Q = lanczos(A, v0, max_steps=A.shape[1], orth=0, return_basis=True)
+rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
+rw = rw / (rw + 1e-4)
+y_test = np.linalg.norm(v0) * (Q @ V @ (V[0,:] * rw))
+ew, ev = np.linalg.eig(A)
+y_true = (ev @ np.diag((ew / (ew + 1e-4))) @ ev.T) @ v0
+assert np.linalg.norm(y_test - y_true) < 1e-3
 
 # %% 
-from primate.diagonalize import lanczos
-from scipy.linalg import eigh_tridiagonal
-np.random.seed(1234)
-v0 = np.array(np.random.uniform(size=A.shape[0]))
-a,b = lanczos(A, v0, max_steps=10)
-
 def lanczos_action(z: np.ndarray, A, alpha, beta, v: np.ndarray):
-  """Yields the matrix y = Qz where T(alpha, beta) = Q^T A Q is the tridiagonal matrix spanning K(A, v)"""
+  """Given an input vector 'z', yields the vector y = Qz where T(alpha, beta) = Q^T A Q is the tridiagonal matrix spanning K(A, v)"""
   n, k = A.shape[0], len(z)
   assert len(v) == n, "v dimension mismatch"
   y = np.zeros(n) # output vector
@@ -36,20 +58,57 @@ def matrix_function_lanczos(A, f: Callable, v: np.ndarray, k: int = 15):
   """Approximates the action v -> f(A)v via the Lanczos method"""
   assert len(v) == A.shape[0], "Dimension mismatch"
   k = min(k, A.shape[0])
-  a, b = lanczos(A, v, max_steps=k)  # diagonal and subdiagonal entries of T 
-  rr, V = eigh_tridiagonal(a,b[:-1]) # Rayleigh-Ritz values + eigenvectors V of T
-  z = V @ (f(rr) * V[0,:])           # Compute < f(T), e_1 >
+  a, b = lanczos(A, v, max_steps=k)   # diagonal and subdiagonal entries of T 
+  rr, V = eigh_tridiagonal(a,b)       # Rayleigh-Ritz values + eigenvectors V of T
+  z = V @ (f(rr) * V[0,:])            # Compute < f(T), e_1 >
   y = lanczos_action(z, A, a, b, v)
   return np.linalg.norm(v) * y
 
+
+Q[:,0]
+v
+
+## Look at the errors of the action f(A)x as a function of k 
+normalize = lambda x: x / np.linalg.norm(x)
 identity = lambda x: x
 truth_Av = A @ v0
+np.linalg.norm(y - truth_Av)
 
-matrix_function_lanczos(A, identity, v0, A.shape[0])
+## Not even close!
+np.dot(normalize(y), normalize(truth_Av))
 
-normalize = lambda x: x / np.linalg.norm(x)
+# errors = [np.linalg.norm(matrix_function_lanczos(A, identity, v0, j) - truth_Av)  for j in range(1, A.shape[1]+1)]
+
+np.linalg.norm(y - A @ v0)
+
+  # from primate.diagonalize import lanczos
+  # np.random.seed(1234)
+  # n = 10
+  # A = np.random.uniform(size=(n, n)).astype(np.float32)
+  # A = A @ A.T
+  # A_sparse = csc_array(A)
+  # v0 = np.random.uniform(size=A.shape[1])
+  # (a,b), Q = lanczos(A_sparse, v0=v0, tol=1e-8, orth=n, return_basis = True) 
+  
+  
+  # e = np.zeros(n)
+  # e[0] = 1
+  # np.linalg.norm(v0) * (Q @ (V @ np.diag(rw) @ V.T) @ e)
+z = A_sparse @ v0
+np.linalg.norm(y - z)
+
+# %% 
+from bokeh.plotting import figure, show
+p = figure(width=200, height=200)
 
 
+
+
+
+
+
+
+# %% 
 from primate.random import rademacher
 samples, samples_mean = [], []
 for i in range(300):
@@ -75,6 +134,15 @@ eigh_tridiagonal(a,b[:-1], select='i', select_range=(0,0))
 
 
 
+
+
+
+
+
+
+
+
+# %% 
 
 
 

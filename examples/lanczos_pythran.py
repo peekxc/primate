@@ -1,16 +1,20 @@
-#pythran export lanczos_action(float[], float[:,:] order(C), float[], float[], float[])
+#pythran export _lanczos(float[], float[:,:] order(C),, float)
 
 import numpy as np 
-def lanczos_action(z: np.ndarray, A: np.ndarray, alpha: np.ndarray, beta: np.ndarray, v: np.ndarray):
-  """Yields the matrix y = Qz where T(alpha, beta) = Q^T A Q is the tridiagonal matrix spanning K(A, v)"""
-  n, k = A.shape[0], len(z)
-  assert len(v) == n, "v dimension mismatch"
-  y = np.zeros(n) # output vector
-  av, bv = np.append([0], alpha), np.append([0,0], beta) 
-  qp, qc, qn = np.zeros(n), np.copy(v), np.zeros(n) # previous, current, next
-  qc /= np.linalg.norm(v)
-  for i in range(1,k+1):
-    qn = A @ qc - bv[i]*qp - av[i]*qc 
-    y += z[i-1] * qc 
+
+def _lanczos(A, v0: np.ndarray = None, k: int = None, tol: float = 1e-8):
+  k = A.shape[1] if k is None else int(k)
+  v0 = np.random.uniform(size=A.shape[1], low=-1.0, high=+1.0) if v0 is None else np.array(v0)
+  n = A.shape[0]
+  alpha, beta = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
+  qp, qc = np.zeros(n, dtype=np.float32), (v0 / np.linalg.norm(v0)).astype(np.float32)
+  for i in range(k):
+    qn = A @ qc - beta[i] * qp
+    alpha[i] = np.dot(qn, qc)
+    qn -= alpha[i] * qc
+    beta[i+1] = np.linalg.norm(qn)
+    if np.isclose(beta[i+1], tol):
+      break
+    qn = qn / beta[i+1]
     qp, qc = qc, qn
-  return y
+  return alpha, beta

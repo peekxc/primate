@@ -3,24 +3,7 @@ import numpy as np
 from scipy.sparse import csc_array
 from scipy.sparse import spdiags
 # T = spdiags(data=[beta, alpha, np.roll(beta,1)], diags=(-1,0,+1), m=n, n=n)
-  
 
-## Very basic Lanczos iteration
-def lanczos_base(A, v: np.ndarray, k: int, tol: float = 1e-8):
-  assert k <= A.shape[0], "Can perform at most k = n iterations"
-  n = A.shape[0]
-  alpha, beta = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
-  qp, qc = np.zeros(n, dtype=np.float32), (v / np.linalg.norm(v)).astype(np.float32)
-  for i in range(k):
-    qn = A @ qc - beta[i] * qp
-    alpha[i] = np.dot(qn, qc)
-    qn -= alpha[i] * qc
-    beta[i+1] = np.linalg.norm(qn)
-    if np.isclose(beta[i+1], tol):
-      break
-    qn = qn / beta[i+1]
-    qp, qc = qc, qn
-  return alpha, beta
 
 def lanczos_paige(A, v: np.ndarray, k: int, tol: float = 1e-8):
   assert k <= A.shape[0], "Can perform at most k = n iterations"
@@ -107,6 +90,8 @@ def test_lanczos_correctness():
   a2, b2 = lanczos_paige2(A, v, n, 0.0)
   # assert np.all(np.isclose(a1, a2)) and np.all(np.isclose(b1, b2))
 
+  a3, b3 = lanczos(A, v, n, 0.0, 0)
+
   a3, b3 = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
   _lanczos.lanczos(A, v, n, 0.0, 2, a3, b3)
   a3, b3
@@ -126,20 +111,20 @@ def test_lanczos_eigen():
     A = A @ A.T
     v = np.random.normal(size=n).astype(np.float32)
     true_ew = np.linalg.eigvalsh(A)
+    A_sparse = csc_array(A)
 
     ## Test #1: Establish baseline
-    a1, b1 = lanczos_base(A, v, k=n, tol=0.0)
+    a1, b1 = lanczos_base(A_sparse, v, k=n, tol=0.0)
     
     ## Test #2: Use Paige's A1 variant
     # a2, b2 = lanczos(A, v, n, 0.0, 0)
-    a2, b2 = lanczos_paige(A, v, n, 0.0)
+    a2, b2 = lanczos_paige(A_sparse, v, n, 0.0)
 
     ## Test #3: Use variation of paige's that re-orthogonalizes
-    a3, b3 = lanczos_paige2(A, v, n, 0.0, 2)
+    a3, b3 = lanczos_paige2(A_sparse, v, n, 0.0, 2)
 
     ## Test #4: Custom 
     a4, b4 = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
-    A_sparse = csc_array(A)
     _lanczos.lanczos(A_sparse, v, n, 0.0, 5, a4, b4)
     assert not(np.any(np.isnan(a4)))
 
@@ -159,10 +144,12 @@ def test_lanczos_eigen():
     #print(f"1: {d1}, 2: {d2}, 3: {d3}, 4: {d4}, winner: {winners[-1]}")
   print(obj_loss / 1500)
 
-  np.bincount(np.array(winners)-1)
-
+def test_matrix_function():
 
   pass
+
+# def test_benchmark():
+
 
 def test_orthogonalize_vector():
   import primate
@@ -207,6 +194,7 @@ def test_orthogonalize_vector():
 
   u, v = U[:,0], U[:,1]
   np.dot(u / np.linalg.norm(u), v / np.linalg.norm(v))
+
 
 def test_mgs():
   import primate
