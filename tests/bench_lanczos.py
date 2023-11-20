@@ -214,7 +214,6 @@ def test_mgs():
   _lanczos.orth_vector(v, U, 1, 4, False)
   print(v)
 
-
   proj = lambda v, u: np.dot(u,v)/np.dot(u,u) * u # project v onto u 
   np.random.seed(1234)
   U = np.random.uniform(size=(6,5)).astype(np.float32, order='F')

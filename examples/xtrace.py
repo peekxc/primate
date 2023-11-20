@@ -102,4 +102,5 @@ def xtrace(A, error_atol: float = 0.1, error_rtol: float = 1e-6, nv: int = 1, co
 		print(t)
 	return t, t_samples, err
 
-savemat("/Users/mpiekenbrock/XTrace/bad_Om.mat", { 'Om' : NewOm })
+# savemat("/Users/mpiekenbrock/XTrace/bad_Om.mat", { 'Om' : NewOm })
+# %%

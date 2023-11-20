@@ -3,7 +3,6 @@
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
-
 template< std::floating_point F >
 struct DenseEigenLinearOperator {
   using value_type = F;
@@ -83,3 +82,28 @@ struct SparseEigenAffineOperator {
     _param = t; 
   }
 };
+
+
+
+template< std::floating_point F >
+auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
+  return SparseEigenLinearOperator< F >(*A);
+}
+
+// TODO: Support Adjoint and Affine Operators out of the box
+template< std::floating_point F >
+auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
+  auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
+  B.setIdentity();
+  return SparseEigenAffineOperator< F >(*A, B);
+}
+
+template< std::floating_point F >
+auto eigen_dense_wrapper(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >* A){
+  return DenseEigenLinearOperator< F >(*A);
+}
+
+template< std::floating_point F >
+auto linearoperator_wrapper(const py::object* A){
+  return PyLinearOperator< F >(*A);
+}

@@ -12,11 +12,6 @@
 #ifndef _RANDOM_GENERATOR_SPLIT_MIX_64_H_
 #define _RANDOM_GENERATOR_SPLIT_MIX_64_H_
 
-
-// ======
-// Header
-// ======
-
 #include <stdint.h>  // uint64_t
 #include <cassert>  // assert
 #include <ctime>  // std::time

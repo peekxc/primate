@@ -72,7 +72,6 @@ struct ThreadedRNG64 {
                 generators[i].seed(seed);
             }
         }
-        
     };
 };
 

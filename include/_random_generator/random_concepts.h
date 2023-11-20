@@ -16,7 +16,6 @@ concept Random64Engine = requires(T rne) {
   T::state_size > 0;                            // has a known positive state size, in terms of number 32 unsigned integers
 } && LightRandom64Engine< T >;
 
-
 // See: https://stackoverflow.com/questions/39288595/why-not-just-use-random-device/
 template < typename T >
 concept ThreadSafeRBG = requires(T rbg, int tid) {

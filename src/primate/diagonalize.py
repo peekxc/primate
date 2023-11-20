@@ -2,9 +2,7 @@ import numpy as np
 from typing import *
 from scipy.sparse import issparse
 from scipy.sparse.linalg import LinearOperator
-import _diagonalize
 import _lanczos 
-
 
 def lanczos(
   A: LinearOperator, 

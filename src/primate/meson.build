@@ -5,7 +5,7 @@ foreach dep_name: dependency_map.keys()
 endforeach
 
 ## Extension modules
-extensions = [ '_random_gen', '_orthogonalize', '_diagonalize', '_trace', '_lanczos']
+extensions = [ '_random_gen', '_orthogonalize', '_trace', '_lanczos']
 foreach ext: extensions
   py.extension_module(
     ext,
