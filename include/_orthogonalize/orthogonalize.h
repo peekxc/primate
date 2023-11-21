@@ -1,18 +1,6 @@
 #include <concepts> // std::floating_point
-#include <Eigen/Core>
+#include "eigen_core.h" // DenseMatrix, EigenCore
 #include <Eigen/QR>
-
-using Eigen::Dynamic; 
-using Eigen::Ref; 
-
-template< typename F >
-using ColVector = Eigen::Matrix< F, Dynamic, 1 >;
-
-template< typename F >
-using RowVector = Eigen::Matrix< F, 1, Dynamic >;
-
-template< typename F >
-using DenseMatrix = Eigen::Matrix< F, Dynamic, Dynamic >;
 
 // Emulate python modulus behavior since C++ '%' is not a true modulus
 constexpr inline auto mod(int a, int b) noexcept -> int {

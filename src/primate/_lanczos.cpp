@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
 #include <iostream>
@@ -40,36 +41,20 @@ PYBIND11_MODULE(_lanczos, m) {
       alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
     );
   });
+  m.def("quadrature", [](const Eigen::SparseMatrix< float >& mat, LANCZOS_PARAMS) -> py_array< float > {
+    const auto lo = SparseEigenLinearOperator(mat);
+    const size_t ncv = static_cast< size_t >(Q.shape(1));
+    auto ew = lanczos_quadrature(
+      lo, v.mutable_data(), num_steps, lanczos_tol, orthogonalize, 
+      alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
+    );
+    std::vector< float > ew_result(ew.begin(), ew.end());
+    return py::cast(ew_result); 
+  });
 }
 
 
-// // Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator
-// template< std::floating_point F, LinearOperator Matrix >
-// void lanczos_quadrature(
-//   const Matrix& A,            // Symmetric linear operator 
-//   F* q,                       // vector to expand the Krylov space K(A, q)
-//   const int k,                // Dimension of the Krylov subspace to capture
-//   const F lanczos_tol,        // Tolerance of residual error for early-stopping the iteration.
-//   const int orth,             // Number of additional vectors to orthogonalize againt 
-//   F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
-//   F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1
-//   F* V,                       // Output matrix for Lanczos vectors (column-major)
-//   const size_t ncv            // Number of Lanczos vectors to allocate
-// ){
-  
-//   // Perform the lanczos iteration 
-//   lanczos_recurrence(A, q, k, lanczos_tol, orth, alpha, beta, V, ncv); // populates alpha, beta
 
-//   // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
-//   // rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
-//   auto solver = Eigen::AdjointSolver< Eigen::Tridiagonal >();
-//   auto V = solver.get_Mat();
-//   auto rw = solver.get_eigenvalues(); // Rayleigh-Ritz values
-  
-//   // Get the quadrature nodes + weights 
-//   auto weights = (RowVector< F >) V.row(0).pow(2);
-//   return 
-// };
 
 
 // Given an input vector 'z', yields the vector y = Qz where T(alpha, beta) = Q^T A Q is the tridiagonal matrix spanning K(A, q)

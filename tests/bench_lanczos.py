@@ -4,25 +4,6 @@ from scipy.sparse import csc_array
 from scipy.sparse import spdiags
 # T = spdiags(data=[beta, alpha, np.roll(beta,1)], diags=(-1,0,+1), m=n, n=n)
 
-
-def lanczos_paige(A, v: np.ndarray, k: int, tol: float = 1e-8):
-  assert k <= A.shape[0], "Can perform at most k = n iterations"
-  n = A.shape[0]
-  alpha, beta = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
-  V = np.zeros(shape=(n, 2), dtype=np.float32)
-  V[:,0] = v / np.linalg.norm(v)  # v
-  V[:,1] = A @ V[:,0]             # u
-  for j in range(k):
-    alpha[j] = np.dot(V[:,0], V[:,1])
-    w = V[:,1] - alpha[j]*V[:,0]
-    beta[j+1] = np.linalg.norm(w)
-    if np.isclose(beta[j+1], tol):
-      break
-    vn = w / beta[j+1]
-    V[:,1] = A @ vn - beta[j+1] * V[:,0]
-    V[:,0] = vn
-  return alpha, beta
-
 def lanczos_paige2(A, v0: np.ndarray, k: int, tol: float = 1e-8, ncv: int = 2):
   """Performs the k-step Lanczos tridiagonalization to a symmetric matrix A.
   
@@ -78,23 +59,6 @@ def lanczos_paige2(A, v0: np.ndarray, k: int, tol: float = 1e-8, ncv: int = 2):
 #     print(V)
 #     # print(f"{j % m} {} {}")
 #   return alpha, beta
-
-def test_lanczos_correctness():
-  from primate.diagonalize import _lanczos, lanczos
-  np.random.seed(1234)
-  n = 10
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
-  v = np.random.normal(size=n).astype(np.float32)
-  a1, b1 = lanczos_paige(A, v, n, 0.0)
-  a2, b2 = lanczos_paige2(A, v, n, 0.0)
-  # assert np.all(np.isclose(a1, a2)) and np.all(np.isclose(b1, b2))
-
-  a3, b3 = lanczos(A, v, n, 0.0, 0)
-
-  a3, b3 = np.zeros(n+1, dtype=np.float32), np.zeros(n+1, dtype=np.float32)
-  _lanczos.lanczos(A, v, n, 0.0, 2, a3, b3)
-  a3, b3
 
 ## Conclusion: Paiges A1 variant + surprisingly base variant show effectively no difference
 ## and are the best in terms of L2-approximation

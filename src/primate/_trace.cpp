@@ -3,6 +3,7 @@
 // #include "pylinops.h"         //
 #include "eigen_operators.h"  // eigen_< mat >_wrappers
 #include "_random_generator/vector_generator.h"
+#include "_lanczos/lanczos.h"
 namespace py = pybind11;
 
 
@@ -10,9 +11,10 @@ namespace py = pybind11;
 // auto* data = out.mutable_data();
 // auto array_sz = static_cast< size_t >(out.size());
 // generate_array< 0, F >(rbg, data, array_sz, num_threads); 
-void stochastic_lanczos_quadrature(){
-  return;
-}
+// void stochastic_lanczos_quadrature(){
+//   lanczos_quadrature();
+//   return;
+// }
 
 
 // Turns out using py::call_guard<py::gil_scoped_release>() just causes everthing to crash immediately
