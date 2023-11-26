@@ -47,5 +47,5 @@ PYBIND11_MODULE(_orthogonalize, m) {
   m.doc() = "orthogonalization module"; 
   _orthogonalize< float >(m);
   _orthogonalize< double >(m);
-  _orthogonalize< long double >(m);
+  // _orthogonalize< long double >(m);
 }

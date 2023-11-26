@@ -4,7 +4,7 @@ from primate.diagonalize import lanczos
 from scipy.linalg import eigh_tridiagonal
 from primate.random import rademacher
 from typing import * 
-from bokeh.plotting import show 
+from bokeh.plotting import show, figure
 from bokeh.io import output_notebook
 output_notebook()
 
@@ -13,46 +13,26 @@ np.random.seed(1234)
 n = 30
 # ew = 0.2 + 1.5*np.linspace(0, 5, n)
 # ew = np.sort(np.random.uniform(low=0.2, high=7.0, size=n))
-ew = np.sort(np.random.normal(loc=0, scale=3, size=n))
+# ew = np.sort(np.random.normal(loc=0, scale=3, size=n))
+
+## symmetric spectrum
+ew = np.sort(np.random.normal(loc=0, scale=3, size=n // 2))
+ew = np.sort(np.append(ew, -ew))
 Q,R = np.linalg.qr(np.random.uniform(size=(n,n)))
 A = Q @ np.diag(ew) @ Q.T
 A = (A + A.T) / 2
 assert np.allclose(np.linalg.eigvalsh(A) - ew, 0)
 
 # %% Try to estimate the trace via Girard-Hutchinson estimator
+sf = lambda x: x / (x + 1e-2)
 trace_true = np.sum(sf(ew))
-
-def lanczos_quadrature(A, v: np.ndarray, k: int = None):
-  """Lanczos quadrature
-  
-  This computes the quadrature nodes { n_i }_{i=1}^k and weights { t_i }_{i=1}^k representing the Gaussian quadrature rule
-
-  Based on Algorithm 2.1 of "An analysis on stochastic Lanczos quadrature with asymmetric quadrature nodes"
-  """
-  k = A.shape[1] if k is None else int(k)
-  (a,b) = lanczos(A, v, max_steps=k, orth=0, return_basis=False)
-  rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
-  return rw, (V[0,:]**2)
-
-def girard_hutch(A, f: Callable, k: int = None):
-  v0 = np.random.choice([-1, +1], size=A.shape[1])
-  theta, tau = lanczos_quadrature(A, v0, k)
-  c = np.linalg.norm(v0)**2
-  return c * np.sum(f(theta) * tau)
-
-def approx_matvec(A, v: np.ndarray, k: int = None, f: Callable = None):
-  k = A.shape[1] if k is None else int(k)
-  (a,b), Q = lanczos(A, v, max_steps=k, orth=0, return_basis=True)
-  rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
-  rw = rw if f is None else f(rw)
-  y = np.linalg.norm(v) * (Q @ V @ (V[0,:] * rw))
-  return y
 
 # Girard-Hutchinsen estimator 
 # Note: indeed, just applying f to Rayleigh-Ritz values is not enough!
 from primate.plotting import figure_trace
 np.random.seed(1236)
-trace_estimates = np.array([girard_hutch(A, sf) for _ in range(200)])
+# trace_estimates = np.array([girard_hutch(A, sf, orth=10, nv=1) for _ in range(200)])
+trace_estimates = girard_hutch(A, sf, orth=10, nv=150, estimates=True)
 show(figure_trace(trace_estimates, trace_true)) 
 
 # %% Look at the set cumulative distributions of the quadrature nodes
@@ -133,17 +113,6 @@ ew, U = np.linalg.eigh(A)
 t0 = (U @ np.diag(f(ew)) @ U.T) @ v0
 np.linalg.norm(y - t0)
 z0 = Q @ V @ np.diag(rw) @ V.T @ Q.T @ v0 
-
-
-# %% Softened sign function 
-def soft_sign(q: int):
-  I = np.arange(q+1)
-  J = np.append([1], np.cumprod([(2*j-1)/(2*j) for j in np.arange(1, q+1)]))
-  def _sign(x: np.ndarray):
-    x = np.atleast_2d(x).T
-    sx = np.ravel(np.sum(x * (1-x**2)**I * J, axis=1))
-    return sx if len(sx) > 1 else np.take(sx,0)
-  return _sign
 
 # def softsign(x: float, q: int) -> float:
 #   val = 0

@@ -2,9 +2,11 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include "_random_generator/threadedrng64.h"
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
 #include <iostream>
+#include <stdio.h>
 
 namespace py = pybind11;
 
@@ -32,6 +34,14 @@ using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
 //   py::arg("processed_samples_indices").noconvert(), py::arg("num_samples_used").noconvert(), py::arg("num_outliers").noconvert(), py::arg("converged").noconvert(), py::arg("alg_wall_time")
 
 
+// void slq(const Eigen::SparseMatrix< float >& mat, LANCZOS_PARAMS){
+
+// }
+
+// void slq_trace(){
+
+// }
+
 PYBIND11_MODULE(_lanczos, m) {
   m.def("lanczos", [](const Eigen::SparseMatrix< float >& mat, LANCZOS_PARAMS){
     const auto lo = SparseEigenLinearOperator(mat);
@@ -41,20 +51,25 @@ PYBIND11_MODULE(_lanczos, m) {
       alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
     );
   });
-  m.def("quadrature", [](const Eigen::SparseMatrix< float >& mat, LANCZOS_PARAMS) -> py_array< float > {
+  m.def("quadrature", [](py_array< float > a, py_array< float > b, const int k) -> py_array< float > {             
+    auto output = DenseMatrix< float >(k, 2); // [nodes, weights]
+    lanczos_quadrature(a.data(), b.data(), k, output.col(0).data(), output.col(1).data());
+    return py::cast(output); 
+  });
+  m.def("stochastic_quadrature", [](
+    const Eigen::SparseMatrix< float >& mat, 
+    const int nv, const int dist, 
+    const int lanczos_degree, const int lanczos_rtol, const int orth, const int ncv,
+    const int num_threads, const int seed
+  ){      
     const auto lo = SparseEigenLinearOperator(mat);
-    const size_t ncv = static_cast< size_t >(Q.shape(1));
-    auto ew = lanczos_quadrature(
-      lo, v.mutable_data(), num_steps, lanczos_tol, orthogonalize, 
-      alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
-    );
-    std::vector< float > ew_result(ew.begin(), ew.end());
-    return py::cast(ew_result); 
+    auto rbg = ThreadedRNG64(num_threads, seed);
+    const auto f = [](int i, float* q, float* Q, float* nodes, float* weights){
+      printf("iter %0d, tid %0d\n", i, omp_get_thread_num());
+    };
+    slq< float >(lo, f, nv, rademacher, rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
   });
 }
-
-
-
 
 
 // Given an input vector 'z', yields the vector y = Qz where T(alpha, beta) = Q^T A Q is the tridiagonal matrix spanning K(A, q)

@@ -1,6 +1,9 @@
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.sparse import csc_array
+from typing import *
+from primate.diagonalize import lanczos
+from scipy.linalg import eigh_tridiagonal
 
 ## Base lanczos algorithm, for establishing a baseline
 def lanczos_base(A, v0: np.ndarray = None, k: int = None, tol: float = 1e-8):
@@ -40,3 +43,34 @@ def lanczos_paige(A, v: np.ndarray, k: int, tol: float = 1e-8):
     V[:,1] = A @ vn - beta[j+1] * V[:,0]
     V[:,0] = vn
   return alpha, beta
+
+def lanczos_quadrature(A, v: np.ndarray, **kwargs):
+  """Lanczos quadrature.
+  
+  Computes the quadrature nodes { n_i }_{i=1}^k and weights { t_i }_{i=1}^k representing the Gaussian quadrature rule
+
+  Based on Algorithm 2.1 of "An analysis on stochastic Lanczos quadrature with asymmetric quadrature nodes"
+  """
+  k = kwargs.pop("k", A.shape[1])
+  (a,b) = lanczos(A, v, max_steps = k, return_basis = False, **kwargs)
+  rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
+  return rw, (V[0,:]**2)
+
+def girard_hutch(A, f: Callable, nv: int = 150, estimates: bool = False, **kwargs):
+  """Girard-Hutchinson estimator"""
+  tr_est = 0.0
+  est = np.zeros(nv)
+  for i in range(nv):
+    v0 = np.random.choice([-1, +1], size=A.shape[1])
+    c = np.linalg.norm(v0)**2
+    theta, tau = lanczos_quadrature(A, v0, **kwargs)
+    est[i] = c * np.sum(f(theta) * tau)
+  return np.sum(est) / nv if not estimates else est
+
+def approx_matvec(A, v: np.ndarray, k: int = None, f: Callable = None):
+  k = A.shape[1] if k is None else int(k)
+  (a,b), Q = lanczos(A, v, max_steps=k, orth=0, return_basis=True)
+  rw, V = eigh_tridiagonal(a,b, eigvals_only=False)  # lanczos_quadrature(A, v, )
+  rw = rw if f is None else f(rw)
+  y = np.linalg.norm(v) * (Q @ V @ (V[0,:] * rw))
+  return y

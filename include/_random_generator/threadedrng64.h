@@ -22,7 +22,7 @@
 // #include "./xoshiro_256_star_star.h"  // Xoshiro256StarStar
 // #include "./pcg_random.h" // PCG 
 
-// Thread-safe random bit generator
+// Thread-safe random number generator
 // This class constructs n_thread copies of a given *random number engine* type (a state machine with a transition + output function) using 
 // different seed sequences (seed_seq's) generated from the std::random_device, such that one can safely call ThreadedRNG64.next(tid) with the 
 // give thread id (tid) and obtain a uniformly random unsigned integer with at least 64-bits. 
