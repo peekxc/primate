@@ -47,6 +47,12 @@ void _random(py_module& m, std::string suffix){
   //   auto array_sz = static_cast< LongIndexType >(out.size());
   //   generate_array< 2, F >(rbg, data, array_sz, num_threads); 
   // });
+  m.def((std::string("rademacher_simd") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
+    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
+    auto* data = out.mutable_data();
+    auto array_sz = static_cast< size_t >(out.size());
+    generate_isotropic< 0, F >(rbg, data, array_sz, 0); 
+  });
 }
 
 // #ifdef USE_NANOBIND

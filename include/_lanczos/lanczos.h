@@ -115,7 +115,7 @@ void slq (
   const Distribution dist,          // Isotropic distribution used to generate random vectors
   RBG& rng,                         // Random bit generator
   const int lanczos_degree,         // Polynomial degree of the Krylov expansion
-  const int lanczos_rtol,           // residual tolerance to consider subspace A-invariant
+  const F lanczos_rtol,             // residual tolerance to consider subspace A-invariant
   const int orth,                   // Number of vectors to re-orthogonalize against <= lanczos_degree
   const int ncv,                    // Number of Lanczos vectors to keep in memory (per-thread)
   const int num_threads,            // Number of threads used to parallelize the computation   
@@ -138,7 +138,7 @@ void slq (
   // auto beta = static_cast< ArrayF >(ArrayF::Zeros(lanczos_degree));
 
   // Set the number of threads
-  // omp_set_num_threads(num_threads);
+  omp_set_num_threads(num_threads);
   rng.initialize(num_threads, seed);
 
   // Using square-root of max possible chunk size for parallel schedules
@@ -148,7 +148,7 @@ void slq (
   int i;
   #pragma omp parallel
   {
-    // int tid = omp_get_thread_num(); // thread-id 
+    int tid = omp_get_thread_num(); // thread-id 
 
     // Pre-allocate memory needed for Lanczos iterations
     auto q = static_cast< ArrayF >(ArrayF::Zero(m)); 
@@ -163,7 +163,8 @@ void slq (
     for (i = 0; i < nv; ++i){
 
       // Generate isotropic vector
-      generate_array< F >(rng, q.data(), m, 0, dist); // pass 0 in parallel region to auto-retrieve thread id
+      // generate_array< F >(rng, q.data(), m, 0, dist); // pass 0 in parallel region to auto-retrieve thread id
+      generate_isotropic< 0, F >(rng, q.data(), m, tid);
       
       // Perform a lanczos iteration (populates alpha, beta)
       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
@@ -173,10 +174,7 @@ void slq (
 
       // Run the user-supplied function
       f(i, q.data(), Q.data(), nodes.data(), weights.data());
-      // Apply the spectral function
-      // nodes.unaryExpr(mf);
-      // estimates[i] = (nodes * weights).sum();
-
+      
       // If supplied, check early-stopping condition
       // #pragma omp single
       // {

@@ -2,6 +2,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/functional.h>
 #include "_random_generator/threadedrng64.h"
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
@@ -38,11 +39,108 @@ using py_array = py::array_t< F, py::array::c_style | py::array::forcecast >;
 
 // }
 
-// void slq_trace(){
+template< std::floating_point F > 
+auto parameterize_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
+  auto kwargs_map = kwargs.cast< std::unordered_map< std::string, py::object > >();
+  std::function< F(F) > f = std::identity();
+  if (kwargs_map.contains("function")){
+    std::string matrix_func = kwargs_map["function"].cast< std::string >(); // py::function
+    if (matrix_func == "identity"){
+      f = std::identity(); 
+    } else if (matrix_func == "abs"){
+      f = [](F eigenvalue) -> F { return std::abs(eigenvalue); }; 
+    } else if (matrix_func == "sqrt"){
+      f = [](F eigenvalue) -> F { return std::sqrt(std::abs(eigenvalue)); }; 
+    } else if (matrix_func == "log"){
+      f = [](F eigenvalue) -> F { return std::log(eigenvalue); }; 
+    } else if (matrix_func == "inv"){
+      f = [](F eigenvalue) -> F {  return 1.0/eigenvalue; };
+    } else if (matrix_func == "exp"){
+      F t = kwargs_map.contains("t") ? kwargs_map["t"].cast< F >() : 0.0;
+      f = [t](F eigenvalue) -> F {  return std::exp(t*eigenvalue); };  
+    } else if (matrix_func == "smoothstep"){
+      F a = kwargs_map.contains("a") ? kwargs_map["a"].cast< F >() : 0.0;
+      F b = kwargs_map.contains("b") ? kwargs_map["b"].cast< F >() : 1.0;
+      const F d = (b-a);
+      f = [a, d](F eigenvalue) -> F { 
+        return std::min(std::max((eigenvalue-a)/d, F(0.0)), F(1.0)); 
+      }; 
+    } else if (matrix_func == "gaussian"){
+      F mu = kwargs_map.contains("mu") ? kwargs_map["mu"].cast< F >() : 0.0;
+      F sigma = kwargs_map.contains("sigma") ? kwargs_map["sigma"].cast< F >() : 1.0;
+      f = [mu, sigma](F eigenvalue) -> F {  
+        auto x = (mu - eigenvalue) / sigma;
+        return (0.5 * M_SQRT1_2 * M_2_SQRTPI / sigma) * exp(-0.5 * x * x); 
+      }; 
+    } else if (matrix_func == "numrank"){
+      F threshold = kwargs_map.contains("threshold") ? kwargs_map["threshold"].cast< F >() : 0.000001;
+      f = [threshold](F eigenvalue) -> F {  
+        return std::abs(eigenvalue) > threshold ? F(1.0) : F(0.0);
+      };  
+    } else if (matrix_func == "generic"){
+      if (kwargs_map.contains("matrix_func")){
+        py::function g = kwargs_map["matrix_func"].cast< py::function >();
+        f = [&g](F val) -> F { return g(val).template cast< F >(); };
+      } else {
+        f = std::identity();
+      }
+    } else {
+      throw std::invalid_argument("Invalid matrix function supplied");
+    }
+  } else {
+    throw std::invalid_argument("No matrix function supplied.");
+  }
+  return f; 
+}
 
-// }
+
+template< std::floating_point F > 
+auto parameterize_rng(const int engine_id) {
+  // "splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"
+  if (engine_id == 0){
+    return ThreadedRNG64< SplitMix64 >(0, seed);
+  } else if (engine_id == 1){
+    return ThreadedRNG64< Xoshiro256StarStar >(0, seed);
+  } else if (engine_id == 2){
+    return ThreadedRNG64< knuth_lcg >(0, seed);
+  } else if (engine_id == 3){
+    return ThreadedRNG64< pcg64 >(0, seed);
+  } else if (engine_id == 4){
+    return ThreadedRNG64< std::mt19937_64 >(0, seed);
+  } else {
+    throw std::invalid_argument("Invalid random number engine id.");
+  }
+}
+
+
+template< std::floating_point F >
+void slq_trace(
+  const Eigen::SparseMatrix< F >& mat, 
+  const std::function< F(F) > sf, 
+  const int nv, const int dist, 
+  const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
+  const int num_threads, const int seed, 
+  F* estimates
+){      
+  using VectorF = Eigen::Array< F, Dynamic, 1>;
+  const auto lo = SparseEigenLinearOperator(mat);
+  auto rbg = ThreadedRNG64(num_threads, seed);
+
+  // Parameterize the trace function
+  const auto trace_f = [lanczos_degree, &sf, &estimates](int i, F* q, F* Q, F* nodes, F* weights){
+    // printf("iter %0d, tid %0d, q[0] = %.4g, nodes[0] = %.4g\n", i, omp_get_thread_num(), q[0], nodes[0]);
+    Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
+    Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
+    nodes_v.unaryExpr(sf);
+    estimates[i] = (nodes_v * weights_v).sum();
+  };
+  
+  // Execute the stochastic Lanczos quadrature with the trace function 
+  slq< float >(lo, trace_f, nv, rademacher, rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+}
 
 PYBIND11_MODULE(_lanczos, m) {
+  using ArrayF = Eigen::Array< float, Dynamic, 1 >;
   m.def("lanczos", [](const Eigen::SparseMatrix< float >& mat, LANCZOS_PARAMS){
     const auto lo = SparseEigenLinearOperator(mat);
     const size_t ncv = static_cast< size_t >(Q.shape(1));
@@ -59,15 +157,22 @@ PYBIND11_MODULE(_lanczos, m) {
   m.def("stochastic_quadrature", [](
     const Eigen::SparseMatrix< float >& mat, 
     const int nv, const int dist, 
-    const int lanczos_degree, const int lanczos_rtol, const int orth, const int ncv,
-    const int num_threads, const int seed
-  ){      
-    const auto lo = SparseEigenLinearOperator(mat);
-    auto rbg = ThreadedRNG64(num_threads, seed);
-    const auto f = [](int i, float* q, float* Q, float* nodes, float* weights){
-      printf("iter %0d, tid %0d\n", i, omp_get_thread_num());
-    };
-    slq< float >(lo, f, nv, rademacher, rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+    const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
+    const int num_threads, const int seed){
+    std::vector< DenseMatrix < float > > quad_nw; // quadrature nodes + weights
+    auto estimates = static_cast< DenseMatrix >(ArrayF::Zero(nv));
+  });
+  m.def("stochastic_trace", [](
+    const Eigen::SparseMatrix< float >& mat, 
+    const int nv, const int dist, 
+    const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
+    const int num_threads, const int seed, 
+    const py::kwargs& kwargs
+  ) -> py_array< float > {
+    const auto sf = parameterize_spectral_func< float >(kwargs);
+    auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
+    slq_trace(mat, sf, nv, dist, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed, estimates.data());
+    return py::cast(estimates);
   });
 }
 

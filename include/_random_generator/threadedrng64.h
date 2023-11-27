@@ -29,6 +29,7 @@
 // NOTE: RandomNumberEngine == UniformRandomBitGenerator + has .seed(), default constructible, and other things
 template< LightRandom64Engine RNE = std::mt19937_64 >
 struct ThreadedRNG64 {
+    static constexpr size_t num_bits = 64;
     int num_threads;
     std::vector< RNE > generators;
     ThreadedRNG64(){

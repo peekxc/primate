@@ -9,9 +9,32 @@
 
 using IndexType = unsigned int;
 using LongIndexType = unsigned long;
+static constexpr long num_bits = 64; 
 
 // TODO: make isotropic generator class that accepts random-bit genertaor
 enum Distribution { rademacher = 0, normal = 1, rayleigh = 2 };
+
+// Generates an isotropic random vector for a given thread id
+template< size_t Distr, std::floating_point F, ThreadSafeRBG RBG > 
+void generate_isotropic(RBG& random_bit_generator, F* array, const long n, const int thread_id){
+	const auto N = static_cast< unsigned long >(n / RBG::num_bits);
+	for (auto i = 0; i < N; ++i) {
+		std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
+		
+		#pragma omp simd
+		for (size_t j = 0; j < RBG::num_bits; ++j) {
+			// array[i*RBG::num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
+			array[i*RBG::num_bits + j] = 2 * int(ubits[j]) - 1;
+		}
+	}
+
+	// This loop should have less than 64 iterations.
+	std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
+	for (size_t j = N * RBG::num_bits, i = 0; j < n; ++j, ++i){
+		// array[j] = ubits[i] ? 1.0 : -1.0;
+		array[j] = 2 * int(ubits[j]) - 1;
+	}
+}
 
 template< size_t Distr, std::floating_point DataType, ThreadSafeRBG RBG > 
 void generate_array(

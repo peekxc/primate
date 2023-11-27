@@ -87,6 +87,18 @@ def test_slq_fixed():
   threshold = 0.05*(np.max(ew)*n - np.min(ew)*n)
   assert np.isclose(A.trace() - tr_est, 0.0, atol=threshold)
 
+def test_slq_trace():
+  np.random.seed(1234)
+  A = gen_sym(30)
+  from primate.diagonalize import _lanczos
+  from scipy.sparse import csr_array, csc_array
+  n = A.shape[1]
+  A = csc_array(A, dtype=np.float32)
+  kwargs = { "function" : "generic", "matrix_func" : lambda x: x }
+  # args = dict(nv=10, dist=0, lanczos_degree=2, lanczos_rtol=0.0, orth=0, ncv=n, num_threads=5, seed=0)
+  args = (10, 0, 2, 0.0, 0, n, 5, 0)
+  _lanczos.stochastic_trace(A, *args, **kwargs)
+
 def test_stochastic_quadrature():
   np.random.seed(1234)
   A = gen_sym(30)
@@ -97,7 +109,7 @@ def test_stochastic_quadrature():
   # nv, dist, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed
   n = A.shape[1]
   A = csc_array(A, dtype=np.float32)
-  _lanczos.stochastic_quadrature(A, 50, 0, n, 0, 0, n, 2, 0)
+  _lanczos.stochastic_quadrature(A, 10, 0, 2, 0, 0, n, 5, 0)
   assert True
   # A.trace()
   # (np.linalg.norm(v0)**2) * np.sum(np.prod(nw_test, axis=1))

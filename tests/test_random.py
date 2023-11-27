@@ -1,7 +1,7 @@
 import numpy as np
 from typing import * 
 from primate import random
-from primate.random import _engines, _engine_prefixes
+from primate.random import _engines, _engine_prefixes, _random_gen
 
 def test_seeding():
   s1 = random.rademacher(250, seed = -1)
@@ -24,6 +24,19 @@ def test_normal():
     counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(1500)])
     cum_counts = np.cumsum(counts) / np.arange(1, len(counts)+1)
     assert abs(cum_counts[-1]) <= 1.0, f"Normal random number generator biased more than 1% (for engine {engine})"
+
+def test_rademacher_simd():
+
+  import timeit
+  timeit.timeit(lambda: random.rademacher(5000, seed = 10), number=5000)
+
+
+  out = np.empty(5000, dtype=np.float32) * np.nan
+  timeit.timeit(lambda: _random_gen.rademacher_simd_sx(out, 1, 10), number=5000)
+  
+
+
+
 
 # def test_rayleigh():
 #   for engine in _engine_prefixes:
