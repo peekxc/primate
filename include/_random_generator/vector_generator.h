@@ -5,7 +5,8 @@
 #include <random>   // uniform_random_bit_generator, normal_distribution
 #include <cstdint>  // uint64_t
 #include <bitset>   // bitset
-#include "random_concepts.h" // ThreadSafeRBG
+#include "threadedrng64.h"	// ThreadSafeRBG
+#include "rne_engines.h"		// all the engines
 
 using IndexType = unsigned int;
 using LongIndexType = unsigned long;
@@ -13,7 +14,6 @@ static constexpr long num_bits = 64;
 
 // TODO: make isotropic generator class that accepts random-bit genertaor
 enum Distribution { rademacher = 0, normal = 1, rayleigh = 2 };
-
 
 // SIMD-vectorized rademacher vector generation; makes N // 64 calls to random bit generator
 template< std::floating_point F, ThreadSafeRBG RBG > 
@@ -169,6 +169,36 @@ void generate_array(RBG& random_bit_generator, DataType* array, const LongIndexT
 			break;
 	}
 }
+
+// Simple way to parameterize the random number generator w/ a templated type
+// https://stackoverflow.com/questions/5450159/what-type-erasure-techniques-are-there-and-how-do-they-work
+template< int engine_id = 0 >
+auto param_rng(const int seed, const int num_threads = 0) {
+  // "splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"
+  if constexpr (engine_id == 0){
+    return ThreadedRNG64< SplitMix64 >(num_threads, seed);
+  } else if constexpr (engine_id == 1){
+    return ThreadedRNG64< Xoshiro256StarStar >(num_threads, seed);
+  } else if constexpr (engine_id == 2){
+    return ThreadedRNG64< knuth_lcg >(num_threads, seed);
+  } else if constexpr (engine_id == 3){
+    return ThreadedRNG64< pcg64 >(num_threads, seed);
+  } else if constexpr (engine_id == 4){
+    return ThreadedRNG64< std::mt19937_64 >(num_threads, seed);
+  } else {
+    throw std::invalid_argument("Invalid random number engine id.");
+  }
+}
+
+// enum rng_engine { sx = 0, xs = 1, lcg = 2, pcg = 3, mt = 4 };
+// auto param_rng(const int engine_id, const int seed, const int num_threads = 0){
+// 	switch(static_cast< rng_engine >(engine_id)){
+// 		case sx: 
+// 			return _param_rng< 0 >(seed, num_threads);
+// 		default: 
+// 			return _param_rng< 1 >(seed, num_threads);
+// 	}
+// }
 
 
 // Template declaration

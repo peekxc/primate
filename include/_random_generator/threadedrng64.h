@@ -77,4 +77,8 @@ struct ThreadedRNG64 {
 };
 
 
+// struct MT_engine : public ThreadedRNG64< std::mt19937_64 > {
+
+// };
+
 #endif  // _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
