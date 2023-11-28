@@ -8,7 +8,7 @@
 
 from typing import * 
 import numpy as np
-from scipy.sparse import issparse
+from scipy.sparse import issparse, sparray
 from scipy.sparse.linalg import LinearOperator
 
 import _trace
@@ -17,6 +17,223 @@ import _trace
 from .random import _engine_prefixes, _engines
 
 _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
+
+def slq_trace (
+  A: Union[LinearOperator, sparray, np.ndarray],
+  matrix_function: Union[str, Callable] = "identity", 
+  nv: int = 150,
+  atol: float = None,
+  rtol: float = None,
+  confidence_level: float = 0.95,
+  distribution: str = "rademacher",
+  rng_engine: str = "pcg",
+  seed: int = -1,
+  lanczos_degree: int = 20,
+  lanczos_rtol: float = None,
+  orthogonalize: int = 0,
+  num_threads: int = 0,
+  verbose: bool = False,
+  plot: bool = False
+  **kwargs
+):
+  """Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). 
+
+  Parameters
+  ----------
+  A : ndarray, sparse matrix, or LinearOperator
+      real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
+  matrix_function : str or Callable, default="identity"
+      float-valued function defined on the spectrum of A. 
+  parameters : Iterable, default = None
+      translates 't' for the affine operator A + t*B (see details). 
+  nv : int, default = 10
+      Maximum number of random vectors to sample for the trace estimate. 
+  atol : float, default = None
+      Absolute tolerance signaling convergence (for early-stopping). 
+  rtol : float, default = 1e-2
+      Relative tolerance signaling convergence (for early-stopping). 
+  confidence_level : float, default = 0.95
+      Confidence level for atol (and rtol). 
+  distribution : { 'rademacher', 'normal' }, default = "rademacher"
+      zero-centered distribution to sample random vectors from.
+  rng_engine : str, default = "pcg"
+      Random number engine to use.
+  seed : int, default = -1
+      Seed to initialize the entropy source. Use non-negative integers for reproducibility.
+  lanczos_degree  : int, default = 20
+      Degree of the quadrature approximation. 
+  lanczos_tol : int, default = None
+      Acceptable residual tolerance to prematurely stop the lanczos iteration. 
+  orthogonalize: int, default = 0,
+      Number of lanczos vectors to orthogonalize the Krylov basis. 
+  num_threads: int, default = 0
+      Number of threads to use in the trace estimates. 
+  plot : bool, default = False
+      If true, plots the samples of the trace estimate along with their convergence characteristics. 
+  return_info : bool, default = False
+      whether to return a dictionary containing all the relevent details of the computation.
+  **kwargs : dict, optional 
+      additional key-values to parameterize the chosen 'matrix_function'.
+      
+  Returns
+  -------
+  trace_estimate : float 
+      Estimate of the trace of the matrix function $f(A)$.
+  info : dict, optional 
+      If 'return_info = True', additional information about the computation. 
+
+  See Also
+  --------
+  lanczos : the lanczos algorithm. 
+
+  Reference
+  ---------
+    .. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
+    SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
+  """
+  # assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
+  attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
+  assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
+  assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
+  assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
+  
+  ## Choose the random number engine 
+  assert rng_engine in _engine_prefixes or rng_engine in _engines, f"Invalid pseudo random number engine supplied '{str(rng_engine)}'"
+  engine_id = _engine_prefixes.index(rng_engine) if rng_engine in _engine_prefixes else _engines.index(rng_engine)
+
+  ## Choose the distribution to sample random vectors from 
+  assert distribution in [ "rademacher", "normal"], f"Invalid distribution '{distribution}'; Must be one of 'rademacher' or 'normal'."
+  distr_id = ["rademacher", "normal"].index(distribution)
+
+  ## Get the dtype; infer it if it's not available
+  f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
+  i_dtype = np.int32
+  assert f_dtype.type == np.float32 or f_dtype.type == np.float64, "Only 32- or 64-bit floating point numbers are supported."
+
+  ## Extract the machine precision for the given floating point type
+  lanczos_rtol = np.finfo(f_dtype).eps if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
+
+  ## Check input arguments have proper type and values
+  error_atol = f_dtype.type(1e-2) if error_atol is None else f_dtype.type(error_atol)
+  error_rtol = f_dtype.type(error_rtol)
+
+  ## Argument checking
+  nv = int(nv)                                          # Number of random vectors to generate
+  trace = np.empty((nv,), dtype=f_dtype)                # Allocate output trace as array of size num_inquiries
+  alg_wall_time = f_dtype.type(0.0)                     # Total time spent by the algorithm
+  lanczos_degree = max(lanczos_degree, 2)               # Should be at least two 
+  ncv = lanczos_degree + orthogonalize                  # Number of Lanczos vectors to keep in memory
+  
+  ## Collect the arguments processed so far 
+  trace_args = (
+    nv, distr_id, 
+    lanczos_degree, lanczos_rtol, orthogonalize, ncv, 
+    distr_id, 
+    num_threads, seed,
+    samples
+  )
+  ## Parameterize the matrix function and trace call
+  if isinstance(matrix_function, str):
+    assert matrix_function in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+    #matrix_func_id = _builtin_matrix_functions.index(matrix_function)
+    kwargs["function"] = matrix_function
+  elif isinstance(matrix_function, Callable):
+    kwargs["function"] = "generic"
+    kwargs["matrix_func"] = matrix_function
+  else: 
+    raise ValueError(f"Invalid matrix function type '{type(matrix_function)}'")
+  
+  ## Make the actual call
+  _trace.trace_slq(A, *trace_args, **kwargs)
+
+  ## If no information is required, just return the trace estimate 
+  if not(return_info) and not(plot) and not(verbose): 
+    return trace
+  else:
+    ## Otherwise, collection runtime information + matrix size info (if available)
+    matrix_size = A.shape[0]
+    matrix_nnz = A.getnnz() if hasattr(A, "getnnz") else None
+    matrix_density = A.getnnz() / np.prod(A.shape) if hasattr(A, "getnnz") else None
+    sparse = None if matrix_density is None else matrix_density <= 0.50
+    info = { }
+    info['error'] = dict(
+      absolute_error=None, relative_error=None, error_atol=error_atol, error_rtol=error_rtol, 
+      confidence_level=confidence_level, outlier_significance_level=outlier_significance_level
+    )
+    info['matrix'] = dict(
+      data_type = np.finfo(f_dtype).dtype.name.encode('utf-8'), gram=False, exponent=kwargs.get('p', 1.0),
+      num_inquiries=num_inquiries, num_operator_parameters=1, parameters=parameters,
+      size=matrix_size, sparse=sparse, nnz=matrix_nnz, density=matrix_density
+    ),
+    info['error'] = {
+      'absolute_error': None,
+      'relative_error': None,
+      'error_atol': error_atol,
+      'error_rtol': error_rtol,
+      'confidence_level': confidence_level,
+      'outlier_significance_level': outlier_significance_level
+    }
+    info['convergence'] = {
+      'converged': converged,
+      'all_converged': np.all(converged),
+      'min_num_samples': min_num_samples,
+      'max_num_samples': max_num_samples,
+      'num_samples_used': None,
+      'num_outliers': None,
+      'samples': None,
+      'samples_mean': None,
+      'samples_processed_order': processed_samples_indices
+    }
+    info['time'] = {
+      'tot_wall_time': 0,
+      'alg_wall_time': alg_wall_time,
+      'cpu_proc_time': 0
+    }
+    info['device'] = {
+      'num_cpu_threads': num_threads,
+      'num_gpu_devices': 0,
+      'num_gpu_multiprocessors': 0,
+      'num_gpu_threads_per_multiprocessor': 0
+    }
+    info['solver'] = {
+      'version': None,
+      'lanczos_degree': lanczos_degree,
+      'lanczos_tol': lanczos_tol,
+      'orthogonalize': orthogonalize,
+      'method': 'slq',
+    }
+
+    # Fill arrays of info depending on whether output is scalar or array
+    output_is_array = False if (parameters is None) or np.isscalar(parameters) else True
+    if output_is_array:
+      info['error']['absolute_error'] = error
+      info['error']['relative_error'] = error / np.abs(trace)
+      info['convergence']['converged'] = converged.astype(bool)
+      info['convergence']['num_samples_used'] = num_samples_used
+      info['convergence']['num_outliers'] = num_outliers
+      info['convergence']['samples'] = samples
+      info['convergence']['samples_mean'] = trace
+    else:
+      info['error']['absolute_error'] = error[0]
+      info['error']['relative_error'] = error[0] / np.abs(trace[0])
+      info['convergence']['converged'] = bool(converged[0])
+      info['convergence']['num_samples_used'] = num_samples_used[0]
+      info['convergence']['num_outliers'] = num_outliers[0]
+      info['convergence']['samples'] = samples[:, 0]
+      info['convergence']['samples_mean'] = trace[0]
+
+    # if verbose: te_util.print_summary(info)
+    # if plot: te_plot.plot_convergence(info)
+    if plot: 
+      from .plotting import plot_trace
+      plot_trace(info)
+    
+    return (trace, info) if output_is_array else (trace[0], info)
+
+
+# def trace_est() -> int:
+#   return _trace.apply_smoothstep(1, 2)
+
 
 def slq (
   A: Union[LinearOperator, np.ndarray],

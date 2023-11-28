@@ -40,7 +40,7 @@ void orth_vector(
 // Modified Gram-Schmidt in-place
 // G. W. Stewart, "Matrix Algorithms, Volume 1", SIAM, 1998.
 template< std::floating_point F >
-void modified_gram_schmidt(Eigen::Ref< DenseMatrix< F > > U, const int s = 0){
+void modified_gram_schmidt(Eigen::Ref< DenseMatrix< F > > U, [[maybe_unused]] const int s = 0){
   // const int n = static_cast< const int >(U.rows());
   const int m = static_cast< const int >(U.cols());
   // auto i = mod(s, m);

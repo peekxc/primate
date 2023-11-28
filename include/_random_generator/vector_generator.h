@@ -14,27 +14,70 @@ static constexpr long num_bits = 64;
 // TODO: make isotropic generator class that accepts random-bit genertaor
 enum Distribution { rademacher = 0, normal = 1, rayleigh = 2 };
 
-// Generates an isotropic random vector for a given thread id
-template< size_t Distr, std::floating_point F, ThreadSafeRBG RBG > 
-void generate_isotropic(RBG& random_bit_generator, F* array, const long n, const int thread_id){
-	const auto N = static_cast< unsigned long >(n / RBG::num_bits);
-	for (auto i = 0; i < N; ++i) {
+
+// SIMD-vectorized rademacher vector generation; makes N // 64 calls to random bit generator
+template< std::floating_point F, ThreadSafeRBG RBG > 
+void generate_rademacher(const long n, RBG& random_bit_generator, const int thread_id, F* array, F& arr_norm){
+	const auto N = static_cast< size_t >(n / RBG::num_bits);
+	for (size_t i = 0; i < N; ++i) {
 		std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
-		
 		#pragma omp simd
 		for (size_t j = 0; j < RBG::num_bits; ++j) {
-			// array[i*RBG::num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
 			array[i*RBG::num_bits + j] = 2 * int(ubits[j]) - 1;
 		}
 	}
-
 	// This loop should have less than 64 iterations.
 	std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
-	for (size_t j = N * RBG::num_bits, i = 0; j < n; ++j, ++i){
-		// array[j] = ubits[i] ? 1.0 : -1.0;
-		array[j] = 2 * int(ubits[j]) - 1;
+	for (size_t j = N * RBG::num_bits, i = 0; j < size_t(n); ++j, ++i){
+		array[j] = (2 * int(ubits[j]) - 1);
+	}
+	arr_norm = static_cast< F >(std::sqrt(n)); 
+}
+
+// Zero mean, unit variance gaussian
+template< std::floating_point F, ThreadSafeRBG RBG > 
+void generate_normal(const unsigned long n, RBG& bit_generator, const int thread_id, F* array, F& arr_norm){
+	static std::normal_distribution d { 0.0, 1.0 };
+	const auto N = static_cast< unsigned long >(n / RBG::num_bits);
+	#pragma omp simd
+	for (auto i = static_cast< unsigned long >(0); i < N; ++i){
+		array[i] = d(bit_generator.generators[thread_id]);
+	}
+	// This loop should have less than num_bits iterations.
+	for (auto j = static_cast< unsigned long >(N * RBG::num_bits), i = static_cast< unsigned long >(0); j < n; ++j, ++i){
+		array[j] = d(bit_generator.generators[0]);
+	}
+	
+	arr_norm = 0.0; 
+	#pragma omp simd reduction(+:arr_norm)
+	for (unsigned long i = 0; i < n; ++i){
+		arr_norm += std::abs(array[i]);
 	}
 }
+
+// Generates an isotropic random vector for a given thread id
+template< std::floating_point F, ThreadSafeRBG RBG > 
+void generate_isotropic(const Distribution dist_id, const long n, RBG& bit_generator, const int thread_id, F* array, F& arr_norm){
+	switch(dist_id){
+		case rademacher:
+			generate_rademacher(n, bit_generator, thread_id, array, arr_norm);
+			break; 
+		case normal: 
+			generate_normal(n, bit_generator, thread_id, array, arr_norm);
+			break; 
+		case rayleigh: 
+			// generate_rayleigh(n, bit_generator, thread_id, array, arr_norm);
+			break; 
+	}
+
+	// Ensure the array has unit norm
+	const F arr_norm_inv = 1.0 / arr_norm;
+	#pragma omp simd
+	for (auto i = static_cast< long >(0); i < n; ++i){
+		array[i] *= arr_norm_inv;
+	}
+}
+// array[i*RBG::num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
 
 template< size_t Distr, std::floating_point DataType, ThreadSafeRBG RBG > 
 void generate_array(
@@ -80,23 +123,7 @@ void generate_array(
 			array[j] = ubits[i] ? 1.0 : -1.0;
 		}
 	} else if constexpr(Distr == 1){
-		// Zero mean, unit variance gaussian
-		std::normal_distribution d {0.0, 1.0};
-		#pragma omp parallel if (num_threads > 0)
-		{
-			thread_id = (num_threads > 0) ? omp_get_thread_num() : 0;
-
-			#pragma omp for schedule(static)
-			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
-				for (IndexType j=0; j < num_bits; ++j) {
-					array[i*num_bits + j] = d(random_bit_generator.generators[thread_id]);
-				}
-			}
-		}
-		// This loop should have less than 64 iterations.
-		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
-			array[j] = d(random_bit_generator.generators[0]);
-		}
+		return; 
 	} else if constexpr(Distr == 2){
 		// rayleigh distribution
 		std::normal_distribution d{0.0, 1.0};

@@ -104,24 +104,21 @@ def test_stochastic_quadrature():
   A = gen_sym(30)
   from primate.diagonalize import _lanczos
   from scipy.sparse import csr_array, csc_array
-  _lanczos.stochastic_quadrature
+  assert hasattr(_lanczos, "stochastic_quadrature"), "Module compile failed"
   
   # nv, dist, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed
   n = A.shape[1]
+  nv, lanczos_deg = 120, 6
   A = csc_array(A, dtype=np.float32)
-  _lanczos.stochastic_quadrature(A, 10, 0, 2, 0, 0, n, 5, 0)
-  assert True
-  # A.trace()
-  # (np.linalg.norm(v0)**2) * np.sum(np.prod(nw_test, axis=1))
-
-  # np.prod(nw_test, axis=1)
-  # ew_true = np.linalg.eigvalsh(A)
-  # assert np.allclose(ew_true, ew_test, atol=1e-5)
-
-  # A.trace()
-  # _lanczos.quadrature
-  # assert np.abs(max(eigh_tridiagonal(a,b, eigvals_only=True)) - max(eigsh(A_sparse)[0])) < 1e-4
-
+  quad_nw = _lanczos.stochastic_quadrature(A, nv, 1, lanczos_deg, 0, 0, n, 5, 0)
+  assert quad_nw.shape[0] == nv * lanczos_deg 
+  quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
+  quad_est = (n / nv) * np.sum(quad_ests)
+  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.01) ## ensure trace estimate within 1% 
+  
+  # from bokeh.plotting import show
+  # from primate.plotting import figure_trace
+  # show(figure_trace(n * quad_ests))
 
 def test_lanczos_correctness():
   from primate.diagonalize import lanczos

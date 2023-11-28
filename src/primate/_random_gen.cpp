@@ -51,7 +51,8 @@ void _random(py_module& m, std::string suffix){
     auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
-    generate_isotropic< 0, F >(rbg, data, array_sz, 0); 
+    float v_norm = 0.0; 
+    generate_rademacher< F >(array_sz, rbg, 0, data, v_norm); 
   });
 }
 

@@ -4,6 +4,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 #include "_random_generator/threadedrng64.h"
+#include "_random_generator/rne_engines.h"
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
 #include <iostream>
@@ -95,7 +96,7 @@ auto parameterize_spectral_func(const py::kwargs& kwargs) -> std::function< F(F)
 
 
 template< std::floating_point F > 
-auto parameterize_rng(const int engine_id) {
+auto parameterize_rng(const int engine_id, const int seed) {
   // "splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"
   if (engine_id == 0){
     return ThreadedRNG64< SplitMix64 >(0, seed);
@@ -113,9 +114,9 @@ auto parameterize_rng(const int engine_id) {
 }
 
 
-template< std::floating_point F >
+template< std::floating_point F, LinearOperator Matrix >
 void slq_trace(
-  const Eigen::SparseMatrix< F >& mat, 
+  const Matrix& mat, 
   const std::function< F(F) > sf, 
   const int nv, const int dist, 
   const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
@@ -127,7 +128,7 @@ void slq_trace(
   auto rbg = ThreadedRNG64(num_threads, seed);
 
   // Parameterize the trace function
-  const auto trace_f = [lanczos_degree, &sf, &estimates](int i, F* q, F* Q, F* nodes, F* weights){
+  const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
     // printf("iter %0d, tid %0d, q[0] = %.4g, nodes[0] = %.4g\n", i, omp_get_thread_num(), q[0], nodes[0]);
     Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
     Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
@@ -136,7 +137,7 @@ void slq_trace(
   };
   
   // Execute the stochastic Lanczos quadrature with the trace function 
-  slq< float >(lo, trace_f, nv, rademacher, rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+  slq< float >(lo, trace_f, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
 PYBIND11_MODULE(_lanczos, m) {
@@ -158,9 +159,27 @@ PYBIND11_MODULE(_lanczos, m) {
     const Eigen::SparseMatrix< float >& mat, 
     const int nv, const int dist, 
     const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
-    const int num_threads, const int seed){
-    std::vector< DenseMatrix < float > > quad_nw; // quadrature nodes + weights
-    auto estimates = static_cast< DenseMatrix >(ArrayF::Zero(nv));
+    const int num_threads, const int seed
+  ) -> py_array< float > {
+    using VectorF = Eigen::Array< float, Dynamic, 1>;
+    auto estimates = static_cast< DenseMatrix< float > >(ArrayF::Zero(nv));  
+    const auto lo = SparseEigenLinearOperator(mat);
+    auto rbg = ThreadedRNG64(num_threads, seed);
+
+    // Parameterize the quadrature function
+    // auto quad_nw = std::vector< DenseMatrix < float > >(); // quadrature nodes + weights
+    auto quad_nw = static_cast< DenseMatrix< float > >(DenseMatrix< float >::Zero(lanczos_degree * nv, 2)); 
+    const auto quad_f = [lanczos_degree, &quad_nw](int i, [[maybe_unused]] float* q, [[maybe_unused]] float* Q, float* nodes, float* weights){
+      // printf("iter %0d, tid %0d, q[0] = %.4g, nodes[0] = %.4g\n", i, omp_get_thread_num(), q[0], nodes[0]);
+      Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);        // no-op
+      Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1);    // no-op
+      quad_nw.block(i*lanczos_degree, 0, lanczos_degree, 1) = nodes_v;
+      quad_nw.block(i*lanczos_degree, 1, lanczos_degree, 1) = weights_v;
+    };
+    
+    // Execute the stochastic Lanczos quadrature
+    slq< float >(lo, quad_f, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+    return py::cast(quad_nw);
   });
   m.def("stochastic_trace", [](
     const Eigen::SparseMatrix< float >& mat, 

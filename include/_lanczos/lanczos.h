@@ -127,17 +127,8 @@ void slq (
   const auto A_shape = A.shape();
   const size_t n = A_shape.first;
   const size_t m = A_shape.second;
-  
-  // Outputs
-  // auto estimates = static_cast< ArrayF >(ArrayF::Zeros(nv));
-  // Allocate diagonals (alpha) and subdiagonals (beta) of Lanczos matrix
-  // auto Alpha = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zeros(lanczos_degree, num_threads));
-  // auto Beta = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zeros(lanczos_degree, num_threads));
 
-  // auto alpha = static_cast< ArrayF >(ArrayF::Zeros(lanczos_degree));
-  // auto beta = static_cast< ArrayF >(ArrayF::Zeros(lanczos_degree));
-
-  // Set the number of threads
+  // Set the number of threads + initialize multi-threaded RNG
   omp_set_num_threads(num_threads);
   rng.initialize(num_threads, seed);
 
@@ -151,6 +142,7 @@ void slq (
     int tid = omp_get_thread_num(); // thread-id 
 
     // Pre-allocate memory needed for Lanczos iterations
+    auto q_norm = static_cast< F >(0.0);
     auto q = static_cast< ArrayF >(ArrayF::Zero(m)); 
     auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
     auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
@@ -162,9 +154,8 @@ void slq (
     #pragma omp for schedule(dynamic, chunk_size)
     for (i = 0; i < nv; ++i){
 
-      // Generate isotropic vector
-      // generate_array< F >(rng, q.data(), m, 0, dist); // pass 0 in parallel region to auto-retrieve thread id
-      generate_isotropic< 0, F >(rng, q.data(), m, tid);
+      // Generate isotropic vector (w/ unit norm)
+      generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
       
       // Perform a lanczos iteration (populates alpha, beta)
       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
