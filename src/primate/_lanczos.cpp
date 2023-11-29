@@ -133,6 +133,7 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
     const Matrix* A, 
     const int nv, const int dist, const int engine_id, const int seed,
     const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
+    const F atol, const F rtol, 
     const int num_threads, 
     const py::kwargs& kwargs
   ) -> py_array< F > {
@@ -142,7 +143,7 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
     // auto rbg = ThreadedRNG64< pcg64 >(num_threads, seed); // TODO: figure out either polymorphism approach or type-erasure approach
     auto rbg = ThreadedRNG64< pcg64 >(num_threads, seed);
     auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
-    sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, estimates.data());
+    sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, estimates.data());
     return py::cast(estimates);
   });
 }
@@ -150,7 +151,7 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
 PYBIND11_MODULE(_lanczos, m) {
   // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
   _lanczos_wrapper< float, Eigen::MatrixXf >(m, eigen_dense_wrapper< float >);
-  // m.def("lanczos", _lanczos_wrapper< float, Eigen::SparseMatrixXf, eigen_sparse_wrapper< float > >);
+  _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);
 };
 
   // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);

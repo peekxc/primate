@@ -99,6 +99,7 @@ struct PyDenseMatrix {
 
 
 // TODO: use moves or buffer object to remove overhead
+// TODO: alternatively, make function to detect native pybind11 function ptr for the matvec 
 template< typename F > 
 struct PyLinearOperator {
   using value_type = F;

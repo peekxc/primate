@@ -9,6 +9,27 @@
 
 using std::function; 
 
+template < int Iterate = 3 >
+double erf_inv(double x) noexcept {
+  // Strategy: solve f(y) = x - erf(y) = 0 for given x with Newton's method.
+  // f'(y) = -erf'(y) = -2/sqrt(pi) e^(-y^2)
+  // Has quadratic convergence, achieving machine precision with ~three iterations.
+  if constexpr(Iterate == 0){
+    // Specialization to get initial estimate; accurate to about 1e-3.
+    // Based on https://stackoverflow.com/questions/27229371/inverse-error-function-in-c
+    const double a = std::log((1 - x) * (1 + x));
+    const double b = std::fma(0.5, a, 4.120666747961526);
+    const double c = 6.47272819164 * a;
+    return std::copysign(std::sqrt(-b + std::sqrt(std::fma(b, b, -c))), x);
+  } else {
+    const double x0 = erf_inv< Iterate - 1 >(x); // compile-time recurse
+    const double fx0 = x - std::erf(x0);
+    const double pi = std::acos(-1);
+    double fpx0 = -2.0 / std::sqrt(pi) * std::exp(-x0 * x0);
+    return x0 - fx0 / fpx0; // = x1
+  } 
+}
+
 // Paige's A1 variant of the Lanczos method
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
 // Precondition: orth < ncv <= k and ncv >= 2.
@@ -114,7 +135,7 @@ template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typen
 void slq (
   const Matrix& A,                  // Any linear operator supporting .matvec() and .shape() methods
   const Lambda& f,                  // Thread-safe function with signature f(int i, F* nodes, F* weights)
-  const function< bool() >& stop_check,   // Function to check for convergence or early-stopping (takes no arguments)
+  const function< bool(int) >& stop_check,   // Function to check for convergence or early-stopping (takes no arguments)
   const int nv,                     // Number of sample vectors to generate
   const Distribution dist,          // Isotropic distribution used to generate random vectors
   RBG& rng,                         // Random bit generator
@@ -126,6 +147,8 @@ void slq (
   const int seed                    // Seed for random number generator for determinism
 ){   
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
+  if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
 
   // Constants
   const auto A_shape = A.shape();
@@ -133,11 +156,12 @@ void slq (
   const size_t m = A_shape.second;
 
   // Set the number of threads + initialize multi-threaded RNG
-  omp_set_num_threads(num_threads);
-  rng.initialize(num_threads, seed);
+  const auto nt = num_threads <= 0 ? omp_get_max_threads() : num_threads;
+  omp_set_num_threads(nt);
+  rng.initialize(nt, seed);
 
   // Using square-root of max possible chunk size for parallel schedules
-  unsigned int chunk_size = std::max(int(sqrt(nv / num_threads)), 1);
+  unsigned int chunk_size = std::max(int(sqrt(nv / nt)), 1);
   
   // Monte-Carlo ensemble sampling
   int i;
@@ -150,8 +174,8 @@ void slq (
     auto q_norm = static_cast< F >(0.0);
     auto q = static_cast< ArrayF >(ArrayF::Zero(m)); 
     auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
-    auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-    auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+    auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+    auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
     auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
     auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
     
@@ -164,6 +188,7 @@ void slq (
       generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
       
       // Perform a lanczos iteration (populates alpha, beta)
+      // NOTE: seems to be crashing here: 
       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
 
       // Obtain nodes + weights via quadrature algorithm
@@ -175,7 +200,7 @@ void slq (
       // If supplied, check early-stopping condition
       #pragma omp critical
       {
-        stop_flag = stop_check();
+        stop_flag = stop_check(i);
       }
     }
   }
@@ -186,6 +211,7 @@ void sl_trace(
   const Matrix& mat, const std::function< F(F) > sf, 
   RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
   const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
+  const F atol, const F rtol, 
   const int num_threads,
   F* estimates
 ){      
@@ -200,9 +226,20 @@ void sl_trace(
   };
   
   // Parameterize when to stop (run in critical section)
-  const auto early_stop = []() -> bool {
-    return false; 
-  };
+  // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
+  // F mean_est = 0.0, var_est = 0.0; 
+  // int c = 0; // counter
+  // const auto z = std::sqrt(2) * erf_inv(0.95);
+  // const auto early_stop = [&estimates, &mean_est, &var_est, &c, z, atol](int i) -> bool {
+  //   ++c; // represents estimates computed
+  //   mean_est = (1 / c) * (estimates[i] + (c - 1) * mean_est);
+  //   var_est = (std::max(c - 2, 0) / std::max(c - 1, 0)) * var_est + (1 / c) * std::pow(estimates[i] - mean_est, 2); // update sample variance
+  //   const auto margin_of_error = z * std::sqrt(var_est) / std::sqrt(c); // todo: remove sqrt's 
+  //   const auto a_error_ub = 0.5 * margin_of_error; // upper bound on absolute error
+  //   return a_error_ub < atol;
+  //   // return false; 
+  // };
+  const auto early_stop = [](int i) -> bool { return false; };
 
   // Execute the stochastic Lanczos quadrature with the trace function 
   slq< float >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
@@ -229,7 +266,7 @@ void sl_quadrature(
   };
 
   // Parameterize when to stop (run in critical section)
-  const auto early_stop = []() -> bool {
+  constexpr auto early_stop = [](int i) -> bool {
     return false; 
   };
 

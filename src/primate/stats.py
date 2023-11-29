@@ -38,10 +38,15 @@ def sample_mean_cinterval(a: np.ndarray, conf=0.95, sdist: str = ["t", "normal"]
     return norm.interval(conf, loc=mean, scale=std / sq_n)
   else: 
     raise ValueError(f"Unknown sampling distribution '{sdist}'.")
-  ## Manual approach
-  # sq_n, ssize = np.sqrt(len(a)), (len(a)-1)  
-  # s = np.std(a, ddof=1) # == (1.0 / np.sqrt(ssize)) * np.sum((a - mean)**2))
-  # rem = (1.0 - conf) / 2.0
-  # upper = st.t.ppf(1.0 - rem, ssize)
-  # lower = np.negative(upper)
-  # c_interval = mean + np.array([lower, upper]) * s / sq_n
+
+
+
+
+## Manual approach
+# sq_n, ssize = np.sqrt(len(a)), (len(a)-1)  
+# s = np.std(a, ddof=1) # == (1.0 / np.sqrt(ssize)) * np.sum((a - mean)**2))
+# rem = (1.0 - conf) / 2.0
+# upper = st.t.ppf(1.0 - rem, ssize)
+# lower = np.negative(upper)
+# c_interval = mean + np.array([lower, upper]) * s / sq_n
+# np.sqrt(2) * erfinv(2*0.025 - 1)

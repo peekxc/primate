@@ -5,6 +5,8 @@
 
 using Eigen::Dynamic; 
 using Eigen::Ref; 
+using Eigen::MatrixXf;
+using Eigen::MatrixXd;
 
 template< typename F >
 using ColVector = Eigen::Matrix< F, Dynamic, 1 >;

@@ -1,14 +1,3 @@
-/*
- *  SPDX-FileCopyrightText: Copyright 2021, Siavash Ameli <sameli@berkeley.edu>
- *  SPDX-License-Identifier: BSD-3-Clause
- *  SPDX-FileType: SOURCE
- *
- *  This program is free software: you can redistribute it and/or modify it
- *  under the terms of the license found in the LICENSE.txt file in the root
- *  directory of this source tree.
- */
-
-
 #ifndef _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
 #define _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
 
@@ -29,51 +18,51 @@
 // NOTE: RandomNumberEngine == UniformRandomBitGenerator + has .seed(), default constructible, and other things
 template< LightRandom64Engine RNE = std::mt19937_64 >
 struct ThreadedRNG64 {
-    static constexpr size_t num_bits = 64;
-    int num_threads;
-    std::vector< RNE > generators;
-    ThreadedRNG64(){
-        // std::uniform_random_bit_generator RBG = std::random_device;
-        int num_threads_ = 1;
-        initialize(num_threads_);
-    };
-    explicit ThreadedRNG64(int num_threads_, int seed = -1){
-        initialize(num_threads_, seed);
-    };
-    auto next(int thread_id) -> std::uint_fast64_t {
-        return generators[thread_id]();
-    }
+	static constexpr size_t num_bits = 64;
+	int num_threads;
+	std::vector< RNE > generators;
+	ThreadedRNG64(){
+		// std::uniform_random_bit_generator RBG = std::random_device;
+		int num_threads_ = 1;
+		initialize(num_threads_);
+	};
+	explicit ThreadedRNG64(int num_threads_, int seed = -1){
+		initialize(num_threads_, seed);
+	};
+	auto next(int thread_id) -> std::uint_fast64_t {
+		return generators[thread_id]();
+	}
 
-    void initialize(int num_threads_, int seed = -1){
-        // assert(num_threads_ > 0);
-        if (num_threads_ == 0){ return; }
-        num_threads = num_threads_;
-        generators = std::vector< RNE >(num_threads);
+	void initialize(int num_threads_, int seed = -1){
+		// assert(num_threads_ > 0);
+		if (num_threads_ == 0){ return; }
+		num_threads = num_threads_;
+		generators = std::vector< RNE >(num_threads);
 
-        // Seeds generators with sources of entropy from a RBG (e.g. random_device)
-        // This seeds the entire state vector of the corresponding RNE's state size / entropy source using rd
-        auto rdev = std::random_device();
-        auto mt = std::mt19937(seed);
-        std::function< std::uint_fast32_t() > rd;
-        if (seed == -1){
-            rd = [&rdev](){ return rdev(); };
-        } else {
-            rd = [&mt](){ return mt(); };
-        } 
-        if constexpr(Random64Engine< RNE >){
-            std::uint_fast32_t seed_data[RNE::state_size];
-            for (int i = 0; i < num_threads; ++i) {
-                std::generate_n(seed_data, RNE::state_size, rd); // generate evenly-distributed 32-bit seeds
-                std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
-                generators[i].seed(seed_gen);
-            }
-        } else {
-            for (int i = 0; i < num_threads; ++i) {
-                uint64_t seed = (uint64_t(rd()) << 32) | rd();
-                generators[i].seed(seed);
-            }
-        }
-    };
+		// Seeds generators with sources of entropy from a RBG (e.g. random_device)
+		// This seeds the entire state vector of the corresponding RNE's state size / entropy source using rd
+		auto rdev = std::random_device();
+		auto mt = std::mt19937(seed);
+		std::function< std::uint_fast32_t() > rd;
+		if (seed == -1){
+			rd = [&rdev](){ return rdev(); };
+		} else {
+			rd = [&mt](){ return mt(); };
+		} 
+		if constexpr(Random64Engine< RNE >){
+			std::uint_fast32_t seed_data[RNE::state_size];
+			for (int i = 0; i < num_threads; ++i) {
+				std::generate_n(seed_data, RNE::state_size, rd); // generate evenly-distributed 32-bit seeds
+				std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
+				generators[i].seed(seed_gen);
+			}
+		} else {
+			for (int i = 0; i < num_threads; ++i) {
+				uint64_t seed = (uint64_t(rd()) << 32) | rd();
+				generators[i].seed(seed);
+			}
+		}
+	};
 };
 
 
