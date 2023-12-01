@@ -121,10 +121,7 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
     const int num_threads
   ) -> py_array< F > {
     const auto op = wrap(A);
-    // auto rbg = ThreadedRNG64(num_threads, seed);
-    // auto rbg = param_rng< 0 >(seed);
-    // auto rbg = param_rng(0, seed, num_threads);
-    auto rbg = ThreadedRNG64< pcg64 >(num_threads, seed);
+    auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
     auto quad_nw = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(lanczos_degree * nv, 2));
     sl_quadrature(op, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, quad_nw.data());
     return py::cast(quad_nw);
@@ -135,15 +132,14 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
     const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
     const F atol, const F rtol, 
     const int num_threads, 
+    const bool use_clt, 
     const py::kwargs& kwargs
   ) -> py_array< F > {
     const auto op = wrap(A);
     const auto sf = param_spectral_func< F >(kwargs);
-    // std::any rbg = param_rng(0, seed, num_threads);
-    // auto rbg = ThreadedRNG64< pcg64 >(num_threads, seed); // TODO: figure out either polymorphism approach or type-erasure approach
-    auto rbg = ThreadedRNG64< pcg64 >(num_threads, seed);
+    auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
     auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
-    sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, estimates.data());
+    sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, use_clt, estimates.data());
     return py::cast(estimates);
   });
 }

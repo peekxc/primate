@@ -12,17 +12,17 @@ _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank",
 
 def sl_trace (
   A: Union[LinearOperator, sparray, np.ndarray],
-  matrix_function: Union[str, Callable] = "identity", 
-  nv: int = 150,
+  fun: Union[str, Callable] = "identity", 
+  maxiter: int = 200,
+  deg: int = 20,
   atol: float = None,
   rtol: float = None,
-  confidence_level: float = 0.95,
-  distribution: str = "rademacher",
-  rng_engine: str = "pcg",
+  stop: str = ["confidence", "change"],
+  orth: int = 0,
+  confidence: float = 0.95,
+  pdf: str = "rademacher",
+  rng: str = "pcg",
   seed: int = -1,
-  lanczos_degree: int = 20,
-  lanczos_rtol: float = None,
-  orthogonalize: int = 0,
   num_threads: int = 0,
   verbose: bool = False,
   plot: bool = False,
@@ -34,36 +34,32 @@ def sl_trace (
   ----------
   A : ndarray, sparse matrix, or LinearOperator
       real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
-  matrix_function : str or Callable, default="identity"
-      float-valued function defined on the spectrum of A. 
-  nv : int, default = 10
+  fun : str or Callable, default="identity"
+      real-valued function defined on the spectrum of A. 
+  maxiter : int, default = 10
       Maximum number of random vectors to sample for the trace estimate. 
+  deg  : int, default = 20
+      Degree of the quadrature approximation.     
   atol : float, default = None
       Absolute tolerance to signal convergence for early-stopping. See details.  
   rtol : float, default = 1e-2
-      Relative tolerance to signal convergence for early-stopping. See details.  
-  confidence_level : float, default = 0.95
-      Confidence level for atol. 
-  distribution : { 'rademacher', 'normal' }, default = "rademacher"
-      zero-centered distribution to sample random vectors from.
-  rng_engine : str, default = "pcg"
-      Random number engine to use.
+      Relative tolerance to signal convergence for early-stopping. See details.
+  orth: int, default = 0,
+      Additional number of Lanczos vectors to orthogonalize against when building the Krylov basis.   
+  confidence : float, default = 0.95
+      Confidence level to use with rule  
+  pdf : { 'rademacher', 'normal' }, default = "rademacher"
+      Choice of zero-centered distribution to sample random vectors from.
+  rng : str, default = "pcg"
+      Random number generator to use. Defaults to PCG64 generator. 
   seed : int, default = -1
       Seed to initialize the entropy source. Use non-negative integers for reproducibility.
-  lanczos_degree  : int, default = 20
-      Degree of the quadrature approximation. 
-  lanczos_tol : int, default = None
-      Acceptable residual tolerance to prematurely stop the lanczos iteration. 
-  orthogonalize: int, default = 0,
-      Additional number of Lanczos vectors to orthogonalize against when building the Krylov basis. 
   num_threads: int, default = 0
       Number of threads to use to parallelize the computation. Use values <= 0 to maximize the number of threads. 
   plot : bool, default = False
       If true, plots the samples of the trace estimate along with their convergence characteristics. 
-  return_info : bool, default = False
-      whether to return a dictionary containing all the relevent details of the computation.
   kwargs : dict, optional 
-      additional key-values to parameterize the chosen 'matrix_function'.
+      additional key-values to parameterize the chosen function 'fun'.
       
   Returns
   -------
@@ -88,12 +84,20 @@ def sl_trace (
   assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
   
   ## Choose the random number engine 
-  assert rng_engine in _engine_prefixes or rng_engine in _engines, f"Invalid pseudo random number engine supplied '{str(rng_engine)}'"
-  engine_id = _engine_prefixes.index(rng_engine) if rng_engine in _engine_prefixes else _engines.index(rng_engine)
+  assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
+  engine_id = _engine_prefixes.index(rng) if rng in _engine_prefixes else _engines.index(rng)
 
   ## Choose the distribution to sample random vectors from 
-  assert distribution in [ "rademacher", "normal"], f"Invalid distribution '{distribution}'; Must be one of 'rademacher' or 'normal'."
-  distr_id = ["rademacher", "normal"].index(distribution)
+  assert pdf in [ "rademacher", "normal"], f"Invalid distribution '{pdf}'; Must be one of 'rademacher' or 'normal'."
+  distr_id = ["rademacher", "normal"].index(pdf)
+
+  ## Choose the stopping criteria
+  if stop == ["confidence", "change"] or stop == "confidence":
+    use_clt: bool = True 
+  elif stop == "change":
+    use_clt: bool = False
+  else: 
+    raise ValueError(f"Invalid convergence criteria '{str(stop)}' supplied.") 
 
   ## Get the dtype; infer it if it's not available
   f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
@@ -101,39 +105,41 @@ def sl_trace (
   assert f_dtype.type == np.float32 or f_dtype.type == np.float64, "Only 32- or 64-bit floating point numbers are supported."
 
   ## Extract the machine precision for the given floating point type
-  lanczos_rtol = np.finfo(f_dtype).eps if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
+  lanczos_rtol = np.finfo(f_dtype).eps  # if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
 
   ## Check input arguments have proper type and values
   error_atol = f_dtype.type(0.0) if atol is None else f_dtype.type(atol)
   error_rtol = f_dtype.type(rtol)
 
   ## Argument checking
-  nv = int(nv)                                          # Number of random vectors to generate
+  nv = int(maxiter)                                          # Number of random vectors to generate
   seed = int(seed)                                      # Seed should be an integer
-  orthogonalize = int(orthogonalize)                    # Number of additional vectors should be an integer
+  orth = int(orth)                    # Number of additional vectors should be an integer
   # alg_wall_time = f_dtype.type(0.0)                     # Total time spent by the algorithm
-  lanczos_degree = max(lanczos_degree, 2)               # Should be at least two 
-  ncv = int(lanczos_degree + orthogonalize)             # Number of Lanczos vectors to keep in memory
+  deg = max(deg, 2)               # Should be at least two 
+  ncv = int(deg + orth)             # Number of Lanczos vectors to keep in memory
   atol = 0.0 if atol is None else float(atol)           # Early stopping upper bound on confidence interval 
   rtol = 0.0 if rtol is None else float(rtol)           # Early stopper relative standard error bound
   num_threads = 0 if num_threads < 0 else int(num_threads)
+  
 
   ## Parameterize the matrix function and trace call
-  if isinstance(matrix_function, str):
-    assert matrix_function in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
-    kwargs["function"] = matrix_function # _builtin_matrix_functions.index(matrix_function)
-  elif isinstance(matrix_function, Callable):
+  if isinstance(fun, str):
+    assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+    kwargs["function"] = fun # _builtin_matrix_functions.index(matrix_function)
+  elif isinstance(fun, Callable):
     kwargs["function"] = "generic"
-    kwargs["matrix_func"] = matrix_function
+    kwargs["matrix_func"] = fun
   else: 
-    raise ValueError(f"Invalid matrix function type '{type(matrix_function)}'")
+    raise ValueError(f"Invalid matrix function type '{type(fun)}'")
   
   ## Collect the arguments processed so far 
   sl_trace_args = (
     nv, distr_id, engine_id, seed, 
-    lanczos_degree, lanczos_rtol, orthogonalize, ncv, 
+    deg, 0.0, orth, ncv, 
     atol, rtol, 
-    num_threads
+    num_threads, 
+    use_clt
   )
 
   ## Make the actual call
@@ -227,19 +233,18 @@ def sl_trace (
 
 def sl_gauss(
   A: Union[LinearOperator, sparray, np.ndarray],
-  nv: int = 150,
-  lanczos_degree: int = 20,
-  distribution: str = "rademacher",
-  rng_engine: str = "pcg",
+  n: int = 150,
+  deg: int = 20,
+  pdf: str = "rademacher",
+  rng: str = "pcg",
   seed: int = -1,
-  lanczos_rtol: float = None,
-  orthogonalize: int = 0,
+  orth: int = 0,
   num_threads: int = 0
 ) -> np.ndarray:
   """Gaussian quadrature.
   
-  Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure \mu(t) of A. 
-  These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. \mu(t).  
+  Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. 
+  These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).  
   """
   attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
   assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
@@ -247,12 +252,12 @@ def sl_gauss(
   assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
   
   ## Choose the random number engine 
-  assert rng_engine in _engine_prefixes or rng_engine in _engines, f"Invalid pseudo random number engine supplied '{str(rng_engine)}'"
-  engine_id = _engine_prefixes.index(rng_engine) if rng_engine in _engine_prefixes else _engines.index(rng_engine)
+  assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
+  engine_id = _engine_prefixes.index(rng) if rng in _engine_prefixes else _engines.index(rng)
 
   ## Choose the distribution to sample random vectors from 
-  assert distribution in [ "rademacher", "normal"], f"Invalid distribution '{distribution}'; Must be one of 'rademacher' or 'normal'."
-  distr_id = ["rademacher", "normal"].index(distribution)
+  assert pdf in [ "rademacher", "normal"], f"Invalid distribution '{pdf}'; Must be one of 'rademacher' or 'normal'."
+  distr_id = ["rademacher", "normal"].index(pdf)
 
   ## Get the dtype; infer it if it's not available
   f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
@@ -260,26 +265,25 @@ def sl_gauss(
   assert f_dtype.type == np.float32 or f_dtype.type == np.float64, "Only 32- or 64-bit floating point numbers are supported."
 
   ## Extract the machine precision for the given floating point type
-  lanczos_rtol = np.finfo(f_dtype).eps if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
+  lanczos_rtol = np.finfo(f_dtype).eps  # if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
 
   ## Argument checking
   m = A.shape[1]                                        # Dimension of the space
-  nv = int(nv)                                          # Number of random vectors to generate
+  nv = int(n)                                          # Number of random vectors to generate
   seed = int(seed)                                      # Seed should be an integer
-  lanczos_degree = max(lanczos_degree, 2)               # Must be at least 2 
-  orthogonalize = m - 1 if orthogonalize < 0 else min(m - 1, orthogonalize)                   # Number of additional vectors should be an integer
-  ncv = max(int(lanczos_degree + orthogonalize), m)             # Number of Lanczos vectors to keep in memory
+  deg = max(deg, 2)               # Must be at least 2 
+  orth = m - 1 if orth < 0 else min(m - 1, orth)                   # Number of additional vectors should be an integer
+  ncv = max(int(deg + orth), m)             # Number of Lanczos vectors to keep in memory
   num_threads = int(num_threads)                        # should be integer; if <= 0 will trigger max threads on C++ side
 
   ## Collect the arguments processed so far 
   sl_quad_args = (
     nv, distr_id, engine_id, seed, 
-    lanczos_degree, lanczos_rtol, orthogonalize, ncv, 
+    deg, lanczos_rtol, orth, ncv, 
     num_threads
   )
 
   ## Make the actual call
-  print(sl_quad_args)
   quad_nw = _lanczos.stochastic_quadrature(A, *sl_quad_args)
   return quad_nw
 

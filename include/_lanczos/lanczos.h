@@ -89,12 +89,6 @@ void lanczos_recurrence(
   }
 }
 
-// const Matrix& A,            // Symmetric linear operator 
-// F* q,                       // vector to expand the Krylov space K(A, q)
-// const int k,                // Dimension of the Krylov subspace to capture
-// const F lanczos_tol,        // Tolerance of residual error for early-stopping the iteration.
-// const int orth,             // Number of additional vectors to orthogonalize againt 
-
 // Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator
 template< std::floating_point F >
 auto lanczos_quadrature(
@@ -213,6 +207,7 @@ void sl_trace(
   const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
   const F atol, const F rtol, 
   const int num_threads,
+  const bool use_CLT, 
   F* estimates
 ){      
   using VectorF = Eigen::Array< F, Dynamic, 1>;
@@ -225,22 +220,50 @@ void sl_trace(
     estimates[i] = (nodes_v * weights_v).sum();
   };
   
-  // Parameterize when to stop (run in critical section)
-  // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
-  // F mean_est = 0.0, var_est = 0.0; 
-  // int c = 0; // counter
-  // const auto z = std::sqrt(2) * erf_inv(0.95);
-  // const auto early_stop = [&estimates, &mean_est, &var_est, &c, z, atol](int i) -> bool {
-  //   ++c; // represents estimates computed
-  //   mean_est = (1 / c) * (estimates[i] + (c - 1) * mean_est);
-  //   var_est = (std::max(c - 2, 0) / std::max(c - 1, 0)) * var_est + (1 / c) * std::pow(estimates[i] - mean_est, 2); // update sample variance
-  //   const auto margin_of_error = z * std::sqrt(var_est) / std::sqrt(c); // todo: remove sqrt's 
-  //   const auto a_error_ub = 0.5 * margin_of_error; // upper bound on absolute error
-  //   return a_error_ub < atol;
-  //   // return false; 
-  // };
-  const auto early_stop = [](int i) -> bool { return false; };
-
+  // Type-erased function since the call is cheap
+  std::function< bool (int) > early_stop; 
+  if (use_CLT){
+    // Parameterize when to stop using either the CLT over the given confidence level or 
+    // This runs in critical section of the SLQ, so we can depend sequential execution (but i will vary!)
+    // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
+    F mu_est = 0.0, vr_est = 0.0; 
+    F mu_pre = 0.0, vr_pre = 0.0; 
+    int n = 0; // number of estimates computed
+    const auto z = std::sqrt(2.0) * erf_inv(0.95);
+    early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n, z, atol, rtol](int i) -> bool {
+      ++n; 
+      const F denom = (1.0 / F(n));
+      const F L = n > 2 ? F(n-2) / F(n-1) : 0.0;
+      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
+      mu_pre = n == 1 ? mu_est : mu_pre;
+      vr_est = L * vr_pre + denom * std::pow(estimates[i] - mu_pre, 2); // update sample variance
+      mu_pre = mu_est;
+      vr_pre = vr_est;
+      if (n < 2){
+        return false; 
+      } else {
+        const auto sd_est = std::sqrt(vr_est);
+        const auto margin_of_error = z * sd_est / std::sqrt(F(n)); // todo: remove sqrt's 
+        // std::cout << "n: " << n << ", mu: " << mu_est << ", ci: [" << mu_est - margin_of_error << ", " << mu_est + margin_of_error << "]";
+        // std::cout << "margin/atol: " << margin_of_error << ", " << atol << "\n";
+        return margin_of_error <= atol || std::abs(sd_est / mu_est) <= rtol;
+      }
+    };
+  } else {
+    // Use traditional iteration checking, akin to scipy.integrate.quadrature
+    F mu_est = 0.0, mu_pre = 0.0;
+    int n = 0; 
+    early_stop = [&n, &estimates, &mu_est, &mu_pre, atol, rtol](int i) -> bool {
+      ++n; 
+      const F denom = (1.0 / F(n));
+      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
+      const bool atol_check = std::abs(mu_est - mu_pre) <= atol;
+      const bool rtol_check = (std::abs(mu_est - mu_pre) / mu_est) <= rtol; 
+      mu_pre = mu_est; 
+      return atol_check || rtol_check;
+    };
+  }
+  
   // Execute the stochastic Lanczos quadrature with the trace function 
   slq< float >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }

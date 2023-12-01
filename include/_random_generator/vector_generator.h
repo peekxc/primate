@@ -39,13 +39,14 @@ template< std::floating_point F, ThreadSafeRBG RBG >
 void generate_normal(const unsigned long n, RBG& bit_generator, const int thread_id, F* array, F& arr_norm){
 	static std::normal_distribution d { 0.0, 1.0 };
 	const auto N = static_cast< unsigned long >(n / RBG::num_bits);
+	auto& gen = *bit_generator.generators[thread_id];
 	#pragma omp simd
 	for (auto i = static_cast< unsigned long >(0); i < N; ++i){
-		array[i] = d(bit_generator.generators[thread_id]);
+		array[i] = d(gen);
 	}
 	// This loop should have less than num_bits iterations.
 	for (auto j = static_cast< unsigned long >(N * RBG::num_bits), i = static_cast< unsigned long >(0); j < n; ++j, ++i){
-		array[j] = d(bit_generator.generators[0]);
+		array[j] = d(gen);
 	}
 	
 	arr_norm = 0.0; 
@@ -134,13 +135,13 @@ void generate_array(
 			#pragma omp for schedule(static)
 			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
 				for (IndexType j=0; j < num_bits; ++j) {
-					array[i*num_bits + j] = d(random_bit_generator.generators[thread_id]);
+					array[i*num_bits + j] = d(*random_bit_generator.generators[thread_id]);
 				}
 			}
 		}
 		// This loop should have less than 64 iterations.
 		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
-			array[j] = d(random_bit_generator.generators[0]);
+			array[j] = d(*random_bit_generator.generators[0]);
 		}
 		
 		DataType sum = 0.0; 
@@ -172,23 +173,23 @@ void generate_array(RBG& random_bit_generator, DataType* array, const LongIndexT
 
 // Simple way to parameterize the random number generator w/ a templated type
 // https://stackoverflow.com/questions/5450159/what-type-erasure-techniques-are-there-and-how-do-they-work
-template< int engine_id = 0 >
-auto param_rng(const int seed, const int num_threads = 0) {
-  // "splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"
-  if constexpr (engine_id == 0){
-    return ThreadedRNG64< SplitMix64 >(num_threads, seed);
-  } else if constexpr (engine_id == 1){
-    return ThreadedRNG64< Xoshiro256StarStar >(num_threads, seed);
-  } else if constexpr (engine_id == 2){
-    return ThreadedRNG64< knuth_lcg >(num_threads, seed);
-  } else if constexpr (engine_id == 3){
-    return ThreadedRNG64< pcg64 >(num_threads, seed);
-  } else if constexpr (engine_id == 4){
-    return ThreadedRNG64< std::mt19937_64 >(num_threads, seed);
-  } else {
-    throw std::invalid_argument("Invalid random number engine id.");
-  }
-}
+// template< int engine_id = 0 >
+// auto param_rng(const int seed, const int num_threads = 0) {
+//   // "splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"
+//   if constexpr (engine_id == 0){
+//     return ThreadedRNG64< SplitMix64 >(num_threads, seed);
+//   } else if constexpr (engine_id == 1){
+//     return ThreadedRNG64< Xoshiro256StarStar >(num_threads, seed);
+//   } else if constexpr (engine_id == 2){
+//     return ThreadedRNG64< knuth_lcg >(num_threads, seed);
+//   } else if constexpr (engine_id == 3){
+//     return ThreadedRNG64< pcg64 >(num_threads, seed);
+//   } else if constexpr (engine_id == 4){
+//     return ThreadedRNG64< std::mt19937_64 >(num_threads, seed);
+//   } else {
+//     throw std::invalid_argument("Invalid random number engine id.");
+//   }
+// }
 
 // enum rng_engine { sx = 0, xs = 1, lcg = 2, pcg = 3, mt = 4 };
 // auto param_rng(const int engine_id, const int seed, const int num_threads = 0){

@@ -34,6 +34,8 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-unused-function',
   '-Wno-conversion',
   '-Wno-misleading-indentation',
+  '-Wno-unused-lambda-capture',
+  '-Wno-unused-parameter',
   '-std=c++20', 
   '-fPIC', 
   '-fvisibility=hidden',

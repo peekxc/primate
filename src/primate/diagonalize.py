@@ -7,8 +7,8 @@ import _lanczos
 def lanczos(
   A: LinearOperator, 
   v0: Optional[np.ndarray] = None, 
-  max_steps: int = None, 
-  tol: float = 1e-8, 
+  deg: int = None, 
+  rtol: float = 1e-8, 
   orth: int = 0, 
   sparse_mat: bool = False, 
   return_basis: bool = False, 
@@ -23,10 +23,10 @@ def lanczos(
     Symmetric operator to tridiagonalize. 
   v0 : ndarray, default = None
     Initial vector to orthogonalize against.
-  max_steps : int, default = None
-    Maximum number of iterations to perform. 
-  tol : float
-    convergence tolerance for early-stopping the iteration. 
+  deg : int, default = None
+    Size of the Krylov subspace to expand. 
+  rtol : float
+    Relative tolerance to consider the invariant subspace as converged. 
   orth : int
     maximum number of Lanczos vectors to orthogonalize vectors against.
   sparse_mat : bool, default = False 
@@ -41,7 +41,7 @@ def lanczos(
   """
   ## Basic parameter validation
   n: int = A.shape[0]
-  k: int = A.shape[1] if max_steps is None else min(max_steps, A.shape[1])
+  k: int = A.shape[1] if deg is None else min(deg, A.shape[1])
   dt = dtype if dtype is not None else (A @ np.zeros(A.shape[1])).dtype
   assert k > 0, "Number of steps must be positive!"
   
@@ -63,7 +63,7 @@ def lanczos(
   assert Q.flags['F_CONTIGUOUS'] and Q.flags['WRITEABLE'] and Q.flags['OWNDATA']
   
   ## Call the procedure
-  _lanczos.lanczos(A, v0, k, tol, orth, alpha, beta, Q)
+  _lanczos.lanczos(A, v0, k, rtol, orth, alpha, beta, Q)
   
   ## Format the output(s)
   if sparse_mat:

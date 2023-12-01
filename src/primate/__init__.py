@@ -3,6 +3,9 @@ __version__ = '0.1.3'
 from . import plotting 
 from . import ortho
 from . import trace
+from . import stats
+from . import random
+from . import diagonalize
 
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101

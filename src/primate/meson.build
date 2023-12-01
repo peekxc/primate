@@ -23,6 +23,7 @@ python_sources = [
   'diagonalize.py',
   'plotting.py',
   'trace.py',
+  'stats.py',
   '__init__.py'
 ]
 

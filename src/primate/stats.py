@@ -1,6 +1,7 @@
 import numpy as np
 from typing import * 
 from numbers import Number
+import scipy.stats as st
 
 ## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
 def suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rademacher") -> int:

@@ -52,7 +52,7 @@ def lanczos_quadrature(A, v: np.ndarray, **kwargs):
   Based on Algorithm 2.1 of "An analysis on stochastic Lanczos quadrature with asymmetric quadrature nodes"
   """
   k = kwargs.pop("k", A.shape[1])
-  (a,b) = lanczos(A, v, max_steps = k, return_basis = False, **kwargs)
+  (a,b) = lanczos(A, v, deg = k, return_basis = False, **kwargs)
   rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
   return rw, (V[0,:]**2)
 

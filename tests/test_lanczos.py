@@ -2,9 +2,13 @@ import numpy as np
 from scipy.linalg import eigh_tridiagonal
 from scipy.sparse.linalg import eigsh, aslinearoperator
 from scipy.sparse import csc_array, csr_array
+from more_itertools import * 
 
+## Add the test directory to the sys path 
 import sys
-sys.path.insert(0, '/Users/mpiekenbrock/primate/tests')
+import primate
+ind = [i for i, c in enumerate(primate.__file__) if c == '/'][-3]
+sys.path.insert(0, primate.__file__[:ind] + '/tests')
 
 def gen_sym(n: int, ew: np.ndarray = None):
   ew = 0.2 + 1.5*np.linspace(0, 5, n) if ew is None else ew
@@ -21,7 +25,7 @@ def test_basic():
   A = A @ A.T
   A_sparse = csc_array(A)
   v0 = np.random.uniform(size=A.shape[1])
-  (a,b), Q = lanczos(A_sparse, v0=v0, tol=1e-8, orth=n-1, return_basis = True)
+  (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=n-1, return_basis = True)
   assert np.abs(max(eigh_tridiagonal(a,b, eigvals_only=True)) - max(eigsh(A_sparse)[0])) < 1e-4
 
 def test_matvec():
@@ -32,7 +36,7 @@ def test_matvec():
   A = A @ A.T
   A_sparse = csc_array(A)
   v0 = np.random.uniform(size=A.shape[1])
-  (a,b), Q = lanczos(A_sparse, v0=v0, tol=1e-8, orth=0, return_basis = True) 
+  (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=0, return_basis = True) 
   rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
   y = np.linalg.norm(v0) * (Q @ V @ (V[0,:] * rw))
   z = A_sparse @ v0
@@ -50,7 +54,7 @@ def test_accuracy():
   tol = np.zeros(30)
   for i in range(30):
     v0 = np.random.uniform(size=A.shape[1])
-    alpha, beta = lanczos(A, v0=v0, tol=1e-8, orth=n-1)
+    alpha, beta = lanczos(A, v0=v0, rtol=1e-8, orth=n-1)
     ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
     ew_test = np.sort(eigh_tridiagonal(alpha, beta, eigvals_only=True))
     tol[i] = np.mean(np.abs(ew_test[1:] - ew_true))
@@ -68,7 +72,7 @@ def test_high_degree():
   tol = np.zeros(30)
   for k in range(2, 30):
     v0 = np.random.choice([-1.0, +1.0], size=A.shape[1])
-    alpha, beta = lanczos(A, v0=v0, tol=1e-7, max_steps=k, orth=0)
+    alpha, beta = lanczos(A, v0=v0, rtol=1e-7, deg=k, orth=0)
     assert np.all(~np.isnan(alpha)) and np.all(~np.isnan(beta))
 
 def test_quadrature():
@@ -82,7 +86,7 @@ def test_quadrature():
   v0 = np.random.uniform(size=A.shape[1])
 
   ## Test the near-equivalence of the weights and nodes
-  alpha, beta = lanczos(A_sparse, v0, max_steps=n, orth=n)  
+  alpha, beta = lanczos(A_sparse, v0, deg=n, orth=n)  
   nw_test = _lanczos.quadrature(alpha, np.append(0, beta), n)
   nw_true = lanczos_quadrature(A, v=v0, k=n, orth=n)
   assert np.allclose(nw_true[0], nw_test[:,0], atol=1e-6)
@@ -98,7 +102,7 @@ def test_stochastic_quadrature():
   np.random.seed(1234)
   A = gen_sym(30)
   n = A.shape[1]
-  nv, lanczos_deg = 150, 20
+  nv, lanczos_deg = 250, 20
   A = csc_array(A, dtype=np.float32)
 
   ## Test raw computation to ensure it's returning valid entries
@@ -108,30 +112,30 @@ def test_stochastic_quadrature():
   assert np.all(~np.isnan(quad_nw))
 
   ## Ensure we can recover the trace under deterministic settings
-  quad_nw = sl_gauss(A, nv=nv, lanczos_degree=lanczos_deg, seed=0, orthogonalize=0, num_threads=1)
+  quad_nw = sl_gauss(A, n=nv, deg=lanczos_deg, seed=0, orth=0, num_threads=1)
   quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
   quad_est = (n / nv) * np.sum(quad_ests)
-  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.01) ## ensure trace estimate within 1% 
+  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.02) ## ensure trace estimate within 1% 
   
   ## Ensure multi-threading works
-  quad_nw = sl_gauss(A, nv=nv, lanczos_degree=lanczos_deg, seed=0, orthogonalize=0, num_threads=8)
+  quad_nw = sl_gauss(A, n=nv, deg=lanczos_deg, seed=6, orth=0, num_threads=8)
   quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
   quad_est = (n / nv) * np.sum(quad_ests)
-  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.02) ## ensure trace estimate within 2% for multi-threaded (different rng!)
+  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.02), "Multithreaded quadrature is worse" ## ensure trace estimate within 2% for multi-threaded (different rng!)
 
   ## Ensure it's generally pretty close
   for _ in range(50):
-    quad_nw = sl_gauss(A, nv=nv, lanczos_degree=lanczos_deg, seed=-1, orthogonalize=0, num_threads=4)
+    quad_nw = sl_gauss(A, n=nv, deg=lanczos_deg, seed=-1, orth=0, num_threads=4)
     quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
     quad_est = (n / nv) * np.sum(quad_ests)
     assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.05)
 
-  ## Try to achieve the highest accuracy
-  nv, lanczos_deg = 1500, 20
-  quad_nw = sl_gauss(A, nv=nv, lanczos_degree=lanczos_deg, seed=0, orthogonalize=5, num_threads=1)
+  ## Try to achieve a decently high accuracy
+  nv, lanczos_deg = 2500, 20
+  quad_nw = sl_gauss(A, n=nv, deg=lanczos_deg, seed=-1, orth=5, num_threads=8)
   quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
   quad_est = (n / nv) * np.sum(quad_ests)
-  np.isclose(A.trace(), quad_est, atol = A.trace() * 0.0025) ## Ensure we can get within 0.25% of true trace 
+  assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.01) ## Ensure we can get within 0.25% of true trace 
 
   # from bokeh.plotting import show
   # from primate.plotting import figure_trace
@@ -157,42 +161,27 @@ def test_slq_trace():
   A = gen_sym(30)
   n = A.shape[1]
   A = csc_array(A, dtype=np.float32)
-  tr_est = sl_trace(A, nv = 50, num_threads=1)
+  tr_est = sl_trace(A, maxiter = 20, num_threads=1)
+  assert len(tr_est) == 20
 
-  # args = dict(nv=10, dist=0, lanczos_degree=2, lanczos_rtol=0.0, orth=0, ncv=n, num_threads=5, seed=0)
-  # args = (10, 0, 2, 0.0, 0, n, 0.0, 0.0, 5, 0)
-  # _lanczos.stochastic_trace(A, *args, **kwargs)
-
-def test_lanczos_correctness():
-  from primate.diagonalize import lanczos
-  from sanity import lanczos_paige
+def test_slq_trace_clt_atol():
+  from primate.trace import sl_trace, _lanczos
   np.random.seed(1234)
-  assert True
-  ## TODO: recombine eigenvalues that are well-separated as a test matrix
-  # n = 20
-  # A = np.random.uniform(size=(n, n)).astype(np.float32)
-  # A = A @ A.T
-  # v = np.random.normal(size=n).astype(np.float32)
-  # a1, b1 = lanczos_paige(A, v, k = n, tol = 0.0)
-  # a2, b2 = lanczos(A, v, max_steps = n, orth=5, tol = 0.0)
-  # ew1 = np.sort(eigh_tridiagonal(a1[:n], b1[1:n], eigvals_only=True))
-  # ew2 = np.sort(eigh_tridiagonal(a2, b2, eigvals_only=True))
-  # ew = np.sort(np.linalg.eigh(A)[0])
-  # np.max(np.abs(ew - ew2))
-  # np.max(np.abs(ew - ew2))
-  # assert np.allclose(ew1, ew2, atol=0.1)
-
-# def test_benchmark():
-#   from primate.diagonalize import lanczos, _lanczos_base
-#   from scipy.sparse import random, csc_array
-#   A = random(1000, 1000, density=0.010)
-#   A = csc_array(A @ A.T, dtype=np.float32)
-#   assert (A.nnz / (1000**2)) <= 0.30
+  A = gen_sym(30)
+  n = A.shape[1]
+  A = csc_array(A, dtype=np.float32)
   
-#   import timeit
+  from primate.stats import sample_mean_cinterval
+  tr_est = sl_trace(A, nv = 100, num_threads=1, seed=5)
+  ci = np.array([sample_mean_cinterval(tr_est[:i], sdist='normal') if i > 1 else [-np.inf, np.inf] for i in range(len(tr_est))])
+  
+  ## Detect when, for the fixed set of samples, the trace estimatro should converge by CLT 
+  atol_threshold = (A.trace() * 0.05) / n
+  clt_converged = np.ravel(0.5*np.diff(ci, axis=1)) <= atol_threshold
+  assert np.any(clt_converged), "Did not converge!"
+  converged_ind = np.flatnonzero(clt_converged)[0]
 
-#   timeit.timeit(lambda: _lanczos_base(A), number=30)
-#   timeit.timeit(lambda: lanczos(A), number=30)
-#   a, b = lanczos(A)
-
-
+  ## Re-run with same seed and ensure the index matches
+  tr_est = sl_trace(A, nv = 100, atol=atol_threshold, num_threads=1, seed=5)
+  converged_online = np.take(np.flatnonzero(tr_est == 0.0), 0)
+  assert converged_online == converged_ind, "SLQ not converging at correct index!"

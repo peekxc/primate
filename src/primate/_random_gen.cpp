@@ -26,16 +26,16 @@
 #endif
 
 // Instantiates the function templates for generic generators
-template< LightRandom64Engine RNE, std::floating_point F >
+template< std::floating_point F >
 void _random(py_module& m, std::string suffix){
   m.def((std::string("rademacher") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
+    auto rbg = ThreadedRNG64(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     generate_array< 0, F >(rbg, data, array_sz, num_threads); 
   });
   m.def((std::string("normal") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
+    auto rbg = ThreadedRNG64(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     generate_array< 1, F >(rbg, data, array_sz, num_threads); 
@@ -48,7 +48,7 @@ void _random(py_module& m, std::string suffix){
   //   generate_array< 2, F >(rbg, data, array_sz, num_threads); 
   // });
   m.def((std::string("rademacher_simd") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64< RNE >(num_threads, seed);
+    auto rbg = ThreadedRNG64(num_threads, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     float v_norm = 0.0; 
@@ -62,9 +62,9 @@ void _random(py_module& m, std::string suffix){
 // PYBIND11_MODULE(_random_gen, m)
 // #endif
 PYBIND11_MODULE(_random_gen, m){
-  _random< SplitMix64, float >(m, std::string("_sx")); 
-  _random< Xoshiro256StarStar, float >(m, std::string("_xs")); 
-  _random< std::mt19937_64, float >(m, std::string("_mt")); 
-  _random< pcg64, float >(m, std::string("_pcg")); 
-  _random< knuth_lcg, float >(m, std::string("_lcg")); 
+  _random< float >(m, std::string("_sx")); 
+  // _random< Xoshiro256StarStar, float >(m, std::string("_xs")); 
+  // _random< std::mt19937_64, float >(m, std::string("_mt")); 
+  // _random< pcg64, float >(m, std::string("_pcg")); 
+  // _random< knuth_lcg, float >(m, std::string("_lcg")); 
 }
