@@ -50,7 +50,8 @@ def test_CLT():
   #   ci = sample_mean_cinterval(x[:i], conf=0.99, sdist='normal')
   #   print(f"{i}: est = {mu:.4}, |x - mu| = {(mu - 5.0):.4}, conf len: {np.take(np.diff(ci),0):.4}, CI says converged? { 0.50*np.diff(ci) <= atol }, actually converged? {(mu - 5.0) <= atol}")
 
-
-
+def test_suggest():
+  from primate.stats import suggest_nv_trace
+  assert suggest_nv_trace(0.95, eps = 0.1) == 2213
 
 

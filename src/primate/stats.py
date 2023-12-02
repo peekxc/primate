@@ -5,8 +5,7 @@ import scipy.stats as st
 
 ## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
 def suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rademacher") -> int:
-  """Suggests a number of sample vectors to use to get an eps-accurate trace estimate with probability p.
-  """
+  """Suggests a number of sample vectors to use to get an eps-accurate trace estimate with probability p."""
   assert p >= 0 and p < 1, "Probability of success 'p' must be  must be between [0, 1)"
   eta = 1.0 - p
   if f == "identity":
@@ -39,8 +38,6 @@ def sample_mean_cinterval(a: np.ndarray, conf=0.95, sdist: str = ["t", "normal"]
     return norm.interval(conf, loc=mean, scale=std / sq_n)
   else: 
     raise ValueError(f"Unknown sampling distribution '{sdist}'.")
-
-
 
 
 ## Manual approach

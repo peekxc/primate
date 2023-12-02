@@ -27,32 +27,20 @@
 
 // Instantiates the function templates for generic generators
 template< std::floating_point F >
-void _random(py_module& m, std::string suffix){
-  m.def((std::string("rademacher") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64(num_threads, seed);
+void _random(py_module& m){
+  m.def("rademacher", [](py_array< F >& out, const int rng = 2, const int seed = -1){
+    auto rbg = ThreadedRNG64(1, rng, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
-    generate_array< 0, F >(rbg, data, array_sz, num_threads); 
+    F arr_norm = 0.0; 
+    generate_rademacher(array_sz, rbg, 0, data, arr_norm);
   });
-  m.def((std::string("normal") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64(num_threads, seed);
+  m.def("normal", [](py_array< F >& out, const int rng = 2, const int seed = -1){
+    auto rbg = ThreadedRNG64(1, rng, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
-    generate_array< 1, F >(rbg, data, array_sz, num_threads); 
-  });
-  // TODO: revisit this one
-  // m.def((std::string("rayleigh") + suffix).c_str(), [](py_array< F >& out, const IndexType num_threads = 1){
-  //   auto rbg = ThreadedRNG64< RNE >(num_threads);
-  //   auto* data = static_cast< F *>(out.request().ptr);
-  //   auto array_sz = static_cast< LongIndexType >(out.size());
-  //   generate_array< 2, F >(rbg, data, array_sz, num_threads); 
-  // });
-  m.def((std::string("rademacher_simd") + suffix).c_str(), [](py_array< F >& out, const size_t num_threads = 1, const int seed = -1){
-    auto rbg = ThreadedRNG64(num_threads, seed);
-    auto* data = out.mutable_data();
-    auto array_sz = static_cast< size_t >(out.size());
-    float v_norm = 0.0; 
-    generate_rademacher< F >(array_sz, rbg, 0, data, v_norm); 
+    F arr_norm = 0.0; 
+    generate_normal(array_sz, rbg, 0, data, arr_norm);
   });
 }
 
@@ -62,9 +50,6 @@ void _random(py_module& m, std::string suffix){
 // PYBIND11_MODULE(_random_gen, m)
 // #endif
 PYBIND11_MODULE(_random_gen, m){
-  _random< float >(m, std::string("_sx")); 
-  // _random< Xoshiro256StarStar, float >(m, std::string("_xs")); 
-  // _random< std::mt19937_64, float >(m, std::string("_mt")); 
-  // _random< pcg64, float >(m, std::string("_pcg")); 
-  // _random< knuth_lcg, float >(m, std::string("_lcg")); 
+  _random< float >(m); 
+  _random< double >(m); 
 }

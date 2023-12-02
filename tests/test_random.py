@@ -3,6 +3,12 @@ from typing import *
 from primate import random
 from primate.random import _engines, _engine_prefixes, _random_gen
 
+## Add the test directory to the sys path 
+import sys
+import primate
+ind = [i for i, c in enumerate(primate.__file__) if c == '/'][-3]
+sys.path.insert(0, primate.__file__[:ind] + '/tests')
+
 def test_seeding():
   s1 = random.rademacher(250, seed = -1)
   s2 = random.rademacher(250, seed = -1)
@@ -14,29 +20,25 @@ def test_seeding():
 
 def test_rademacher():
   assert np.all([r in [-1.0, +1.0] for r in random.rademacher(100)]), "Basic rademacher test failed"
-  for engine in _engine_prefixes:
-    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(1500)])
+  assert np.all(~np.isnan(random.rademacher(1500, rng='sx')))
+  for rng in _engine_prefixes:
+    c = random.rademacher(100*1500, rng=rng, seed=-1)
+    counts = np.add.reduceat(c, np.arange(0, 100*1500, 100))
     cum_counts = np.cumsum(counts) / np.arange(1, len(counts)+1)
-    assert abs(cum_counts[-1]) <= 1.0, f"Rademacher random number generator biased more than 1% (for engine {engine})"
+    assert abs(cum_counts[-1]) <= 1.0, f"Rademacher random number generator biased more than 1% (for engine {rng})"
 
 def test_normal():
-  for engine in _engine_prefixes:
-    counts = np.array([np.sum(random.normal(100, engine=engine)) for _ in range(1500)])
+  assert np.all(~np.isnan(random.normal(1500, rng="sx")))
+  for rng in _engine_prefixes:
+    c = random.normal(100*1500, rng=rng, seed=-1)
+    counts = np.add.reduceat(c, np.arange(0, 100*1500, 100))
     cum_counts = np.cumsum(counts) / np.arange(1, len(counts)+1)
+    np.sum(random.normal(1500, rng=rng))
     assert abs(cum_counts[-1]) <= 1.0, f"Normal random number generator biased more than 1% (for engine {engine})"
 
-def test_rademacher_simd():
-
-  import timeit
-  timeit.timeit(lambda: random.rademacher(5000, seed = 10), number=5000)
-
-
-  out = np.empty(5000, dtype=np.float32) * np.nan
-  timeit.timeit(lambda: _random_gen.rademacher_simd_sx(out, 1, 10), number=5000)
-  
-
-
-
+# 2.69
+# import timeit
+# timeit.timeit(lambda: random.rademacher(5000), number=10000)
 
 # def test_rayleigh():
 #   for engine in _engine_prefixes:

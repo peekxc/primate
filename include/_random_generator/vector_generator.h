@@ -4,6 +4,7 @@
 #include <omp.h>   // omp_set_num_threads, omp_get_thread_num
 #include <random>   // uniform_random_bit_generator, normal_distribution
 #include <cstdint>  // uint64_t
+#include <cmath> // isnan
 #include <bitset>   // bitset
 #include "threadedrng64.h"	// ThreadSafeRBG
 #include "rne_engines.h"		// all the engines
@@ -19,9 +20,10 @@ enum Distribution { rademacher = 0, normal = 1, rayleigh = 2 };
 template< std::floating_point F, ThreadSafeRBG RBG > 
 void generate_rademacher(const long n, RBG& random_bit_generator, const int thread_id, F* array, F& arr_norm){
 	const auto N = static_cast< size_t >(n / RBG::num_bits);
+	
 	for (size_t i = 0; i < N; ++i) {
 		std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
-		#pragma omp simd
+		#pragma omp simd 
 		for (size_t j = 0; j < RBG::num_bits; ++j) {
 			array[i*RBG::num_bits + j] = 2 * int(ubits[j]) - 1;
 		}
@@ -29,7 +31,7 @@ void generate_rademacher(const long n, RBG& random_bit_generator, const int thre
 	// This loop should have less than 64 iterations.
 	std::bitset< RBG::num_bits > ubits { random_bit_generator.next(thread_id) };
 	for (size_t j = N * RBG::num_bits, i = 0; j < size_t(n); ++j, ++i){
-		array[j] = (2 * int(ubits[j]) - 1);
+		array[j] = (2 * int(ubits[i]) - 1);
 	}
 	arr_norm = static_cast< F >(std::sqrt(n)); 
 }
@@ -38,33 +40,34 @@ void generate_rademacher(const long n, RBG& random_bit_generator, const int thre
 template< std::floating_point F, ThreadSafeRBG RBG > 
 void generate_normal(const unsigned long n, RBG& bit_generator, const int thread_id, F* array, F& arr_norm){
 	static std::normal_distribution d { 0.0, 1.0 };
-	const auto N = static_cast< unsigned long >(n / RBG::num_bits);
+	// const auto N = static_cast< unsigned long >(n / RBG::num_bits);
 	auto& gen = *bit_generator.generators[thread_id];
 	#pragma omp simd
-	for (auto i = static_cast< unsigned long >(0); i < N; ++i){
+	for (auto i = static_cast< unsigned long >(0); i < n; ++i){
 		array[i] = d(gen);
 	}
-	// This loop should have less than num_bits iterations.
-	for (auto j = static_cast< unsigned long >(N * RBG::num_bits), i = static_cast< unsigned long >(0); j < n; ++j, ++i){
-		array[j] = d(gen);
-	}
+	// // This loop should have less than num_bits iterations.
+	// for (auto j = static_cast< unsigned long >(N * RBG::num_bits), i = static_cast< unsigned long >(0); j < n; ++j, ++i){
+	// 	array[j] = d(gen);
+	// }
 	
 	arr_norm = 0.0; 
-	#pragma omp simd reduction(+:arr_norm)
+	// #pragma omp simd reduction(+:arr_norm)
 	for (unsigned long i = 0; i < n; ++i){
 		arr_norm += std::abs(array[i]);
 	}
+	arr_norm = std::sqrt(arr_norm);
 }
 
 // Generates an isotropic random vector for a given thread id
 template< std::floating_point F, ThreadSafeRBG RBG > 
-void generate_isotropic(const Distribution dist_id, const long n, RBG& bit_generator, const int thread_id, F* array, F& arr_norm){
+void generate_isotropic(const Distribution dist_id, const long n, RBG& rbg, const int thread_id, F* array, F& arr_norm){
 	switch(dist_id){
 		case rademacher:
-			generate_rademacher(n, bit_generator, thread_id, array, arr_norm);
+			generate_rademacher(n, rbg, thread_id, array, arr_norm);
 			break; 
 		case normal: 
-			generate_normal(n, bit_generator, thread_id, array, arr_norm);
+			generate_normal(n, rbg, thread_id, array, arr_norm);
 			break; 
 		case rayleigh: 
 			// generate_rayleigh(n, bit_generator, thread_id, array, arr_norm);
@@ -80,96 +83,96 @@ void generate_isotropic(const Distribution dist_id, const long n, RBG& bit_gener
 }
 // array[i*RBG::num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
 
-template< size_t Distr, std::floating_point DataType, ThreadSafeRBG RBG > 
-void generate_array(
-	RBG& random_bit_generator,
-	DataType* array,
-	const LongIndexType array_size,
-	const IndexType num_threads
-){
-	// Passing zero-threads indicates caller was already parallelized and thus should not re-set threads
-	// Otherwise 'num_threads' threads is created 
-	if (num_threads > 0) {
-		omp_set_num_threads(num_threads);
-	}
+// template< size_t Distr, std::floating_point DataType, ThreadSafeRBG RBG > 
+// void generate_array(
+// 	RBG& random_bit_generator,
+// 	DataType* array,
+// 	const LongIndexType array_size,
+// 	const IndexType num_threads
+// ){
+// 	// Passing zero-threads indicates caller was already parallelized and thus should not re-set threads
+// 	// Otherwise 'num_threads' threads is created 
+// 	if (num_threads > 0) {
+// 		omp_set_num_threads(num_threads);
+// 	}
 
-	// Get the thread id
-	int thread_id = 0;
-	if (num_threads == 0) { // if in parent thread 
-		thread_id = omp_get_thread_num();
-	}
+// 	// Get the thread id
+// 	int thread_id = 0;
+// 	if (num_threads == 0) { // if in parent thread 
+// 		thread_id = omp_get_thread_num();
+// 	}
 
-	// Number of bits to generate in each call of the random generator. This is the number of bits in a uint64_t integer.
-	const int bits_per_byte = 8;
-	const int num_bits = sizeof(uint64_t) * bits_per_byte;
+// 	// Number of bits to generate in each call of the random generator. This is the number of bits in a uint64_t integer.
+// 	const int bits_per_byte = 8;
+// 	const int num_bits = sizeof(uint64_t) * bits_per_byte;
 
-	// Compile each distribution to generate individual row vectors in parallel 
-	// The parallel section only works if num_threads is non-zero. Otherwise it runs in serial order.
-	if constexpr(Distr == 0){ // Rademacher distribution 
-		#pragma omp parallel if (num_threads > 0)
-		{
-			thread_id = (num_threads > 0) ? omp_get_thread_num() : 0; // changed
+// 	// Compile each distribution to generate individual row vectors in parallel 
+// 	// The parallel section only works if num_threads is non-zero. Otherwise it runs in serial order.
+// 	if constexpr(Distr == 0){ // Rademacher distribution 
+// 		#pragma omp parallel if (num_threads > 0)
+// 		{
+// 			thread_id = (num_threads > 0) ? omp_get_thread_num() : 0; // changed
 
-			#pragma omp for schedule(static)
-			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
-				std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
-				for (IndexType j=0; j < num_bits; ++j) {
-					array[i*num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
-				}
-			}
-		}
-		// This loop should have less than 64 iterations.
-		std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
-		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
-			array[j] = ubits[i] ? 1.0 : -1.0;
-		}
-	} else if constexpr(Distr == 1){
-		return; 
-	} else if constexpr(Distr == 2){
-		// rayleigh distribution
-		std::normal_distribution d{0.0, 1.0};
-		#pragma omp parallel if (num_threads > 0)
-		{
-			thread_id = (num_threads > 0) ? omp_get_thread_num() : 0;
+// 			#pragma omp for schedule(static)
+// 			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+// 				std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+// 				for (IndexType j=0; j < num_bits; ++j) {
+// 					array[i*num_bits + j] = ubits[j] ? 1.0 : -1.0; // Shift checks the j-th bit (from right to left) is 1 or 0
+// 				}
+// 			}
+// 		}
+// 		// This loop should have less than 64 iterations.
+// 		std::bitset< 64 > ubits { random_bit_generator.next(thread_id) };
+// 		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+// 			array[j] = ubits[i] ? 1.0 : -1.0;
+// 		}
+// 	} else if constexpr(Distr == 1){
+// 		return; 
+// 	} else if constexpr(Distr == 2){
+// 		// rayleigh distribution
+// 		std::normal_distribution d{0.0, 1.0};
+// 		#pragma omp parallel if (num_threads > 0)
+// 		{
+// 			thread_id = (num_threads > 0) ? omp_get_thread_num() : 0;
 
-			#pragma omp for schedule(static)
-			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
-				for (IndexType j=0; j < num_bits; ++j) {
-					array[i*num_bits + j] = d(*random_bit_generator.generators[thread_id]);
-				}
-			}
-		}
-		// This loop should have less than 64 iterations.
-		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
-			array[j] = d(*random_bit_generator.generators[0]);
-		}
+// 			#pragma omp for schedule(static)
+// 			for (LongIndexType i=0; i < static_cast<LongIndexType>(array_size/num_bits); ++i) {
+// 				for (IndexType j=0; j < num_bits; ++j) {
+// 					array[i*num_bits + j] = d(*random_bit_generator.generators[thread_id]);
+// 				}
+// 			}
+// 		}
+// 		// This loop should have less than 64 iterations.
+// 		for (auto j = LongIndexType(array_size/num_bits) * num_bits, i = LongIndexType(0); j < array_size; ++j, ++i){
+// 			array[j] = d(*random_bit_generator.generators[0]);
+// 		}
 		
-		DataType sum = 0.0; 
-		#pragma omp parallel for reduction (+:sum)
-		for (auto i = LongIndexType(0); i < array_size; ++i){
-			sum = sum + array[i];
-		}
-		for (auto i = LongIndexType(0); i < array_size; ++i){
-			array[i] = array[i] / sum;
-		}
-	}
-}   
+// 		DataType sum = 0.0; 
+// 		#pragma omp simd for reduction (+:sum)
+// 		for (auto i = LongIndexType(0); i < array_size; ++i){
+// 			sum = sum + array[i];
+// 		}
+// 		for (auto i = LongIndexType(0); i < array_size; ++i){
+// 			array[i] = array[i] / sum;
+// 		}
+// 	}
+// }   
 
-template< std::floating_point DataType, ThreadSafeRBG RBG > 
-void generate_array(RBG& random_bit_generator, DataType* array, const LongIndexType array_size, const IndexType num_threads, const Distribution d){
-	// enum Distribution { rademacher, normal, rayleigh };
-	switch(d){
-		case rademacher:
-			generate_array< 0 >(random_bit_generator, array, array_size, num_threads);
-			break;
-		case normal: 
-			generate_array< 1 >(random_bit_generator, array, array_size, num_threads);
-			break;
-		case rayleigh:
-			generate_array< 2 >(random_bit_generator, array, array_size, num_threads);
-			break;
-	}
-}
+// template< std::floating_point DataType, ThreadSafeRBG RBG > 
+// void generate_array(RBG& rgb, DataType* array, const LongIndexType array_size, const IndexType num_threads, const Distribution d = 0){
+// 	// enum Distribution { rademacher, normal, rayleigh };
+// 	switch(d){
+// 		case rademacher:
+// 			generate_array< 0 >(rgb, array, array_size, num_threads);
+// 			break;
+// 		case normal: 
+// 			generate_array< 1 >(rgb, array, array_size, num_threads);
+// 			break;
+// 		case rayleigh:
+// 			generate_array< 2 >(rgb, array, array_size, num_threads);
+// 			break;
+// 	}
+// }
 
 // Simple way to parameterize the random number generator w/ a templated type
 // https://stackoverflow.com/questions/5450159/what-type-erasure-techniques-are-there-and-how-do-they-work
