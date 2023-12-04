@@ -54,14 +54,19 @@ struct ThreadedRNG64 {
 				case sx:
 					static_assert(std::uniform_random_bit_generator< Random64Engine< SplitMix64 > >, "Wrapper RNG engine constraints not met");
 					generators[i] = new Random64Engine< SplitMix64 >();
+					break; 
 				case xs: 
 					generators[i] = new Random64Engine< Xoshiro256StarStar >();
+					break; 
 				case pcg: 
 					generators[i] = new Random64Engine< pcg64 >();
+					break; 
 				case lcg:
 					generators[i] = new Random64Engine< knuth_lcg >();
+					break; 
 				case mt: 
 					generators[i] = new Random64Engine< std::mt19937_64 >();
+					break; 
 			}
 		}
 
