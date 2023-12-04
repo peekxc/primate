@@ -28,8 +28,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Clang with OpenMP support
       run: |
+        brew update 
         rm -rf /usr/local/bin/2to3*
-        brew install --force libomp llvm
+        brew install --force libomp llvm > nul
     - name: Update environment flags for Clang 
       run: |
         export PATH="/usr/local/opt/llvm/bin:$PATH"
