@@ -33,7 +33,10 @@ jobs:
         source ~/.bash_profile
     - name: Verify Clang version 
       run: | 
-        clang --version
+        /usr/local/opt/llvm/bin/clang --version
+      env:
+        CC: /usr/local/opt/llvm/bin/clang
+        CXX: /usr/local/opt/llvm/bin/clang
     - name: Install OpenBLAS
       run: |
         brew install openblas
@@ -57,11 +60,4 @@ jobs:
     - name: Test with pytest
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip
-        coverage run --source=./primate -m pytest tests/ --benchmark-skip
-        coverage json -o tests/test_results.json
         coverage report -m
-    - if: matrix.os == 'ubuntu-latest'
-      run: |
-        COV_RESULT=$(cat tests/test_results.json)
-        COV_PERCENT=$(echo $COV_RESULT | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["totals"]["percent_covered_display"])')
-        echo "COV_PERCENT=$COV_PERCENT" >> $GITHUB_ENV

@@ -30,11 +30,13 @@ jobs:
     #   with:
     #     version: latest
     #     platform: x64
-    - name: Install Clang with OpenMP support using Chocolatey
-      run: |
-        choco install -y llvm --params "clang;compiler=clang" --version 13.0.0
-        $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
-        clang --version
+    - name: Setup MSVC 
+      uses: ilammy/msvc-dev-cmd@v1.4.1
+    # - name: Install Clang with OpenMP support using Chocolatey
+    #   run: |
+    #     choco install -y llvm --params "clang;compiler=clang" --version 13.0.0
+    #     $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
+    #     clang --version
     # - name: Install OpenBLAS using Chocolatey
     #   run: |
     #     choco install -y openblas
@@ -51,9 +53,10 @@ jobs:
     - name: Install package
       run: |
         pip install --verbose .
+      env: 
+        CC: msvc
+        CXX: msvc
     - name: Test with pytest
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip
-        coverage run --source=./primate -m pytest tests/ --benchmark-skip
-        coverage json -o tests/test_results.json
         coverage report -m

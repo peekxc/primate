@@ -1,120 +1,5 @@
 [
   {
-    "objectID": "imate_compare.html",
-    "href": "imate_compare.html",
-    "title": "Comparison to imate",
-    "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, genericity, and choice of FFI / build system.\nNotable differences between the two packages include:\n\n\n\nFeature\nprimate\nimate\n\n\n\n\nParallel support\nCPU only\nCPU & GPU\n\n\nFunction support\nArbitrary\nPackage supported2\n\n\nOperator support\nArbitrary\nMatrix-derived\n\n\nLinking strategy\nHeader only\nShared libraries\n\n\nC++ version\n\\geq C++20\nAny\n\n\nFFI\nPybind11\nCython\n\n\nBuild tool\nMeson\nCMake\n\n\n\nOne motivation for developing primate was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guide.\n\n\n\n\n\n\nFootnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using Eigen the library.↩︎\nSee imates documentation for the list of supported functions.↩︎",
-    "crumbs": [
-      "Comparison to *imate*"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Package overview",
-    "section": "",
-    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions—that is, matrices parameterized by functions:\n \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\n\nA highly-parametrizable trace estimator (see SLQ)\nVarious distribution / engine choices for random vector generation (the stochastic part!)\nOrthogonalization routines, such as the Lanczos, Golub Kahan, and Gram Schmidt methods\nSupport for arbitrary matrix functions, i.e. Callable’s (Python) and invocable’s2 (C++)\nSupport for arbitrary LinearOperator’s, e.g. those in SciPy or Pylops\n\nMuch of primate’s computational code was directly ported from the (excellent) imate package—for a comparison of the two, see here.\n\n\n\n\nFootnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
-    "crumbs": [
-      "Overview"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html",
-    "href": "integration/cpp_integration.html",
-    "title": "C++ Integration",
-    "section": "",
-    "text": "To get started calling any matrix-free function provided by primate, such sl_trace or lanczos, simply pass any type with a .shape() and .matvec() member functions defined like so:\nIt’s up to you to ensure shape() yields the correct size; primate will supply vectors to input of size .shape().second (number of columns) and guarantees the pointer to the output will be at least shape().first (number of rows), no more.",
-    "crumbs": [
-      "Integration Guide",
-      "Usage from C++"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html#linearoperator",
-    "href": "integration/cpp_integration.html#linearoperator",
-    "title": "C++ Integration",
-    "section": "LinearOperator",
-    "text": "LinearOperator\nAny class respecting the LinearOperator concept can be given to the trace estimator.\ntemplate &lt; typename T, typename F = typename T::value_type &gt;\nconcept LinearOperator = requires(T op, const F* v, F* o) {\n  { op.matvec(v, o) }; // o = A v\n  { op.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nThus, a given instance A must support member functions:\n\nA method \\(Av \\mapsto o\\), with signature A.matvec(const float_t* v, float_t* o)\nA method yielding \\((\\mathrm{card}(o), \\mathrm{card}(v))\\), with signatureA.shape() -&gt; pair&lt; ... &gt;\n\nFor example, in the matrix setting, shape() should yield a pair (r,c) where r and c indicates the number of rows and columns, respectively.",
-    "crumbs": [
-      "Usage with C++"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html#example-the-linop-class",
-    "href": "integration/cpp_integration.html#example-the-linop-class",
-    "title": "C++ Integration",
-    "section": "Example: the LinOp class",
-    "text": "Example: the LinOp class\nAs an example, here’s the declarations for a bare-bones C++ class that respects the LinearOperator concept:\nclass LinOp {\n  int nrow, ncol;\n  \n  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}\n  \n  void matvec(const float* input, float* output) const {\n    ... // implementation details \n  }\n\n  void shape() const { return std::make_pair(nrow, ncol); }\n}\nIt is up to the user to ensure shape() yields the correct size; primate will supply vectors to input of size .shape().second (number of columns) and guarantees the pointer to the output will be at least shape().first (number of rows), no more.",
-    "crumbs": [
-      "Integration Guide",
-      "Usage from C++"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html#other-concepts",
-    "href": "integration/cpp_integration.html#other-concepts",
-    "title": "C++ Integration",
-    "section": "Other Concepts",
-    "text": "Other Concepts\nDepending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:\n\n\n\n\n\n\n\n\n\nConcept\nSupports\nSignature\nRequires\n\n\n\n\nLinearOperator\nA v \\mapsto o\nA.matvec(v, o)\nNA\n\n\nAdjointOperator\nA^T v \\mapsto o\nA.rmatvec(v, o)\nLinearOperator\n\n\nAdditiveOperator\no \\gets o + \\alpha Av\nA.matvec_add(v, alpha, o)\nLinearOperator\n\n\nAffineOperator\nSets t s.t. A + tB\nA.set_parameter(t)\nLinearOperator\n\n\n\nRespecting these constraints is opt-in: if your operator is symmetric and you only need access to the Lanczos method, then any satisfying the LinearOperator concept is sufficient.",
-    "crumbs": [
-      "Integration Guide",
-      "Usage from C++"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html#slq-parameters",
-    "href": "integration/cpp_integration.html#slq-parameters",
-    "title": "C++ Integration",
-    "section": "",
-    "text": "Below is the full signature of the SLQ function template:\n// Stochastic Lanczos quadrature method\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid slq (\n  const Matrix& A,                    // Any *LinearOperator*\n  const function&lt; F(int,F*,F*) &gt;& f,  // Matrix function \n  const function&lt; bool(int) &gt;& stop,  // Early-stop function\n  const int nv,                       // Num. of sample vectors\n  const Distribution dist,            // Sample vector distribution\n  RBG& rng,                           // Random bit generator\n  const int lanczos_degree,           // Krylov subspace degree\n  const F lanczos_rtol,               // Lanczos residual tolerance\n  const int orth,                     // Add. vectors to orthogonalize\n  const int ncv,                      // Num. of Lanczos vectors\n  const int num_threads,              // # threads to allocate \n  const int seed                      // Seed for RNG \n)\nThe runtime parameters are documented on the sl_trace page; the compile-time (template) parameters are:\n\nThe floating point type (e.g. float, double, long double)\nThe operator type (e.g. Eigen::MatrixXf, torch::Tensor, LinOp)\nThe multi-threaded random number generator (e.g. ThreadedRNG64)\n\nAny combination of types satisfying the concepts above (std::floating_point, LinearOperator, etc.) generates a function specialized for that combination at compile-time, a process known as template instantiation.",
-    "crumbs": [
-      "Usage with C++"
-    ]
-  },
-  {
-    "objectID": "integration/cpp_integration.html#example-log-determinant",
-    "href": "integration/cpp_integration.html#example-log-determinant",
-    "title": "C++ Integration",
-    "section": "Example: Log determinant",
-    "text": "Example: Log determinant\nFor explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_lanczos/lanczos.h&gt;                 // sl_trace\n#include \"LinOp.h\"                            // custom class\n\nvoid slq_log_det(LinOp A, ...){ \n  static_assert(LinearOperator&lt; LinOp &gt;);  // Constraint check\n  const auto matrix_func = std::log;       // any invocable\n  auto rbg = ThreadedRNG64();              // default RNG\n  auto estimates = vector&lt; float &gt;(n, 0);  // output estimates\n  sl_trace&lt; float &gt;(\n    A, matrix_func, rbg,                   // main arguments\n    ...,        \n    estimates.data()\n  );\n}",
-    "crumbs": [
-      "Usage with C++"
-    ]
-  },
-  {
-    "objectID": "integration/python_integration.html",
-    "href": "integration/python_integration.html",
-    "title": "Python Integration",
-    "section": "",
-    "text": "To demonstrate the SLQ method in Python, we start with a simple symmetric matrix A \\in \\mathbb{R}^{n \\times n}.\n\nimport numpy as np\nfrom primate.random import symmetric\nA = symmetric(150, psd = True)\n\nThis generates a random positive semi-definite matrix with eigenvalues in the interval [0, 1].\n\nfrom primate.trace import sl_trace\nestimates = sl_trace(A, plot=True)\n\n\n  \n\n\n\n\n\n\ntr_est = np.mean(estimates)\nprint(f\"Error: {abs(tr_est - A.trace()):.5}\")\nprint(f\"Samples std. deviation: {estimates.std(ddof=1)}\")\nprint(f\"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}\")\n\nError: 0.43677\nSamples std. deviation: 5.014724254608154\nEstimator standard error: 0.35459455262140804\n\n\n\n# from scipy.sparse import csr_array, csc_array\n# from scipy.sparse.linalg import LinearOperator, aslinearoperator\n# tr_true = np.sum(A.diagonal())\n# tr_est_1 = slq(A, **slq_params)\n# tr_est_2 = slq(csc_array(A), **slq_params)\n# tr_est_3 = slq(aslinearoperator(A), **slq_params)\n# assert np.isclose(np.take(tr_est_1,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"\n# assert np.isclose(np.take(tr_est_2,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"\n# assert np.isclose(np.take(tr_est_3,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"",
-    "crumbs": [
-      "Integration Guide",
-      "Usage from Python"
-    ]
-  },
-  {
-    "objectID": "integration/pybind11_integration.html",
-    "href": "integration/pybind11_integration.html",
-    "title": "pybind11 Integration",
-    "section": "",
-    "text": "If you’re using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using primates binding headers.",
-    "crumbs": [
-      "Integration Guide",
-      "Integrating with pybind11"
-    ]
-  },
-  {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Installation",
-    "section": "",
-    "text": "primate is a standard PEP-517 package, and thus can be installed via pip:\npip install &lt; primate source directory &gt;\nCurrently the package must be built from source via cloning the repository. PYPI support is planned.\n\nCompiling extension modules\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.\n\n\n\n\n\nIntegration\nOn the Python side, primate uses a supports a variety of matrix-types of the box, including numpy ndarray’s, compressed sparse matrices (a lá SciPy), and any LinearOperator.\nIn general, primate supports any operator posessing the following methods:\n\nA method A.matvec(input: ndarray) -&gt; ndarray implementing v \\mapsto Av\nA method A.shape() -&gt; tuple yielding the matrix dimensions (A.nrow(), A.ncol())\n\nThis support extends to the C++ side as well—see the C++ integration guide. If you’re using pybind11 and you want to be able to create your own trace estimator from Python, see the pybind11 integration guide.",
-    "crumbs": [
-      "Installation"
-    ]
-  },
-  {
     "objectID": "reference/get_include.html",
     "href": "reference/get_include.html",
     "title": "get_include",
@@ -122,243 +7,11 @@
     "text": "get_include\nget_include()\nReturn the directory that contains the primate’s *.h header files.\nExtension modules that need to compile against primate should use this function to locate the appropriate include directory.\nNotes: When using distutils, for example in setup.py: python     import primate as pyim     ...     Extension('extension_name', ..., include_dirs=[pyim.get_include()])     ... Or with meson-python, for example in meson.build: meson     ...     run_command(py, ['-c', 'import primate as pyim; print(pyim.get_include())', check : true).stdout().strip()     ..."
   },
   {
-    "objectID": "reference/trace.sl_trace.html",
-    "href": "reference/trace.sl_trace.html",
-    "title": "trace.sl_trace",
-    "section": "",
-    "text": "trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099."
-  },
-  {
-    "objectID": "reference/trace.sl_trace.html#parameters",
-    "href": "reference/trace.sl_trace.html#parameters",
-    "title": "trace.sl_trace",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}"
-  },
-  {
-    "objectID": "reference/trace.sl_trace.html#returns",
-    "href": "reference/trace.sl_trace.html#returns",
-    "title": "trace.sl_trace",
-    "section": "",
-    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation."
-  },
-  {
-    "objectID": "reference/trace.sl_trace.html#see-also",
-    "href": "reference/trace.sl_trace.html#see-also",
-    "title": "trace.sl_trace",
-    "section": "",
-    "text": "lanczos : the lanczos algorithm."
-  },
-  {
-    "objectID": "reference/trace.sl_trace.html#reference",
-    "href": "reference/trace.sl_trace.html#reference",
-    "title": "trace.sl_trace",
-    "section": "",
-    "text": ".. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099."
-  },
-  {
-    "objectID": "reference/index.html",
-    "href": "reference/index.html",
-    "title": "Function reference",
-    "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#primate.trace",
-    "href": "reference/index.html#primate.trace",
-    "title": "Function reference",
-    "section": "",
-    "text": "Trace estimation module\n\n\n\ntrace.sl_trace\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\ntrace.sl_gauss\nGaussian quadrature.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#primate.random",
-    "href": "reference/index.html#primate.random",
-    "title": "Function reference",
-    "section": "",
-    "text": "Randomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#misc",
-    "href": "reference/index.html#misc",
-    "title": "Function reference",
-    "section": "",
-    "text": "Miscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/random.rademacher.html",
-    "href": "reference/random.rademacher.html",
-    "title": "random.rademacher",
-    "section": "",
-    "text": "random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Random",
-      "Rademacher"
-    ]
-  },
-  {
-    "objectID": "reference/random.rademacher.html#parameters",
-    "href": "reference/random.rademacher.html#parameters",
-    "title": "random.rademacher",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Random",
-      "Rademacher"
-    ]
-  },
-  {
-    "objectID": "reference/random.normal.html",
-    "href": "reference/random.normal.html",
-    "title": "random.normal",
-    "section": "",
-    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Random",
-      "Normal"
-    ]
-  },
-  {
-    "objectID": "reference/random.normal.html#parameters",
-    "href": "reference/random.normal.html#parameters",
-    "title": "random.normal",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Random",
-      "Normal"
-    ]
-  },
-  {
-    "objectID": "reference/trace.sl_gauss.html",
-    "href": "reference/trace.sl_gauss.html",
-    "title": "trace.sl_gauss",
-    "section": "",
-    "text": "trace.sl_gauss\ntrace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)\nGaussian quadrature.\nComputes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).",
-    "crumbs": [
-      "API Reference",
-      "Trace",
-      "SL Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#trace",
-    "href": "reference/index.html#trace",
-    "title": "Function reference",
-    "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/trace.html",
-    "href": "reference/trace.html",
-    "title": "trace",
-    "section": "",
-    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/trace.html#functions",
-    "href": "reference/trace.html#functions",
-    "title": "trace",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#random",
-    "href": "reference/index.html#random",
-    "title": "Function reference",
-    "section": "",
-    "text": "Randomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.qmd.html",
-    "href": "reference/index.qmd.html",
-    "title": "Trace",
-    "section": "",
-    "text": "Trace estimation module\n\n\ntrace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\ntrace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.qmd.html#primate.trace",
-    "href": "reference/index.qmd.html#primate.trace",
-    "title": "Trace",
-    "section": "",
-    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\ntrace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.qmd.html#primate.random.rademacher",
-    "href": "reference/index.qmd.html#primate.random.rademacher",
-    "title": "Trace",
-    "section": "random.rademacher",
-    "text": "random.rademacher\nrandom.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\nParameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.qmd.html#primate.random.normal",
-    "href": "reference/index.qmd.html#primate.random.normal",
-    "title": "Trace",
-    "section": "random.normal",
-    "text": "random.normal\nrandom.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\nParameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
-    "objectID": "reference/index.qmd.html#primate.get_include",
-    "href": "reference/index.qmd.html#primate.get_include",
-    "title": "Trace",
-    "section": "get_include",
-    "text": "get_include\nget_include()\nReturn the directory that contains the primate’s *.h header files.\nExtension modules that need to compile against primate should use this function to locate the appropriate include directory.\nNotes: When using distutils, for example in setup.py: python     import primate as pyim     ...     Extension('extension_name', ..., include_dirs=[pyim.get_include()])     ... Or with meson-python, for example in meson.build: meson     ...     run_command(py, ['-c', 'import primate as pyim; print(pyim.get_include())', check : true).stdout().strip()     ...",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
-  },
-  {
     "objectID": "reference/primate.trace.sl_trace.html",
     "href": "reference/primate.trace.sl_trace.html",
     "title": "sl_trace",
     "section": "",
-    "text": "trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function \\(f(A)\\) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
+    "text": "trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -382,7 +35,7 @@
     "href": "reference/primate.trace.sl_trace.html#returns",
     "title": "sl_trace",
     "section": "",
-    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function \\(f(A)\\).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.",
+    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -414,79 +67,27 @@
     ]
   },
   {
-    "objectID": "reference/primate.trace.sl_gauss.html",
-    "href": "reference/primate.trace.sl_gauss.html",
-    "title": "sl_gauss",
+    "objectID": "reference/random.normal.html",
+    "href": "reference/random.normal.html",
+    "title": "random.normal",
     "section": "",
-    "text": "sl_gauss\ntrace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)\nGaussian quadrature.\nComputes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).",
+    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
     "crumbs": [
       "API Reference",
-      "Trace",
-      "SL Gauss"
+      "Random",
+      "Normal"
     ]
   },
   {
-    "objectID": "reference/index.html#primate",
-    "href": "reference/index.html#primate",
-    "title": "Function reference",
-    "section": "",
-    "text": "rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nnormal\nGenerates random vectors from the rademacher distribution.",
-    "crumbs": [
-      "API Reference"
-    ]
-  },
-  {
-    "objectID": "reference/normal.html",
-    "href": "reference/normal.html",
-    "title": "normal",
-    "section": "",
-    "text": "normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "normal"
-    ]
-  },
-  {
-    "objectID": "reference/normal.html#parameters",
-    "href": "reference/normal.html#parameters",
-    "title": "normal",
+    "objectID": "reference/random.normal.html#parameters",
+    "href": "reference/random.normal.html#parameters",
+    "title": "random.normal",
     "section": "",
     "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
     "crumbs": [
       "API Reference",
-      "normal"
-    ]
-  },
-  {
-    "objectID": "reference/rademacher.html",
-    "href": "reference/rademacher.html",
-    "title": "rademacher",
-    "section": "",
-    "text": "rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "rademacher"
-    ]
-  },
-  {
-    "objectID": "reference/rademacher.html#parameters",
-    "href": "reference/rademacher.html#parameters",
-    "title": "rademacher",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
-    "crumbs": [
-      "API Reference",
-      "rademacher"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#diagonalize",
-    "href": "reference/index.html#diagonalize",
-    "title": "Function reference",
-    "section": "",
-    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.",
-    "crumbs": [
-      "API Reference"
+      "Random",
+      "Normal"
     ]
   },
   {
@@ -526,42 +127,67 @@
     ]
   },
   {
-    "objectID": "integration/cpp_integration.html#slq-implementation",
-    "href": "integration/cpp_integration.html#slq-implementation",
-    "title": "C++ Integration",
-    "section": "SLQ Implementation",
-    "text": "SLQ Implementation\nRecall the pseudo-code for the stochastic lanczos procedure.\n\n\n\\begin{algorithm} \\caption{Stochastic Lanczos Quadrature} \\begin{algorithmic} \\Input Symmetric operator ($A \\in \\mathbb{R}^{n \\times n}$), function ($f: \\mathbb{R} \\to \\mathbb{R}$) \\Require Number of queries ($n_v$), Degree of quadrature ($k$) \\Output Approximate trace $\\Gamma \\approx \\mathtt{tr}(f(A)) = e_1^\\top U f(\\Lambda)U^\\top e_1$ \\Function{SLQ}{$A$, $f$, $n_v$, $k$} \\State $\\Gamma \\gets 0$ \\For{$j = 1, 2, \\dots, n_v$} \\State $v_i \\sim \\mathcal{D}$ where $\\mathcal{D}$ satisfies $\\mathbb{E}(v v^\\top) = I$ \\State $T^{(j)}(\\alpha, \\beta)$ $\\gets$ $\\mathrm{Lanczos}(A,v_j,k+1)$ \\State $[\\Theta, Y] \\gets \\mathrm{eigh\\_tridiag}(T^{(j)}(\\alpha, \\beta))$ \\State $\\Gamma \\texttt{ += } n_v^{-1} \\sum\\limits_{i = 1}^k \\tau_i^2 \\cdot f(\\theta_i)$, where $\\tau_i = \\langle e_1, y_i \\rangle$ \\EndFor \\Return $n \\cdot \\Gamma$ \\EndFunction \\end{algorithmic} \\end{algorithm}\n\n\nGiven a valid set of parameters, the main body of the SLQ\n  bool stop_flag = false; // convergence checking\n  #pragma omp parallel shared(stop_flag)\n  {\n    int tid = omp_get_thread_num(); // thread-id \n\n    // &lt; allocations for Q, alpha, beta, etc. &gt; \n\n    #pragma omp for schedule(dynamic, chunk_size)\n    for (i = 0; i &lt; nv; ++i){\n      if (stop_flag){ continue; }\n\n      // Generate isotropic vector (populates q)\n      generate_isotropic&lt; F &gt;(...);\n\n      // Lanczos iteration (populates alpha + beta)\n      lanczos_recurrence&lt; F &gt;(...); \n\n      // Gaussian quad. (populates nodes + weights)\n      lanczos_quadrature&lt; F &gt;(...);\n\n      // Run the user-supplied function \n      f(i, q, Q, nodes, weights);\n\n      // Checks early-stopping condition\n      #pragma omp critical\n      {\n        stop_flag = stop(i);\n      }\n    } // end for\n  } // end parallel",
+    "objectID": "imate_compare.html",
+    "href": "imate_compare.html",
+    "title": "Comparison to imate",
+    "section": "",
+    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, genericity, and choice of FFI / build system.\nNotable differences between the two packages include:\n\n\n\nFeature\nprimate\nimate\n\n\n\n\nParallel support\nCPU only\nCPU & GPU\n\n\nFunction support\nArbitrary\nPackage supported2\n\n\nOperator support\nArbitrary\nMatrix-derived\n\n\nLinking strategy\nHeader only\nShared libraries\n\n\nC++ version\n\\geq C++20\nAny\n\n\nFFI\nPybind11\nCython\n\n\nBuild tool\nMeson\nCMake\n\n\n\nOne motivation for developing primate was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guide.\n\n\n\n\n\n\nFootnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using Eigen the library.↩︎\nSee imates documentation for the list of supported functions.↩︎",
     "crumbs": [
-      "Usage with C++"
+      "Comparison to *imate*"
     ]
   },
   {
-    "objectID": "guide/sl_trace_ex.html",
-    "href": "guide/sl_trace_ex.html",
-    "title": "SLQ Trace guide",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Package overview",
     "section": "",
-    "text": "One of the base offerings of primate is an extensible implementation of the stochastic Lanczos method (SLQ). Despite its simplicity (only a few lines of pseudocode!), there are actually many methods called the ‘SLQ’ method, each typically performing a related but otherwise distinct functionality. For example, sl_quad computes Gaussian quadrature nodes / weights while sl_trace computes an unbiased estimator for the trace of a matrix function."
+    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions; that is, matrices parameterized by functions:\n \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\n\nA highly-parametrizable trace estimator (SLQ)\nVarious distribution / engine choices for random vector generation (the stochastic part!)\nOrthogonalization routines, such as the Lanczos, Golub Kahan, and Gram Schmidt methods\nSupport for arbitrary matrix functions, i.e. Callable’s (Python) and invocable’s2 (C++)\nSupport for arbitrary LinearOperator’s, e.g. those in SciPy or Pylops\n\n\n\nMuch of primate’s computational code was directly ported from the (excellent) imate package—for a comparison of the two, see here.\n\n\nprimate relies on BLAS libraries\n\npipx run cibuildwheel –platform linux",
+    "crumbs": [
+      "Overview"
+    ]
   },
   {
-    "objectID": "guide/sl_trace_ex.html#slq-parameters",
-    "href": "guide/sl_trace_ex.html#slq-parameters",
-    "title": "SLQ Trace guide",
-    "section": "SLQ parameters",
-    "text": "SLQ parameters\nBelow is the full signature of the SLQ function template:\n// Stochastic Lanczos quadrature method\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid slq (\n  const Matrix& A,                    // Any *LinearOperator*\n  const function&lt; F(int,F*,F*) &gt;& f,  // Matrix function \n  const function&lt; bool(int) &gt;& stop,  // Early-stop function\n  const int nv,                       // Num. of sample vectors\n  const Distribution dist,            // Sample vector distribution\n  RBG& rng,                           // Random bit generator\n  const int lanczos_degree,           // Krylov subspace degree\n  const F lanczos_rtol,               // Lanczos residual tolerance\n  const int orth,                     // Add. vectors to orthogonalize\n  const int ncv,                      // Num. of Lanczos vectors\n  const int num_threads,              // # threads to allocate \n  const int seed                      // Seed for RNG \n)\nMany of the runtime arguments are documented in the lanczos or sl_trace docs; the compile-time (template) parameters are:\n\nThe floating point type (e.g. float, double, long double)\nThe operator type (e.g. Eigen::MatrixXf, torch::Tensor, LinOp)\nThe multi-threaded random number generator (e.g. ThreadedRNG64)\n\nAny combination of types satisfying the concepts above (std::floating_point, LinearOperator, etc.) generates a function specialized for that combination at compile-time, a process known as template instantiation."
+    "objectID": "index.html#compilation-development",
+    "href": "index.html#compilation-development",
+    "title": "Package overview",
+    "section": "",
+    "text": "primate relies on BLAS libraries\n\npipx run cibuildwheel –platform linux",
+    "crumbs": [
+      "Overview"
+    ]
   },
   {
-    "objectID": "guide/sl_trace_ex.html#slq-implementation",
-    "href": "guide/sl_trace_ex.html#slq-implementation",
-    "title": "SLQ Trace guide",
-    "section": "SLQ Implementation",
-    "text": "SLQ Implementation\nThe pseudo-code for the abstract stochastic Lanczos quadrature procedure is given below.\n\n\n\\begin{algorithm} \\caption{Stochastic Lanczos Quadrature} \\begin{algorithmic} \\Input Symmetric operator ($A \\in \\mathbb{R}^{n \\times n}$), function ($f: \\mathbb{R} \\to \\mathbb{R}$) \\Require Number of queries ($n_v$), Degree of quadrature ($k$) \\Function{SLQ}{$A$, $n_v$, $k$} \\State $\\Gamma \\gets 0$ \\For{$j = 1, 2, \\dots, n_v$} \\State $v_i \\sim \\mathcal{D}$ where $\\mathcal{D}$ satisfies $\\mathbb{E}(v v^\\top) = I$ \\State $T^{(j)}(\\alpha, \\beta)$ $\\gets$ $\\mathrm{Lanczos}(A,v_j,k+1)$ \\State $[\\Theta, Y] \\gets \\mathrm{eigh\\_tridiag}(T^{(j)}(\\alpha, \\beta))$ \\State &lt; Do something with the node/weight pairs $(\\theta_i, \\tau_i^2)$ &gt;, where $\\tau_i = \\langle e_1, y_i \\rangle$ \\EndFor \\Return $n \\cdot \\Gamma$ \\EndFunction \\end{algorithmic} \\end{algorithm}\n\n\nGiven a valid set of parameters, the main body of the SLQ\n  bool stop_flag = false; // convergence checking\n  #pragma omp parallel shared(stop_flag)\n  {\n    int tid = omp_get_thread_num(); // thread-id \n\n    // &lt; allocations for Q, alpha, beta, etc. &gt; \n\n    #pragma omp for schedule(dynamic, chunk_size)\n    for (i = 0; i &lt; nv; ++i){\n      if (stop_flag){ continue; }\n\n      // Generate isotropic vector (populates q)\n      generate_isotropic&lt; F &gt;(...);\n\n      // Lanczos iteration (populates alpha + beta)\n      lanczos_recurrence&lt; F &gt;(...); \n\n      // Gaussian quad. (populates nodes + weights)\n      lanczos_quadrature&lt; F &gt;(...);\n\n      // Run the user-supplied function \n      f(i, q, Q, nodes, weights);\n\n      // Checks early-stopping condition\n      #pragma omp critical\n      {\n        stop_flag = stop(i);\n      }\n    } // end for\n  } // end parallel"
+    "objectID": "integration/cpp_integration.html",
+    "href": "integration/cpp_integration.html",
+    "title": "C++ Integration",
+    "section": "",
+    "text": "To get started calling any matrix-free function provided by primate, such sl_trace or lanczos, simply pass any type with a .shape() and .matvec() member functions defined like so:\nIt’s up to you to ensure shape() yields the correct size; primate will supply vectors to input of size .shape().second (number of columns) and guarantees the pointer to the output will be at least shape().first (number of rows), no more.",
+    "crumbs": [
+      "Integration Guide",
+      "Usage from C++"
+    ]
   },
   {
-    "objectID": "guide/sl_trace_ex.html#example-log-determinant",
-    "href": "guide/sl_trace_ex.html#example-log-determinant",
-    "title": "SLQ Trace guide",
-    "section": "Example: Log determinant",
-    "text": "Example: Log determinant\nFor explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_lanczos/lanczos.h&gt;                 // sl_trace\n#include \"LinOp.h\"                            // custom class\n\nvoid slq_log_det(LinOp A, ...){ \n  static_assert(LinearOperator&lt; LinOp &gt;);  // Constraint check\n  const auto matrix_func = std::log;       // any invocable\n  auto rbg = ThreadedRNG64();              // default RNG\n  auto estimates = vector&lt; float &gt;(n, 0);  // output estimates\n  sl_trace&lt; float &gt;(                       // specific precision\n    A, matrix_func, rbg,                   // main arguments\n    ...,                                   // other inputs \n    estimates.data()                       // output \n  );\n}"
+    "objectID": "integration/cpp_integration.html#the-linearoperator-concept",
+    "href": "integration/cpp_integration.html#the-linearoperator-concept",
+    "title": "C++ Integration",
+    "section": "The LinearOperator concept",
+    "text": "The LinearOperator concept\nprimate’s generic API is enabled through C++20 concepts. Thus, the more exact statement is that any type respecting the LinearOperator concept shown below can be passed:\nusing FP = std::floating_point; \ntemplate &lt; typename T, FP float_t = typename T::value_type &gt;\nconcept LinearOperator = requires(T A, const float_t* v, float_t* o) {\n  { A.matvec(v, o) }; // o = A v\n  { A.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nAn instance A of type T is said to support the LinearOperator concept if it has:\n\nA method Av \\mapsto o, with signature A.matvec(const float_t* v, float_t* o)\nA method yielding (\\mathrm{card}(o), \\mathrm{card}(v)), with signatureA.shape() -&gt; pair&lt; ... &gt;\n\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
+    "crumbs": [
+      "Integration Guide",
+      "Usage from C++"
+    ]
+  },
+  {
+    "objectID": "integration/cpp_integration.html#other-concepts",
+    "href": "integration/cpp_integration.html#other-concepts",
+    "title": "C++ Integration",
+    "section": "Other Concepts",
+    "text": "Other Concepts\nDepending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:\n\n\n\n\n\n\n\n\n\nConcept\nSupports\nSignature\nRequires\n\n\n\n\nLinearOperator\nA v \\mapsto o\nA.matvec(v, o)\nNA\n\n\nAdjointOperator\nA^T v \\mapsto o\nA.rmatvec(v, o)\nLinearOperator\n\n\nAdditiveOperator\no \\gets o + \\alpha Av\nA.matvec_add(v, alpha, o)\nLinearOperator\n\n\nAffineOperator\nSets t s.t. A + tB\nA.set_parameter(t)\nLinearOperator\n\n\n\nRespecting these constraints is opt-in: if your operator is symmetric and you only need access to the Lanczos method, then any satisfying the LinearOperator concept is sufficient.",
+    "crumbs": [
+      "Integration Guide",
+      "Usage from C++"
+    ]
   },
   {
     "objectID": "guide/slq_guide.html",
@@ -575,77 +201,11 @@
     ]
   },
   {
-    "objectID": "guide/slq_guide.html#slq-parameters",
-    "href": "guide/slq_guide.html#slq-parameters",
-    "title": "SLQ Trace guide",
-    "section": "SLQ parameters",
-    "text": "SLQ parameters\nBelow is the full signature of the SLQ function template:\n// Stochastic Lanczos quadrature method\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid slq (\n  const Matrix& A,                    // Any *LinearOperator*\n  const function&lt; F(int,F*,F*) &gt;& f,  // Matrix function \n  const function&lt; bool(int) &gt;& stop,  // Early-stop function\n  const int nv,                       // Num. of sample vectors\n  const Distribution dist,            // Sample vector distribution\n  RBG& rng,                           // Random bit generator\n  const int lanczos_degree,           // Krylov subspace degree\n  const F lanczos_rtol,               // Lanczos residual tolerance\n  const int orth,                     // Add. vectors to orthogonalize\n  const int ncv,                      // Num. of Lanczos vectors\n  const int num_threads,              // # threads to allocate \n  const int seed                      // Seed for RNG \n)\nMany of the runtime arguments are documented in the lanczos or sl_trace docs; the compile-time (template) parameters are:\n\nThe floating point type (e.g. float, double, long double)\nThe operator type (e.g. Eigen::MatrixXf, torch::Tensor, LinOp)\nThe multi-threaded random number generator (e.g. ThreadedRNG64)\n\nAny combination of types satisfying the concepts above (std::floating_point, LinearOperator, etc.) generates a function specialized for that combination at compile-time, a process known as template instantiation.",
-    "crumbs": [
-      "User Guide",
-      "The SLQ method"
-    ]
-  },
-  {
-    "objectID": "guide/slq_guide.html#slq-implementation",
-    "href": "guide/slq_guide.html#slq-implementation",
-    "title": "SLQ Trace guide",
-    "section": "SLQ Implementation",
-    "text": "SLQ Implementation\nGiven a valid set of parameters, the main body of the SLQ\n  bool stop_flag = false; // convergence checking\n  #pragma omp parallel shared(stop_flag)\n  {\n    int tid = omp_get_thread_num(); // thread-id \n\n    // &lt; allocations for Q, alpha, beta, etc. &gt; \n\n    #pragma omp for schedule(dynamic, chunk_size)\n    for (i = 0; i &lt; nv; ++i){\n      if (stop_flag){ continue; }\n\n      // Generate isotropic vector (populates q)\n      generate_isotropic&lt; F &gt;(...);\n\n      // Lanczos iteration (populates alpha + beta)\n      lanczos_recurrence&lt; F &gt;(...); \n\n      // Gaussian quad. (populates nodes + weights)\n      lanczos_quadrature&lt; F &gt;(...);\n\n      // Run the user-supplied function \n      f(i, q, Q, nodes, weights);\n\n      // Checks early-stopping condition\n      #pragma omp critical\n      {\n        stop_flag = stop(i);\n      }\n    } // end for\n  } // end parallel",
-    "crumbs": [
-      "User Guide",
-      "The SLQ method"
-    ]
-  },
-  {
-    "objectID": "guide/slq_guide.html#example-log-determinant",
-    "href": "guide/slq_guide.html#example-log-determinant",
-    "title": "SLQ Trace guide",
-    "section": "Example: Log determinant",
-    "text": "Example: Log determinant\nFor explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_lanczos/lanczos.h&gt;                 // sl_trace\n#include \"LinOp.h\"                            // custom class\n\nvoid slq_log_det(LinOp A, ...){ \n  static_assert(LinearOperator&lt; LinOp &gt;);  // Constraint check\n  const auto matrix_func = std::log;       // any invocable\n  auto rbg = ThreadedRNG64();              // default RNG\n  auto estimates = vector&lt; float &gt;(n, 0);  // output estimates\n  sl_trace&lt; float &gt;(                       // specific precision\n    A, matrix_func, rbg,                   // main arguments\n    ...,                                   // other inputs \n    estimates.data()                       // output \n  );\n}",
-    "crumbs": [
-      "User Guide",
-      "The SLQ method"
-    ]
-  },
-  {
-    "objectID": "integration/pybind11_integration.html#example-log-determinant",
-    "href": "integration/pybind11_integration.html#example-log-determinant",
-    "title": "pybind11 Integration",
-    "section": "Example: Log determinant",
-    "text": "Example: Log determinant\nFor explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_lanczos/lanczos.h&gt;                 // sl_trace\n#include \"LinOp.h\"                            // custom class\n\nvoid slq_log_det(LinOp A, ...){ \n  static_assert(LinearOperator&lt; LinOp &gt;);  // Constraint check\n  const auto matrix_func = std::log;       // any invocable\n  auto rbg = ThreadedRNG64();              // default RNG\n  auto estimates = vector&lt; float &gt;(n, 0);  // output estimates\n  sl_trace&lt; float &gt;(                       // specific precision\n    A, matrix_func, rbg,                   // main arguments\n    ...,                                   // other inputs \n    estimates.data()                       // output \n  );\n}",
-    "crumbs": [
-      "Integration Guide",
-      "Integrating with pybind11"
-    ]
-  },
-  {
     "objectID": "guide/slq_guide.html#slq-as-a-function-template",
     "href": "guide/slq_guide.html#slq-as-a-function-template",
     "title": "SLQ Trace guide",
     "section": "SLQ as a function template",
     "text": "SLQ as a function template\nBelow is the full signature of the SLQ function template:\n// Stochastic Lanczos quadrature method\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid slq (\n  const Matrix& A,                    // Any *LinearOperator*\n  const function&lt; F(int,F*,F*) &gt;& f,  // Generic function\n  const function&lt; bool(int) &gt;& stop,  // Early-stop function\n  const int nv,                       // Num. of sample vectors\n  const Distribution dist,            // Sample vector distribution\n  RBG& rng,                           // Random bit generator\n  const int lanczos_degree,           // Krylov subspace degree\n  const F lanczos_rtol,               // Lanczos residual tolerance\n  const int orth,                     // Add. vectors to orthogonalize\n  const int ncv,                      // Num. of Lanczos vectors\n  const int num_threads,              // # threads to allocate \n  const int seed                      // Seed for RNG \n)\nMany of the runtime arguments are documented in the lanczos or sl_trace docs; the compile-time (template) parameters are:\n\nThe floating point type (e.g. float, double, long double)\nThe operator type (e.g. Eigen::MatrixXf, torch::Tensor, LinOp)\nThe multi-threaded random number generator (e.g. ThreadedRNG64)\n\nNote any type combination satisfying these concepts (e.g. std::floating_point, LinearOperator) generates a function specialized of said types at compile-time—this is known as template instantiation.",
-    "crumbs": [
-      "User Guide",
-      "The SLQ method"
-    ]
-  },
-  {
-    "objectID": "guide/slq_guide.html#genericity-by-function-passing",
-    "href": "guide/slq_guide.html#genericity-by-function-passing",
-    "title": "SLQ Trace guide",
-    "section": "Genericity by function passing",
-    "text": "Genericity by function passing\nGiven a valid set of parameters, the main body of the SLQ looks something like this:\n  bool stop_flag = false; // convergence checking\n  #pragma omp parallel shared(stop_flag)\n  {\n    int tid = omp_get_thread_num(); // thread-id \n\n    // &lt; allocations for Q, alpha, beta, etc. &gt; \n\n    #pragma omp for schedule(dynamic, chunk_size)\n    for (i = 0; i &lt; nv; ++i){\n      if (stop_flag){ continue; }\n\n      // Generate isotropic vector (populates q)\n      generate_isotropic&lt; F &gt;(...);\n\n      // Lanczos iteration (populates alpha + beta)\n      lanczos_recurrence&lt; F &gt;(...); \n\n      // Gaussian quad. (populates nodes + weights)\n      lanczos_quadrature&lt; F &gt;(...);\n\n      // Run the user-supplied function \n      f(i, q, Q, nodes, weights);\n\n      // Checks early-stopping condition\n      #pragma omp critical\n      {\n        stop_flag = stop(i);\n      }\n    } // end for\n  } // end parallel \nThere are two functions that can be used for generalizing SLQ for different purposes.\nThe first is the generic function f which can save, modify, or otherwise use the information available from the iteration index i, the isotropic vector q, the Lanczos vectors Q, and/or the quadrature information nodes, weights.\nThe second is a boolean-valued function stop which can be used to stop the iteration early, for example if convergence has been achieved according to some rule.",
-    "crumbs": [
-      "User Guide",
-      "The SLQ method"
-    ]
-  },
-  {
-    "objectID": "guide/slq_guide.html#sl_trace-method",
-    "href": "guide/slq_guide.html#sl_trace-method",
-    "title": "SLQ Trace guide",
-    "section": "sl_trace method",
-    "text": "sl_trace method\nTo see how these formulas are actually implemented with the generic SLQ implementation, here’s an abbreviated form of the sl_trace function implemented by primate:\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid sl_trace(\n  const Matrix& A, const std::function&lt; F(F) &gt; sf, RBG& rbg, \n  const int nv, const int dist, const int engine_id, const int seed,\n  const int deg, const float lanczos_rtol, const int orth, const int ncv,\n  const F atol, const F rtol\n  F* estimates\n){  \n  using VectorF = Eigen::Array&lt; F, Dynamic, 1&gt;;\n\n  // Parameterize the trace function (runs in parallel)\n  auto trace_f = [&](int i, F* q, F* Q, F* nodes, F* weights){\n    Map&lt; VectorF &gt; nodes_v(nodes, deg, 1);     // no-op\n    Map&lt; VectorF &gt; weights_v(weights, deg, 1); // no-op\n    nodes_v.unaryExpr(sf);\n    estimates[i] = (nodes_v * weights_v).sum();\n  };\n  \n  // Convergence checking like scipy.integrate.quadrature\n  int n = 0;\n  F mu_est = 0.0, mu_pre = 0.0;\n  const auto early_stop = [&](int i) -&gt; bool {\n    ++n; // Number of estimates\n    mu_est = (1.0 / F(n)) * (estimates[i] + (n - 1) * mu_pre); \n    bool atol_check = abs(mu_est - mu_pre) &lt;= atol;\n    bool rtol_check = abs(mu_est - mu_pre) / mu_est &lt;= rtol; \n    mu_pre = mu_est; \n    return atol_check || rtol_check;\n  };\n\n  // Execute the stochastic Lanczos quadrature with the trace function \n  slq&lt; float &gt;(A, trace_f, early_stop, ...);\n}\nAs before, two functions are used to parameterize the slq method.\nThe first (trace_f) applies an arbitrary spectral function sf to the Rayleigh-Ritz values obtained by the Lanczos tridiagonalization of A(or equivalently, the nodes of the Gaussian quadrature). These are the \\theta’s in the pseudocode above. When multiplied by the weights of the quadrature, the corresponding sum forms an estimate of the trace of the matrix function.\nThe second function early_stop is used to check for convergence of the estimator. First, it uses the trace estimate x_n to update the sample mean \\mu_n via the formula:\n \\mu_n = n^{-1} [x_n + (n - 1)\\mu_{n-1}] \nThen, much in the same way the quadrature function from scipy.integrate approximates a definite integral, it checks for convergence using the absolute and relative tolerances supplied by the user. Returning true signals convergence, stopping the iteration early.",
     "crumbs": [
       "User Guide",
       "The SLQ method"
@@ -674,6 +234,17 @@
     ]
   },
   {
+    "objectID": "guide/slq_guide.html#sl_trace-method",
+    "href": "guide/slq_guide.html#sl_trace-method",
+    "title": "SLQ Trace guide",
+    "section": "sl_trace method",
+    "text": "sl_trace method\nTo see how these formulas are actually implemented with the generic SLQ implementation, here’s an abbreviated form of the sl_trace function implemented by primate:\ntemplate&lt; std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG &gt;\nvoid sl_trace(\n  const Matrix& A, const std::function&lt; F(F) &gt; sf, RBG& rbg, \n  const int nv, const int dist, const int engine_id, const int seed,\n  const int deg, const float lanczos_rtol, const int orth, const int ncv,\n  const F atol, const F rtol\n  F* estimates\n){  \n  using VectorF = Eigen::Array&lt; F, Dynamic, 1&gt;;\n\n  // Parameterize the trace function (runs in parallel)\n  auto trace_f = [&](int i, F* q, F* Q, F* nodes, F* weights){\n    Map&lt; VectorF &gt; nodes_v(nodes, deg, 1);     // no-op\n    Map&lt; VectorF &gt; weights_v(weights, deg, 1); // no-op\n    nodes_v.unaryExpr(sf);\n    estimates[i] = (nodes_v * weights_v).sum();\n  };\n  \n  // Convergence checking like scipy.integrate.quadrature\n  int n = 0;\n  F mu_est = 0.0, mu_pre = 0.0;\n  const auto early_stop = [&](int i) -&gt; bool {\n    ++n; // Number of estimates\n    mu_est = (1.0 / F(n)) * (estimates[i] + (n - 1) * mu_pre); \n    bool atol_check = abs(mu_est - mu_pre) &lt;= atol;\n    bool rtol_check = abs(mu_est - mu_pre) / mu_est &lt;= rtol; \n    mu_pre = mu_est; \n    return atol_check || rtol_check;\n  };\n\n  // Execute the stochastic Lanczos quadrature with the trace function \n  slq&lt; float &gt;(A, trace_f, early_stop, ...);\n}\nAs before, two functions are used to parameterize the slq method.\nThe first (trace_f) applies an arbitrary spectral function sf to the Rayleigh-Ritz values obtained by the Lanczos tridiagonalization of A(or equivalently, the nodes of the Gaussian quadrature). These are the \\theta’s in the pseudocode above. When multiplied by the weights of the quadrature, the corresponding sum forms an estimate of the trace of the matrix function.\nThe second function early_stop is used to check for convergence of the estimator. First, it uses the trace estimate x_n to update the sample mean \\mu_n via the formula:\n \\mu_n = n^{-1} [x_n + (n - 1)\\mu_{n-1}] \nThen, much in the same way the quadrature function from scipy.integrate approximates a definite integral, it checks for convergence using the absolute and relative tolerances supplied by the user. Returning true signals convergence, stopping the iteration early.",
+    "crumbs": [
+      "User Guide",
+      "The SLQ method"
+    ]
+  },
+  {
     "objectID": "guide/slq_guide.html#references",
     "href": "guide/slq_guide.html#references",
     "title": "SLQ Trace guide",
@@ -685,14 +256,154 @@
     ]
   },
   {
-    "objectID": "integration/cpp_integration.html#the-linearoperator-concept",
-    "href": "integration/cpp_integration.html#the-linearoperator-concept",
-    "title": "C++ Integration",
-    "section": "The LinearOperator concept",
-    "text": "The LinearOperator concept\nprimate’s generic API is enabled through C++20 concepts. Thus, the more exact statement is that any type respecting the LinearOperator concept shown below can be passed:\nusing FP = std::floating_point; \ntemplate &lt; typename T, FP float_t = typename T::value_type &gt;\nconcept LinearOperator = requires(T A, const float_t* v, float_t* o) {\n  { A.matvec(v, o) }; // o = A v\n  { A.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nAn instance A of type T is said to support the LinearOperator concept if it has:\n\nA method Av \\mapsto o, with signature A.matvec(const float_t* v, float_t* o)\nA method yielding (\\mathrm{card}(o), \\mathrm{card}(v)), with signatureA.shape() -&gt; pair&lt; ... &gt;\n\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
+    "objectID": "integration/python_integration.html",
+    "href": "integration/python_integration.html",
+    "title": "Python Integration",
+    "section": "",
+    "text": "To demonstrate the SLQ method in Python, we start with a simple symmetric matrix A \\in \\mathbb{R}^{n \\times n}.\n\nimport numpy as np\nfrom primate.random import symmetric\nA = symmetric(150, psd = True)\n\nThis generates a random positive semi-definite matrix with eigenvalues in the interval [0, 1].\n\nfrom primate.trace import sl_trace\nestimates = sl_trace(A, plot=True)\n\n\n  \n\n\n\n\n\n\ntr_est = np.mean(estimates)\nprint(f\"Error: {abs(tr_est - A.trace()):.5}\")\nprint(f\"Samples std. deviation: {estimates.std(ddof=1)}\")\nprint(f\"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}\")\n\nError: 62.002\nSamples std. deviation: 25.753618240356445\nEstimator standard error: 1.8210558097845604\n\n\n\n# from scipy.sparse import csr_array, csc_array\n# from scipy.sparse.linalg import LinearOperator, aslinearoperator\n# tr_true = np.sum(A.diagonal())\n# tr_est_1 = slq(A, **slq_params)\n# tr_est_2 = slq(csc_array(A), **slq_params)\n# tr_est_3 = slq(aslinearoperator(A), **slq_params)\n# assert np.isclose(np.take(tr_est_1,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"\n# assert np.isclose(np.take(tr_est_2,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"\n# assert np.isclose(np.take(tr_est_3,0), tr_true, atol=np.abs(tr_true)*0.35), \"Estimate is off more than 5%\"",
     "crumbs": [
       "Integration Guide",
-      "Usage from C++"
+      "Usage from Python"
+    ]
+  },
+  {
+    "objectID": "integration/pybind11_integration.html",
+    "href": "integration/pybind11_integration.html",
+    "title": "pybind11 Integration",
+    "section": "",
+    "text": "If you’re using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using primates binding headers.",
+    "crumbs": [
+      "Integration Guide",
+      "Integrating with pybind11"
+    ]
+  },
+  {
+    "objectID": "integration/pybind11_integration.html#example-log-determinant",
+    "href": "integration/pybind11_integration.html#example-log-determinant",
+    "title": "pybind11 Integration",
+    "section": "Example: Log determinant",
+    "text": "Example: Log determinant\nFor explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator LinOp:\n#include &lt;cmath&gt;                              // std::log\n#include &lt;_linear_operator/linear_operator.h&gt; // LinearOperator\n#include &lt;_lanczos/lanczos.h&gt;                 // sl_trace\n#include \"LinOp.h\"                            // custom class\n\nvoid slq_log_det(LinOp A, ...){ \n  static_assert(LinearOperator&lt; LinOp &gt;);  // Constraint check\n  const auto matrix_func = std::log;       // any invocable\n  auto rbg = ThreadedRNG64();              // default RNG\n  auto estimates = vector&lt; float &gt;(n, 0);  // output estimates\n  sl_trace&lt; float &gt;(                       // specific precision\n    A, matrix_func, rbg,                   // main arguments\n    ...,                                   // other inputs \n    estimates.data()                       // output \n  );\n}",
+    "crumbs": [
+      "Integration Guide",
+      "Integrating with pybind11"
+    ]
+  },
+  {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Installation",
+    "section": "",
+    "text": "primate is a standard PEP-517 package, and thus can be installed via pip:\npip install &lt; primate source directory &gt;\nCurrently the package must be built from source via cloning the repository. PYPI support is planned.\n\nCompiling extension modules\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.\n\n\n\n\n\nIntegration\nOn the Python side, primate uses a supports a variety of matrix-types of the box, including numpy ndarray’s, compressed sparse matrices (a lá SciPy), and any LinearOperator.\nIn general, primate supports any operator posessing the following methods:\n\nA method A.matvec(input: ndarray) -&gt; ndarray implementing v \\mapsto Av\nA method A.shape() -&gt; tuple yielding the matrix dimensions (A.nrow(), A.ncol())\n\nThis support extends to the C++ side as well—see the C++ integration guide. If you’re using pybind11 and you want to be able to create your own trace estimator from Python, see the pybind11 integration guide.",
+    "crumbs": [
+      "Installation"
+    ]
+  },
+  {
+    "objectID": "reference/random.rademacher.html",
+    "href": "reference/random.rademacher.html",
+    "title": "random.rademacher",
+    "section": "",
+    "text": "random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
+    "crumbs": [
+      "API Reference",
+      "Random",
+      "Rademacher"
+    ]
+  },
+  {
+    "objectID": "reference/random.rademacher.html#parameters",
+    "href": "reference/random.rademacher.html#parameters",
+    "title": "random.rademacher",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
+    "crumbs": [
+      "API Reference",
+      "Random",
+      "Rademacher"
+    ]
+  },
+  {
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Function reference",
+    "section": "",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#trace",
+    "href": "reference/index.html#trace",
+    "title": "Function reference",
+    "section": "",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#random",
+    "href": "reference/index.html#random",
+    "title": "Function reference",
+    "section": "",
+    "text": "Randomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#diagonalize",
+    "href": "reference/index.html#diagonalize",
+    "title": "Function reference",
+    "section": "",
+    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#misc",
+    "href": "reference/index.html#misc",
+    "title": "Function reference",
+    "section": "",
+    "text": "Miscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/primate.trace.sl_gauss.html",
+    "href": "reference/primate.trace.sl_gauss.html",
+    "title": "sl_gauss",
+    "section": "",
+    "text": "sl_gauss\ntrace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)\nGaussian quadrature.\nComputes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).",
+    "crumbs": [
+      "API Reference",
+      "Trace",
+      "SL Gauss"
+    ]
+  },
+  {
+    "objectID": "reference/trace.html",
+    "href": "reference/trace.html",
+    "title": "trace",
+    "section": "",
+    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
+    "crumbs": [
+      "API Reference",
+      "Trace"
+    ]
+  },
+  {
+    "objectID": "reference/trace.html#functions",
+    "href": "reference/trace.html#functions",
+    "title": "trace",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
+    "crumbs": [
+      "API Reference",
+      "Trace"
     ]
   }
 ]
