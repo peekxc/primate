@@ -102,7 +102,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">random.rademacher</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">Random</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">Rademacher</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -136,13 +136,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../cpp_integration.qmd" class="sidebar-item-text sidebar-link">
+  <a href="../integration/cpp_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with C++</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../pybind11_integration.qmd" class="sidebar-item-text sidebar-link">
+  <a href="../integration/pybind11_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with pybind11</span></a>
   </div>
 </li>
@@ -161,24 +161,69 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Diagonalize</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">random.normal</span></a>
+  <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Trace</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SL Trace</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SL Gauss</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Random</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">random.rademacher</span></a>
+ <span class="menu-text">Rademacher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/trace.slq.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">trace.slq</span></a>
+  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Normal</span></a>
   </div>
 </li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -205,11 +250,17 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="primate.random.rademacher" class="level1">
 <h1>random.rademacher</h1>
-<p><code>random.rademacher(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)</code></p>
+<p><code>random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)</code></p>
 <p>Generates random vectors from the rademacher distribution.</p>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 16%">
+<col style="width: 62%">
+<col style="width: 13%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -222,8 +273,26 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td><code>size</code></td>
 <td>int or tuple</td>
-<td>the output shape to generate</td>
+<td>Output shape to generate.</td>
 <td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>rng</code></td>
+<td>str = “splitmix64”</td>
+<td>Random number generator to use.</td>
+<td><code>'splitmix64'</code></td>
+</tr>
+<tr class="odd">
+<td><code>seed</code></td>
+<td>int = -1</td>
+<td>Seed for the generator. Use -1 to for random (non-deterministic) behavior.</td>
+<td><code>-1</code></td>
+</tr>
+<tr class="even">
+<td><code>dtype</code></td>
+<td>dtype = float32</td>
+<td>Floating point dtype for the output. Must be float32 or float64.</td>
+<td><code>np.float32</code></td>
 </tr>
 </tbody>
 </table>

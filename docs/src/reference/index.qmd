@@ -1,18 +1,34 @@
 # Function reference
 
-## `primate.trace`
+## Trace
 
-Trace estimation module
+Functions for estimating the trace of matrices and matrix functions.
 
 | | |
 | --- | --- |
-| [trace.slq](trace.slq.qmd#primate.trace.slq) | Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ).  |
+| [trace](trace.qmd#primate.trace) |  |
 
-## `primate.random`
+## Random
 
 Randomized module
 
 | | |
 | --- | --- |
 | [random.rademacher](random.rademacher.qmd#primate.random.rademacher) | Generates random vectors from the rademacher distribution.  |
-| [random.normal](random.normal.qmd#primate.random.normal) |  |
+| [random.normal](random.normal.qmd#primate.random.normal) | Generates random vectors from the rademacher distribution.  |
+
+## Diagonalize
+
+Diagonalization methods
+
+| | |
+| --- | --- |
+| [diagonalize.lanczos](diagonalize.lanczos.qmd#primate.diagonalize.lanczos) | Lanczos method of minimized iterations. |
+
+## Misc
+
+Miscellenous functions
+
+| | |
+| --- | --- |
+| [get_include](get_include.qmd#primate.get_include) | Return the directory that contains the primate's \*.h header files. |

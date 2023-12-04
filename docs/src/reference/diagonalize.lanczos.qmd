@@ -1,0 +1,21 @@
+# diagonalize.lanczos { #primate.diagonalize.lanczos }
+
+`diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)`
+
+Lanczos method of minimized iterations.
+
+## Parameters
+
+| Name           | Type                                          | Description                                                                             | Default    |
+|----------------|-----------------------------------------------|-----------------------------------------------------------------------------------------|------------|
+| `A`            | scipy.sparse.linalg.LinearOperator \| sparray | Symmetric operator to tridiagonalize.                                                   | _required_ |
+| `v0`           | ndarray                                       | Initial vector to orthogonalize against.                                                | `= None`   |
+| `deg`          | int                                           | Size of the Krylov subspace to expand.                                                  | `= None`   |
+| `rtol`         | float                                         | Relative tolerance to consider the invariant subspace as converged.                     | `1e-08`    |
+| `orth`         | int                                           | maximum number of Lanczos vectors to orthogonalize vectors against.                     | `0`        |
+| `sparse_mat`   | bool                                          | Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output. | `= False ` |
+| `return_basis` | bool                                          | Whether to return the last 'ncv' orthogonal basis / 'Lanczos' vectors.                  | `= False`  |
+
+## Description
+
+This function implements the Lanczos method, or as Lanczos called it, the _method of minimized iterations_.

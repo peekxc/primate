@@ -2,24 +2,27 @@
 title: "Comparison to `imate`"
 ---
 
-Much of `primate`'s computational code was ported from the (excellent) [`imate` package](https://github.com/ameli/imate), prompting questions about their differences. In general, `primate` was developed with slightly different goals in mind than `imate`, most of which have to do with integrability and the choice of FFI / build system.
+`primate`'s namesake (and some of the original code[^1]) was inspired from the (excellent) [`imate` package](https://github.com/ameli/imate), prompting questions about their differences. In general, `primate` was developed with slightly different goals in mind than `imate`, most of which have to do with things like integrability, genericity, and choice of FFI / build system.
 
 Notable differences between the two packages include:
 
 | **Feature**      | `primate`             | `imate`                |
 |------------------|-----------------------|------------------------|
-| Trace methods    | SLQ only              | Multiple               |
 | Parallel support | CPU only              | CPU & GPU              |
-| Function support | Arbitrary             | Package supported[^1]  |
+| Function support | Arbitrary             | Package supported[^2]  |
 | Operator support | Arbitrary             | Matrix-derived         |
 | Linking strategy | Header only           | Shared libraries       |
 | C++ version      | $\geq$ C++20          | Any                    |
 | FFI              | Pybind11              | Cython                 |
 | Build tool       | Meson                 | CMake                  |
 
-[^1]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
 
-One of the primary motivations for developing `primate` was to streamline access to SLQ method from *user* (i.e. dependent) packages, as well as to extend native support for types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. If this fits your use case, consider giving `primate` a try!
+One motivation for developing `primate` was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
+These modifications not only simplify access to the SLQ method from *user* (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. For more details on this, see the integration guide. 
+
+[^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) the library.
+[^2]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
+
 
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 

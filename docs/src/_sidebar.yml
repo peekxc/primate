@@ -1,0 +1,10 @@
+website:
+  sidebar:
+  - contents:
+    - reference/index.qmd
+    - contents:
+      - reference/rademacher.qmd
+      - reference/normal.qmd
+      section: primate
+    id: reference
+  - id: dummy-sidebar

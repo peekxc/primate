@@ -2,32 +2,16 @@
 title: "C++ Integration"
 ---
 
-`primate` relies on the use of C++20's [concepts](https://en.cppreference.com/w/cpp/language/constraints) to support calling the SLQ trace estimator using _any_ matrix function and _any_ linear operator having the prerequisite member functions. 
+<!-- `primate`'s matrix-free API can handle effectively _any_ linear operator type that [supports the interface](integration/cpp_integration.qmd). What's perhaps surprising is that this generality is essentially zero-cost: no abstract base classes, no type erasure, no fancy [delegate pattern](https://simoncoenen.com/blog/programming/CPP_Delegates). Just supply a type with defined `.shape()` and a `.matvec()` methods and you're good to go! 
 
-To understand this more in detail, it is imperative to understand the `LinearOperator` concept.
+The heart of this generic progammming design is [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). To make things most concrete, this guide delves into the `LinearOperator` concept, and gives an example of how to create a suitable operator for the `sl_trace` method. -->
 
-## `LinearOperator`
+<!-- To use `primate` from C++,  
+`primate` uses [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints) to be generic in its API.  -->
 
-Any class respecting the `LinearOperator` _concept_ can be given to the trace estimator. 
+<!-- ## The `LinearOperator` interface -->
 
-```cpp
-template < typename T, typename F = typename T::value_type >
-concept LinearOperator = requires(T op, const F* v, F* o) {
-  { op.matvec(v, o) }; // o = A v
-  { op.shape() } -> std::convertible_to< std::pair< size_t, size_t > >;
-};
-```
-
-Thus, a given instance `A` must support member functions: 
-
-1. A method $Av \mapsto o$, with signature `A.matvec(const float_t* v, float_t* o)` 
-2. A method yielding $(\mathrm{card}(o), \mathrm{card}(v))$, with signature`A.shape() -> pair< ... >`
-
-For example, in the matrix setting, `shape()` should yield a pair `(r,c)` where `r` and `c` indicates the number of rows and columns, respectively.
-
-## Example: the LinOp class 
-
-Here's the declarations for a bare-bones C++ class that respects the `LinearOperator` concept: 
+To get started calling any matrix-free function provided by `primate`, such `sl_trace` or `lanczos`, simply pass any type with a `.shape()` and `.matvec()` member functions defined like so: 
 
 ```cpp
 class LinOp {
@@ -43,12 +27,32 @@ class LinOp {
 }
 ```
 
-Note that it is up to the user to ensure `shape()` yields the correct size sizes. `primate` only guarentees the pointer to the `output` will be at least as large as the size reported by the first parameter of `shape()`. 
+It's up to you to ensure `shape()` yields the correct size; `primate` will supply vectors to `input` of size `.shape().second` (number of columns) and guarantees the pointer to the `output` will be at least `shape().first` (number of rows), no more. 
+
+## The `LinearOperator` concept
+
+`primate`'s generic API is enabled through [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). 
+Thus, the more exact statement is that any type respecting the `LinearOperator` [concept](https://en.cppreference.com/w/cpp/language/constraints) shown below can be passed: 
+
+```cpp
+using FP = std::floating_point; 
+template < typename T, FP float_t = typename T::value_type >
+concept LinearOperator = requires(T A, const float_t* v, float_t* o) {
+  { A.matvec(v, o) }; // o = A v
+  { A.shape() } -> std::convertible_to< std::pair< size_t, size_t > >;
+};
+```
+
+An instance `A` of type `T` is said to support the `LinearOperator` concept if it has: 
+
+1. A method $Av \mapsto o$, with signature `A.matvec(const float_t* v, float_t* o)` 
+2. A method yielding $(\mathrm{card}(o), \mathrm{card}(v))$, with signature`A.shape() -> pair< ... >`
+
+`shape()` should yield a pair `(n,m)` representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.
 
 ## Other Concepts
 
-Depending on the parameter choices and particular template specializations, the supplied operator may need to meet other constraints. Here's a short list additional operator concepts:
-
+Depending on the problem at hand, the supplied operator may need to meet other constraints. Here's a short list additional operator concepts:
 
 | Concept                   | Supports     | Signature           | Requires |
 |---------------------------|-------------------------|------------------------------|------------------------|
@@ -57,75 +61,5 @@ Depending on the parameter choices and particular template specializations, the 
 | `AdditiveOperator`        | $o \gets o + \alpha Av$ | `A.matvec_add(v, alpha, o)` | `LinearOperator` |
 | `AffineOperator`          | Sets $t$ s.t. $A + tB$  | `A.set_parameter(t)`        | `LinearOperator` |
 
-Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the _Lanczos_ method, then any satisfying the `LinearOperator` concept is sufficient. However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h]().
-
-## SLQ parameters
-
-The trace estimator has many parameters, both compile-time and run-time. It's full signature is given below: 
-
-```cpp
-template< 
-  bool gramian, 
-  std::floating_point DataType, 
-  Operator Matrix, 
-  ThreadSafeRBG RBG, 
-  std::invocable< DataType > Func 
-> FlagType trace_estimator(
-    Matrix* A,
-    Func&& matrix_function,
-    RBG& rng,
-    const IndexType distr,
-    const DataType* parameters,
-    const IndexType num_parameters,
-    const FlagType orthogonalize,
-    const IndexType lanczos_degree,
-    const DataType lanczos_tol,
-    const IndexType min_num_samples,
-    const IndexType max_num_samples,
-    const DataType error_atol,
-    const DataType error_rtol,
-    const DataType confidence_level,
-    const DataType outlier_significance_level,
-    const IndexType num_threads,
-    DataType* trace,
-    DataType* error,
-    DataType** samples,
-    IndexType* processed_samples_indices,
-    IndexType* num_samples_used,
-    IndexType* num_outliers,
-    FlagType* converged,
-    DataType& alg_wall_time
-  )
-```
-
-Other than the templated arguments, in general, `const` parameters represent inputs and non-`const` parameters represent outputs. 
-
-
-## Example: Log determinant
-
-For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
-
-```cpp
-#include <cmath>                              // std::log
-#include <_linear_operator/linear_operator.h> // LinearOperator
-#include <_trace_estimator/trace_estimator.h> // trace_estimator
-#include "LinOp.h"                            // custom LinOp class
-
-void slq_log_det(LinOp A, ...){ // LinOp must support .matvec() and .shape()
-  static_assert(LinearOperator< LinOp >);  // compile-time constraint check
-  static constexpr bool gramian = false;   // whether to compute the gramian
-  const auto matrix_func = std::log;       // any invocable will due
-  trace_estimator< gramian, float >(       // compile-time arguments
-    A, matrix_func, ...                    // run-time arguments 
-  ) 
-}
-```
-
-<!-- The parameters to the function can effectively be grouped as follows: 
-
-#### Inputs 
-
-Base 
-Affine parameters: `parameters`, `num_parameters` -->
-
-
+Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the _Lanczos_ method, then any satisfying the `LinearOperator` concept is sufficient. 
+<!-- However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h](). -->

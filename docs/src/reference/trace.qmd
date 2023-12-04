@@ -1,0 +1,12 @@
+# trace { #primate.trace }
+
+`trace`
+
+
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [sl_trace](primate.trace.sl_trace.qmd#primate.trace.sl_trace) | Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ).  |
+| [sl_gauss](primate.trace.sl_gauss.qmd#primate.trace.sl_gauss) | Gaussian quadrature. |

@@ -58,7 +58,7 @@ In general, `primate` supports _any_ operator posessing the following methods:
 1. A method `A.matvec(input: ndarray) -> ndarray` implementing $v \mapsto Av$
 2. A method `A.shape() -> tuple` yielding the matrix dimensions `(A.nrow(), A.ncol())`
 
-This support extends to the C++ side as well---see the [C++ integration guide](integration.qmd). If you're using pybind11 and you want to be able to create your own trace estimator from Python, see the [pybind11 integration guide](pybind11_integration.qmd). 
+This support extends to the C++ side as well---see the [C++ integration guide](integration/cpp_integration.qmd). If you're using pybind11 and you want to be able to create your own trace estimator from Python, see the [pybind11 integration guide](integration/pybind11_integration.qmd). 
 
 <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
 

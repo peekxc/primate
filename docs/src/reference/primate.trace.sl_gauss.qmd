@@ -1,0 +1,8 @@
+# sl_gauss { #primate.trace.sl_gauss }
+
+`trace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)`
+
+Gaussian quadrature.
+
+Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. 
+These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).

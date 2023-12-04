@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate – api_index</title>
+<title>primate – get_include</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -65,8 +65,6 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -104,7 +102,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api_index.qmd">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/api_index.html">Function reference</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -138,13 +136,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../integration/cpp_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with C++</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../pybind11_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../integration/pybind11_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage with pybind11</span></a>
   </div>
 </li>
@@ -156,37 +154,76 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../api_index.qmd" class="sidebar-item-text sidebar-link">
+            <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">API Reference</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+ <span class="menu-text">Diagonalize</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/api_index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Function reference</span></a>
+  <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lanczos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+ <span class="menu-text">Trace</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SL Trace</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SL Gauss</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Random</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Rademacher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">random.normal</span></a>
+ <span class="menu-text">Normal</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">random.rademacher</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/trace.slq.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">trace.slq</span></a>
-  </div>
-</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -199,11 +236,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#function-reference" id="toc-function-reference" class="nav-link active" data-scroll-target="#function-reference">Function reference</a>
-  <ul class="collapse">
-  <li><a href="#primate.trace" id="toc-primate.trace" class="nav-link" data-scroll-target="#primate.trace"><code>primate.trace</code></a></li>
-  <li><a href="#primate.random" id="toc-primate.random" class="nav-link" data-scroll-target="#primate.random"><code>primate.random</code></a></li>
-  </ul></li>
+  <li><a href="#primate.get_include" id="toc-primate.get_include" class="nav-link active" data-scroll-target="#primate.get_include">get_include</a></li>
   </ul>
 </nav>
     </div>
@@ -212,38 +245,14 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="function-reference" class="level1">
-<h1>Function reference</h1>
-<section id="primate.trace" class="level2">
-<h2 class="anchored" data-anchor-id="primate.trace"><code>primate.trace</code></h2>
-<p>Trace estimation module</p>
-<table class="table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/trace.slq.html#primate.trace.slq">trace.slq</a></td>
-<td>Estimates the trace of a matrix function <span class="math inline">\(f(A) = U f(D) U^{-1}\)</span> using the stochastic Lanczos quadrature (SLQ) method.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="primate.random" class="level2">
-<h2 class="anchored" data-anchor-id="primate.random"><code>primate.random</code></h2>
-<p>Randomized module</p>
-<table class="table">
-<tbody>
-<tr class="odd">
-<td><a href="../reference/random.rademacher.html#primate.random.rademacher">random.rademacher</a></td>
-<td>Generates random vectors from the rademacher distribution.</td>
-</tr>
-<tr class="even">
-<td><a href="../reference/random.normal.html#primate.random.normal">random.normal</a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<section id="primate.get_include" class="level1">
+<h1>get_include</h1>
+<p><code>get_include()</code></p>
+<p>Return the directory that contains the primate’s *.h header files.</p>
+<p>Extension modules that need to compile against primate should use this function to locate the appropriate include directory.</p>
+<p>Notes: When using <code>distutils</code>, for example in <code>setup.py</code>: <code>python     import primate as pyim     ...     Extension('extension_name', ..., include_dirs=[pyim.get_include()])     ...</code> Or with <code>meson-python</code>, for example in <code>meson.build</code>: <code>meson     ...     run_command(py, ['-c', 'import primate as pyim; print(pyim.get_include())', check : true).stdout().strip()     ...</code></p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

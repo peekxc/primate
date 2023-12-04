@@ -109,3 +109,27 @@ PYBIND11_MODULE(_custom_trace, m) {
 ```
 
 That's it. The module `_custom_trace` will now have an exported `trace_slq` method that you can call from Python. For a list of arguments, it's recommended to see the `slq` declaration in [trace.py](https://github.com/peekxc/primate/blob/main/src/primate/trace.py).
+
+
+## Example: Log determinant
+
+For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
+
+```cpp
+#include <cmath>                              // std::log
+#include <_linear_operator/linear_operator.h> // LinearOperator
+#include <_lanczos/lanczos.h>                 // sl_trace
+#include "LinOp.h"                            // custom class
+
+void slq_log_det(LinOp A, ...){ 
+  static_assert(LinearOperator< LinOp >);  // Constraint check
+  const auto matrix_func = std::log;       // any invocable
+  auto rbg = ThreadedRNG64();              // default RNG
+  auto estimates = vector< float >(n, 0);  // output estimates
+  sl_trace< float >(                       // specific precision
+    A, matrix_func, rbg,                   // main arguments
+    ...,                                   // other inputs 
+    estimates.data()                       // output 
+  );
+}
+```

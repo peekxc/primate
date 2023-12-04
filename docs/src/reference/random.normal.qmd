@@ -1,4 +1,14 @@
 # random.normal { #primate.random.normal }
 
-`random.normal(size, engine='splitmix64', num_threads=1, seed=-1, dtype=np.float32)`
+`random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)`
 
+Generates random vectors from the rademacher distribution. 
+
+## Parameters
+
+| Name    | Type               | Description                                                                | Default        |
+|---------|--------------------|----------------------------------------------------------------------------|----------------|
+| `size`  | int or tuple       | Output shape to generate.                                                  | _required_     |
+| `rng`   | str = "splitmix64" | Random number generator to use.                                            | `'splitmix64'` |
+| `seed`  | int = -1           | Seed for the generator. Use -1 to for random (non-deterministic) behavior. | `-1`           |
+| `dtype` | dtype = float32    | Floating point dtype for the output. Must be float32 or float64.           | `np.float32`   |

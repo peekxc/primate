@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate – random.normal</title>
+<title>primate - SLQ Trace guide</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +19,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -64,6 +98,7 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -102,7 +137,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">Random</a></li><li class="breadcrumb-item"><a href="../reference/random.normal.html">Normal</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">SLQ Trace guide</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -180,7 +215,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true">
+            <a href="../reference/trace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Trace</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -218,7 +253,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Normal</span></a>
   </div>
 </li>
@@ -236,69 +271,122 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#primate.random.normal" id="toc-primate.random.normal" class="nav-link active" data-scroll-target="#primate.random.normal">random.normal</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  </ul></li>
+  <li><a href="#slq-parameters" id="toc-slq-parameters" class="nav-link active" data-scroll-target="#slq-parameters">SLQ parameters</a></li>
+  <li><a href="#slq-implementation" id="toc-slq-implementation" class="nav-link" data-scroll-target="#slq-implementation">SLQ Implementation</a></li>
+  <li><a href="#example-log-determinant" id="toc-example-log-determinant" class="nav-link" data-scroll-target="#example-log-determinant">Example: Log determinant</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SLQ Trace guide</h1>
+</div>
 
 
-<section id="primate.random.normal" class="level1">
-<h1>random.normal</h1>
-<p><code>random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)</code></p>
-<p>Generates random vectors from the rademacher distribution.</p>
-<section id="parameters" class="level2">
-<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="table">
-<colgroup>
-<col style="width: 7%">
-<col style="width: 16%">
-<col style="width: 62%">
-<col style="width: 13%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>size</code></td>
-<td>int or tuple</td>
-<td>Output shape to generate.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td><code>rng</code></td>
-<td>str = “splitmix64”</td>
-<td>Random number generator to use.</td>
-<td><code>'splitmix64'</code></td>
-</tr>
-<tr class="odd">
-<td><code>seed</code></td>
-<td>int = -1</td>
-<td>Seed for the generator. Use -1 to for random (non-deterministic) behavior.</td>
-<td><code>-1</code></td>
-</tr>
-<tr class="even">
-<td><code>dtype</code></td>
-<td>dtype = float32</td>
-<td>Floating point dtype for the output. Must be float32 or float64.</td>
-<td><code>np.float32</code></td>
-</tr>
-</tbody>
-</table>
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
+</header>
+
+<p>One of the base offerings of <code>primate</code> is an extensible implementation of the stochastic Lanczos method (SLQ). Despite its simplicity (only a few lines of pseudocode!), there are actually many methods called the ‘SLQ’ method, each typically performing a related but otherwise distinct functionality. For example, <code>sl_quad</code> computes Gaussian quadrature nodes / weights while <code>sl_trace</code> computes an unbiased estimator for the trace of a matrix function.</p>
+<section id="slq-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="slq-parameters">SLQ parameters</h2>
+<p>Below is the full signature of the SLQ <a href="https://en.cppreference.com/w/cpp/language/function_template">function template</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Stochastic Lanczos quadrature method</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> <span class="bu">std::</span>floating_point F<span class="op">,</span> LinearOperator Matrix<span class="op">,</span> ThreadSafeRBG RBG <span class="op">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> slq <span class="op">(</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Matrix<span class="op">&amp;</span> A<span class="op">,</span>                    <span class="co">// Any *LinearOperator*</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> function<span class="op">&lt;</span> F<span class="op">(</span><span class="dt">int</span><span class="op">,</span>F<span class="op">*,</span>F<span class="op">*)</span> <span class="op">&gt;&amp;</span> f<span class="op">,</span>  <span class="co">// Matrix function </span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> function<span class="op">&lt;</span> <span class="dt">bool</span><span class="op">(</span><span class="dt">int</span><span class="op">)</span> <span class="op">&gt;&amp;</span> stop<span class="op">,</span>  <span class="co">// Early-stop function</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> nv<span class="op">,</span>                       <span class="co">// Num. of sample vectors</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Distribution dist<span class="op">,</span>            <span class="co">// Sample vector distribution</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  RBG<span class="op">&amp;</span> rng<span class="op">,</span>                           <span class="co">// Random bit generator</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> lanczos_degree<span class="op">,</span>           <span class="co">// Krylov subspace degree</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> F lanczos_rtol<span class="op">,</span>               <span class="co">// Lanczos residual tolerance</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> orth<span class="op">,</span>                     <span class="co">// Add. vectors to orthogonalize</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> ncv<span class="op">,</span>                      <span class="co">// Num. of Lanczos vectors</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> num_threads<span class="op">,</span>              <span class="co">// # threads to allocate </span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> seed                      <span class="co">// Seed for RNG </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Many of the runtime arguments are documented in the <a href="reference/diagonalize.lanczos.qmd">lanczos</a> or <a href="reference/primate.trace.sl_trace.qmd">sl_trace</a> docs; the compile-time (template) parameters are:</p>
+<ul>
+<li>The floating point type (e.g.&nbsp;<code>float</code>, <code>double</code>, <code>long double</code>)</li>
+<li>The operator type (e.g.&nbsp;<code>Eigen::MatrixXf</code>, <code>torch::Tensor</code>, <code>LinOp</code>)</li>
+<li>The multi-threaded random number generator (e.g.&nbsp;<code>ThreadedRNG64</code>)</li>
+</ul>
+<p>Any combination of types satisfying the concepts above (<code>std::floating_point</code>, <code>LinearOperator</code>, etc.) generates a function specialized for that combination at compile-time, a process known as <em>template instantiation</em>.</p>
 </section>
+<section id="slq-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="slq-implementation">SLQ Implementation</h2>
+<p>The pseudo-code for the abstract stochastic Lanczos quadrature procedure is given below.</p>
+<div id="alg-slq" class="pseudocode-container" data-alg-title="Algorithm" data-no-end="true" data-line-number="true" data-comment-delimiter="//" data-pseudocode-index="1" data-indent-size="1.1em" data-line-number-punc=":">
+<div class="pseudocode">
+\begin{algorithm} \caption{Stochastic Lanczos Quadrature} \begin{algorithmic} \Input Symmetric operator ($A \in \mathbb{R}^{n \times n}$), function ($f: \mathbb{R} \to \mathbb{R}$) \Require Number of queries ($n_v$), Degree of quadrature ($k$) \Function{SLQ}{$A$, $n_v$, $k$} \State $\Gamma \gets 0$ \For{$j = 1, 2, \dots, n_v$} \State $v_i \sim \mathcal{D}$ where $\mathcal{D}$ satisfies $\mathbb{E}(v v^\top) = I$ \State $T^{(j)}(\alpha, \beta)$ $\gets$ $\mathrm{Lanczos}(A,v_j,k+1)$ \State $[\Theta, Y] \gets \mathrm{eigh\_tridiag}(T^{(j)}(\alpha, \beta))$ \State &lt; Do something with the node/weight pairs $(\theta_i, \tau_i^2)$ &gt;, where $\tau_i = \langle e_1, y_i \rangle$ \EndFor \Return $n \cdot \Gamma$ \EndFunction \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<p>Given a valid set of parameters, the main body of the SLQ</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> stop_flag <span class="op">=</span> <span class="kw">false</span><span class="op">;</span> <span class="co">// convergence checking</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#pragma omp parallel shared(stop_flag)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> tid <span class="op">=</span> omp_get_thread_num<span class="op">();</span> <span class="co">// thread-id </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">// &lt; allocations for Q, alpha, beta, etc. &gt; </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="pp">#pragma omp for schedule(dynamic, chunk_size)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> nv<span class="op">;</span> <span class="op">++</span>i<span class="op">){</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>stop_flag<span class="op">){</span> <span class="cf">continue</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Generate isotropic vector (populates q)</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      generate_isotropic<span class="op">&lt;</span> F <span class="op">&gt;(...);</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Lanczos iteration (populates alpha + beta)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      lanczos_recurrence<span class="op">&lt;</span> F <span class="op">&gt;(...);</span> </span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Gaussian quad. (populates nodes + weights)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      lanczos_quadrature<span class="op">&lt;</span> F <span class="op">&gt;(...);</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Run the user-supplied function </span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      f<span class="op">(</span>i<span class="op">,</span> q<span class="op">,</span> Q<span class="op">,</span> nodes<span class="op">,</span> weights<span class="op">);</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      <span class="co">// Checks early-stopping condition</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="pp">#pragma omp critical</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        stop_flag <span class="op">=</span> stop<span class="op">(</span>i<span class="op">);</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="co">// end for</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="co">// end parallel </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="example-log-determinant" class="level2">
+<h2 class="anchored" data-anchor-id="example-log-determinant">Example: Log determinant</h2>
+<p>For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator <code>LinOp</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;cmath&gt;</span><span class="pp">                              </span><span class="co">// std::log</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;_linear_operator/linear_operator.h&gt;</span><span class="pp"> </span><span class="co">// LinearOperator</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;_lanczos/lanczos.h&gt;</span><span class="pp">                 </span><span class="co">// sl_trace</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">"LinOp.h"</span><span class="pp">                            </span><span class="co">// custom class</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> slq_log_det<span class="op">(</span>LinOp A<span class="op">,</span> <span class="op">...){</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="kw">static_assert</span><span class="op">(</span>LinearOperator<span class="op">&lt;</span> LinOp <span class="op">&gt;);</span>  <span class="co">// Constraint check</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="kw">auto</span> matrix_func <span class="op">=</span> <span class="bu">std::</span>log<span class="op">;</span>       <span class="co">// any invocable</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">auto</span> rbg <span class="op">=</span> ThreadedRNG64<span class="op">();</span>              <span class="co">// default RNG</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">auto</span> estimates <span class="op">=</span> vector<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;(</span>n<span class="op">,</span> <span class="dv">0</span><span class="op">);</span>  <span class="co">// output estimates</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  sl_trace<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;(</span>                       <span class="co">// specific precision</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    A<span class="op">,</span> matrix_func<span class="op">,</span> rbg<span class="op">,</span>                   <span class="co">// main arguments</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">...,</span>                                   <span class="co">// other inputs </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    estimates<span class="op">.</span>data<span class="op">()</span>                       <span class="co">// output </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">);</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -791,6 +879,30 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 });
 </script>
 </div> <!-- /content -->
+<script src="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+(function(d) {
+  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+    let pseudocodeOptions = {
+      indentSize: el.dataset.indentSize || "1.2em",
+      commentDelimiter: el.dataset.commentDelimiter || "//",
+      lineNumber: el.dataset.lineNumber === "true" ? true : false,
+      lineNumberPunc: el.dataset.lineNumberPunc || ":",
+      noEnd: el.dataset.noEnd === "true" ? true : false,
+      titlePrefix: el.dataset.algTitle || "Algorithm"
+    };
+    pseudocode.renderElement(el.querySelector(".pseudocode"), pseudocodeOptions);
+  });
+})(document);
+(function(d) {
+  d.querySelectorAll(".pseudocode-container").forEach(function(el) {
+    titleSpan = el.querySelector(".ps-root > .ps-algorithm > .ps-line > .ps-keyword")
+    titlePrefix = el.dataset.algTitle;
+    titleIndex = el.dataset.chapterLevel ? el.dataset.chapterLevel + "." + el.dataset.pseudocodeIndex : el.dataset.pseudocodeIndex;
+    titleSpan.innerHTML = titlePrefix + " " + titleIndex + " ";
+  });
+})(document);
+</script>
 
 
 

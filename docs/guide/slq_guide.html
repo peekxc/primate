@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - C++ Integration</title>
+<title>primate - SLQ Trace guide</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -171,7 +171,7 @@ MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../integration/python_integration.html">Integration Guide</a></li><li class="breadcrumb-item"><a href="../integration/cpp_integration.html">Usage from C++</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guide/lanczos.html">User Guide</a></li><li class="breadcrumb-item"><a href="../guide/slq_guide.html">The SLQ method</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -220,7 +220,7 @@ MathJax = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../integration/cpp_integration.html" class="sidebar-item-text sidebar-link active">
+  <a href="../integration/cpp_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage from C++</span></a>
   </div>
 </li>
@@ -249,7 +249,7 @@ MathJax = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guide/slq_guide.html" class="sidebar-item-text sidebar-link">
+  <a href="../guide/slq_guide.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">The SLQ method</span></a>
   </div>
 </li>
@@ -345,17 +345,20 @@ MathJax = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-linearoperator-concept" id="toc-the-linearoperator-concept" class="nav-link active" data-scroll-target="#the-linearoperator-concept">The <code>LinearOperator</code> concept</a></li>
-  <li><a href="#other-concepts" id="toc-other-concepts" class="nav-link" data-scroll-target="#other-concepts">Other Concepts</a></li>
+  <li><a href="#slq-as-a-function-template" id="toc-slq-as-a-function-template" class="nav-link active" data-scroll-target="#slq-as-a-function-template">SLQ as a function template</a></li>
+  <li><a href="#generality-via-function-passing" id="toc-generality-via-function-passing" class="nav-link" data-scroll-target="#generality-via-function-passing">Generality via function passing</a></li>
+  <li><a href="#using-slq-to-estimate-mathrmtrfa" id="toc-using-slq-to-estimate-mathrmtrfa" class="nav-link" data-scroll-target="#using-slq-to-estimate-mathrmtrfa">Using SLQ to estimate <span class="math inline">\mathrm{tr}(f(A))</span></a></li>
+  <li><a href="#sl_trace-method" id="toc-sl_trace-method" class="nav-link" data-scroll-target="#sl_trace-method"><code>sl_trace</code> method</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../integration/python_integration.html">Integration Guide</a></li><li class="breadcrumb-item"><a href="../integration/cpp_integration.html">Usage from C++</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../guide/lanczos.html">User Guide</a></li><li class="breadcrumb-item"><a href="../guide/slq_guide.html">The SLQ method</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">C++ Integration</h1>
+<h1 class="title">SLQ Trace guide</h1>
 </div>
 
 
@@ -371,92 +374,129 @@ MathJax = {
 
 </header>
 
-<!-- `primate`'s matrix-free API can handle effectively _any_ linear operator type that [supports the interface](integration/cpp_integration.qmd). What's perhaps surprising is that this generality is essentially zero-cost: no abstract base classes, no type erasure, no fancy [delegate pattern](https://simoncoenen.com/blog/programming/CPP_Delegates). Just supply a type with defined `.shape()` and a `.matvec()` methods and you're good to go! 
+<p><code>primate</code> offers an extensible implementation of the stochastic Lanczos method (SLQ). There are many algorithms named the “stochastic Lanczos quadrature” in the literature; though each is typically related, they often have distinct goals. Pseudocode for a generic form of SLQ is given below:</p>
+<div id="alg-slq" class="pseudocode-container" data-pseudocode-index="1" data-line-number="true" data-alg-title="Algorithm" data-indent-size="1.1em" data-no-end="true" data-line-number-punc=":" data-comment-delimiter="//">
+<div class="pseudocode">
+\begin{algorithm} \caption{Stochastic Lanczos Quadrature} \begin{algorithmic} \Input Symmetric operator ($A \in \mathbb{R}^{n \times n}$) \Require Number of queries ($n_v$), Degree of quadrature ($k$) \Function{SLQ}{$A$, $n_v$, $k$} \State $\Gamma \gets 0$ \For{$j = 1, 2, \dots, n_v$} \State $v_i \sim \mathcal{D}$ where $\mathcal{D}$ satisfies $\mathbb{E}(v v^\top) = I$ \State $T^{(j)}(\alpha, \beta)$ $\gets$ $\mathrm{Lanczos}(A,v_j,k+1)$ \State $[\Theta, Y] \gets \mathrm{eigh\_tridiag}(T^{(j)}(\alpha, \beta))$ \State $\tau_i \gets \langle e_1, y_i \rangle$ \State &lt; Do something with the node/weight pairs $(\theta_i, \tau_i^2)$ &gt; \EndFor \EndFunction \end{algorithmic} \end{algorithm}
+</div>
+</div>
+<p>This guide walks through the SLQ method implemented in <code>primate</code>, which can be specialized for different purposes.</p>
+<section id="slq-as-a-function-template" class="level2">
+<h2 class="anchored" data-anchor-id="slq-as-a-function-template">SLQ as a function template</h2>
+<p>Below is the full signature of the SLQ <a href="https://en.cppreference.com/w/cpp/language/function_template">function template</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Stochastic Lanczos quadrature method</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> <span class="bu">std::</span>floating_point F<span class="op">,</span> LinearOperator Matrix<span class="op">,</span> ThreadSafeRBG RBG <span class="op">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> slq <span class="op">(</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Matrix<span class="op">&amp;</span> A<span class="op">,</span>                    <span class="co">// Any *LinearOperator*</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> function<span class="op">&lt;</span> F<span class="op">(</span><span class="dt">int</span><span class="op">,</span>F<span class="op">*,</span>F<span class="op">*)</span> <span class="op">&gt;&amp;</span> f<span class="op">,</span>  <span class="co">// Generic function</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> function<span class="op">&lt;</span> <span class="dt">bool</span><span class="op">(</span><span class="dt">int</span><span class="op">)</span> <span class="op">&gt;&amp;</span> stop<span class="op">,</span>  <span class="co">// Early-stop function</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> nv<span class="op">,</span>                       <span class="co">// Num. of sample vectors</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Distribution dist<span class="op">,</span>            <span class="co">// Sample vector distribution</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  RBG<span class="op">&amp;</span> rng<span class="op">,</span>                           <span class="co">// Random bit generator</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> lanczos_degree<span class="op">,</span>           <span class="co">// Krylov subspace degree</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> F lanczos_rtol<span class="op">,</span>               <span class="co">// Lanczos residual tolerance</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> orth<span class="op">,</span>                     <span class="co">// Add. vectors to orthogonalize</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> ncv<span class="op">,</span>                      <span class="co">// Num. of Lanczos vectors</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> num_threads<span class="op">,</span>              <span class="co">// # threads to allocate </span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> seed                      <span class="co">// Seed for RNG </span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Many of the runtime arguments are documented in the <a href="reference/diagonalize.lanczos.qmd">lanczos</a> or <a href="reference/primate.trace.sl_trace.qmd">sl_trace</a> docs; the compile-time (template) parameters are:</p>
+<ul>
+<li>The floating point type (e.g.&nbsp;<code>float</code>, <code>double</code>, <code>long double</code>)</li>
+<li>The operator type (e.g.&nbsp;<code>Eigen::MatrixXf</code>, <code>torch::Tensor</code>, <code>LinOp</code>)</li>
+<li>The multi-threaded random number generator (e.g.&nbsp;<code>ThreadedRNG64</code>)</li>
+</ul>
+<p>Note any type combination satisfying these concepts (e.g.&nbsp;<code>std::floating_point</code>, <code>LinearOperator</code>) generates a function specialized of said types at compile-time—this is known as <em>template instantiation</em>.</p>
+</section>
+<section id="generality-via-function-passing" class="level2">
+<h2 class="anchored" data-anchor-id="generality-via-function-passing">Generality via function passing</h2>
+<p>Given a valid set of parameters, the main body of the SLQ looks something like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> stop_flag <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#pragma omp parallel shared(stop_flag)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">// &lt; allocations for Q, alpha, beta, etc. &gt; </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> tid <span class="op">=</span> omp_get_thread_num<span class="op">();</span> <span class="co">// thread-id </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="pp">#pragma omp for</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">(</span>i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> nv<span class="op">;</span> <span class="op">++</span>i<span class="op">){</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> <span class="op">(</span>stop_flag<span class="op">){</span> <span class="cf">continue</span><span class="op">;</span> <span class="op">}</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      generate_isotropic<span class="op">&lt;</span> F <span class="op">&gt;(...);</span> <span class="co">// populates q</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      lanczos_recurrence<span class="op">&lt;</span> F <span class="op">&gt;(...);</span> <span class="co">// populates alpha + beta</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      lanczos_quadrature<span class="op">&lt;</span> F <span class="op">&gt;(...);</span> <span class="co">// populates nodes + weights</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      f<span class="op">(</span>i<span class="op">,</span> q<span class="op">,</span> Q<span class="op">,</span> nodes<span class="op">,</span> weights<span class="op">);</span>   <span class="co">// Run user-supplied function </span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      <span class="pp">#pragma omp critical</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="op">{</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        stop_flag <span class="op">=</span> stop<span class="op">(</span>i<span class="op">);</span>        <span class="co">// Checks for early-stopping</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="co">// end for</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="co">// end parallel </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>There are two functions that can be used for generalizing SLQ for different purposes.</p>
+<p>The first generic function <code>f</code> can read, save, or modify the information available from the iteration index <code>i</code>, the isotropic vector <code>q</code>, the Lanczos vectors <code>Q</code>, and/or the quadrature information <code>nodes</code>, <code>weights</code>. Note this function is run in the parallel section.</p>
+<p>The second is a boolean-valued function <code>stop</code> which can be used to stop the iteration early, for example if convergence has been achieved according to some rule. Since this is run in the critical section, it is called sequentially.</p>
+</section>
+<section id="using-slq-to-estimate-mathrmtrfa" class="level2">
+<h2 class="anchored" data-anchor-id="using-slq-to-estimate-mathrmtrfa">Using SLQ to estimate <span class="math inline">\mathrm{tr}(f(A))</span></h2>
+<p>The SLQ method is often used to estimate the trace of an arbitrary <a href="">matrix function</a>:</p>
+<p><span class="math display"> \mathrm{tr}(f(A)), \quad \text{ where } f(A) = U f(\Lambda) U^T </span></p>
+<p>It’s has been shown<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> that the information obtained by the Lanczos method is sufficient to obtained a Gaussian quadrature approximation of the empirical spectral measure of <span class="math inline">A</span>. By sampling zero-mean vectors satisfying <span class="math inline">\mathbb{E}[v v^T] = I</span>, one can obtain estimates of the trace above: <span class="math display">\operatorname{tr}(f(A)) \approx \frac{n}{\mathrm{n}_{\mathrm{v}}} \sum_{l=1}^{\mathrm{n}_{\mathrm{v}}}\left(\sum_{k=0}^m\left(\tau_k^{(l)}\right)^2 f\left(\theta_k^{(l)}\right)\right)</span></p>
+<p>It turns out averaging these trace estimates yields unbiased, <em>Girard-Hutchinson</em> estimator of the trace. To see why this estimator is unbiased, note that: <span class="math display"> \mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i </span></p>
+<p>Thus, all we need to do to estimate the trace of a matrix function is multiply and sum the quadrature nodes and weights output by SLQ.</p>
+</section>
+<section id="sl_trace-method" class="level2">
+<h2 class="anchored" data-anchor-id="sl_trace-method"><code>sl_trace</code> method</h2>
+<p>To see how these formulas are actually implemented with the generic SLQ implementation, here’s an abbreviated form of the <code>sl_trace</code> function implemented by <code>primate</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span><span class="op">&lt;</span> <span class="bu">std::</span>floating_point F<span class="op">,</span> LinearOperator Matrix<span class="op">,</span> ThreadSafeRBG RBG <span class="op">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">void</span> sl_trace<span class="op">(</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> Matrix<span class="op">&amp;</span> A<span class="op">,</span> <span class="at">const</span> <span class="bu">std::</span>function<span class="op">&lt;</span> F<span class="op">(</span>F<span class="op">)</span> <span class="op">&gt;</span> sf<span class="op">,</span> RBG<span class="op">&amp;</span> rbg<span class="op">,</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> nv<span class="op">,</span> <span class="at">const</span> <span class="dt">int</span> dist<span class="op">,</span> <span class="at">const</span> <span class="dt">int</span> engine_id<span class="op">,</span> <span class="at">const</span> <span class="dt">int</span> seed<span class="op">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="dt">int</span> deg<span class="op">,</span> <span class="at">const</span> <span class="dt">float</span> lanczos_rtol<span class="op">,</span> <span class="at">const</span> <span class="dt">int</span> orth<span class="op">,</span> <span class="at">const</span> <span class="dt">int</span> ncv<span class="op">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> F atol<span class="op">,</span> <span class="at">const</span> F rtol</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  F<span class="op">*</span> estimates</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="op">){</span>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">using</span> VectorF <span class="op">=</span> Eigen<span class="op">::</span>Array<span class="op">&lt;</span> F<span class="op">,</span> Dynamic<span class="op">,</span> <span class="dv">1</span><span class="op">&gt;;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Parameterize the trace function (runs in parallel)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">auto</span> trace_f <span class="op">=</span> <span class="op">[&amp;](</span><span class="dt">int</span> i<span class="op">,</span> F<span class="op">*</span> q<span class="op">,</span> F<span class="op">*</span> Q<span class="op">,</span> F<span class="op">*</span> nodes<span class="op">,</span> F<span class="op">*</span> weights<span class="op">){</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    Map<span class="op">&lt;</span> VectorF <span class="op">&gt;</span> nodes_v<span class="op">(</span>nodes<span class="op">,</span> deg<span class="op">,</span> <span class="dv">1</span><span class="op">);</span>     <span class="co">// no-op</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    Map<span class="op">&lt;</span> VectorF <span class="op">&gt;</span> weights_v<span class="op">(</span>weights<span class="op">,</span> deg<span class="op">,</span> <span class="dv">1</span><span class="op">);</span> <span class="co">// no-op</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    nodes_v<span class="op">.</span>unaryExpr<span class="op">(</span>sf<span class="op">);</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    estimates<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">(</span>nodes_v <span class="op">*</span> weights_v<span class="op">).</span>sum<span class="op">();</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Convergence checking like scipy.integrate.quadrature</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  F mu_est <span class="op">=</span> <span class="fl">0.0</span><span class="op">,</span> mu_pre <span class="op">=</span> <span class="fl">0.0</span><span class="op">;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">const</span> <span class="kw">auto</span> early_stop <span class="op">=</span> <span class="op">[&amp;](</span><span class="dt">int</span> i<span class="op">)</span> <span class="op">-&gt;</span> <span class="dt">bool</span> <span class="op">{</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">++</span>n<span class="op">;</span> <span class="co">// Number of estimates</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    mu_est <span class="op">=</span> <span class="op">(</span><span class="fl">1.0</span> <span class="op">/</span> F<span class="op">(</span>n<span class="op">))</span> <span class="op">*</span> <span class="op">(</span>estimates<span class="op">[</span>i<span class="op">]</span> <span class="op">+</span> <span class="op">(</span>n <span class="op">-</span> <span class="dv">1</span><span class="op">)</span> <span class="op">*</span> mu_pre<span class="op">);</span> </span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="dt">bool</span> atol_check <span class="op">=</span> abs<span class="op">(</span>mu_est <span class="op">-</span> mu_pre<span class="op">)</span> <span class="op">&lt;=</span> atol<span class="op">;</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="dt">bool</span> rtol_check <span class="op">=</span> abs<span class="op">(</span>mu_est <span class="op">-</span> mu_pre<span class="op">)</span> <span class="op">/</span> mu_est <span class="op">&lt;=</span> rtol<span class="op">;</span> </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    mu_pre <span class="op">=</span> mu_est<span class="op">;</span> </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> atol_check <span class="op">||</span> rtol_check<span class="op">;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="op">};</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Execute the stochastic Lanczos quadrature with the trace function </span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  slq<span class="op">&lt;</span> <span class="dt">float</span> <span class="op">&gt;(</span>A<span class="op">,</span> trace_f<span class="op">,</span> early_stop<span class="op">,</span> <span class="op">...);</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As before, two functions are used to parameterize the <code>slq</code> method.</p>
+<p>The first (<code>trace_f</code>) applies an arbitrary spectral function <code>sf</code> to the Rayleigh-Ritz values obtained by the Lanczos tridiagonalization of <code>A</code>(or equivalently, the nodes of the Gaussian quadrature). These are the <span class="math inline">\theta</span>’s in the pseudocode above. When multiplied by the weights of the quadrature, the corresponding sum forms an estimate of the trace of the matrix function.</p>
+<p>The second function <code>early_stop</code> is used to check for convergence of the estimator. First, it uses the trace estimate <span class="math inline">x_n</span> to update the sample mean <span class="math inline">\mu_n</span> via the formula:</p>
+<p><span class="math display"> \mu_n = n^{-1} [x_n + (n - 1)\mu_{n-1}] </span></p>
+<p>Then, much in the same way the <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quadrature.html">quadrature function</a> from <code>scipy.integrate</code> approximates a definite integral, it checks for convergence using the absolute and relative tolerances supplied by the user. Returning <code>true</code> signals convergence, stopping the iteration early.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
 
-The heart of this generic progammming design is [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). To make things most concrete, this guide delves into the `LinearOperator` concept, and gives an example of how to create a suitable operator for the `sl_trace` method. -->
-<!-- To use `primate` from C++,  
-`primate` uses [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints) to be generic in its API.  -->
-<!-- ## The `LinearOperator` interface -->
-<p>To get started calling any matrix-free function provided by <code>primate</code>, such <code>sl_trace</code> or <code>lanczos</code>, simply pass any type with a <code>.shape()</code> and <code>.matvec()</code> member functions defined like so:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  LinOp<span class="op">(</span><span class="dt">int</span> nr<span class="op">,</span> <span class="dt">int</span> nc<span class="op">)</span> <span class="op">:</span> nrow<span class="op">(</span>nr<span class="op">),</span> ncol<span class="op">(</span>nc<span class="op">)</span> <span class="op">{}</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> <span class="dt">float</span><span class="op">*</span> input<span class="op">,</span> <span class="dt">float</span><span class="op">*</span> output<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// implementation details </span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">(</span>nrow<span class="op">,</span> ncol<span class="op">);</span> <span class="op">}</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>It’s up to you to ensure <code>shape()</code> yields the correct size; <code>primate</code> will supply vectors to <code>input</code> of size <code>.shape().second</code> (number of columns) and guarantees the pointer to the <code>output</code> will be at least <code>shape().first</code> (number of rows), no more.</p>
-<section id="the-linearoperator-concept" class="level2">
-<h2 class="anchored" data-anchor-id="the-linearoperator-concept">The <code>LinearOperator</code> concept</h2>
-<p><code>primate</code>’s generic API is enabled through <a href="https://en.cppreference.com/w/cpp/language/constraints">C++20 concepts</a>. Thus, the more exact statement is that any type respecting the <code>LinearOperator</code> <a href="https://en.cppreference.com/w/cpp/language/constraints">concept</a> shown below can be passed:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> FP <span class="op">=</span> <span class="bu">std::</span>floating_point<span class="op">;</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span> <span class="kw">typename</span> T<span class="op">,</span> FP <span class="dt">float_t</span> <span class="op">=</span> <span class="kw">typename</span> T<span class="op">::</span><span class="dt">value_type</span> <span class="op">&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">concept</span> LinearOperator <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T A<span class="op">,</span> <span class="at">const</span> <span class="dt">float_t</span><span class="op">*</span> v<span class="op">,</span> <span class="dt">float_t</span><span class="op">*</span> o<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> A<span class="op">.</span>matvec<span class="op">(</span>v<span class="op">,</span> o<span class="op">)</span> <span class="op">};</span> <span class="co">// o = A v</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> A<span class="op">.</span>shape<span class="op">()</span> <span class="op">}</span> <span class="op">-&gt;</span> <span class="bu">std::</span>convertible_to<span class="op">&lt;</span> <span class="bu">std::</span>pair<span class="op">&lt;</span> <span class="dt">size_t</span><span class="op">,</span> <span class="dt">size_t</span> <span class="op">&gt;</span> <span class="op">&gt;;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>An instance <code>A</code> of type <code>T</code> is said to support the <code>LinearOperator</code> concept if it has:</p>
-<ol type="1">
-<li>A method <span class="math inline">Av \mapsto o</span>, with signature <code>A.matvec(const float_t* v, float_t* o)</code></li>
-<li>A method yielding <span class="math inline">(\mathrm{card}(o), \mathrm{card}(v))</span>, with signature<code>A.shape() -&gt; pair&lt; ... &gt;</code></li>
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-<p><code>shape()</code> should yield a pair <code>(n,m)</code> representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.</p>
-</section>
-<section id="other-concepts" class="level2">
-<h2 class="anchored" data-anchor-id="other-concepts">Other Concepts</h2>
-<p>Depending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:</p>
-<table class="table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 23%">
-<col style="width: 28%">
-<col style="width: 22%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Concept</th>
-<th>Supports</th>
-<th>Signature</th>
-<th>Requires</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>LinearOperator</code></td>
-<td><span class="math inline">A v \mapsto o</span></td>
-<td><code>A.matvec(v, o)</code></td>
-<td>NA</td>
-</tr>
-<tr class="even">
-<td><code>AdjointOperator</code></td>
-<td><span class="math inline">A^T v \mapsto o</span></td>
-<td><code>A.rmatvec(v, o)</code></td>
-<td><code>LinearOperator</code></td>
-</tr>
-<tr class="odd">
-<td><code>AdditiveOperator</code></td>
-<td><span class="math inline">o \gets o + \alpha Av</span></td>
-<td><code>A.matvec_add(v, alpha, o)</code></td>
-<td><code>LinearOperator</code></td>
-</tr>
-<tr class="even">
-<td><code>AffineOperator</code></td>
-<td>Sets <span class="math inline">t</span> s.t. <span class="math inline">A + tB</span></td>
-<td><code>A.set_parameter(t)</code></td>
-<td><code>LinearOperator</code></td>
-</tr>
-</tbody>
-</table>
-<p>Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the <em>Lanczos</em> method, then any satisfying the <code>LinearOperator</code> concept is sufficient. <!-- However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h](). --></p>
-
-
-</section>
-
-</main> <!-- /main -->
+</aside></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

@@ -1,3 +1,4 @@
+import sys
 import yaml
 import quartodoc
 from more_itertools import unique_everseen
@@ -6,29 +7,48 @@ from quartodoc.builder.blueprint import BlueprintTransformer
 from quartodoc.layout import Auto
 import primate
 
+## Get th path to the doc src
+ind = [i for i, c in enumerate(primate.__file__) if c == '/'][-3]
+doc_src = primate.__file__[:ind] + '/docs/src'
+sys.path.insert(0, doc_src)
+
 # from griffe.loader import GriffeLoader
 # from griffe.collections import ModulesCollection, LinesCollection
 
 # %% 
 ## Configure builder 
-cfg = yaml.safe_load(open("_quarto.yml", "r"))
+doc_src = "/Users/mpiekenbrock/primate/docs/src"
+cfg = yaml.safe_load(open(doc_src + "/_quarto.yml", "r"))
 builder = Builder.from_quarto_config(cfg)
-builder.renderer = MdRenderer(show_signature=True, show_signature_annotations=True, display_name="name")
+builder.renderer = MdRenderer(show_signature=True, show_signature_annotations=False, display_name="name")
 # builder.renderer.display_name = 'name'
 # builder.renderer.show_signature_annotations = True 
 
 ## Preview the section layout
 preview(builder.layout)
 
+## Build
+bp = blueprint(builder.layout)
+pages, items = collect(bp, builder.dir)
+builder.build()
+# builder.write_doc_pages(pages, "*")
+
+# preview(pages, max_depth=3)
+
 ## Transform 
-blueprint_tf = BlueprintTransformer(parser="numpy")
-blueprint_tf.visit(builder.layout)
-pages, items = collect(blueprint_tf, builder.dir)
+# blueprint_tf = BlueprintTransformer(parser="numpy")
+# blueprint_tf.visit(builder.layout)
+# pages, items = collect(blueprint_tf, builder.dir)
+
+## Why is this empty
+preview(pages)
 
 ## Write the doc pages + the index  
 builder.write_doc_pages(pages, "*")
-builder.write_index(blueprint_tf)
-builder.write_sidebar(blueprint_tf)
+# builder.write_index(blueprint_tf)
+builder.write_index()
+
+# builder.write_sidebar(blueprint_tf)
 
 
 # ## NOTE: this doesn't work with editable installs!
