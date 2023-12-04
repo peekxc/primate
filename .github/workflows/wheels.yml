@@ -1,8 +1,8 @@
 name: Package Wheels
 
-on:
-  release:
-    branches: [ "main" ]
+# on:
+#   release:
+#     branches: [ "main" ]
 
 jobs:
   build_windows_wheels:
