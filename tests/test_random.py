@@ -6,8 +6,8 @@ from primate.random import _engines, _engine_prefixes, _random_gen
 ## Add the test directory to the sys path 
 import sys
 import primate
-ind = [i for i, c in enumerate(primate.__file__) if c == '/'][-3]
-sys.path.insert(0, primate.__file__[:ind] + '/tests')
+rel_dir = primate.__file__[:(primate.__file__.find('primate') + 7)]
+sys.path.insert(0, rel_dir + '/tests')
 
 def test_seeding():
   s1 = random.rademacher(250, seed = -1)
