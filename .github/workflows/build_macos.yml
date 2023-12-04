@@ -29,6 +29,7 @@ jobs:
     - name: Install Clang with OpenMP support
       run: |
         rm -rf /usr/local/bin/2to3*
+        sudo chown -R $(whoami) /usr/local 
         brew install --force libomp llvm > nul
     - name: Update environment flags for Clang 
       run: |
