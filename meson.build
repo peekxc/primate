@@ -12,6 +12,7 @@ project(
     'pkgconfig.relocatable=true'
   ]
 )
+OS_platform = host_machine.system()
 env = environment()
 
 ## Import python kernel 
@@ -69,28 +70,26 @@ dependency_map = {}
 
 ## Include OpenMP, if possible
 omp = dependency('openmp', required: false)
+openmp_flags = []
 if omp.found()
-  # _cpp_args += compiler.get_supported_arguments('-fopenmp')
-  openmp_flags = compiler.get_supported_arguments('-fopenmp')
-  openmp_flags += compiler.get_supported_arguments('-fopenmp=libomp') 
-  # openmp_flags += compiler.get_supported_arguments('/openmp') # windows
-  # openmp_flags += compiler.get_supported_arguments('-lomp') # link
+  if OS_platform == 'windows'
+    openmp_flags += compiler.get_supported_arguments('/openmp', '/openmp:experimental', '/openmp:llvm')
+  else
+    if compiler.get_id() == 'gcc'
+      openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
+    elif compiler.get_id() == 'llvm' or compiler.get_id() == 'clang'
+      openmp_flags = compiler.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
+    endif 
+  endif
   add_project_link_arguments(openmp_flags, language : 'cpp')
   dependency_map += { 'OpenMP' : omp }
 elif compiler.has_argument('-fopenmp')
-  _c = compiler.has_argument('-fopenmp')
-  _h = compiler.has_header('omp.h')
-  if (_c and _h)
-    omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
-    dependency_map += { 'OpenMP' : omp }
-  endif
+  _c = compiler.has_argument('-fopenmp', required: false)
+  _h = compiler.has_header('omp.h', required: true)
+  omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
+  dependency_map += { 'OpenMP' : omp }
 else
-  if meson.get_compiler('cpp').get_id() == 'clang'
-    dependency_map += { 'OpenMP' : declare_dependency(compile_args : ['-Xpreprocessor', '-fopenmp']) }
-  else
-    dependency_map += { 'OpenMP' : dependency('openmp', required: true) }
-  endif
-  # message('NO OPENMP DETECTED; primate will be built for single-threaded only.')
+  error('OpenMP not detected in the system.')
 endif
 
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
