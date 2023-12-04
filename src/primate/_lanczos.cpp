@@ -39,6 +39,8 @@ using py_array = py::array_t< F, py::array::f_style | py::array::forcecast >;
 
 template< std::floating_point F > 
 auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
+  constexpr F SQRT2_REC = 0.70710678118654752440;  // 1 / sqrt(2)
+  constexpr F SQRT2_RECPI = 1.12837916709551257390; // 2 / sqrt(pi)
   auto kwargs_map = kwargs.cast< std::unordered_map< std::string, py::object > >();
   std::function< F(F) > f = std::identity();
   if (kwargs_map.contains("function")){
@@ -68,7 +70,7 @@ auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
       F sigma = kwargs_map.contains("sigma") ? kwargs_map["sigma"].cast< F >() : 1.0;
       f = [mu, sigma](F eigenvalue) -> F {  
         auto x = (mu - eigenvalue) / sigma;
-        return (0.5 * M_SQRT1_2 * M_2_SQRTPI / sigma) * exp(-0.5 * x * x); 
+        return (0.5 * SQRT2_REC * SQRT2_RECPI / sigma) * exp(-0.5 * x * x); 
       }; 
     } else if (matrix_func == "numrank"){
       F threshold = kwargs_map.contains("threshold") ? kwargs_map["threshold"].cast< F >() : 0.000001;

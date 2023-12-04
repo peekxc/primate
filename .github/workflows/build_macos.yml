@@ -29,7 +29,10 @@ jobs:
         export LDFLAGS="-L/usr/local/opt/llvm/lib"
         export CPPFLAGS="-I/usr/local/opt/llvm/include"
         echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
+        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> /Users/runner/.bash_profile
         source ~/.bash_profile
+    - name: Verify Clang version 
+      run: | 
         clang --version
     - name: Install OpenBLAS
       run: |
@@ -48,6 +51,9 @@ jobs:
     - name: Install package
       run: |
         pip install --verbose .
+      env:
+        CC: /usr/local/opt/llvm/bin/clang
+        CXX: /usr/local/opt/llvm/bin/clang
     - name: Test with pytest
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip

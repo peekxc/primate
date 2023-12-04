@@ -1,6 +1,6 @@
 from typing import * 
 import numpy as np
-from scipy.sparse import issparse, sparray
+from scipy.sparse import issparse
 from scipy.sparse.linalg import LinearOperator
 
 ## Package imports
@@ -11,7 +11,7 @@ import _lanczos
 _builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
 
 def sl_trace (
-  A: Union[LinearOperator, sparray, np.ndarray],
+  A: Union[LinearOperator, np.ndarray],
   fun: Union[str, Callable] = "identity", 
   maxiter: int = 200,
   deg: int = 20,
@@ -77,7 +77,6 @@ def sl_trace (
     [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
     SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
   """
-  # assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
   attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
   assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method" 
   assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
@@ -242,7 +241,7 @@ def sl_trace (
 
 
 def sl_gauss(
-  A: Union[LinearOperator, sparray, np.ndarray],
+  A: Union[LinearOperator, np.ndarray],
   n: int = 150,
   deg: int = 20,
   pdf: str = "rademacher",

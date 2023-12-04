@@ -4,7 +4,7 @@ requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy', 'pythran-open
 
 [project]
 name = "primate"
-version = '0.2.2'
+version = "0.2.3"
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",
@@ -18,7 +18,7 @@ authors = [
 requires-python = ">=3.8"
 dependencies = [
   "numpy", 
-  "scipy >= 1.11.3",
+  "scipy",
 	"more_itertools"
 ]
 license = {file = "LICENSE"}
