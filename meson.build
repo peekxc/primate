@@ -71,10 +71,11 @@ dependency_map = {}
 omp = dependency('openmp', required: false)
 if omp.found()
   # _cpp_args += compiler.get_supported_arguments('-fopenmp')
-  # openmp_flags = compiler.get_supported_arguments('-fopenmp')
+  openmp_flags = compiler.get_supported_arguments('-fopenmp')
+  openmp_flags += compiler.get_supported_arguments('-fopenmp=libomp') 
   # openmp_flags += compiler.get_supported_arguments('/openmp') # windows
   # openmp_flags += compiler.get_supported_arguments('-lomp') # link
-  # add_project_link_arguments(openmp_flags, language : 'cpp')
+  add_project_link_arguments(openmp_flags, language : 'cpp')
   dependency_map += { 'OpenMP' : omp }
 elif compiler.has_argument('-fopenmp')
   _c = compiler.has_argument('-fopenmp')

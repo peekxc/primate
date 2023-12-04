@@ -18,7 +18,8 @@ authors = [
 requires-python = ">=3.8"
 dependencies = [
   "numpy", 
-  "scipy"
+  "scipy",
+	"more_itertools"
 ]
 license = {file = "LICENSE"}
 include = [
