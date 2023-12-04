@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.special import erfinv
 from typing import Union
 
 def figure_trace(samples: Union[np.ndarray, dict], real_trace: float = None, **kwargs):
@@ -9,6 +8,7 @@ def figure_trace(samples: Union[np.ndarray, dict], real_trace: float = None, **k
   from bokeh.plotting import figure
   from bokeh.layouts import row, column
   from bokeh.models import NumeralTickFormatter
+  from scipy.special import erfinv
 
   main_title = "Stochastic trace estimates"
   extra_titles = []

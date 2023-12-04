@@ -74,7 +74,7 @@ def sl_trace (
 
   Reference
   ---------
-    .. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
+    [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
     SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
   """
   # assert isinstance(A, spmatrix) or isinstance(A, sparray), "A must be a sparse matrix, for now."
@@ -122,6 +122,8 @@ def sl_trace (
   rtol = 0.0 if rtol is None else float(rtol)           # Early stopper relative standard error bound
   num_threads = 0 if num_threads < 0 else int(num_threads)
   
+  ## Adjust tolerance for the quadrature estimates
+  atol /= A.shape[1]  
 
   ## Parameterize the matrix function and trace call
   if isinstance(fun, str):
@@ -144,6 +146,14 @@ def sl_trace (
 
   ## Make the actual call
   estimates = _lanczos.stochastic_trace(A, *sl_trace_args, **kwargs)
+  estimates *= A.shape[1]
+
+  ## Plot
+  if plot: 
+    from bokeh.plotting import show
+    from .plotting import figure_trace
+    show(figure_trace(estimates))
+
   return estimates
 
   ## If no information is required, just return the trace estimate 

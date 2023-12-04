@@ -124,21 +124,21 @@ auto lanczos_quadrature(
 };
 
 // Stochastic Lanczos quadrature method
-// const std::function<F(F)> mf,     // function to apply the eigenvalues of T = Q^T A Q
+// std::function<F(int,F*,F*)>
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typename Lambda >
 void slq (
-  const Matrix& A,                  // Any linear operator supporting .matvec() and .shape() methods
-  const Lambda& f,                  // Thread-safe function with signature f(int i, F* nodes, F* weights)
-  const function< bool(int) >& stop_check,   // Function to check for convergence or early-stopping (takes no arguments)
-  const int nv,                     // Number of sample vectors to generate
-  const Distribution dist,          // Isotropic distribution used to generate random vectors
-  RBG& rng,                         // Random bit generator
-  const int lanczos_degree,         // Polynomial degree of the Krylov expansion
-  const F lanczos_rtol,             // residual tolerance to consider subspace A-invariant
-  const int orth,                   // Number of vectors to re-orthogonalize against <= lanczos_degree
-  const int ncv,                    // Number of Lanczos vectors to keep in memory (per-thread)
-  const int num_threads,            // Number of threads used to parallelize the computation   
-  const int seed                    // Seed for random number generator for determinism
+  const Matrix& A,                            // Any linear operator supporting .matvec() and .shape() methods
+  const Lambda& f,                            // Thread-safe function with signature f(int i, F* nodes, F* weights)
+  const std::function< bool(int) >& stop_check, // Function to check for convergence or early-stopping (takes no arguments)
+  const int nv,                               // Number of sample vectors to generate
+  const Distribution dist,                    // Isotropic distribution used to generate random vectors
+  RBG& rng,                                   // Random bit generator
+  const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
+  const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
+  const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
+  const int ncv,                              // Number of Lanczos vectors to keep in memory (per-thread)
+  const int num_threads,                      // Number of threads used to parallelize the computation   
+  const int seed                              // Seed for random number generator for determinism
 ){   
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
@@ -182,7 +182,6 @@ void slq (
       generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
       
       // Perform a lanczos iteration (populates alpha, beta)
-      // NOTE: seems to be crashing here: 
       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
 
       // Obtain nodes + weights via quadrature algorithm
@@ -213,6 +212,7 @@ void sl_trace(
   using VectorF = Eigen::Array< F, Dynamic, 1>;
 
   // Parameterize the trace function (run in parallel)
+  // const auto N = mat.shape().second;
   const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
     Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
     Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
@@ -265,7 +265,7 @@ void sl_trace(
   }
   
   // Execute the stochastic Lanczos quadrature with the trace function 
-  slq< float >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+  slq< F >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG > 

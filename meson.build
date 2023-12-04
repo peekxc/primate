@@ -65,7 +65,7 @@ inc_pkg = include_directories('include')
 
 ## Add dependencies, if they are available
 dependency_map = {}
-subdir('blas') # Configure BLAS / LAPACK 
+# subdir('blas') # Configure BLAS / LAPACK 
 
 ## Include OpenMP, if possible
 omp = dependency('openmp', required: false)

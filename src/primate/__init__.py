@@ -1,12 +1,15 @@
-__version__ = '0.1.3'
+import importlib.metadata
+__version__ = importlib.metadata.version("primate")
 
 from . import plotting 
 from . import ortho
 from . import trace
 from . import stats
-from . import random
+from .random import rademacher, normal
 from . import diagonalize
 
+
+# __all__ = ['rademacher', 'normal']
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
 def get_include():
@@ -33,3 +36,5 @@ def get_include():
   import os 
   d = os.path.join(os.path.dirname(__file__), 'include')
   return d
+
+

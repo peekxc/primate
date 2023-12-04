@@ -13,7 +13,6 @@ using IndexType = unsigned int;
 using LongIndexType = unsigned long;
 static constexpr long num_bits = 64; 
 
-// TODO: make isotropic generator class that accepts random-bit genertaor
 enum Distribution { rademacher = 0, normal = 1, rayleigh = 2 };
 
 // SIMD-vectorized rademacher vector generation; makes N // 64 calls to random bit generator
@@ -42,7 +41,7 @@ void generate_normal(const unsigned long n, RBG& bit_generator, const int thread
 	static std::normal_distribution d { 0.0, 1.0 };
 	// const auto N = static_cast< unsigned long >(n / RBG::num_bits);
 	auto& gen = *bit_generator.generators[thread_id];
-	#pragma omp simd
+	// #pragma omp simd
 	for (auto i = static_cast< unsigned long >(0); i < n; ++i){
 		array[i] = d(gen);
 	}

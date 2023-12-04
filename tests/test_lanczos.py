@@ -3,6 +3,7 @@ from scipy.linalg import eigh_tridiagonal
 from scipy.sparse.linalg import eigsh, aslinearoperator
 from scipy.sparse import csc_array, csr_array
 from more_itertools import * 
+from primate.random import symmetric
 
 ## Add the test directory to the sys path 
 import sys
@@ -10,21 +11,12 @@ import primate
 ind = [i for i, c in enumerate(primate.__file__) if c == '/'][-3]
 sys.path.insert(0, primate.__file__[:ind] + '/tests')
 
-def gen_sym(n: int, ew: np.ndarray = None):
-  ew = 0.2 + 1.5*np.linspace(0, 5, n) if ew is None else ew
-  Q,R = np.linalg.qr(np.random.uniform(size=(n,n)))
-  A = Q @ np.diag(ew) @ Q.T
-  A = (A + A.T) / 2
-  return A
-
 def test_basic():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
   n = 10
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
-  A_sparse = csc_array(A)
-  v0 = np.random.uniform(size=A.shape[1])
+  A_sparse = csc_array(symmetric(n))
+  v0 = np.random.uniform(size=n)
   (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=n-1, return_basis = True)
   assert np.abs(max(eigh_tridiagonal(a,b, eigvals_only=True)) - max(eigsh(A_sparse)[0])) < 1e-4
 
@@ -32,10 +24,8 @@ def test_matvec():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
   n = 10
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
-  A_sparse = csc_array(A)
-  v0 = np.random.uniform(size=A.shape[1])
+  A_sparse = csc_array(symmetric(n))
+  v0 = np.random.uniform(size=n)
   (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=0, return_basis = True) 
   rw, V = eigh_tridiagonal(a,b, eigvals_only=False)
   y = np.linalg.norm(v0) * (Q @ V @ (V[0,:] * rw))
@@ -46,8 +36,7 @@ def test_accuracy():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
   n = 30
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
+  A = symmetric(n)
   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
   
   ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
@@ -64,8 +53,7 @@ def test_high_degree():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
   n = 30
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
+  A = symmetric(n)
   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
   
   ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
@@ -80,30 +68,24 @@ def test_quadrature():
   from sanity import lanczos_quadrature
   np.random.seed(1234)
   n = 10
-  A = np.random.uniform(size=(n, n)).astype(np.float32)
-  A = A @ A.T
-  A_sparse = csc_array(A)
+  A = csc_array(symmetric(n))
   v0 = np.random.uniform(size=A.shape[1])
 
   ## Test the near-equivalence of the weights and nodes
-  alpha, beta = lanczos(A_sparse, v0, deg=n, orth=n)  
+  alpha, beta = lanczos(A, v0, deg=n, orth=n)  
   nw_test = _lanczos.quadrature(alpha, np.append(0, beta), n)
   nw_true = lanczos_quadrature(A, v=v0, k=n, orth=n)
   assert np.allclose(nw_true[0], nw_test[:,0], atol=1e-6)
   assert np.allclose(nw_true[1], nw_test[:,1], atol=1e-6)
 
-
-## TODO: see https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quadrature.html for alternative tol and rtol 
 def test_stochastic_quadrature():
   from primate.diagonalize import _lanczos
   assert hasattr(_lanczos, "stochastic_quadrature"), "Module compile failed"
   
   from primate.trace import sl_gauss
   np.random.seed(1234)
-  A = gen_sym(30)
-  n = A.shape[1]
-  nv, lanczos_deg = 250, 20
-  A = csc_array(A, dtype=np.float32)
+  n, nv, lanczos_deg = 30, 250, 20
+  A = csc_array(symmetric(30), dtype=np.float32)
 
   ## Test raw computation to ensure it's returning valid entries
   # A, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, num_threads
@@ -158,25 +140,24 @@ def test_slq_fixed():
 def test_slq_trace():
   from primate.trace import sl_trace, _lanczos
   np.random.seed(1234)
-  A = gen_sym(30)
-  n = A.shape[1]
-  A = csc_array(A, dtype=np.float32)
-  tr_est = sl_trace(A, maxiter = 20, num_threads=1)
-  assert len(tr_est) == 20
+  n = 25
+  A = csc_array(symmetric(n), dtype=np.float32)
+  tr_est = sl_trace(A, maxiter = 200, num_threads=1)
+  assert len(tr_est) == 200
+  assert np.isclose(np.mean(tr_est), A.trace(), atol=1.0)
 
 def test_slq_trace_clt_atol():
   from primate.trace import sl_trace, _lanczos
   np.random.seed(1234)
-  A = gen_sym(30)
-  n = A.shape[1]
-  A = csc_array(A, dtype=np.float32)
+  n = 30
+  A = csc_array(symmetric(n), dtype=np.float32)
   
   from primate.stats import sample_mean_cinterval
   tr_est = sl_trace(A, nv = 100, num_threads=1, seed=5)
   ci = np.array([sample_mean_cinterval(tr_est[:i], sdist='normal') if i > 1 else [-np.inf, np.inf] for i in range(len(tr_est))])
   
   ## Detect when, for the fixed set of samples, the trace estimatro should converge by CLT 
-  atol_threshold = (A.trace() * 0.05) / n
+  atol_threshold = (A.trace() * 0.05)
   clt_converged = np.ravel(0.5*np.diff(ci, axis=1)) <= atol_threshold
   assert np.any(clt_converged), "Did not converge!"
   converged_ind = np.flatnonzero(clt_converged)[0]
@@ -185,3 +166,6 @@ def test_slq_trace_clt_atol():
   tr_est = sl_trace(A, nv = 100, atol=atol_threshold, num_threads=1, seed=5)
   converged_online = np.take(np.flatnonzero(tr_est == 0.0), 0)
   assert converged_online == converged_ind, "SLQ not converging at correct index!"
+
+
+

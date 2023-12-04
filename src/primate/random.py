@@ -3,9 +3,28 @@ from typing import *
 import _random_gen
 from math import prod 
 from numbers import Integral
+from scipy.spatial.distance import squareform
 
 _engines = ["splitmix64", "xoshiro256**", "lcg64", "pcg64", "mt64"]
 _engine_prefixes = ["sx", "xs", "lcg", "pcg", "mt"]
+
+def symmetric(n: int, dist: str = "normal", psd: bool = True, ew: np.ndarray = None):
+  N: int = n * (n-1) // 2
+  if dist == "uniform":
+    A = squareform(np.random.uniform(size=N))
+    np.einsum('ii->i', A)[:] = np.random.random(n)
+  elif dist == "normal": 
+    A = squareform(np.random.normal(size=N))
+    np.einsum('ii->i', A)[:] = np.random.random(n)
+  else: 
+    raise ValueError(f"Invalid distribution {dist} supplied")
+  ew = np.random.uniform(size=n, low=-1.0, high=1.0) if ew is None else np.array(ew)
+  if psd: 
+    ew = (ew + 1.0) / 2.0
+  Q, R = np.linalg.qr(A)
+  A = Q @ np.diag(ew) @ Q.T
+  A = (A + A.T) / 2
+  return A
 
 def rademacher(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1, dtype=np.float32):
   """Generates random vectors from the rademacher distribution. 
