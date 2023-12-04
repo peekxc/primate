@@ -1,0 +1,12 @@
+version: '3'
+services:
+  manylinux: 
+    image: quay.io/pypa/manylinux_2_28_x86_64
+    volumes:
+      - ..:/workspace # Mount the parent folder to workspace
+    command: sleep infinity
+  windows: 
+    image: mcr.microsoft.com/windows/servercore:1903
+    volumes:
+      - ..:/workspace # Mount the parent folder to workspace
+    command: sleep infinity
