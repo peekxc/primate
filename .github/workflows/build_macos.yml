@@ -28,7 +28,8 @@ jobs:
         export PATH="/usr/local/opt/llvm/bin:$PATH"
         export LDFLAGS="-L/usr/local/opt/llvm/lib"
         export CPPFLAGS="-I/usr/local/opt/llvm/include"
-        clang --version
+        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
+        source ~/.bash_profile
         clang --version
     - name: Install OpenBLAS
       run: |

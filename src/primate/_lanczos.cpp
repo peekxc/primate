@@ -6,6 +6,7 @@
 #include "_random_generator/vector_generator.h"
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
+#include <cmath> // constants
 #include <iostream>
 #include <stdio.h>
 #include <any>
