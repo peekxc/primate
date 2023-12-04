@@ -22,13 +22,13 @@ jobs:
       uses: actions/checkout@v3
       with: 
         submodules: true
-    - name: Install Clang with OpenMP support
-      run: |
-        brew install libomp llvm
-        export PATH="/usr/local/opt/llvm/bin:$PATH"
-        export LDFLAGS="-L/usr/local/opt/llvm/lib"
-        export CPPFLAGS="-I/usr/local/opt/llvm/include"
-        clang --version
+    # - name: Install Clang with OpenMP support
+    #   run: |
+    #     brew install libomp llvm
+    #     export PATH="/usr/local/opt/llvm/bin:$PATH"
+    #     export LDFLAGS="-L/usr/local/opt/llvm/lib"
+    #     export CPPFLAGS="-I/usr/local/opt/llvm/include"
+    #     clang --version
     - name: Install OpenBLAS
       run: |
         brew install openblas

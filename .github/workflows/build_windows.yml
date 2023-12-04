@@ -35,11 +35,11 @@ jobs:
         choco install -y llvm --params "clang;compiler=clang" --version 13.0.0
         $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
         clang --version
-    - name: Install OpenBLAS using Chocolatey
-      run: |
-        choco install -y openblas
-        $env:PATH = "C:\ProgramData\chocolatey\lib\openblas\tools\bin;$env:PATH"
-        openblas_info
+    # - name: Install OpenBLAS using Chocolatey
+    #   run: |
+    #     choco install -y openblas
+    #     $env:PATH = "C:\ProgramData\chocolatey\lib\openblas\tools\bin;$env:PATH"
+    #     openblas_info
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
