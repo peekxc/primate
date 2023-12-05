@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-brew install libomp llvm openblas
+brew install --force libomp llvm openblas
+rm /usr/local/bin/2to3/*
+
 export CC=/usr/local/opt/llvm/bin/clang
 export CXX=/usr/local/opt/llvm/bin/clang++
 export CPPFLAGS="$CPPFLAGS -Xpreprocessor -fopenmp"
@@ -18,3 +20,7 @@ fi
 
 echo CXX VARIABLE: 
 echo $CXX
+ln -s $CC /usr/bin/clang
+ln -s $CXX /usr/bin/clang++
+alias clang=/usr/local/opt/llvm/bin/clang
+alias clang++=/usr/local/opt/llvm/bin/clang++
