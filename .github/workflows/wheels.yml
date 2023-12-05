@@ -46,7 +46,7 @@ jobs:
       - name: Pre-run linux pre-build
         if: runner.os == 'Linux'
         run: | 
-          bash {project}/tools/cibw_linux.sh {project}
+          bash ./tools/cibw_linux.sh
         
       - name: Set VSDev RC (windows only)
         if: runner.os == 'Windows'
