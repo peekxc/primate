@@ -45,7 +45,7 @@ jobs:
           python -m pip install cibuildwheel
           
       - name: Set VSDev RC (windows only)
-        if: ${{ matrix.buildplat[1] }} == 'win'
+        if: runner.os == 'Windows'
         run: | 
           function Invoke-VSDevEnvironment {
             $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -59,7 +59,7 @@ jobs:
           }
           Invoke-VSDevEnvironment
           Get-Command rc.exe | Format-Table -AutoSize
-          
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.15.0
         env:
