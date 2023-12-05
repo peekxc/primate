@@ -36,14 +36,27 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-conversion',
   '-Wno-misleading-indentation',
   '-Wno-unused-lambda-capture',
-  '-Wno-unused-parameter',
-  '-std=c++20', 
+  '-Wno-unused-parameter', 
   '-fPIC', 
   '-fvisibility=hidden',
   # '-flto=thin'        # release only: thin LTO 
   # '-flto'             # release only: monolithic LTO 
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
+
+## Require C++20 for concepts
+concept_code = '''
+#include <concepts>
+#include <type_traits>
+template <class T>
+concept integral = std::is_integral_v<T>;
+'''
+concepts_check = compiler.compiles(concept_code, name : 'concepts check')
+if concepts_check
+  _cpp_args += compiler.get_supported_arguments('-std=c++20')
+else 
+  error('A C++20-compliant compiler is required')
+endif
 
 ## Add Xclang 
 _cpp_args += compiler.get_supported_arguments('-Xclang')
