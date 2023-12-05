@@ -31,9 +31,10 @@ include = [
 setup = ['--default-library=static']
 
 [tool.cibuildwheel.macos]
-before-build = "brew install libomp llvm openblas"
-environment = { CXX = "/usr/local/opt/llvm/bin/clang" }
+before-build = "sh tools/cibw_macos.sh"
+# environment = { CXX = "/usr/local/opt/llvm/bin/clang", CC = "/usr/local/opt/llvm/bin/clang" }
+
 
 [tool.cibuildwheel.windows]
 before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206"
-environment = { PATH = "C:\\rtools40\\ucrt64\\bin;$PATH" }
+environment = { PATH = "C:\\rtools40\\ucrt64\\bin;$PATH", CXX = "gcc", CC = "gcc" }
