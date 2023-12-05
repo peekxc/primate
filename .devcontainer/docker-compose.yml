@@ -5,8 +5,13 @@ services:
     volumes:
       - ..:/workspace # Mount the parent folder to workspace
     command: sleep infinity
-  windows: 
-    image: mcr.microsoft.com/windows/servercore:1903
+  musllinux:
+    image: quay.io/pypa/musllinux_1_1_x86_64
     volumes:
       - ..:/workspace # Mount the parent folder to workspace
     command: sleep infinity
+  # windows: 
+  #   image: mcr.microsoft.com/windows/servercore:1903
+  #   volumes:
+  #     - ..:/workspace # Mount the parent folder to workspace
+  #   command: sleep infinity
