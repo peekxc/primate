@@ -307,16 +307,7 @@ MathJax = {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#primate" id="toc-primate" class="nav-link active" data-scroll-target="#primate">primate</a>
-  <ul class="collapse">
-  <li><a href="#compilation-development" id="toc-compilation-development" class="nav-link" data-scroll-target="#compilation-development">Compilation &amp; Development</a></li>
-  </ul></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -339,28 +330,20 @@ MathJax = {
 
 </header>
 
-<section id="primate" class="level1">
-<h1>primate</h1>
-<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is Python package that performs randomized matrix trace estimation of <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>; that is, matrices parameterized by functions:</p>
-<p><span class="math display"> \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}</span></p>
-<p>Trace estimates are obtained in a Monte-Carlo fashion via the <em>stochastic Lanczos method</em> (SLQ)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This method is useful for sparse or highly structured matrices with efficiently computable <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a>.</p>
+<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is a Python package that provides estimators of quantities derived from <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>; that is, matrices parameterized by functions:</p>
+<p><span class="math display"> f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}</span></p>
+<p>Matrix function approximations are obtained via the <em>Lanczos</em><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> and <em>stochastic Lanczos quadrature</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> methods, which are well-suited for sparse or highly structured operators with fast <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a>.</p>
 <p>Notable features of <code>primate</code> include:</p>
 <ul>
-<li>A highly-parametrizable trace estimator (SLQ)</li>
+<li>Efficient methods for trace, quadrature, and matrix function approximation</li>
 <li>Various distribution / engine choices for random vector generation (the stochastic part!)</li>
-<li>Orthogonalization routines, such as the <em>Lanczos</em>, <em>Golub Kahan</em>, and <em>Gram Schmidt</em> methods</li>
-<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> (C++)</li>
+<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> (C++)</li>
 <li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator">SciPy</a> or <a href="https://pylops.readthedocs.io/en/stable/index.html">Pylops</a></li>
+<li>Matrix-free interface to the <em>Lanczos</em>, <em>Golub-Welsch</em>, and <em>Gram Schmidt</em> methods</li>
 </ul>
 <!-- Moreover, `primate`'s C++ API uses a generic template interface written with [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, any `LinearOperator` [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49).  -->
 <!-- To use,, the library is is [header-only](https://en.wikipedia.org/wiki/Header-only), so integration is a si.  -->
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>—for a comparison of the two, see <a href="https://peekxc.github.io/primate/imate_compare.html">here</a>.</p>
-<section id="compilation-development" class="level2">
-<h2 class="anchored" data-anchor-id="compilation-development">Compilation &amp; Development</h2>
-<p><code>primate</code> relies on BLAS libraries</p>
-<blockquote class="blockquote">
-<p>pipx run cibuildwheel –platform linux</p>
-</blockquote>
+<p><code>primate</code> was partially inspired by the <a href="https://github.com/ameli/imate"><code>imate</code> package</a>—for a comparison of the two, see <a href="https://peekxc.github.io/primate/imate_compare.html">here</a>.</p>
 <!-- 
 `primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package that performs randomized matrix trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix)---that is, matrices parameterized by functions:
 
@@ -382,15 +365,14 @@ Much of `primate`'s computational code was directly ported from the (excellent) 
 [^2]: This includes [std::function](https://en.cppreference.com/w/cpp/utility/functional/function)'s, C-style function pointers, [functors](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses), and [lambda expressions](https://en.cppreference.com/w/cpp/language/lambda). -->
 
 
-</section>
-</section>
 
 
 <div id="quarto-appendix" class="default"><aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>This includes <a href="https://en.cppreference.com/w/cpp/utility/functional/function">std::function</a>’s, C-style function pointers, <a href="https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses">functors</a>, and <a href="https://en.cppreference.com/w/cpp/language/lambda">lambda expressions</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Musco, Cameron, Christopher Musco, and Aaron Sidford. “Stability of the Lanczos method for matrix function approximation.” Proceedings of the Twenty-Ninth Annual ACM-SIAM Symposium on Discrete Algorithms. Society for Industrial and Applied Mathematics, 2018.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>This includes <a href="https://en.cppreference.com/w/cpp/utility/functional/function">std::function</a>’s, C-style function pointers, <a href="https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses">functors</a>, and <a href="https://en.cppreference.com/w/cpp/language/lambda">lambda expressions</a>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </aside></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

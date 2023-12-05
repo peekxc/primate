@@ -29,3 +29,11 @@ include = [
 
 [tool.meson-python.args]
 setup = ['--default-library=static']
+
+[tool.cibuildwheel.macos]
+before-build = "brew install libomp llvm openblas"
+environment = { CXX = "/usr/local/opt/llvm/bin/clang" }
+
+[tool.cibuildwheel.windows]
+before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206"
+environment = { PATH = "C:\\rtools40\\ucrt64\\bin;$PATH" }
