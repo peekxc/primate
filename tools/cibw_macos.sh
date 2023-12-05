@@ -1,4 +1,4 @@
-!#/usr/bin/bash 
+#!/usr/bin/env bash
 
 brew install libomp llvm openblas
 export CC=/usr/bin/clang
@@ -15,3 +15,6 @@ if [[ $(uname -m) == "arm64" && "$CIBW_BUILD" == "cp38-macosx_arm64" ]]; then
   sudo installer -pkg /tmp/Python38.pkg -target /
   sh "/Applications/Python 3.8/Install Certificates.command"
 fi
+
+echo CXX VARIABLE: 
+echo $CXX
