@@ -34,20 +34,13 @@ setup = ['--default-library=static']
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
 test-command = ["coverage run --source={package} -m pytest {package}/tests", "coverage report -m"]
 build-verbosity = 2
-skip = "cp36-* cp37-* cp38-* pp* *_ppc64le *_i686 *_s390x"
+skip = "cp36-* cp37-* pp* *_ppc64le *_i686 *_s390x"
 
 [tool.cibuildwheel.macos]
 before-build = "bash {project}/tools/cibw_macos.sh"
-environment = { 
-	CC = "/usr/local/opt/llvm/bin/clang"
-	CXX = "/usr/local/opt/llvm/bin/clang++"
-}
+environment = { CC="/usr/local/opt/llvm/bin/clang", CXX="/usr/local/opt/llvm/bin/clang++" }
 
 [tool.cibuildwheel.windows]
 # before-build = "sh tools/cibw_windows.sh"
 before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\\rtools40\\ucrt64\\bin\\;%PATH%"
-environment = { 
-	PKG_CONFIG_PATH = "C:/opt/64/lib/pkgconfig" 
-	CXX = "g++",
-	CC = "gcc"
-}
+environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CXX="g++", CC="gcc" }
