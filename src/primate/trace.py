@@ -21,7 +21,7 @@ def sl_trace (
   orth: int = 0,
   confidence: float = 0.95,
   pdf: str = "rademacher",
-  rng: str = "pcg",
+  rng: str = "lcg",
   seed: int = -1,
   num_threads: int = 0,
   verbose: bool = False,
@@ -295,10 +295,6 @@ def sl_gauss(
   ## Make the actual call
   quad_nw = _lanczos.stochastic_quadrature(A, *sl_quad_args)
   return quad_nw
-
-
-
-
 
 
 

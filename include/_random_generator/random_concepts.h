@@ -42,7 +42,7 @@ struct Random64Engine : public Random64EngineConcept {
   void seed(std::seed_seq& S) { rng.seed(S); };
   uint64_t operator()() { return rng(); }
   size_t state_size() const {
-    if constexpr (Stateful64Engine< T >){ return T::state_size; } 
+    if constexpr (Stateful64Engine< T >){ return std::max(T::state_size, size_t(1)); } 
     return 1; 
   }
 };

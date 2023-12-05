@@ -216,13 +216,19 @@ void sl_trace(
   const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
     Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
     Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
-    nodes_v.unaryExpr(sf);
+    for (int c = 0; c < lanczos_degree; ++c){
+      std::cout << node_v[c] << " -> " << sf(node_v[c]) << std::endl; 
+      node_v[c] = sf(node_v[c]);
+    }
+    // nodes_v.unaryExpr(sf);
     estimates[i] = (nodes_v * weights_v).sum();
   };
   
   // Type-erased function since the call is cheap
   std::function< bool (int) > early_stop; 
-  if (use_CLT){
+  if (atol == 0.0 && rtol == 0.0){
+    early_stop = [](int i) -> bool { return false; };
+  } else if (use_CLT){
     // Parameterize when to stop using either the CLT over the given confidence level or 
     // This runs in critical section of the SLQ, so we can depend sequential execution (but i will vary!)
     // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
@@ -239,7 +245,7 @@ void sl_trace(
       vr_est = L * vr_pre + denom * std::pow(estimates[i] - mu_pre, 2); // update sample variance
       mu_pre = mu_est;
       vr_pre = vr_est;
-      if (n < 2){
+      if (n < 3){
         return false; 
       } else {
         const auto sd_est = std::sqrt(vr_est);

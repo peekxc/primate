@@ -13,7 +13,6 @@ def suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rad
   else: 
     raise NotImplementedError("TODO")
 
-
 # def suggest_nv_mf(p: float, eps: float, max_f: float, k: int, e_min: float, e_max: float, n: int, dist: str = "rademacher"):
 #   k = e_max / e_min 
 #   rho = (np.sqrt(k) + 1)/(np.sqrt(k) - 1)

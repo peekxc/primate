@@ -71,12 +71,23 @@ def test_slq_fixed():
   assert np.isclose(A.trace() - tr_est, 0.0, atol=threshold)
 
 def test_slq_trace():
-  from primate.trace import sl_trace, _lanczos
+  from primate.trace import sl_trace
   np.random.seed(1234)
   n = 25
   A = csc_array(symmetric(n), dtype=np.float32)
-  tr_est = sl_trace(A, maxiter = 200, num_threads=1)
+  tr_est = sl_trace(A, maxiter = 200, num_threads=1, seed=-1)
   assert len(tr_est) == 200
+  assert np.all(~np.isclose(tr_est, 0.0))
+  assert np.isclose(np.mean(tr_est), A.trace(), atol=1.0)
+
+def test_slq_trace_multithread():
+  from primate.trace import sl_trace
+  np.random.seed(1234)
+  n = 25
+  A = csc_array(symmetric(n), dtype=np.float32)
+  tr_est = sl_trace(A, maxiter = 200, atol=0.0, num_threads=6)
+  assert len(tr_est) == 200
+  assert np.all(~np.isclose(tr_est, 0.0))
   assert np.isclose(np.mean(tr_est), A.trace(), atol=1.0)
 
 def test_slq_trace_clt_atol():
@@ -100,5 +111,14 @@ def test_slq_trace_clt_atol():
   converged_online = np.take(np.flatnonzero(tr_est == 0.0), 0)
   assert converged_online == converged_ind, "SLQ not converging at correct index!"
 
+
+def test_slq_trace_f():
+  from primate.trace import sl_trace, _lanczos
+  np.random.seed(1234)
+  n = 30
+  A = csc_array(symmetric(n), dtype=np.float32)
+  
+
+  np.isclose(np.mean(sl_trace(A, fun="numrank")), np.linalg.matrix_rank(A.todense())
 
 

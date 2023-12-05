@@ -84,7 +84,7 @@ def xtrace(A, error_atol: float = 0.1, error_rtol: float = 1e-6, nv: int = 1, co
 		ns = min(A.shape[1] - Y.shape[1], ns)
 		NewOm = sample_isotropic(n, ns, method=method)
 		
-		## If the sampled vectors have a lot of linear dependence  won't be (numerically) span a large enough subspace
+		## If the sampled vectors have a lot of linear dependence won't be (numerically) span a large enough subspace
 		## to permit sufficient exploration of the eigen-space, so we optionally re-sample based on a loose upper bound
 		## Based on: https://math.stackexchange.com/questions/1191503/conditioning-of-triangular-matrices
 		cond_numb_bound = np.inf
