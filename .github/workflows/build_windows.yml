@@ -68,11 +68,16 @@ jobs:
     - name: Build a wheel
       run: | 
         output_dir="$(mktemp -d)"
-        python - pip wheel . --wheel-dir "$output_dir" 
-    - name: Test the wheel 
+        python -m pip wheel . --no-deps --wheel-dir "$output_dir" 
+    - name: Install the wheel
       run: | 
         python -m pip uninstall primate -y
         python -m pip install $(find "$output_dir" -type f | grep *primate*.whl)
+    - name: Wheel dry-run 
+      run: | 
+        python -c "import primate; print(primate.__version__)"
+    - name: Test the wheel 
+      run: |
         python -m pytest tests/ --cov=primate --benchmark-skip
         coverage report -m
     # - name: Make wheel w/ delvewheel 
