@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 brew install --force libomp llvm openblas
-rm /usr/local/bin/2to3/*
+rm -rf /usr/local/bin/2to3/*
 
 export CC=/usr/local/opt/llvm/bin/clang
 export CXX=/usr/local/opt/llvm/bin/clang++
@@ -20,6 +20,8 @@ fi
 
 echo CXX VARIABLE: 
 echo $CXX
+rm /usr/bin/clang
+rm /usr/bin/clang++
 ln -s $CC /usr/bin/clang
 ln -s $CXX /usr/bin/clang++
 alias clang=/usr/local/opt/llvm/bin/clang

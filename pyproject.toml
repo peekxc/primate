@@ -36,6 +36,6 @@ before-build = "sh tools/cibw_macos.sh"
 
 
 [tool.cibuildwheel.windows]
-before-build = "sh tools/cibw_windows.sh"
-# before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206"
+# before-build = "sh tools/cibw_windows.sh"
+before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\rtools40\ucrt64\bin\;%PATH%"
 # environment = { PATH = "C:\rtools40\ucrt64\bin;$PATH", CXX = "gcc", CC = "gcc" }
