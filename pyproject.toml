@@ -34,7 +34,6 @@ setup = ['--default-library=static']
 before-build = "sh tools/cibw_macos.sh"
 # environment = { CXX = "/usr/local/opt/llvm/bin/clang", CC = "/usr/local/opt/llvm/bin/clang" }
 
-
 [tool.cibuildwheel.windows]
 # before-build = "sh tools/cibw_windows.sh"
 before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\\rtools40\\ucrt64\\bin\\;%PATH%"
