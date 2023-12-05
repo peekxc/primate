@@ -7,15 +7,26 @@ on:
   #   branches: [ "main" ]
 
 jobs:
-  build_windows_wheels:
-    name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  build_wheels:
+    name: Wheel build for ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }} ${{ matrix.buildplat[2] }}
+    runs-on: ${{ matrix.buildplat[0] }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
-        cibw_arch: ["AMD64"]
-        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
+        # Github Actions doesn't support pairing matrix values together, let's improvise
+        # https://github.com/github/feedback/discussions/7835#discussioncomment-1769026
+        buildplat:
+        # should also be able to do multi-archs on a single entry, e.g.
+        # [windows-2019, win*, "AMD64 x86"]. However, those two require a different compiler setup
+        # so easier to separate out here.
+        - [ubuntu-latest, manylinux, x86_64]
+        - [ubuntu-latest, musllinux, x86_64]
+        - [macos-latest, x86_64]
+        - [windows-latest]
+        # os: [windows-latest]
+        # cibw_arch: ["AMD64"]
+        # cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -25,184 +36,150 @@ jobs:
           fetch-depth: 0
           submodules: true 
 
-      # - name: Check Python version 
-      #   run: |
-      #     case "${{ matrix.cibw_python }}" in
-      #       "cp38-") export PYTHON_VERSION="3.8" ;;
-      #       "cp39-") export PYTHON_VERSION="3.9" ;;
-      #       "cp310-") export PYTHON_VERSION="3.10" ;;
-      #       "cp311-") export PYTHON_VERSION="3.11" ;;
-      #     esac
-      #     echo "PYTHON_VERSION=${PYTHON_VERSION}" >> $GITHUB_ENV
-
       - uses: actions/setup-python@v4
         name: Install Python
         with:
           python-version: "3.9"
 
-      - name: Install cibuildwheel and add clang-cl to path
+      - name: Install cibuildwheel
         run: |
           python -m pip install cibuildwheel
 
-      - name: Build AMD64 Windows wheels for CPython
-        if: matrix.cibw_arch == 'AMD64'
-        # To avoid "LINK : fatal error LNK1158: cannot run 'rc.exe'"
-        # we explicitly add rc.exe to path using the method from:
-        # https://github.com/actions/virtual-environments/issues/294#issuecomment-588090582
-        # with additional -arch=x86 flag to vsdevcmd.bat
-        run: |
-          function Invoke-VSDevEnvironment {
-            $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-              $installationPath = & $vswhere -prerelease -legacy -latest -property installationPath
-              $Command = Join-Path $installationPath "Common7\Tools\vsdevcmd.bat"
-            & "${env:COMSPEC}" /s /c "`"$Command`" -arch=amd64 -no_logo && set" | Foreach-Object {
-                  if ($_ -match '^([^=]+)=(.*)') {
-                      [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
-                  }
-              }
-          }
-          Invoke-VSDevEnvironment
-          Get-Command rc.exe | Format-Table -AutoSize
-          python -m cibuildwheel --output-dir dist
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.15.0
         env:
           # define CC, CXX so meson will use clang-cl instead of MSVC
           # CC: clang-cl
           # CXX: clang-cl
-          CC: gcc
-          CXX: g++
-          CIBW_BUILD: ${{ matrix.cibw_python }}
-          CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_arch }}
+          # CC: gcc
+          # CXX: g++
+          CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }}*
+          CIBW_ARCHS: ${{ matrix.buildplat[2] }}
           # -Wl,-S equivalent to gcc's -Wl,--strip-debug
-          LDFLAGS: "-Wl,-S"
-          CIBW_TEST_REQUIRES: pytest pytest-cov coverage
-          CIBW_TEST_COMMAND: coverage run --source={package} -m pytest {package}/tests && coverage report -m
+          # LDFLAGS: "-Wl,-S"
 
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: ./dist/*.whl
 
-  build_macos_wheels:
-    name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [macos-latest]
-        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
-        cibw_arch: ["x86_64", "arm64"]  # TODO: add "universal2" once a universal2 libomp is available
+  # build_macos_wheels:
+  #   name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [macos-latest]
+  #       cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
+  #       cibw_arch: ["x86_64", "arm64"]  # TODO: add "universal2" once a universal2 libomp is available
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          submodules: true
-
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: "3.9"
-
-      - name: Install cibuildwheel
-        run: |
-          python -m pip install cibuildwheel
-
-      - name: Build wheels for CPython Mac OS
-        run: |
-          python -m cibuildwheel --output-dir dist
-        env:
-          CC: /usr/local/opt/llvm/bin/clang
-          CXX: /usr/local/opt/llvm/bin/clang
-          CIBW_BUILD: ${{ matrix.cibw_python }}
-          CIBW_ARCHS_MACOS: ${{ matrix.cibw_arch }}
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
-          CIBW_MANYLINUX_I686_IMAGE: manylinux1
-          CIBW_TEST_SKIP: "*-macosx_arm64"
-          CIBW_TEST_REQUIRES: pytest pytest-cov coverage
-          CIBW_TEST_COMMAND: python -m pytest tests/ --cov={package} --benchmark-skip && coverage report -m
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: ./dist/*.whl
-
-  build_linux_wheels:
-    name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
-        cibw_manylinux: [manylinux2014]
-        cibw_arch: ["x86_64"]
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: "3.9"
-
-      - name: Install cibuildwheel
-        run: |
-          python -m pip install cibuildwheel
-
-      - name: Build the wheel for Linux
-        run: python -m cibuildwheel --output-dir dist
-        env:
-          CIBW_BUILD: ${{ matrix.cibw_python }}
-          CIBW_ARCHS_LINUX: ${{ matrix.cibw_arch }}
-          CIBW_SKIP: "*-musllinux_*"
-          CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.cibw_manylinux }}
-          CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.cibw_manylinux }}
-          CIBW_TEST_REQUIRES: pytest pytest-cov coverage
-          CIBW_TEST_COMMAND: coverage run --source={package} -m pytest {package}/tests && coverage report -m
-          
-      - uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: ./dist/*.whl
-          
-  make_sdist:
-    name: Make SDist
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: true 
-    
-    - uses: actions/setup-python@v4
-      name: Install Python
-      with:
-        python-version: "3.9"
-
-    - name: Build SDist
-      run: pipx run build --sdist
-
-    - uses: actions/upload-artifact@v3
-      with:
-        path: dist/*.tar.gz
-
-  # upload_all:
-  #   needs: [build_linux_wheels, build_macos_wheels, build_windows_wheels, make_sdist]
-  #   environment: pypi
-  #   permissions:
-  #     id-token: write
-  #   runs-on: ubuntu-latest
-  #   if: github.event_name == 'release' && github.event.action == 'published'
   #   steps:
-  #   - uses: actions/download-artifact@v3
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: true
+
+  #     - uses: actions/setup-python@v4
+  #       name: Install Python
+  #       with:
+  #         python-version: "3.9"
+
+  #     - name: Install cibuildwheel
+  #       run: |
+  #         python -m pip install cibuildwheel
+
+  #     - name: Build wheels for CPython Mac OS
+  #       run: |
+  #         python -m cibuildwheel --output-dir dist
+  #       env:
+  #         CC: /usr/local/opt/llvm/bin/clang
+  #         CXX: /usr/local/opt/llvm/bin/clang
+  #         CIBW_BUILD: ${{ matrix.cibw_python }}
+  #         CIBW_ARCHS_MACOS: ${{ matrix.cibw_arch }}
+  #         CIBW_MANYLINUX_X86_64_IMAGE: manylinux1
+  #         CIBW_MANYLINUX_I686_IMAGE: manylinux1
+  #         CIBW_TEST_SKIP: "*-macosx_arm64"
+
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: ./dist/*.whl
+
+  # build_linux_wheels:
+  #   name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       os: [ubuntu-latest]
+  #       cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
+  #       cibw_manylinux: [manylinux2014]
+  #       cibw_arch: ["x86_64"]
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: true
+
+  #     - uses: actions/setup-python@v4
+  #       name: Install Python
+  #       with:
+  #         python-version: "3.9"
+
+  #     - name: Install cibuildwheel
+  #       run: |
+  #         python -m pip install cibuildwheel
+
+  #     - name: Build the wheel for Linux
+  #       run: python -m cibuildwheel --output-dir dist
+  #       env:
+  #         CIBW_BUILD: ${{ matrix.cibw_python }}
+  #         CIBW_ARCHS_LINUX: ${{ matrix.cibw_arch }}
+  #         CIBW_SKIP: "*-musllinux_*"
+  #         CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.cibw_manylinux }}
+  #         CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.cibw_manylinux }}
+
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels
+  #         path: ./dist/*.whl
+          
+  # make_sdist:
+  #   name: Make SDist
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   steps:
+  #   - uses: actions/checkout@v3
   #     with:
-  #       name: artifact
-  #       path: dist
-  #   - uses: pypa/gh-action-pypi-publish@release/v1
+  #       submodules: true 
+    
+  #   - uses: actions/setup-python@v4
+  #     name: Install Python
+  #     with:
+  #       python-version: "3.9"
+
+  #   - name: Build SDist
+  #     run: pipx run build --sdist
+
+  #   - uses: actions/upload-artifact@v3
+  #     with:
+  #       path: dist/*.tar.gz
+
+  # # upload_all:
+  # #   needs: [build_linux_wheels, build_macos_wheels, build_windows_wheels, make_sdist]
+  # #   environment: pypi
+  # #   permissions:
+  # #     id-token: write
+  # #   runs-on: ubuntu-latest
+  # #   if: github.event_name == 'release' && github.event.action == 'published'
+  # #   steps:
+  # #   - uses: actions/download-artifact@v3
+  # #     with:
+  # #       name: artifact
+  # #       path: dist
+  # #   - uses: pypa/gh-action-pypi-publish@release/v1
