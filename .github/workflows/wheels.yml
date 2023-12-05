@@ -19,7 +19,6 @@ jobs:
         # should also be able to do multi-archs on a single entry, e.g.
         # [os-image, os-name, os-arch]
         - [ubuntu-latest, manylinux, x86_64]
-        - [ubuntu-latest, musllinux, x86_64]
         - [macos-latest, macosx, x86_64]
         - [windows-latest, win, AMD64] 
         # os: [windows-latest]
@@ -44,6 +43,11 @@ jobs:
         run: |
           python -m pip install cibuildwheel
           
+      - name: Pre-run linux pre-build
+        if: runner.os == 'Linux'
+        run: | 
+          bash {project}/tools/cibw_linux.sh {project}
+        
       - name: Set VSDev RC (windows only)
         if: runner.os == 'Windows'
         run: | 

@@ -3,6 +3,9 @@ set -xe
 WHEEL="$1"
 DEST_DIR="$2"
 
+## Need delvewheel for this 
+pip install delvewheel
+
 # create a temporary directory in the destination folder and unpack the wheel into there
 pushd $DEST_DIR
 mkdir -p tmp
@@ -16,7 +19,6 @@ pushd primate*
 # building with mingw.
 # We therefore find each PYD in the directory structure and strip them.
 for f in $(find ./primate* -name '*.pyd'); do strip $f; done
-
 
 # now repack the wheel and overwrite the original
 wheel pack .

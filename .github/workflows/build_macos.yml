@@ -28,9 +28,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Clang with OpenMP support
       run: |
-        rm -rf /usr/local/bin/2to3*
-        sudo chown -R $(whoami) /usr/local 
-        brew install --force libomp llvm > nul
+        brew install --force libomp llvm
     - name: Update environment flags for Clang 
       run: |
         export PATH="/usr/local/opt/llvm/bin:$PATH"
@@ -60,7 +58,7 @@ jobs:
         pip install --verbose .
       env:
         CC: /usr/local/opt/llvm/bin/clang
-        CXX: /usr/local/opt/llvm/bin/clang
+        CXX: /usr/local/opt/llvm/bin/clang++
     - name: Test with pytest
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip
