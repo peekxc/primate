@@ -67,11 +67,12 @@ jobs:
         coverage report -m
     - name: Build a wheel
       run: | 
-        python -m pip wheel . -w dist
+        output_dir="$(mktemp -d)"
+        python - pip wheel . --wheel-dir "$output_dir" 
     - name: Test the wheel 
       run: | 
-        pip uninstall primate -y
-        python -m pip install dist/primate*.whl
+        python -m pip uninstall primate -y
+        python -m pip install $(find "$output_dir" -type f | grep *primate*.whl)
         python -m pytest tests/ --cov=primate --benchmark-skip
         coverage report -m
     # - name: Make wheel w/ delvewheel 
