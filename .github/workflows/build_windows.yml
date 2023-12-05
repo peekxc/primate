@@ -65,3 +65,15 @@ jobs:
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip
         coverage report -m
+    - name: Build a wheel
+      run: | 
+        python -m pip wheel . -w dist
+    - name: Test the wheel 
+      run: | 
+        pip uninstall primate -y
+        python -m pip install dist/primate*.whl
+        python -m pytest tests/ --cov=primate --benchmark-skip
+        coverage report -m
+    # - name: Make wheel w/ delvewheel 
+    #   run: |
+    #     bash ./tools/repair_windows.sh
