@@ -34,7 +34,7 @@ setup = ['--default-library=static']
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
 test-command = ["coverage run --source={package} -m pytest {package}/tests", "coverage report -m"]
 build-verbosity = 2
-skip = "cp36-* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
+skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
 
 [tool.cibuildwheel.macos]
 before-build = "bash {project}/tools/cibw_macos.sh"
