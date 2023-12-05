@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 brew install libomp llvm openblas
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
+export CC=/usr/local/opt/llvm/bin/clang
+export CXX=/usr/local/opt/llvm/bin/clang++
 export CPPFLAGS="$CPPFLAGS -Xpreprocessor -fopenmp"
 export CFLAGS="$CFLAGS -I$PREFIX/include"
 export CXXFLAGS="$CXXFLAGS -I$PREFIX/include"
