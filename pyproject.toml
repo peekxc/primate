@@ -33,7 +33,7 @@ setup = ['--default-library=static']
 [tool.cibuildwheel]
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
 test-command = ["coverage run --source={package} -m pytest {package}/tests", "coverage report -m"]
-build-verbosity = 2
+build-verbosity = 1
 skip = "cp36-* cp37-* pp* *_ppc64le *_i686 *_s390x"
 
 [tool.cibuildwheel.macos]
@@ -47,4 +47,5 @@ environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CXX="g++", CC="gcc" }
 repair-wheel-command = "bash ./tools/wheels/repair_windows.sh {wheel} {dest_dir}"
 
 [tool.cibuildwheel.linux]
-environment = { CC="clang", CXX="clang++" }
+before-build = "bash {project}/tools/cibw_linux.sh"
+environment = { CC="clang", CXX="clang" }
