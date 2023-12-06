@@ -216,11 +216,11 @@ void sl_trace(
   const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
     Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
     Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
-    for (int c = 0; c < lanczos_degree; ++c){
-      std::cout << node_v[c] << " -> " << sf(node_v[c]) << std::endl; 
-      node_v[c] = sf(node_v[c]);
-    }
-    // nodes_v.unaryExpr(sf);
+    // for (int c = 0; c < lanczos_degree; ++c){
+    //   // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
+    //   nodes_v[c] = sf(nodes_v[c]);
+    // }
+    nodes_v.unaryExpr(sf);
     estimates[i] = (nodes_v * weights_v).sum();
   };
   
@@ -302,3 +302,15 @@ void sl_quadrature(
   // Execute the stochastic Lanczos quadrature
   slq< float >(mat, quad_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
+
+
+// Approximates the action v |-> f(A)v via the Lanczos method
+// template< std::floating_point F, LinearOperator Matrix > 
+// void matrix_approx(const Matrix& M, const std::function< F(F) > sf, F* v){
+
+//   // Perform a lanczos iteration (populates alpha, beta)
+//   lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+
+//   // Obtain nodes + weights via quadrature algorithm
+//   lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, nodes.data(), weights.data());  
+// }

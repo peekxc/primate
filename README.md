@@ -2,7 +2,7 @@
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-Matrix function approximations are obtained via the _Lanczos_[^1] and _stochastic Lanczos quadrature_[^2] methods, which are well-suited for sparse or highly structured operators with fast [quadratic forms](https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix).
+Matrix function approximations are obtained via the _Lanczos_[^1] and _stochastic Lanczos quadrature_[^2] methods, which are particularly well-suited for sparse or highly structured operators equipped with fast _matvec_ actions $v \mapsto Av$.
 
 Notable features of `primate` include:
 
@@ -17,7 +17,7 @@ Notable features of `primate` include:
 
 `primate` was partially inspired by the [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](https://peekxc.github.io/primate/imate_compare.html).
 
-[^1]: Musco, Cameron, Christopher Musco, and Aaron Sidford. "Stability of the Lanczos method for matrix function approximation." Proceedings of the Twenty-Ninth Annual ACM-SIAM Symposium on Discrete Algorithms. Society for Industrial and Applied Mathematics, 2018.
+[^1]: Musco, Cameron, Christopher Musco, and Aaron Sidford. (2018) "Stability of the Lanczos method for matrix function approximation."
 [^2]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.
 [^3]: This includes [std::function](https://en.cppreference.com/w/cpp/utility/functional/function)'s, C-style function pointers, [functors](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses), and [lambda expressions](https://en.cppreference.com/w/cpp/language/lambda).
 

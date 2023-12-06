@@ -25,6 +25,7 @@ def sl_trace (
   seed: int = -1,
   num_threads: int = 0,
   verbose: bool = False,
+  info: bool = False, 
   plot: bool = False,
   **kwargs
 ) -> Union[float, tuple]:
@@ -58,6 +59,8 @@ def sl_trace (
       Number of threads to use to parallelize the computation. Use values <= 0 to maximize the number of threads. 
   plot : bool, default = False
       If true, plots the samples of the trace estimate along with their convergence characteristics. 
+  info: bool, default = False
+      If True, returns a dictionary containing all relevant information about the computation. 
   kwargs : dict, optional 
       additional key-values to parameterize the chosen function 'fun'.
       
@@ -66,7 +69,7 @@ def sl_trace (
   trace_estimate : float 
       Estimate of the trace of the matrix function $f(A)$.
   info : dict, optional 
-      If 'return_info = True', additional information about the computation. 
+      If 'info = True', additional information about the computation. 
 
   See Also
   --------
@@ -147,13 +150,20 @@ def sl_trace (
   estimates = _lanczos.stochastic_trace(A, *sl_trace_args, **kwargs)
   estimates *= A.shape[1]
 
-  ## Plot
+  ## Plot the trace estimates 
   if plot: 
     from bokeh.plotting import show
     from .plotting import figure_trace
     show(figure_trace(estimates))
 
-  return estimates
+  ## If requested, create the info dictionary; o/w just return the point-estimate
+  trace_estimate = np.mean(estimates)
+  if not info: return trace_estimate
+  info = {
+    'estimate' : trace_estimate,
+    'samples' : estimates
+  }
+  return trace_estimate, info
 
   ## If no information is required, just return the trace estimate 
   # if not(return_info) and not(plot) and not(verbose): 

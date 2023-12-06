@@ -2,14 +2,16 @@
 
 if [ -n "$(command -v yum)" ]; then
   cat /etc/*-release 
+  yum remove -y epel-release
   yum update -y 
-  yum install centos-release-scl
-  yum install llvm-toolset-7
-  scl enable llvm-toolset-7
+  ulimit -n 4096
+  yum install -y clang
+  yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   yum install -y openblas
-  yum install -y python3.9
-  yum install -y python39-devel
-  alias python=python3.9
+  yum install -y epel-release
+  # yum install -y python3.9
+  # yum install -y python39-devel
+  # alias python=python3.9
 elif [ -n "$(command -v apt-get)" ]; then 
   cat /etc/*-release
   sudo apt-get update -y
