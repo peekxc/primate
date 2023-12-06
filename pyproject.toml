@@ -32,8 +32,9 @@ setup = ['--default-library=static']
 
 [tool.cibuildwheel]
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
-test-command = ["coverage run --source={package} -m pytest {package}/tests", "coverage report -m"]
-build-verbosity = 2
+# test-command = "coverage run --source={package} -m pytest {package}/tests" # "coverage report -m"
+test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
+build-verbosity = 1
 skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
 
 [tool.cibuildwheel.macos]
@@ -44,8 +45,9 @@ environment = { CC="/usr/local/opt/llvm/bin/clang", CXX="/usr/local/opt/llvm/bin
 before-build = "bash {project}/tools/cibw_windows.sh"
 # before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\\rtools40\\ucrt64\\bin\\;%PATH%"
 environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CXX="g++", CC="gcc" }
-repair-wheel-command = "bash ./tools/repair_windows.sh {wheel} {dest_dir}"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
+# repair-wheel-command = "bash ./tools/repair_windows.sh {wheel} {dest_dir}"
 
 [tool.cibuildwheel.linux]
-before-build = "bash {project}/tools/cibw_linux.sh {project}"
+# before-build = "bash {project}/tools/cibw_linux.sh {project}"
 environment = { CC="clang", CXX="clang" }

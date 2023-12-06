@@ -35,7 +35,7 @@ struct ThreadedRNG64 {
 	};
 	~ThreadedRNG64(){
 		for (int i = 0; i < num_threads; ++i){
-			delete generators[i];
+			// delete generators[i]; // todo: see if this is causing heap corruption
 		}
 	}
 	auto next(int thread_id) -> std::uint64_t {
