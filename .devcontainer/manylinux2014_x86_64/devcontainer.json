@@ -1,7 +1,7 @@
 {
 	"name": "manylinux_x86_64",
 	"dockerComposeFile": ["../docker-compose.yml"],
-	"service": "manylinux",
+	"service": "manylinux14",
 	"shutdownAction": "none",
 	"workspaceFolder": "/workspace/",
 	"mounts": ["type=bind,source=../../primate,target=/primate"],

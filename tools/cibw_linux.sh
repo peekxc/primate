@@ -2,13 +2,12 @@
 
 if [ -n "$(command -v yum)" ]; then
   cat /etc/*-release 
-  yum remove -y epel-release
+  # yum remove -y epel-release
   yum update -y 
   ulimit -n 4096
   yum install -y clang
-  yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   yum install -y openblas
-  yum install -y epel-release
+  alias python=/opt/python/cp39-cp39/bin/python
   # yum install -y python3.9
   # yum install -y python39-devel
   # alias python=python3.9

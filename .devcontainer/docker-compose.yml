@@ -1,6 +1,12 @@
 version: '3'
 services:
-  manylinux: 
+  # See for a better description of these images: https://github.com/pypa/manylinux
+  manylinux28: 
+    image: quay.io/pypa/manylinux_2_28_x86_64 # quay.io/pypa/manylinux_2_28_x86_64
+    volumes:
+      - ..:/workspace # Mount the parent folder to workspace
+    command: sleep infinity
+  manylinux14: 
     image: quay.io/pypa/manylinux2014_x86_64 # quay.io/pypa/manylinux_2_28_x86_64
     volumes:
       - ..:/workspace # Mount the parent folder to workspace

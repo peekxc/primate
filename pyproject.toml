@@ -36,6 +36,7 @@ test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
 test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
 build-verbosity = 1
 skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
+manylinux-x86_64-image = "manylinux_2_28" # prefer the newer one
 
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/tools/cibw_linux.sh {project}"
