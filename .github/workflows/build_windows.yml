@@ -67,7 +67,9 @@ jobs:
         coverage report -m
     - name: Build a wheel
       run: | 
-        python -m build --wheel
+        python -m pip wheel --no-deps -w wheelhouse .
+        delvewheel repair -w dist -v wheelhouse/*.whl
+        # python -m build --wheel
         # $env:wheel_name=Get-ChildItem -Path dist/* -Include *.whl
         # delvewheel repair -w dist $env:wheel_name
     - name: Uninstall the package 
@@ -77,11 +79,7 @@ jobs:
       # python -m pip install $(find "$output_dir" -type f | grep *primate*.whl)
       # python -m pip install $env:wheel_name
       run: | 
-        set PROJ_WHEEL=true
-        FOR %%F IN (dist\*.whl) DO (set PYPROJ_WHEEL=%%F)
-        delvewheel repair %PYPROJ_WHEEL%
-        FOR %%F IN (wheelhouse\*.whl) DO (set PYPROJ_WHEEL=%%F)
-        python -m pip install %PYPROJ_WHEEL%
+        python -m pip install dist/*.whl
     - name: Wheel dry-run 
       run: | 
         python -c "import primate; print(primate.__version__)"
