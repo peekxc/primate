@@ -69,8 +69,7 @@ jobs:
       run: | 
         python -m build 
         $env:wheel_name=Get-ChildItem -Path dist/* -Include *.whl
-        delvewheel repair -w dist $env:wheel_name
-        
+        # delvewheel repair -w dist $env:wheel_name
     - name: Install the wheel
       run: | 
         python -m pip uninstall primate -y

@@ -50,4 +50,5 @@ repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 
 [tool.cibuildwheel.linux]
 # before-build = "bash {project}/tools/cibw_linux.sh {project}"
+before-build = ["ulimit -n 4096", "yum install -y clang", "yum install -y openblas"]
 environment = { CC="clang", CXX="clang" }
