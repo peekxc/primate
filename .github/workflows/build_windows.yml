@@ -67,7 +67,7 @@ jobs:
         coverage report -m
     - name: Build a wheel
       run: |
-        python -m pip wheel --no-deps -w wheelhouse .
+        python -m pip wheel --no-deps --only-binary --wheel-dir $GITHUB_WORKSPACE/wheelhouse .
         # delvewheel repair -w dist -v wheelhouse/*.whl
         # python -m build --wheel
         # $env:wheel_name=Get-ChildItem -Path dist/* -Include *.whl
