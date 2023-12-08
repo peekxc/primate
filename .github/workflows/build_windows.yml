@@ -27,22 +27,28 @@ jobs:
     #   run: |
     #     choco install rtools -y --no-progress --force --version=4.0.0.20220206
     #     echo "c:\rtools40\ucrt64\bin;" >> $env:GITHUB_PATH
+    
+    ## NOTE: this installs clang, but no OpenMP yet 
     # - name: Set up Clang
     #   uses: egor-tensin/setup-clang@v1
     #   with:
     #     version: latest
     #     platform: x64
-    - name: Setup MSVC 
-      uses: ilammy/msvc-dev-cmd@v1
+    
+    ## NOTE: MSVC seems to only support OpenMP up to 2.0 
+    # - name: Setup MSVC 
+    #   uses: ilammy/msvc-dev-cmd@v1
     # - name: Setup MSVC
     #   uses: bus1/cabuild/action/msdevshell@v1
     #   with:
     #     architecture: x64
-    # - name: Install Clang with OpenMP support using Chocolatey
-    #   run: |
-    #     choco install -y llvm --params "clang;compiler=clang" --version 13.0.0
-    #     $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
-    #     clang --version
+    
+    ## NOTE: this installs clang, clang-cl, lld, etc
+    - name: Install Clang with OpenMP support using Chocolatey
+      run: |
+        choco install -y llvm --params "clang;compiler=clang" --version 17.0.0
+        $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
+        clang --version
     # - name: Install OpenBLAS using Chocolatey
     #   run: |
     #     choco install -y openblas
@@ -75,8 +81,6 @@ jobs:
     - name: Install the wheel
       run: | 
         python -m pip install dist/*.whl
-        pip install delvewheel
-        delvewheel repair dist/*.whl
     - name: Wheel dry-run 
       run: | 
         python -c "import primate; print(primate.__version__)"
