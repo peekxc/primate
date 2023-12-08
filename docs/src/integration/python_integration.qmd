@@ -19,8 +19,6 @@ from bokeh.io import output_notebook
 output_notebook()
 ```
 
-
-
 ```{python}
 from primate.trace import sl_trace
 estimates = sl_trace(A, plot=True)
@@ -31,17 +29,4 @@ tr_est = np.mean(estimates)
 print(f"Error: {abs(tr_est - A.trace()):.5}")
 print(f"Samples std. deviation: {estimates.std(ddof=1)}")
 print(f"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}")
-```
-
-```{python}
-# from scipy.sparse import csr_array, csc_array
-# from scipy.sparse.linalg import LinearOperator, aslinearoperator
-# tr_true = np.sum(A.diagonal())
-# tr_est_1 = slq(A, **slq_params)
-# tr_est_2 = slq(csc_array(A), **slq_params)
-# tr_est_3 = slq(aslinearoperator(A), **slq_params)
-# assert np.isclose(np.take(tr_est_1,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
-# assert np.isclose(np.take(tr_est_2,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
-# assert np.isclose(np.take(tr_est_3,0), tr_true, atol=np.abs(tr_true)*0.35), "Estimate is off more than 5%"
-
 ```

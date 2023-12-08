@@ -4,5 +4,5 @@ from scipy.sparse import csr_array
 from primate.ortho import *
 
 def test_gram_schmidt():
-  assert True    
+  assert True
 

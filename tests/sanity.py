@@ -69,7 +69,7 @@ def girard_hutch(A, f: Callable, nv: int = 150, estimates: bool = False, **kwarg
 
 def approx_matvec(A, v: np.ndarray, k: int = None, f: Callable = None):
   k = A.shape[1] if k is None else int(k)
-  (a,b), Q = lanczos(A, v, max_steps=k, orth=0, return_basis=True)
+  (a,b), Q = lanczos(A, v, deg=k, orth=0, return_basis=True)
   rw, V = eigh_tridiagonal(a,b, eigvals_only=False)  # lanczos_quadrature(A, v, )
   rw = rw if f is None else f(rw)
   y = np.linalg.norm(v) * (Q @ V @ (V[0,:] * rw))

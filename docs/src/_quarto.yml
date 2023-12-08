@@ -7,19 +7,32 @@ filters:
 
 website:
   title: "primate"
+  reader-mode: true 
+  # pinned: false
   navbar: 
     title: PRIMATE
     right:
       - icon: github
         href: https://github.com/peekxc/primate
         aria-label: GitHub
+  search:
+    location: sidebar
+    type: "overlay" # or textbox
+    copy-button: true
   sidebar:
-    search: true 
+    collapse-level: 3
+    search: true
+    style: "floating" # or docked
+    border: false # maybe true for docked
     contents:
       - href: index.qmd
         text: Overview
+      # - text: "Basics"
       - href: install.qmd
         text: Installation
+      - href: imate_compare.qmd
+        text: Comparison to *imate*
+      # - text: "Advanced"
       - section: Integration Guide
         contents:
           - href: integration/python_integration.qmd
@@ -34,8 +47,7 @@ website:
             text: The Lanczos method 
           - href: guide/slq_guide.qmd
             text: The SLQ method 
-      - href: imate_compare.qmd
-        text: Comparison to *imate*
+      # - text: "Reference"
       - section: API Reference 
         href: reference/index.qmd
         contents:
@@ -56,18 +68,7 @@ website:
             - href: reference/random.normal.qmd
               text: Normal
             section: Random 
-              
           
-        # contents: reference/*
-
-
-    collapse-level: 3
-    pinned: false
-  search:
-    location: sidebar
-    type: textbox
-    copy-button: true
-
 # metadata-files:
 #   - _sidebar.yml
 

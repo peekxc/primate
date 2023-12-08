@@ -4,11 +4,15 @@ from scipy.sparse.linalg import LinearOperator
 from .diagonalize import lanczos
 
 class MatrixFunction(LinearOperator):
-  def __init__(lo: Union[np.ndarray, LinearOperator], fun: Callable[float, float]):
+  """Approximates the action v |-> f(A)v """
+  def __init__(self, lo: Union[np.ndarray, LinearOperator], fun: Callable[float, float], dtype = None):
     assert isinstance(lo, LinearOperator), "Must pass a linear operator"
     self.op = lo
-    self.fun = fun
+    self.fun: Callable[float, float] = fun
 
-  def _matvec():
+  def _matvec(self, v: np.ndarray) -> np.ndarray:
+    """ Matrix-vector multiplication (forward mode)"""
+    pass
 
-
+  def shape(self) -> tuple:
+    return self.op.shape()

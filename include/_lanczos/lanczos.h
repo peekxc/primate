@@ -7,6 +7,8 @@
 #include <Eigen/Core> 
 #include <Eigen/Eigenvalues> 
 
+#include <iostream>
+
 using std::function; 
 
 template < int Iterate = 3 >
@@ -89,19 +91,20 @@ void lanczos_recurrence(
   }
 }
 
+
 // Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator
 template< std::floating_point F >
 auto lanczos_quadrature(
   const F* alpha,                   // Input diagonal elements of T of size k
   const F* beta,                    // Output subdiagonal elements of T of size k, whose non-zeros start at index 1
   const int k,                      // Size of input / output elements 
+  Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >& solver, // assumes this has been allocated
   F* nodes,                         // Output nodes of the quadrature
   F* weights                        // Output weights of the quadrature
 ) -> void {
   using VectorF = Eigen::Array< F, Dynamic, 1>;
 
   // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
-  auto solver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >(k);
   Eigen::Map< const VectorF > a(alpha, k);        // diagonal elements
   Eigen::Map< const VectorF > b(beta+1, k-1);     // subdiagonal elements (offset by 1!)
 
@@ -141,6 +144,7 @@ void slq (
   const int seed                              // Seed for random number generator for determinism
 ){   
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
   if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
   if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
 
@@ -172,6 +176,7 @@ void slq (
     auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
     auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
     auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+    auto solver = EigenSolver(lanczos_degree);
     
     // Run in parallel 
     #pragma omp for schedule(dynamic, chunk_size)
@@ -185,7 +190,7 @@ void slq (
       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
 
       // Obtain nodes + weights via quadrature algorithm
-      lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, nodes.data(), weights.data());
+      lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, solver, nodes.data(), weights.data());
 
       // Run the user-supplied function (parallel section!)
       f(i, q.data(), Q.data(), nodes.data(), weights.data());
@@ -305,12 +310,73 @@ void sl_quadrature(
 
 
 // Approximates the action v |-> f(A)v via the Lanczos method
-// template< std::floating_point F, LinearOperator Matrix > 
-// void matrix_approx(const Matrix& M, const std::function< F(F) > sf, F* v){
+template< std::floating_point F, LinearOperator Matrix > 
+void matrix_approx(
+  const Matrix& A,                            // LinearOperator 
+  const std::function< F(F) > sf,             // the spectral function 
+  F* v,                                       // the input vector
+  const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
+  const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
+  const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
+  F* y                                        // Output vector
+){
+  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+  using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
 
-//   // Perform a lanczos iteration (populates alpha, beta)
-//   lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+  // Constants
+  const auto A_shape = A.shape();
+  const size_t n = A_shape.first;
+  const size_t m = A_shape.second;
+  const size_t ncv = lanczos_degree;
 
-//   // Obtain nodes + weights via quadrature algorithm
-//   lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, nodes.data(), weights.data());  
-// }
+  // Pre-allocate memory needed for Lanczos iterations
+  auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
+  auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+  auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+  auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+  auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+  auto solver = EigenSolver(lanczos_degree);
+
+  // Perform a lanczos iteration (populates alpha, beta)
+  Eigen::Map< VectorF > v_map(v, m);
+  const F v_scale = v_map.norm(); // this is needed because v will be modified! 
+  lanczos_recurrence< F >(A, v, lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+
+  // std::cout << alpha << std::endl;
+  // std::cout << beta << std::endl;
+  // std::cout << Q << std::endl;
+
+  // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
+  Eigen::Map< ArrayF > a(alpha.data(), ncv);        // diagonal elements
+  Eigen::Map< ArrayF > b(beta.data()+1, ncv-1);     // subdiagonal elements (offset by 1!)
+  solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
+  
+  // Retrieve the Rayleigh-Ritz values (nodes)
+  auto theta = static_cast< ArrayF >(solver.eigenvalues());
+  std::cout << "theta: " << theta << std::endl;
+
+  // Apply the spectral function (in-place)
+  theta.unaryExpr(sf); 
+  std::cout << "theta f: " << theta << std::endl;
+
+  // Get the function approximation
+  Eigen::Map< VectorF > y_map(y, n);
+  const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here -- static_cast< DenseMatrix< F > >( 
+  auto v_mod = static_cast< ArrayF >(V.row(0).array());
+
+  std::cout << V << std::endl;
+  std::cout << v_mod << std::endl;
+  v_mod *= theta;
+  std::cout << "scaled:" << v_mod << std::endl;
+
+  auto tmp = static_cast< VectorF >(V * v_mod.matrix());
+  std::cout << "tmp: " << tmp.adjoint() << std::endl; // this is zero??? 
+  
+  std::cout << "Q: " << Q << std::endl;
+  y_map = Q * tmp; // equivalent to Q V diag(sf(theta)) V^T e_1
+  
+  std::cout << "scaling:" << v_scale<< std::endl;
+  std::cout << "y before scale:" << y_map.adjoint() << std::endl;
+  y_map.array() *= v_scale; // re-scale
+}

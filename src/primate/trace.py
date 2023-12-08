@@ -31,24 +31,28 @@ def sl_trace (
 ) -> Union[float, tuple]:
   """Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). 
 
+
+
   Parameters
   ----------
-  A : ndarray, sparse matrix, or LinearOperator
-      real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator. 
-  fun : str or Callable, default="identity"
-      real-valued function defined on the spectrum of A. 
+  A : ndarray, sparray, or LinearOperator
+      real symmetric operator.
+  fun : str or Callable, default = "identity"
+      real-valued function defined on the spectrum of `A`. 
   maxiter : int, default = 10
       Maximum number of random vectors to sample for the trace estimate. 
   deg  : int, default = 20
-      Degree of the quadrature approximation.     
+      Degree of the quadrature approximation. 
   atol : float, default = None
       Absolute tolerance to signal convergence for early-stopping. See details.  
   rtol : float, default = 1e-2
       Relative tolerance to signal convergence for early-stopping. See details.
-  orth: int, default = 0,
-      Additional number of Lanczos vectors to orthogonalize against when building the Krylov basis.   
+  stop : str, default = "confidence"
+      Early-stopping criteria to test estimator convergence. See details.
+  orth: int, default = 0
+      Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.   
   confidence : float, default = 0.95
-      Confidence level to use with rule  
+      Confidence level to Only used when `stop` = "confidence". 
   pdf : { 'rademacher', 'normal' }, default = "rademacher"
       Choice of zero-centered distribution to sample random vectors from.
   rng : str, default = "pcg"

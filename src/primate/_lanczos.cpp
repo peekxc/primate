@@ -109,13 +109,24 @@ void _lanczos_wrapper(py::module& m, WrapperFunc wrap = std::identity()){
       alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
     );
   });
-  m.def("quadrature", [](
-    py_array< F > a, py_array< F > b, 
-    const int k
-  ) -> py_array< F > {             
+  m.def("quadrature", [](py_array< F > a, py_array< F > b, const int k) -> py_array< F > {
     auto output = DenseMatrix< F >(k, 2); // [nodes, weights]
-    lanczos_quadrature(a.data(), b.data(), k, output.col(0).data(), output.col(1).data());
+    auto solver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >(k);
+    lanczos_quadrature(a.data(), b.data(), k, solver, output.col(0).data(), output.col(1).data());
     return py::cast(output); 
+  });
+  m.def("function_approx", [wrap](
+    const Matrix* A, 
+    py_array< F > v, 
+    const int lanczos_degree, const F lanczos_rtol, const int orth,
+    const py::kwargs& kwargs
+  ){
+    const auto op = wrap(A);
+    const auto sf = param_spectral_func< F >(kwargs);
+    F* v_inp = v.mutable_data();
+    auto y_out = static_cast< ArrayF >(ArrayF::Zero(op.shape().second));
+    matrix_approx(op, sf, v_inp, lanczos_degree, lanczos_rtol, orth, y_out.data());
+    return py::cast(y_out);
   });
   m.def("stochastic_quadrature", [wrap](
     const Matrix* A, 
