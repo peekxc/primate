@@ -12,8 +12,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CC: msvc
-      CXX: msvc 
       #   LDFLAGS: "-Wl,-S"
     strategy:
       fail-fast: false
