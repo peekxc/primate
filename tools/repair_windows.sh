@@ -1,7 +1,7 @@
 set -xe
 
-WHEELDIR=$GITHUB_WORKSPACE/wheelhouse
-WHEELNAME=$(find "$WHEELDIR" -type f | grep *primate*.whl)
+# WHEELDIR=$GITHUB_WORKSPACE/wheelhouse
+# WHEELNAME=$(find "$WHEELDIR" -type f | grep *primate*.whl)
 
 # strip .local/bin/*.dll
 

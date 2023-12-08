@@ -26,6 +26,9 @@ export PATH=$PATH:/c:/rtools40/ucrt64/bin:$PATH
 # set PATH=C:\rtools40\ucrt64\bin\;%PATH%
 g++ --version
 
+# Create a a set commands to install mingw64 on windows-2019 server for compiling native Python extension modules 
+
+
 # $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
 # Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 # refreshenv
