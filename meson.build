@@ -58,9 +58,6 @@ else
   error('A C++20-compliant compiler is required')
 endif
 
-## Add Xclang 
-_cpp_args += compiler.get_supported_arguments('-Xclang')
-
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
 # incdir_eigen = run_command(py, ['-c', 'import os; os.chdir(".."); import eigenpip; print(eigenpip.get_include())'], check : true).stdout().strip()
@@ -81,19 +78,21 @@ inc_pkg = include_directories('include')
 dependency_map = {}
 # subdir('blas') # Configure BLAS / LAPACK 
 
-## Include OpenMP, if possible
+## Include OpenMP (mandatory) 
 omp = dependency('openmp', required: false)
 openmp_flags = []
 if omp.found()
-  if OS_platform == 'windows'
+  ## Handle msvc, gcc, clang, or clang-cl
+  if OS_platform == 'windows' and compiler.get_id() == 'msvc'
+    # https://devblogs.microsoft.com/cppblog/improved-openmp-support-for-cpp-in-visual-studio/
     openmp_flags += compiler.get_supported_arguments('/openmp', '/openmp:experimental', '/openmp:llvm')
-  else
-    if compiler.get_id() == 'gcc'
-      openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
-    elif compiler.get_id() == 'llvm' or compiler.get_id() == 'clang'
-      openmp_flags = compiler.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
-    endif 
-  endif
+  elif compiler.get_id() == 'gcc'
+    openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
+  elif compiler.get_id() == 'clang-cl'
+    openmp_flags += compiler.get_supported_arguments('-Xclang', '-fopenmp') 
+  elif compiler.get_id() == 'llvm' or compiler.get_id() == 'clang'
+    openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
+  endif 
   add_project_link_arguments(openmp_flags, language : 'cpp')
   dependency_map += { 'OpenMP' : omp }
 elif compiler.has_argument('-fopenmp')
