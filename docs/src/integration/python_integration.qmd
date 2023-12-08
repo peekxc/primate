@@ -17,16 +17,19 @@ This generates a random positive semi-definite matrix with eigenvalues in the in
 #| output: false
 from bokeh.io import output_notebook
 output_notebook()
+np.random.seed(1234)
 ```
 
 ```{python}
 from primate.trace import sl_trace
-estimates = sl_trace(A, plot=True)
+trace_estimate = sl_trace(A)
+print(A.trace()) 
+print(trace_estimate)
 ```
 
 ```{python}
-tr_est = np.mean(estimates)
-print(f"Error: {abs(tr_est - A.trace()):.5}")
-print(f"Samples std. deviation: {estimates.std(ddof=1)}")
-print(f"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}")
+# tr_est = np.mean(estimates)
+# print(f"Error: {abs(tr_est - A.trace()):.5}")
+# print(f"Samples std. deviation: {estimates.std(ddof=1)}")
+# print(f"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}")
 ```

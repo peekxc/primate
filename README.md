@@ -2,7 +2,7 @@
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-Matrix function approximations are obtained via the _Lanczos_[^1] and _stochastic Lanczos quadrature_[^2] methods, which are well-suited for sparse or structured operators having fast $v \mapsto Av$ actions.
+Estimator approximations are obtained via the _Lanczos_[^1] and _stochastic Lanczos quadrature_[^2] methods, which are well-suited for sparse or structured operators supporting fast $v \mapsto Av$ actions.
 
 Notable features of `primate` include:
 

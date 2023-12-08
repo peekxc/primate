@@ -5,3 +5,23 @@
 #quarto-document-content{
   margin-top: 0;
 }
+
+.sidebar-item > span.menu-text {
+  font-weight: bold;
+  font-size: 1.05em;
+  color: darkslategray;
+  padding-top: 0.20em;
+  padding-bottom: 0.20em;
+  text-decoration: underline;
+  cursor: default;
+}
+
+/* 
+.sidebar-search {
+  border: 0.10em solid #d3d3d3; 
+  padding: 0.25em; 
+  border-radius: 5px;
+}
+.sidebar-search button {
+  background-color: #d3d3d3;
+} */

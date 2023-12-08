@@ -7,8 +7,9 @@ filters:
 
 website:
   title: "primate"
-  reader-mode: true 
-  # pinned: false
+  reader-mode: true     # reader mode collapses sidebar 
+  page-navigation: true # ability to go to next / prev 
+  page-footer: "Copyright 2023, Matt Piekenbrock" 
   navbar: 
     title: PRIMATE
     right:
@@ -16,14 +17,13 @@ website:
         href: https://github.com/peekxc/primate
         aria-label: GitHub
   search:
-    location: sidebar
-    type: "overlay" # or textbox
+    location: navbar # sidebar navbar 
+    type: "overlay" # textbox or overlay
     copy-button: true
   sidebar:
     collapse-level: 3
-    search: true
-    style: "floating" # or docked
-    border: false # maybe true for docked
+    style: "floating"   # or docked
+    border: false       # maybe true for docked
     contents:
       - href: index.qmd
         text: Overview
@@ -32,7 +32,7 @@ website:
         text: Installation
       - href: imate_compare.qmd
         text: Comparison to *imate*
-      # - text: "Advanced"
+      - text: Advanced
       - section: Integration Guide
         contents:
           - href: integration/python_integration.qmd
