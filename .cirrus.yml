@@ -5,7 +5,6 @@ task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
-    populate_script: python -m pip install .
   environment:
     CC: clang 
     CXX: clang++
