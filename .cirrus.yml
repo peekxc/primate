@@ -8,6 +8,8 @@ task:
   environment:
     CC: clang 
     CXX: clang++
+  submodule_script: 
+    git submodule update --recursive
   install_dependencies_script: |
     bash tools/cibw_linux.sh
   build_script: |
