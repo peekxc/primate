@@ -1,9 +1,17 @@
 container:
   image: python:slim
 
-build_package:
+task:
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
     populate_script: python -m pip install .
-  test_script: pytest
+  environment:
+    CC: clang 
+    CXX: clang++
+  install_dependencies_script: |
+    bash tools/cibw_linux.sh
+  build_script: |
+    python -m pip install .
+  test_script: |
+    python -m pytest tests/
