@@ -308,75 +308,138 @@ void sl_quadrature(
   slq< float >(mat, quad_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
+template< std::floating_point F, LinearOperator Matrix > 
+struct MatrixFunction {
+  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+  using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
+
+  // Parameters 
+  const Matrix& op; 
+  std::function< F(F) > f; 
+  const int deg;
+  const F rtol; 
+  const int orth;
+
+  MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) 
+  : op(A), f(fun), deg(lanczos_degree), rtol(lanczos_rtol), orth(add_orth) {
+    // Pre-allocate memory needed for Lanczos iterations
+    Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(A.shape().first, deg));
+    alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
+    beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
+    nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
+    weights = static_cast< ArrayF >(ArrayF::Zero(deg));
+    solver = EigenSolver(deg);
+  };
+ 
+  // Approximates v |-> f(A)v via a limited degree Lanczos iteration
+  void matvec(const F* v, F* y) const noexcept {
+    
+    // Inputs / outputs 
+    Eigen::Map< const VectorF > v_map(v, op.shape().second);
+    Eigen::Map< VectorF > y_map(y, op.shape().first);
+    
+    // Lanczos iteration: save v norm 
+    const F v_scale = v_map.norm(); 
+    VectorF v_copy = v_map; // save copy
+    lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), deg); 
+    
+    // Note: Maps are used here to offset the pointers; they should be no-ops anyways
+    Eigen::Map< ArrayF > a(alpha.data(), deg);      // diagonal elements
+    Eigen::Map< ArrayF > b(beta.data()+1, deg-1);   // subdiagonal elements (offset by 1!)
+    solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
+
+    // Apply the spectral function (in-place) to Rayleigh-Ritz values (nodes)
+    auto theta = static_cast< ArrayF >(solver.eigenvalues());
+    theta.unaryExpr(f); 
+    
+    // The approximation v |-> f(A)v 
+    const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here 
+    auto v_mod = static_cast< ArrayF >(V.row(0).array());
+    v_mod *= theta;
+    y_map = Q * static_cast< VectorF >(V * v_mod.matrix()); // equivalent to Q V diag(sf(theta)) V^T e_1
+    y_map.array() *= v_scale; // re-scale
+  }   
+
+private: // Internal state to re-use
+  mutable DenseMatrix< F > Q;
+  mutable ArrayF alpha;
+  mutable ArrayF beta;
+  mutable ArrayF nodes;
+  mutable ArrayF weights;
+  mutable EigenSolver solver;  
+};
 
 // Approximates the action v |-> f(A)v via the Lanczos method
 template< std::floating_point F, LinearOperator Matrix > 
 void matrix_approx(
   const Matrix& A,                            // LinearOperator 
   const std::function< F(F) > sf,             // the spectral function 
-  F* v,                                       // the input vector
+  const F* v,                                 // the input vector
   const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
   const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
   const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
   F* y                                        // Output vector
 ){
-  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-  using ArrayF = Eigen::Array< F, Dynamic, 1 >;
-  using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
+  MatrixFunction< F, Matrix >(A, sf, lanczos_degree, lanczos_rtol, orth).matvec(v, y);
+};
 
-  // Constants
-  const auto A_shape = A.shape();
-  const size_t n = A_shape.first;
-  const size_t m = A_shape.second;
-  const size_t ncv = lanczos_degree;
+  // using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+  // using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  // using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
 
-  // Pre-allocate memory needed for Lanczos iterations
-  auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
-  auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-  auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-  auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-  auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-  auto solver = EigenSolver(lanczos_degree);
+  // // Constants
+  // const auto A_shape = A.shape();
+  // const size_t n = A_shape.first;
+  // const size_t m = A_shape.second;
+  // const size_t ncv = lanczos_degree;
 
-  // Perform a lanczos iteration (populates alpha, beta)
-  Eigen::Map< VectorF > v_map(v, m);
-  const F v_scale = v_map.norm(); // this is needed because v will be modified! 
-  lanczos_recurrence< F >(A, v, lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+  // // Pre-allocate memory needed for Lanczos iterations
+  // auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
+  // auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+  // auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+  // auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+  // auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+  // auto solver = EigenSolver(lanczos_degree);
 
-  // std::cout << alpha << std::endl;
-  // std::cout << beta << std::endl;
-  // std::cout << Q << std::endl;
+  // // Perform a lanczos iteration (populates alpha, beta)
+  // Eigen::Map< VectorF > v_map(v, m);
+  // const F v_scale = v_map.norm(); // this is needed because v will be modified! 
+  // lanczos_recurrence< F >(A, v, lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
 
-  // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
-  Eigen::Map< ArrayF > a(alpha.data(), ncv);        // diagonal elements
-  Eigen::Map< ArrayF > b(beta.data()+1, ncv-1);     // subdiagonal elements (offset by 1!)
-  solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
+  // // std::cout << alpha << std::endl;
+  // // std::cout << beta << std::endl;
+  // // std::cout << Q << std::endl;
+
+  // // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
+  // Eigen::Map< ArrayF > a(alpha.data(), ncv);        // diagonal elements
+  // Eigen::Map< ArrayF > b(beta.data()+1, ncv-1);     // subdiagonal elements (offset by 1!)
+  // solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
   
-  // Retrieve the Rayleigh-Ritz values (nodes)
-  auto theta = static_cast< ArrayF >(solver.eigenvalues());
-  std::cout << "theta: " << theta << std::endl;
+  // // Retrieve the Rayleigh-Ritz values (nodes)
+  // auto theta = static_cast< ArrayF >(solver.eigenvalues());
+  // // std::cout << "theta: " << theta << std::endl;
 
-  // Apply the spectral function (in-place)
-  theta.unaryExpr(sf); 
-  std::cout << "theta f: " << theta << std::endl;
+  // // Apply the spectral function (in-place)
+  // theta.unaryExpr(sf); 
+  // // std::cout << "theta f: " << theta << std::endl;
 
-  // Get the function approximation
-  Eigen::Map< VectorF > y_map(y, n);
-  const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here -- static_cast< DenseMatrix< F > >( 
-  auto v_mod = static_cast< ArrayF >(V.row(0).array());
+  // // Get the function approximation
+  // Eigen::Map< VectorF > y_map(y, n);
+  // const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here -- static_cast< DenseMatrix< F > >( 
+  // auto v_mod = static_cast< ArrayF >(V.row(0).array());
 
-  std::cout << V << std::endl;
-  std::cout << v_mod << std::endl;
-  v_mod *= theta;
-  std::cout << "scaled:" << v_mod << std::endl;
+  // // std::cout << V << std::endl;
+  // // std::cout << v_mod << std::endl;
+  // v_mod *= theta;
+  // // std::cout << "scaled:" << v_mod << std::endl;
 
-  auto tmp = static_cast< VectorF >(V * v_mod.matrix());
-  std::cout << "tmp: " << tmp.adjoint() << std::endl; // this is zero??? 
+  // auto tmp = static_cast< VectorF >(V * v_mod.matrix());
+  // // std::cout << "tmp: " << tmp.adjoint() << std::endl; // this is zero??? 
   
-  std::cout << "Q: " << Q << std::endl;
-  y_map = Q * tmp; // equivalent to Q V diag(sf(theta)) V^T e_1
+  // // std::cout << "Q: " << Q << std::endl;
+  // y_map = Q * tmp; // equivalent to Q V diag(sf(theta)) V^T e_1
   
-  std::cout << "scaling:" << v_scale<< std::endl;
-  std::cout << "y before scale:" << y_map.adjoint() << std::endl;
-  y_map.array() *= v_scale; // re-scale
-}
+  // // std::cout << "scaling:" << v_scale<< std::endl;
+  // // std::cout << "y before scale:" << y_map.adjoint() << std::endl;
+  // y_map.array() *= v_scale; // re-scale

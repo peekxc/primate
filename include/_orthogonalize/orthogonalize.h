@@ -16,9 +16,9 @@ template< std::floating_point F >
 void orth_vector(
   Ref< ColVector< F > > v,                   // input/output vector
   const Ref< const DenseMatrix< F > >& U,    // matrix of vectors to project onto
-  const int start_idx,                              // starting column index
-  const int p,                                      // number of projections
-  const bool reverse = false                        // whether to cycle through the columns of U backwards
+  const int start_idx,                       // starting column index
+  const int p,                               // number of projections
+  const bool reverse = false                 // whether to cycle through the columns of U backwards
 ) {
   const int n = (int) U.rows(); 
   const int m = (int) U.cols(); 

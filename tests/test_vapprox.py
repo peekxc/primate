@@ -17,21 +17,18 @@ def test_vector_approx():
   from sanity import approx_matvec
   np.random.seed(1234)
   n = 10
-  A_sparse = csc_array(symmetric(n), dtype=np.float32)
+  A_sparse = csc_array(symmetric(n), psd = True, dtype=np.float32)
   v0 = np.random.uniform(size=n).astype(np.float32)
-
   deg, rtol, orth = 6, 0.0, 0
+
+  ## Test that very basic implementation works as expected on identity
   y_true = A_sparse @ v0
   y_test = approx_matvec(A_sparse, v0, deg)
   assert np.allclose(y_true, y_test, atol=1e-5)
 
-  print(y_true)
+  ## Test more efficient implementation works
   y_test_cpp = _lanczos.function_approx(A_sparse, v0, deg, rtol, orth, **dict(function="identity"))
+  assert np.max(np.abs(y_test_cpp - y_true)) < 1e-5 
 
-  y_test_cpp = _lanczos.function_approx(A_sparse, v0, deg, rtol, orth, **dict(function="identity"))
-  print(y_test_cpp)
-
-  ## it's working, just scaling isn't right!
-  # np.dot(y_true / np.linalg.norm(y_true))
-  print(np.linalg.norm(y_true))
-  print(np.linalg.norm(y_test_cpp))
+def test_mf_approx():
+  pass

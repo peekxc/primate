@@ -27,13 +27,25 @@ website:
     contents:
       - href: index.qmd
         text: Overview
-      # - text: "Basics"
-      - href: install.qmd
-        text: Installation
-      - href: imate_compare.qmd
-        text: Comparison to *imate*
-      - text: Advanced
-      - section: Integration Guide
+      - section: Basics 
+        contents:
+          - text: Installation
+            href: install.qmd
+          - text: Basic usage 
+            href: usage.qmd
+          - text: Comparison to *imate*
+            href: imate_compare.qmd
+      # - text: Advanced
+      - section: Theory
+        contents:
+          - text: Introduction 
+            href: theory/intro.qmd
+          - text: Lanczos 
+            href: theory/lanczos.qmd
+          - text: SLQ
+            href: theory/slq.qmd
+          - text: 
+      - section: Advanced
         contents:
           - href: integration/python_integration.qmd
             text: Usage from Python

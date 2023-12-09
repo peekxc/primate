@@ -1,0 +1,8 @@
+---
+title: "Introduction"
+---
+
+Whether used for spectral sum estimation, quadrature approximation, or many techniques 
+Unfortunately, there are many algorithms named the "stochastic Lanczos quadrature" in the literature, and though each is typically related, they often have introduced and used in different contexts. 
+
+`primate` contains an extensible implementation of the stochastic Lanczos method (SLQ).

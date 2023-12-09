@@ -164,6 +164,12 @@ PYBIND11_MODULE(_lanczos, m) {
   _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, eigen_sparse_wrapper< float >);
 };
 
+
+
+
+
+
+
   // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
   // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
 

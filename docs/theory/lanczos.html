@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - Package overview</title>
+<title>primate - The Lanczos method</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,25 +23,26 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./install.html" rel="next">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../theory/slq.html" rel="next">
+<link href="../theory/intro.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -102,7 +103,7 @@ MathJax = {
   </script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -112,7 +113,7 @@ MathJax = {
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">PRIMATE</span>
     </a>
   </div>
@@ -144,7 +145,7 @@ MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Overview</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -158,7 +159,7 @@ MathJax = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -173,13 +174,13 @@ MathJax = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./install.html" class="sidebar-item-text sidebar-link">
+  <a href="../install.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Installation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -196,19 +197,19 @@ MathJax = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./theory/intro.html" class="sidebar-item-text sidebar-link">
+  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./theory/lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./theory/slq.html" class="sidebar-item-text sidebar-link">
+  <a href="../theory/slq.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">SLQ</span></a>
   </div>
 </li>
@@ -225,19 +226,19 @@ MathJax = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./integration/python_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../integration/python_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage from Python</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./integration/cpp_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../integration/cpp_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage from C++</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./integration/pybind11_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../integration/pybind11_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Integrating with pybind11</span></a>
   </div>
 </li>
@@ -254,13 +255,13 @@ MathJax = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./guide/lanczos.qmd" class="sidebar-item-text sidebar-link">
+  <a href="../guide/lanczos.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Lanczos method</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./guide/slq_guide.qmd" class="sidebar-item-text sidebar-link">
+  <a href="../guide/slq_guide.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The SLQ method</span></a>
   </div>
 </li>
@@ -268,7 +269,7 @@ MathJax = {
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reference/index.html" class="sidebar-item-text sidebar-link">
+            <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">API Reference</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -286,7 +287,7 @@ MathJax = {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
@@ -294,7 +295,7 @@ MathJax = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="./reference/trace.html" class="sidebar-item-text sidebar-link">
+            <a href="../reference/trace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Trace</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -303,13 +304,13 @@ MathJax = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">SL Trace</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">SL Gauss</span></a>
   </div>
 </li>
@@ -326,13 +327,13 @@ MathJax = {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Rademacher</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/random.normal.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Normal</span></a>
   </div>
 </li>
@@ -346,14 +347,24 @@ MathJax = {
 <div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#why-care" id="toc-why-care" class="nav-link active" data-scroll-target="#why-care">Why care?</a></li>
+  <li><a href="#lanczos-on-a-bumper-sticker" id="toc-lanczos-on-a-bumper-sticker" class="nav-link" data-scroll-target="#lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</a></li>
+  <li><a href="#quadratic-time-and-linear-space-how" id="toc-quadratic-time-and-linear-space-how" class="nav-link" data-scroll-target="#quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</a></li>
+  <li><a href="#the-lanczos-iteration" id="toc-the-lanczos-iteration" class="nav-link" data-scroll-target="#the-lanczos-iteration">The Lanczos Iteration</a></li>
+  <li><a href="#uniqueness-of-t" id="toc-uniqueness-of-t" class="nav-link" data-scroll-target="#uniqueness-of-t">Uniqueness of <span class="math inline">T</span></a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Package overview</h1>
+<h1 class="title">The Lanczos method</h1>
 </div>
 
 
@@ -369,49 +380,87 @@ MathJax = {
 
 </header>
 
-<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is a Python package that provides estimators of quantities derived from <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>; that is, matrices parameterized by functions:</p>
-<p><span class="math display"> f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}</span></p>
-<p>Estimator approximations are obtained via the <em>Lanczos</em><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> and <em>stochastic Lanczos quadrature</em><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> methods, which are well-suited for sparse or structured operators supporting fast <span class="math inline">v \mapsto Av</span> actions.</p>
-<p>Notable features of <code>primate</code> include:</p>
-<ul>
-<li>Efficient methods for trace, quadrature, and matrix function approximation</li>
-<li>Various distribution / engine choices for random vector generation (the stochastic part!)</li>
-<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> (C++)</li>
-<li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator">SciPy</a> or <a href="https://pylops.readthedocs.io/en/stable/index.html">Pylops</a></li>
-<li>Matrix-free interface to the <em>Lanczos</em>, <em>Golub-Welsch</em>, and <em>Gram Schmidt</em> methods</li>
-</ul>
-<!-- Moreover, `primate`'s C++ API uses a generic template interface written with [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, any `LinearOperator` [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49).  -->
-<!-- To use,, the library is is [header-only](https://en.wikipedia.org/wiki/Header-only), so integration is a si.  -->
-<p><code>primate</code> was partially inspired by the <a href="https://github.com/ameli/imate"><code>imate</code> package</a>—for a comparison of the two, see <a href="https://peekxc.github.io/primate/imate_compare.html">here</a>.</p>
-<!-- 
-`primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is Python package that performs randomized matrix trace estimation of [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix)---that is, matrices parameterized by functions:
+<p>In 1950, Cornelius Lanczos proposed the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the world to <strong>iteratively</strong> expose the spectrum of a symmetric <span class="math inline">A</span> via <em>tridiagonalization</em>. Though introduced in more than half-century ago, it remains the standard algorithm both for computing eigenvectors and eigenvalues and for solving linear systems.</p>
+<!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  -->
+<!-- When Cornelius first published the method,  -->
+<p>One of the main appeals of the Lanczos method is that its <em>matrix free</em>: one need not store <span class="math inline">A</span> explicitly to carry out the execution—-all that is required is a (fast) matrix-vector product <span class="math inline">v \mapsto Av</span>.</p>
+<section id="why-care" class="level2">
+<h2 class="anchored" data-anchor-id="why-care">Why care?</h2>
+<p>Computing the eigen-decomposition <span class="math inline">A = U \Lambda U^T</span> for general symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> is essentially bounded above by <span class="math inline">\Theta(n^\omega)</span> time and <span class="math inline">\Theta(n^2)</span> space, where <span class="math inline">\omega \approx</span> is the matrix-multiplication constant. This translates to an effective <span class="math inline">\Omega(n^3)</span> time bound if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways). <em>However</em>, if one can show that <span class="math inline">v \mapsto Av \approx O(n)</span>, then there is a simple way of obtaining <span class="math inline">\Lambda(A)</span> in <span style="color: red;"><span class="math inline">O(n^2)</span> time</span> and <span style="color: red;"><span class="math inline">O(n)</span> space</span>!</p>
+</section>
+<section id="lanczos-on-a-bumper-sticker" class="level2">
+<h2 class="anchored" data-anchor-id="lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</h2>
+<p>The idea of the Lanczos method is as follows: for some non-zero <span class="math inline">v \in \mathbb{R}^n</span>, suppose we expand <span class="math inline">v</span> with successive powers of <span class="math inline">A</span>:</p>
+<p><span class="math display">
+A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v
+</span></p>
+<p>If we collect these vectors into a matrix and orthogonalize them, we get the following trio of matrices:</p>
+<p><span class="math display">
+\begin{align}
+K_j &amp;= [ v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}v] &amp;&amp; \\
+Q_j &amp;= [ q_1, q_2, \dots, q_j] \gets \mathrm{qr}(K_j) &amp;&amp; \\
+T_j &amp;= Q_j^T A Q_j &amp;&amp;
+\end{align}
+</span></p>
+<p>Since <span class="math inline">A</span> is symmetric, it turns out that—for any <span class="math inline">0 \leq j \leq n</span>---this last matrix <span class="math inline">T_j</span> will be a symmetric <em>tridiagonal</em> matrix:</p>
+<p><span class="math display">
+T_j = \mathrm{tridiag}\Bigg(
+\begin{array}{ccccccccc}
+&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_n &amp; \\
+\alpha_1 &amp; &amp; \alpha_2 &amp; &amp; \cdot &amp; &amp; \cdot &amp; &amp; \alpha_n \\
+&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_n &amp;
+\end{array}
+\Bigg)
+</span></p>
+<p>This is pretty fortunate, because obtaining the eigenvalues of any symmetric tridiagonal matrix $T \in \mathbb{R}^{n \times n}$ takes just <span class="math inline">O(n^2)</span> time[^2].</p>
+<p>Taking a quote from the lucid introduction to the Lanczos method by Parlett<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, <a href="(https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf)">could anything be more simple?</a></p>
+</section>
+<section id="quadratic-time-and-linear-space-how" class="level2">
+<h2 class="anchored" data-anchor-id="quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</h2>
+<p>Unless you know the tricks, its not obvious at all decompositions above takes just <span class="math inline">O(n^2)</span> time and <span class="math inline">O(n)</span> space to obtain. So… how does the complexity argument play out?</p>
+<p>If you squint hard enough, you can deduce that every symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> expanded this way into a tridiagonal <span class="math inline">T</span> admits a <em>three-term recurrence</em>: <span class="math display"> A q_j = \beta_{j-1} q_{j-1} + \alpha_j q_j + \beta_j q_{j+1} </span></p>
+<p>From a computational point of view, this recurrence is fantastic: given <span class="math inline">q_{j-1}, q_j</span> (+their coefficients), we can get at <span class="math inline">q_{j+1}</span> by just re-arranging the terms and multiplying by <span class="math inline">A</span>. No explicit call to the QR algorithm necessary!</p>
+<p>Note that a symmetric tridiagonal matrix takes just <span class="math inline">O(n)</span> space to store and is fully characterized by its diagonal and subdiagonal terms. Thus, if we assume that <span class="math inline">v \mapsto Av \sim O(n)</span>, we can deduce this procedure clearly takes at most <span class="math inline">O(n^2)</span> time since there are most <span class="math inline">n</span> such vectors <span class="math inline">\{q_i\}_{i=1}^n</span> to generate. Moreover, if we only need <span class="math inline">\Lambda(A)</span> (and not <span class="math inline">Q</span>), we can exploit the recurrence by keeping in memory at most the triplet <span class="math inline">\{q_{j-1}, q_{j}, q_{j+1}\}</span>. Since each of these is <span class="math inline">O(n)</span> is size, the claim of <span class="math inline">O(n)</span> space is also justified!</p>
+</section>
+<section id="the-lanczos-iteration" class="level2">
+<h2 class="anchored" data-anchor-id="the-lanczos-iteration">The Lanczos Iteration</h2>
+<p>The Lanczos method exposes the spectrum of <span class="math inline">A</span> by successively projecting onto <em>Krylov subspaces</em>. That is, given a symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> with eigenvalues <span class="math inline">\lambda_1 \geq \lambda_2 &gt; \dots \geq \lambda_r &gt; 0</span> and a vector <span class="math inline">v \in \mathbb{R} \setminus \{0\}</span>, the order-<span class="math inline">j</span> Krylov subspaces / Krylov matrices of the pair <span class="math inline">(A, v)</span> are given by: <span class="math display">
+    \mathcal{K}_j(A, v) := \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \}, \quad \quad K_j(A, v) = [ v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}]
+</span> Krylov subspaces arise naturally from using the minimal polynomial of <span class="math inline">A</span> to express <span class="math inline">A^{-1}</span> in terms of powers of <span class="math inline">A</span>: if <span class="math inline">A</span> is nonsingular and its minimal polynomial has degree <span class="math inline">m</span>, then <span class="math inline">A^{-1}v \in K_m(A, v)</span> and <span class="math inline">K_m(A, v)</span> is an invariant subspace.</p>
+<p>The spectral theorem implies that since <span class="math inline">A</span> is symmetric, it is orthogonally diagonalizable: thus, <span class="math inline">\Lambda(A)</span> may be obtained by generating an orthonormal basis for <span class="math inline">\mathcal{K}_n(A, v)</span>. To do this, the Lanczos method constructs successive QR factorizations of <span class="math inline">K_j(A,v) = Q_j R_j</span> for each <span class="math inline">j = 1, 2, \dots, n</span>. Due to <span class="math inline">A</span>’s symmetry and the orthogonality of <span class="math inline">Q_j</span>, we have <span class="math inline">q_k^T A q_l = q_l^T A^T q_k = 0</span> for <span class="math inline">k &gt; l + 1</span>, implying <span class="math inline">T_j = Q_j^T A Q_j</span> has a tridiagonal structure: <span class="math display">\begin{equation}
+    T_j = \begin{bmatrix}
+    \alpha_1 &amp; \beta_2 &amp; &amp; &amp; \\
+    \beta_2 &amp; \alpha_2 &amp; \beta_3 &amp; &amp; \\
+     &amp; \beta_3 &amp; \alpha_3 &amp; \ddots &amp; \\
+    &amp; &amp; \ddots &amp; \ddots &amp; \beta_{j} \\
+    &amp; &amp; &amp; \beta_{j} &amp; \alpha_{j}
+    \end{bmatrix}, \; \beta_j &gt; 0, \; j = 1, 2, \dots, n
+\end{equation}
+</span> Given an initial pair <span class="math inline">(A, q_1)</span> satisfying <span class="math inline">\lVert q_1 \rVert = 1</span>, one can restrict and project <span class="math inline">A</span> to its <span class="math inline">j</span>-th Krylov subspace <span class="math inline">T_j</span> via: <span class="math display">
+\begin{equation}
+    A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T \quad\quad (\beta_j &gt; 0)
+\end{equation}
+</span> where <span class="math inline">Q_j = [\, q_1 \mid q_2 \mid \dots \mid q_j \,]</span> is an orthonormal set of vectors mutually orthogonal to <span class="math inline">q_{j+1}</span>. Equating the <span class="math inline">j</span>-th columns on each side of the above and rearranging the terms yields the famed <em>three-term recurrence</em>: <span class="math display">\begin{equation}
+     \beta_{j} \, q_{j+1} = A q_j - \alpha_j \, q_j - \beta_{j\text{-}1} \, q_{j\text{-}1}  
+\end{equation}
+</span> where <span class="math inline">\alpha_j = q_j^T A q_j</span>, <span class="math inline">\beta_j = \lVert r_j \rVert_2</span>, <span class="math inline">r_j = (A - \alpha_j I)q_j - \beta_{j\text{-}1} q_j</span>, and <span class="math inline">q_{j+1} = r_j / \beta_j</span>. The equation above is a variable-coefficient second-order linear difference equation, and such equations have unique solutions: if (<span class="math inline">q_{j\text{-}1}, \beta_j, q_j</span>) are known, then (<span class="math inline">\alpha_j</span>, <span class="math inline">\beta_{j+1}, q_{j+1}</span>) are completely determined. This sequential process which iteratively builds <span class="math inline">T_j</span> via this three-term recurrence is what is known as the <em>Lanczos iteration</em>.</p>
+</section>
+<section id="uniqueness-of-t" class="level2">
+<h2 class="anchored" data-anchor-id="uniqueness-of-t">Uniqueness of <span class="math inline">T</span></h2>
+<p>Unfortunately, unlike the spectral decomposition <span class="math inline">A = V \Lambda V^T</span>—which identifies a diagonalizable <span class="math inline">A</span> with its spectrum <span class="math inline">\Lambda(A)</span> up to a change of basis <span class="math inline">A \mapsto M^{-1} A M</span>—there is no canonical choice of <span class="math inline">T_j</span> due to the arbitrary choice of <span class="math inline">v</span>. However, there is a connection between the iterates <span class="math inline">K_j(A,v)</span> and the full tridiagonalization of <span class="math inline">A</span>: if <span class="math inline">Q^T A Q = T</span> is tridiagonal and <span class="math inline">Q= [\, q_1 \mid q_2 \mid \dots \mid q_n \,]</span> is an <span class="math inline">n \times n</span> orthogonal matrix <span class="math inline">Q Q^T = I_n = [e_1, e_2, \dots, e_n]</span>, then we have: <span class="math display">
+\begin{equation}
+    K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
+\end{equation}
+</span> <em>is</em> the QR factorization of <span class="math inline">K_n(A, q_1)</span>. Thus, tridiagonalizing <span class="math inline">A</span> with respect to a unit-norm <span class="math inline">q_1</span> determines <span class="math inline">Q</span>. Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely</em> determined by <span class="math inline">(A, q_1)</span>.</p>
 
-$$ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}$$
 
-Trace estimates are obtained in a Monte-Carlo fashion via the _stochastic Lanczos method_ (SLQ)[^1]. This method is useful for sparse or highly structured matrices with efficiently computable [quadratic forms](https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix).
-
-Notable features of `primate` include:
-
-- A highly-parametrizable trace estimator (see SLQ)
-- Various distribution / engine choices for random vector generation (the stochastic part!)
-- Orthogonalization routines, such as the _Lanczos_, _Golub Kahan_, and _Gram Schmidt_ methods
-- Support for _arbitrary_ matrix functions, i.e. `Callable`'s (Python) and `invocable`'s[^2] (C++)
-- Support for _arbitrary_ `LinearOperator`'s, e.g. those in [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator) or [Pylops](https://pylops.readthedocs.io/en/stable/index.html)
-
-Much of `primate`'s computational code was directly ported from the (excellent) [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](imate_compare.qmd).
-
-[^1]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
-[^2]: This includes [std::function](https://en.cppreference.com/w/cpp/utility/functional/function)'s, C-style function pointers, [functors](https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses), and [lambda expressions](https://en.cppreference.com/w/cpp/language/lambda). -->
-
-
+</section>
 
 
 <div id="quarto-appendix" class="default"><aside id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Musco, Cameron, Christopher Musco, and Aaron Sidford. (2018) “Stability of the Lanczos method for matrix function approximation.”<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>This includes <a href="https://en.cppreference.com/w/cpp/utility/functional/function">std::function</a>’s, C-style function pointers, <a href="https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses">functors</a>, and <a href="https://en.cppreference.com/w/cpp/language/lambda">lambda expressions</a>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Do We Fully Understand the Symmetric Lanczos Algorithm Yet?<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </aside></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -904,10 +953,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../theory/intro.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./install.html" class="pagination-link">
-        <span class="nav-page-text">Installation</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/slq.html" class="pagination-link">
+        <span class="nav-page-text">SLQ</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

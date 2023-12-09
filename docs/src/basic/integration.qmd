@@ -1,3 +1,7 @@
+---
+title: "Integration"
+---
+
 ### Python Integration 
 
 On the Python side, `primate` uses a supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), along with type supporting the [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) interface. 

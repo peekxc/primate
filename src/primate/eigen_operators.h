@@ -3,6 +3,10 @@
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
+// ## TODO: use CRTP to craft a set of template classes, e.g. 
+// 
+
+
 template< std::floating_point F >
 struct DenseEigenLinearOperator {
   using value_type = F;
