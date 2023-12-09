@@ -21,7 +21,7 @@ website:
     type: "overlay" # textbox or overlay
     copy-button: true
   sidebar:
-    collapse-level: 3
+    collapse-level: 2
     style: "floating"   # or docked
     border: false       # maybe true for docked
     contents:
@@ -30,9 +30,11 @@ website:
       - section: Basics 
         contents:
           - text: Installation
-            href: install.qmd
+            href: basic/install.qmd
+          - text: Integration
+            href: basic/integration.qmd
           - text: Basic usage 
-            href: usage.qmd
+            href: basic/usage.qmd
           - text: Comparison to *imate*
             href: imate_compare.qmd
       # - text: Advanced
@@ -47,18 +49,18 @@ website:
           - text: 
       - section: Advanced
         contents:
-          - href: integration/python_integration.qmd
-            text: Usage from Python
-          - href: integration/cpp_integration.qmd
+          - href: advanced/cpp_integration.qmd
             text: Usage from C++
-          - href: integration/pybind11_integration.qmd
+          - href: advanced/pybind11_integration.qmd
             text: Integrating with pybind11
-      - section: User Guide 
-        contents: 
-          - href: guide/lanczos.qmd 
-            text: The Lanczos method 
-          - href: guide/slq_guide.qmd
-            text: The SLQ method 
+          - href: advanced/slq_param.qmd
+            text: Parameterizing SLQ 
+      # - section: User Guide 
+      #   contents: 
+      #     - href: guide/lanczos.qmd 
+      #       text: The Lanczos method 
+      #     - href: guide/slq_guide.qmd
+      #       text: The SLQ method 
       # - text: "Reference"
       - section: API Reference 
         href: reference/index.qmd
@@ -127,25 +129,5 @@ format:
     # mainfont: "Atkinson Hyperlegible"
     code-copy: true
     code-overflow: wrap
-    include-in-header:
-      text: |
-        <script>
-        MathJax = {
-          loader: {
-            load: ['[tex]/boldsymbol']
-          },
-          tex: {
-            tags: "all",
-            inlineMath: [['$','$'], ['\\(','\\)']],
-            displayMath: [['$$','$$'], ['\\[','\\]']],
-            processEscapes: true,
-            processEnvironments: true,
-            packages: {
-              '[+]': ['boldsymbol']
-            }
-          }
-        };
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - Introduction to primate</title>
+<title>primate - pybind11 Integration</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../theory/lanczos.html" rel="next">
-<link href="../imate_compare.html" rel="prev">
+<link href="../advanced/slq_param.html" rel="next">
+<link href="../advanced/cpp_integration.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -103,27 +69,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -167,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/intro.html">Introduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Advanced</a></li><li class="breadcrumb-item"><a href="../advanced/pybind11_integration.html">Integrating with pybind11</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -231,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link active">
+  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
@@ -266,7 +213,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../advanced/pybind11_integration.html" class="sidebar-item-text sidebar-link">
+  <a href="../advanced/pybind11_integration.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Integrating with pybind11</span></a>
   </div>
 </li>
@@ -358,21 +305,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#trace-estimation" id="toc-trace-estimation" class="nav-link active" data-scroll-target="#trace-estimation">Trace estimation</a></li>
-  <li><a href="#the-implicit-trace-estimation-problem" id="toc-the-implicit-trace-estimation-problem" class="nav-link" data-scroll-target="#the-implicit-trace-estimation-problem">The implicit trace estimation problem</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/intro.html">Introduction</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Advanced</a></li><li class="breadcrumb-item"><a href="../advanced/pybind11_integration.html">Integrating with pybind11</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Introduction to <code>primate</code></h1>
+<h1 class="title">pybind11 Integration</h1>
 </div>
 
 
@@ -389,106 +329,140 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><code>primate</code> contains an extensible implementation of a variety of methods for estimating quantities from matrix functions.</p>
-<p>One such method, often used in trace estimation, is the “stochastic Lanczos quadrature” (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.</p>
-<section id="trace-estimation" class="level2">
-<h2 class="anchored" data-anchor-id="trace-estimation">Trace estimation</h2>
-<!-- Whether used for spectral sum estimation, quadrature approximation, or many techniques 
- -->
-<p>To illustrate the functionality of <code>primate</code>, we need some kind of matrix and some spectral quantity of interest. To sole the former, let’s start with a simple (random) positive semi-definite matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span>.</p>
-<div id="1595e03b" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>, psd <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>By default, <code>symmetric</code>normalizes <span class="math inline">A</span> such that the eigenvalues are uniformly distributed in the interval <span class="math inline">[0, 1]</span>.</p>
-<div id="39adc985" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.histogram(np.linalg.eigvalsh(A)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>(array([15, 18, 12,  9, 16, 18, 21, 12, 15, 14]), array([0.00209579, 0.10135048, 0.20060517, 0.29985986, 0.39911455,
-       0.49836924, 0.59762393, 0.69687862, 0.79613331, 0.895388  ,
-       0.99464269]))</code></pre>
-</div>
-</div>
-<p>Now, the problem to solve. Suppose, for starters, we wanted to compute the trace of <span class="math inline">A</span>: <span class="math display">\mathrm{tr}(A) \triangleq \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i </span></p>
-<p>Obviously, there are many ways to obtain this… here’s three:</p>
-<ol type="1">
-<li>Use the built-in <code>.trace()</code> call</li>
-<li>Sum the diagonal entries directly</li>
-<li>Sum the eigenvalues</li>
-</ol>
-<div id="2d5a25f4" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(A.trace()) </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(A.diagonal()))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(np.linalg.eigvalsh(A)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.69739302999076
-75.69739302999076
-75.69739302999078</code></pre>
-</div>
-</div>
-<p>Yet another way to compute <span class="math inline">\mathrm{tr}(A)</span> exactly is to multiply <span class="math inline">A</span> by a sequence of <span class="math inline">n</span> identity vectors:</p>
-<p><span class="math display">\mathrm{tr}(A) = \sum\limits_{i=1}^n e_i^T A e_i, \quad e_i = [0, \dots, 0, \underset{i}{1}, 0, \dots, 0] </span></p>
-<div id="6750804f" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> A.shape[<span class="dv">0</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>trace <span class="op">=</span> <span class="fl">0.0</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n): </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  v <span class="op">=</span> np.eye(<span class="dv">1</span>, n, k<span class="op">=</span>k).T</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  trace <span class="op">+=</span> np.take(v.T <span class="op">@</span> A <span class="op">@</span> v, <span class="dv">0</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(trace)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.6973930299908</code></pre>
-</div>
-</div>
-<p>Putting aside the fact that each <span class="math inline">v \mapsto Av</span> takes <span class="math inline">O(n^2)</span> here, observe this last approach is pretty inefficient in general as most of the entries of <span class="math inline">v</span> are zero. One idea, accredited first to A. Girard and then studied by M.F. Huchinson, is to use random sign vector <span class="math inline">v \in \{-1, +1\}^{n}</span>.</p>
-<p><span class="math display">\mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i = n_v^{-1} \cdot V^\top A V</span></p>
-<p>Let’s see how this fares using, let’s say, <span class="math inline">\frac{1}{2}</span> the number of <em>matvecs</em>:</p>
-<div id="3b006868" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>trace_estimate <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n <span class="op">//</span> <span class="dv">4</span>):</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  v <span class="op">=</span> np.random.choice([<span class="op">-</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>], size<span class="op">=</span>n)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  trace_estimate <span class="op">+=</span> v <span class="op">@</span> A <span class="op">@</span> v</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(trace_estimate <span class="op">/</span> (n <span class="op">//</span> <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.21454150546832</code></pre>
-</div>
-</div>
-<p>Not bad!</p>
-</section>
-<section id="the-implicit-trace-estimation-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-implicit-trace-estimation-problem">The implicit trace estimation problem</h2>
-<blockquote class="blockquote">
-<p>Given access to a square matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> via its matrix-vector product operator <span class="math inline">x \mapsto Ax</span>, estimate its trace&nbsp;<span class="math inline">\mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii}</span></p>
-</blockquote>
-<!-- ```{python}
-c = np.reciprocal(np.sqrt(n))
-trace_estimates = np.empty(n)
-for j in range(n):
-  v = np.random.choice([-1, +1], size=n)
-  trace_estimates[j] = v @ A @ v
-
-
-est_index = np.arange(1, (n*10)+1)
-p = figure(width=200, height=150)
-p.line(est_index, (np.cumsum(trace_estimates) / est_index))
-p.line(est_index, np.repeat(A.trace(), n*10), color='red')
-show(p)
-``` -->
-<!-- ```{python}
-from primate.trace import sl_trace
-trace_estimate = sl_trace(A)
-print(trace_estimate)
-``` -->
+<p>If you’re using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using <code>primate</code>s <em>binding</em> headers.</p>
+<p>TODO</p>
 <!-- 
+### Native pybind11 types
 
-# tr_est = np.mean(estimates)
-# print(f"Error: {abs(tr_est - A.trace()):.5}")
-# print(f"Samples std. deviation: {estimates.std(ddof=1)}")
-# print(f"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}")
+Suppose you have a custom class `LinOp` [understood by pybind11](https://pybind11.readthedocs.io/en/stable/classes.html#object-oriented-code), which looks something like: 
+
+```cpp
+class LinOp {
+  int nrow, ncol;
+  
+  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}
+  
+  void matvec(const float* input, float* output) const {
+    ... // implementation details 
+  }
+
+  void shape() const { return std::make_pair(nrow, ncol); }
+}
+```
+
+Since pybind11 understands how to pass a pointer to this type natively, creating an extension module that calls `primate`'s SLQ trace estimator with `LinOp` can be done by just calling the `_trace_wrapper` function: 
+
+```cpp
+#include <binders/pb11_trace_bind.h>  // _trace_wrapper binding  
+#include "LinOp.h"                    // custom LinOp class  
+
+PYBIND11_MODULE(_custom_trace, m) {   
+  // m is the actual py::module (exported as _custom_trace)
+  m.doc() = "custom trace estimator module";
+  _trace_wrapper< false, float, LinOp >(m); 
+}
+```
+
+The final extension module `_custom_trace` will have a method `trace_slq` as an attribute that can be called from Python to initiate the SLQ method with the corresponding `LineOp` type. 
+
+### Wrapping types
+
+If you're trying to create bindings for a class that isn't known to pybind11, or it doesn't natively support the `matvec` and `shape` constraints, you can optionally provide a wrapper function to the last template parameter of `_trace_wrapper`: 
+
+```cpp
+struct WrappedLinOp {
+  LinOp op;
+
+  void WrappedLinOp(LinOp& _op) : op(_op){ }
+
+  void matvec(const float* input, float* output){
+    ... // implementation details, e.g. op.dot(input, output)
+  }
+
+  void shape() { ... }
+}
+
+void linop_wrapper(LinOp* op){ // or py::object, for non-native types
+  return WrappedLinOp(*op); 
+}
+
+PYBIND11_MODULE(_custom_trace, m) {   
+  // m is the actual py::module (exported as _custom_trace)
+  m.doc() = "custom trace estimator module";
+  _trace_wrapper< false, float, LinOp, linop_wrapper >(m); 
+}
+```
+
+As a side effect, this also enables full access to matrix types that implement matrix-vector multiplication but don't have the matching method names / signatures available needed to match the underlying `LinearOperaor` concept. 
+
+### Full Example using Eigen 
+
+Here's a real example of what simple code might look like that wraps a [Eigen](https://eigen.tuxfamily.org/) SparseMatrix for use with `primate`. `Eigen` supports matrix-vector multiplication out of the box with the overloaded `operator*()` and [is understood natively by pybind11](https://pybind11.readthedocs.io/en/stable/advanced/cast/eigen.html), thus it suffices to define wrapper class that respects the `LinearOperator` concept:
+
+```cpp
+template< std::floating_point F >
+struct SparseEigenLinearOperator {
+  using value_type = F;
+  using float_vec = Eigen::Matrix< F, Eigen::Dynamic, 1 >;
+
+  const Eigen::SparseMatrix< F > A;  
+  SparseEigenLinearOperator(const Eigen::SparseMatrix< F >& _mat) : A(_mat){}
+
+  void matvec(const F* inp, F* out) const noexcept {
+    auto input = Eigen::Map< const float_vec >(inp, A.cols(), 1); 
+    auto output = Eigen::Map< float_vec >(out, A.rows(), 1);
+    output = A * input; 
+  }
+
+  auto shape() const noexcept -> std::pair< size_t, size_t > {
+    return std::make_pair((size_t) A.rows(), (size_t) A.cols());
+  }
+};
+```
+
+Then, simply write a quick wrapper function that converts a `Eigen::SparseMatrix< F >*` type to a `SparseEigenLinearOperator< F >` types and incorporate with `_trace_wrapper`
+
+```cpp
+template< std::floating_point F >
+auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
+  return SparseEigenLinearOperator< F >(*A);
+}
+
+PYBIND11_MODULE(_custom_trace, m) {
+  m.doc() = "custom trace estimator module";
+  _trace_wrapper< false, float, Eigen::SparseMatrix< float > >(
+    m, eigen_sparse_wrapper< float >
+  ); 
+}
+```
+
+That's it. The module `_custom_trace` will now have an exported `trace_slq` method that you can call from Python. For a list of arguments, it's recommended to see the `slq` declaration in [trace.py](https://github.com/peekxc/primate/blob/main/src/primate/trace.py).
+
+
+## Example: Log determinant
+
+For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
+
+```cpp
+#include <cmath>                              // std::log
+#include <_linear_operator/linear_operator.h> // LinearOperator
+#include <_lanczos/lanczos.h>                 // sl_trace
+#include "LinOp.h"                            // custom class
+
+void slq_log_det(LinOp A, ...){ 
+  static_assert(LinearOperator< LinOp >);  // Constraint check
+  const auto matrix_func = std::log;       // any invocable
+  auto rbg = ThreadedRNG64();              // default RNG
+  auto estimates = vector< float >(n, 0);  // output estimates
+  sl_trace< float >(                       // specific precision
+    A, matrix_func, rbg,                   // main arguments
+    ...,                                   // other inputs 
+    estimates.data()                       // output 
+  );
+}
 ``` -->
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1034,13 +1008,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../imate_compare.html" class="pagination-link  aria-label=" comparison="" to="" *imate*"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Comparison to <em>imate</em></span>
+      <a href="../advanced/cpp_integration.html" class="pagination-link  aria-label=" usage="" from="" c++"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Usage from C++</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../theory/lanczos.html" class="pagination-link" aria-label="Lanczos">
-        <span class="nav-page-text">Lanczos</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../advanced/slq_param.html" class="pagination-link" aria-label="Parameterizing SLQ">
+        <span class="nav-page-text">Parameterizing SLQ</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

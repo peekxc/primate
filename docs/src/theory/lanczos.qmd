@@ -1,70 +1,137 @@
 ---
 title: "The Lanczos method"
+editor: 
+    rendor-on-save: true
 ---
 
-In 1950, Cornelius Lanczos proposed the *method of minimized iterations*---now known as the *Lanczos method*---enabling the world to **iteratively** expose the spectrum of a symmetric $A$ via *tridiagonalization*. Though introduced in more than half-century ago, it remains the standard algorithm both for computing eigenvectors and eigenvalues and for solving linear systems.
+In 1950, Cornelius Lanczos proposed the *method of minimized iterations*---now known as the *Lanczos method*---enabling the world to **iteratively** expose the spectrum of a symmetric $A$ via *tridiagonalization*. Despite its age, the Lanczos iteration remains the standard[^1] algorithm both for computing eigensets and for solving linear systems in the large-scale regime. 
 
-<!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  --> <!-- When Cornelius first published the method,  -->
+<!-- In fact, a [an IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) elected Krylov Subspace Iteration Methods among the top 10 most influential algorithms of the 20th century---on essentially equal footing with other well known algorithms, such as e.g. the _Fast Fourier Transform_, the _Simplex algorithm_, and _QuickSort_. 
 
-One of the main appeals of the Lanczos method is that its *matrix free*: one need not store $A$ explicitly to carry out the execution----all that is required is a (fast) matrix-vector product $v \mapsto Av$.
+The Lanczos iteration is the de-facto standard approach to generating a _Krylov subspaces_. Given a symmetric $A \in \mathbb{R}^{n \times n}$ and a non-zero vector $v\in \mathbb{R}^n$, the order-$j$ of the pair $(A,v)$ is given as:
 
-## Why care? 
+$$\mathcal{K}_j(A, v) \triangleq \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \} $$ -->
 
-Computing the eigen-decomposition $A = U \Lambda U^T$ for general symmetric $A \in \mathbb{R}^{n \times n}$ is essentially bounded above by $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx$ is the matrix-multiplication constant. This translates to an effective $\Omega(n^3)$ time bound if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways). *However*, if one can show that $v \mapsto Av \approx O(n)$, then there is a simple way of obtaining $\Lambda(A)$ in [ $O(n^2)$ time ]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}!
+<!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  --> 
+<!-- When Cornelius first published the method,  -->
+
+In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now. 
 
 ## Lanczos on a bumper sticker
 
-The idea of the Lanczos method is as follows: for some non-zero $v \in \mathbb{R}^n$, suppose we expand $v$ with successive powers of $A$:
+The Lanczos method starts by expanding some non-zero $v \in \mathbb{R}^n$ via successive powers of $A$:
 
 $$
 v \mapsto \{ \, A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v \, \}
 $$
 
-If we collect these vectors into a matrix and orthogonalize them, we get the following trio of matrices:
+If we collect these vectors into a matrix, orthogonalize them, and then use them to rotate $A$, we get the following trio of matrices:
 
-$$
-\begin{align}
-K_j &= [ v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}v] && \\
-Q_j &= [ q_1, q_2, \dots, q_j] \gets \mathrm{qr}(K_j) && \\
+$$ 
+\begin{align*}
+K_j &= [\, v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}v \,] && \\
+Q_j &= [\, q_1, q_2, \dots, q_j \,] \gets \mathrm{qr}(K_j) &&  \\
 T_j &= Q_j^T A Q_j &&
-\end{align}
+\end{align*}
 $$
 
-Since $A$ is symmetric, it turns out that---for any $0 \leq j \leq n$\-\--this last matrix $T_j$ will be a symmetric *tridiagonal* matrix:
+Since $A$ is symmetric, it turns out $T_j$ will be a _symmetric tridiagonal matrix_ for all $j \leq n$:
 
 $$
 T_j = \mathrm{tridiag}\Bigg(
 \begin{array}{ccccccccc} 
-& \beta_2 & & \beta_3 & & \cdot & & \beta_n & \\
-\alpha_1 & & \alpha_2 & & \cdot & & \cdot & & \alpha_n \\
-& \beta_2 & & \beta_3 & & \cdot & & \beta_n &
+& \beta_2 & & \beta_3 & & \cdot & & \beta_j & \\
+\alpha_1 & & \alpha_2 & & \cdot & & \cdot & & \alpha_j \\
+& \beta_2 & & \beta_3 & & \cdot & & \beta_j &
 \end{array}
 \Bigg)
 $$
 
-That's pretty fortunate, because getting at the eigenvalues of symmetric tridiagonal matrices takes just $O(n^2)$ time\[\^2\].
+That's pretty fortunate, because the eigen-sets of $T_j$ can be obtained in just $O(j^2)$ time[^2]!
 
-Taking a quote from the lucid introduction to the Lanczos method by Parlett[^1], [could anything be more simple?]((https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf))
+To quote the lucid [Lanczos introduction from Parlett](https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf), _could anything be more simple?_
 
-[^1]: Do We Fully Understand the Symmetric Lanczos Algorithm Yet?
+## Surpassing the cubic bound
+
+Computing the eigen-decomposition $A = U \Lambda U^T$ for general symmetric $A \in \mathbb{R}^{n \times n}$ is essentially bounded by $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx 2.37\dots$ is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective $\Omega(n^3)$ time bound. Not great!
+
+One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
+Moreover, entire method is *matrix free*     as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators. 
 
 ## Quadratic time and linear space? How?
 
 Unless you know the tricks, its not obvious at all decompositions above takes just $O(n^2)$ time and $O(n)$ space to obtain. So... how does the complexity argument play out?
 
-If you squint hard enough, you can deduce that every symmetric $A \in \mathbb{R}^{n \times n}$ expanded this way into a tridiagonal $T$ admits a *three-term recurrence*: $$ A q_j = \beta_{j-1} q_{j-1} + \alpha_j q_j + \beta_j q_{j+1} $$
+If you squint hard enough, you can deduce that since $A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T$, every symmetric $A \in \mathbb{R}^{n \times n}$ expanded this way admits a *three-term recurrence*: 
+$$ 
+\begin{align*}
+A q_j &= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} \\
+\Leftrightarrow \beta_{j} \, q_{j+1} &= A q_j - \alpha_j \, q_j - \beta_{j\text{-}1} \, q_{j\text{-}1}  
+\end{align*}
+$$
 
-From a computational point of view, this recurrence is fantastic: given $q_{j-1}, q_j$ (+their coefficients), we can get at $q_{j+1}$ by just re-arranging the terms and multiplying by $A$. No explicit call to the QR algorithm necessary!
+The equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions: 
+$$
+\alpha_j = q_j^T A q_j, \;\; \beta_j = \lVert r_j \rVert_2, \;\; q_{j+1} = r_j / \beta_j
+$$
 
-Note that a symmetric tridiagonal matrix takes just $O(n)$ space to store and is fully characterized by its diagonal and subdiagonal terms. Thus, if we assume that $v \mapsto Av \sim O(n)$, we can deduce this procedure clearly takes at most $O(n^2)$ time since there are most $n$ such vectors $\{q_i\}_{i=1}^n$ to generate. Moreover, if we only need $\Lambda(A)$ (and not $Q$), we can exploit the recurrence by keeping in memory at most the triplet $\{q_{j-1}, q_{j}, q_{j+1}\}$. Since each of these is $O(n)$ is size, the claim of $O(n)$ space is also justified!
+$$
+\text{where  } r_j = (A - \alpha_j I)q_j - \beta_{j\text{-}1} q_j
+$$
 
+In other words, if ($q_{j\text{-}1}, \beta_j, q_j$) are known, then ($\alpha_j$, $\beta_{j+1}, q_{j+1}$) are completely determined. This fact is fantastic from a computational point of view: no explicit call to the QR algorithm necessary[^3]!
+
+Note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just $O(n)$ space. If we assume that $v \mapsto Av \sim O(n)$, then the above procedure clearly takes at most $O(n^2)$ time, since there are most $n$ such vectors $\{q_i\}_{i=1}^n$ to generate! 
+
+Moreover, if we only need the eigen-_values_ $\Lambda(A)$ ( and not their vectors $U$), then we may execute the recurrence keeping at most three vectors $\{q_{j-1}, q_{j}, q_{j+1}\}$ in memory at any given time. Since each of these is $O(n)$ is size, the claim of $O(n)$ space is justified!
+
+The description above is essentially the proof of the following Theorem:
+
+::: {#thm-line}
+
+## Parlett 1994, Simon 1984
+
+Given a symmetric rank-$r$ matrix $A \in \mathbb{R}^{n \times n}$ whose operator $x \mapsto A x$ requires $O(\eta)$ time and $O(\nu)$ space, the Lanczos iteration computes $\Lambda(A) = \{ \lambda_1, \lambda_2, \dots, \lambda_r \}$ in $O(\max\{\eta, n\}\cdot r)$ time and $O(\max\{\nu, n\})$ space, when computation is done in exact arithmetic
+
+:::
+
+## But wait, isn't $T$ arbitrary? 
+
+Unfortunately, there is no canonical choice of $T_j$. Indeed, as $T_n$ is a family with $n - 1$ degrees of freedom and $v \in \mathbb{R}^n$ was chosen arbitrarily, there are infinitely many _essentially distinct_ such decompositions. In contrast, the spectral decomposition $A = U \Lambda U^T$ identifies a diagonalizable $A$ with its spectrum $\Lambda(A)$ up to a change of basis $A \mapsto M^{-1} A M$.
+
+Not all hope is lost though. Notice that since $Q$ is formed by an orthonormal set $\{ q_i \}_{i=1}^n$, it is orthogonal, thus we have: 
+
+$$ Q Q^T = I_n = [e_1, e_2, \dots, e_n] $$
+
+By extension, given an initial pair $(A, q_1)$ satisfying $\lVert q_1 \rVert = 1$, we have:
+
+$$
+K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
+$$
+
+This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely_ determined by $(A, q_1)$. 
+
+Thus, tridiagonalizing $A$ with respect to an arbitrary $q_1 \in \mathbb{R}^n$ satisfying $\lVert q_1\rVert = 1$ _determines_ $Q$. 
+
+## Pseudocode 
+
+<!-- Alright, enough of the  -->
+
+
+<!-- 
 ## The Lanczos Iteration
 
-The Lanczos method exposes the spectrum of $A$ by successively projecting onto *Krylov subspaces*. That is, given a symmetric $A \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_1 \geq \lambda_2 > \dots \geq \lambda_r > 0$ and a vector $v \in \mathbb{R} \setminus \{0\}$, the order-$j$ Krylov subspaces / Krylov matrices of the pair $(A, v)$ are given by: $$
-    \mathcal{K}_j(A, v) := \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \}, \quad \quad K_j(A, v) = [ v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}]
-$$ Krylov subspaces arise naturally from using the minimal polynomial of $A$ to express $A^{-1}$ in terms of powers of $A$: if $A$ is nonsingular and its minimal polynomial has degree $m$, then $A^{-1}v \in K_m(A, v)$ and $K_m(A, v)$ is an invariant subspace.
+The Lanczos method exposes the spectrum of $A$ by successively projecting onto *Krylov subspaces*. That is, given a symmetric $A \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_1 \geq \lambda_2 > \dots \geq \lambda_r > 0$ and a vector $v \in \mathbb{R} \setminus \{0\}$, the order-$j$ Krylov subspaces / Krylov matrices of the pair $(A, v)$ are given by: 
 
-The spectral theorem implies that since $A$ is symmetric, it is orthogonally diagonalizable: thus, $\Lambda(A)$ may be obtained by generating an orthonormal basis for $\mathcal{K}_n(A, v)$. To do this, the Lanczos method constructs successive QR factorizations of $K_j(A,v) = Q_j R_j$ for each $j = 1, 2, \dots, n$. Due to $A$'s symmetry and the orthogonality of $Q_j$, we have $q_k^T A q_l = q_l^T A^T q_k = 0$ for $k > l + 1$, implying $T_j = Q_j^T A Q_j$ has a tridiagonal structure: $$\begin{equation}
+$$
+\mathcal{K}_j(A, v) := \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \}, \quad \quad K_j(A, v) = [ v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}]
+$$ 
+
+Krylov subspaces arise naturally from using the minimal polynomial of $A$ to express $A^{-1}$ in terms of powers of $A$: if $A$ is nonsingular and its minimal polynomial has degree $m$, then $A^{-1}v \in K_m(A, v)$ and $K_m(A, v)$ is an invariant subspace.
+
+The spectral theorem implies that since $A$ is symmetric, it is orthogonally diagonalizable: thus, $\Lambda(A)$ may be obtained by generating an orthonormal basis for $\mathcal{K}_n(A, v)$. To do this, the Lanczos method constructs successive QR factorizations of $K_j(A,v) = Q_j R_j$ for each $j = 1, 2, \dots, n$. Due to $A$'s symmetry and the orthogonality of $Q_j$, we have $q_k^T A q_l = q_l^T A^T q_k = 0$ for $k > l + 1$, implying $T_j = Q_j^T A Q_j$ has a tridiagonal structure: 
+
+$$\begin{equation}
     T_j = \begin{bmatrix} 
     \alpha_1 & \beta_2 & & & \\
     \beta_2 & \alpha_2 & \beta_3 & & \\
@@ -73,7 +140,9 @@ The spectral theorem implies that since $A$ is symmetric, it is orthogonally dia
     & & & \beta_{j} & \alpha_{j} 
     \end{bmatrix}, \; \beta_j > 0, \; j = 1, 2, \dots, n
 \end{equation}
-$$ Given an initial pair $(A, q_1)$ satisfying $\lVert q_1 \rVert = 1$, one can restrict and project $A$ to its $j$-th Krylov subspace $T_j$ via: $$
+$$ 
+
+Given an initial pair $(A, q_1)$ satisfying $\lVert q_1 \rVert = 1$, one can restrict and project $A$ to its $j$-th Krylov subspace $T_j$ via: $$
 \begin{equation}
     A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T \quad\quad (\beta_j > 0)
 \end{equation}
@@ -89,3 +158,11 @@ Unfortunately, unlike the spectral decomposition $A = V \Lambda V^T$---which ide
     K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 \end{equation}
 $$ *is* the QR factorization of $K_n(A, q_1)$. Thus, tridiagonalizing $A$ with respect to a unit-norm $q_1$ determines $Q$. Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are *uniquely* determined by $(A, q_1)$.
+ -->
+
+[^1]: A variant of the Lanczos method is actually at the heart `scipy.sparse.linalg`'s default `eigsh` solver (which is a port of [ARPACK](https://en.wikipedia.org/wiki/ARPACK)). 
+[^2]: tridiag ref 
+[^3]: In fact, there's a strnger 
+[^4]: testing
+
+Do We Fully Understand the Symmetric Lanczos Algorithm Yet?

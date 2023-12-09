@@ -4,6 +4,9 @@ title: "pybind11 Integration"
 
 If you're using pybind11, you can easily incorporate your own custom linear operator / matrix function pair using `primate`s _binding_ headers. 
 
+TODO 
+
+<!-- 
 ### Native pybind11 types
 
 Suppose you have a custom class `LinOp` [understood by pybind11](https://pybind11.readthedocs.io/en/stable/classes.html#object-oriented-code), which looks something like: 
@@ -132,4 +135,4 @@ void slq_log_det(LinOp A, ...){
     estimates.data()                       // output 
   );
 }
-```
+``` -->

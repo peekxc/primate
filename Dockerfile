@@ -1,1 +1,0 @@
-FROM cibuildwheel/manylinux1_x86_64:latest

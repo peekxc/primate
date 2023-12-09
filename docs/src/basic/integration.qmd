@@ -2,54 +2,14 @@
 title: "Integration"
 ---
 
-### Python Integration 
+`primate` supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), and [LinearOperators](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html). Note the last option enables the use of _matrix free_ operators.
 
-On the Python side, `primate` uses a supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), along with type supporting the [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) interface. 
-
-The latter most option allows `primate` to work with _matrix free_ operators. For example, the basic requirements for an operator `A` to be used with e.g. the `Lanczos` method are: 
+More generally, the basic requirements for any operator `A` to be used with e.g. the `Lanczos` method in `primate` are: 
 
 1. A method `A.matvec(input: ndarray) -> ndarray` implementing $v \mapsto Av$
 2. A method `A.shape() -> tuple[int, int]` giving the output/input dimensions of $A$
 
-Note in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, recovering the second requirement. 
+<!-- Note that in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, so existing matrix implementations like [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)'s and [sparray](https://docs.scipy.org/doc/scipy/reference/sparse.html#sparse-array-classes)'s natively support the interface. -->
 
-This support extends to the C++ side as well---see the [C++ integration guide](integration/cpp_integration.qmd). If you're using pybind11 and you want to be able to create your own trace estimator from Python, see the [pybind11 integration guide](integration/pybind11_integration.qmd). 
+These semantics extend to the C++ side as well via _C++20 concepts_---see the [C++ integration guide](advanced/cpp_integration.qmd). If you're using pybind11 and you want to extend `primate`'s Python API to work natively with linear operator implemented in C++, see the [pybind11 integration guide](advanced/pybind11_integration.qmd). 
 
-### C++ Integration
-
-`primate`'s C++ interface is [header-only](https://en.wikipedia.org/wiki/Header-only), making it easy to compile your own [extension modules](https://docs.python.org/3/extending/extending.html). The simplest way to link these headers is to add `primate` as a [dependency](https://peps.python.org/pep-0631/) to your package and use the `get_include()` function to find the appropriate directory.
-
-::: {.panel-tabset}
-## setuptools 
-
-```python
-# setup.py
-import primate as pm
-...
-Extension('extension_name', ..., include_dirs=[pm.get_include()])
-...
-```
-
-## meson-python
-
-```python
-# meson.build
-...
-primate_include_dirs = run_command(py, 
-  ['-c', 'import primate as pm; print(pm.get_include())']
-).stdout().strip()
-...
-```
-
-## git submodule 
-
-Assuming your headers are located in `extern`, from your git repository, you can use: 
-
-```bash
-git submodule add https://github.com/peekxc/primate extern/primate
-git submodule update --init
-```
-
-From here, you can now include `extern/primate/include` into your C++ source files, or you can add this directory to the search path used other various build tools, such as [CMake](https://cmake.org/) or [Meson](https://mesonbuild.com/).
-
-::: 
