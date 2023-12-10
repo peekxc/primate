@@ -2,17 +2,30 @@ container:
   image: python:slim
 env: 
   CIRRUS_CLONE_SUBMODULES: true
-  
+
 task:
+  # skip: "!changesInclude('.cirrus.yml', '**.{js,ts}')"
   pip_cache:
     folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION
+    fingerprint_script: echo $PYTHON_VERSION  
   environment:
     CC: clang 
     CXX: clang++
-  install_dependencies_script: |
+  before_script: |
+    python -m pip install --upgrade pip
+    python -m pip install pytest pytest-cov pytest-benchmark
+  dependencies_script: |
     bash tools/cibw_linux.sh
   build_script: |
-    python -m pip install .
+    python -m pip install . --verbose
   test_script: |
     python -m pytest tests/
+  uninstall_script: |
+    python -m pip uninstall primate
+  wheel_script: |
+    python -m pip wheel . --no-deps --wheel-dir dist/ --verbose
+  install_script: |
+    python -m pip install dist/primate*.whl
+  test_post_script: |
+    python -m pytest tests/
+  

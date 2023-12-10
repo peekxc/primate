@@ -17,7 +17,7 @@ def test_vector_approx():
   from sanity import approx_matvec
   np.random.seed(1234)
   n = 10
-  A_sparse = csc_array(symmetric(n), psd = True, dtype=np.float32)
+  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
   v0 = np.random.uniform(size=n).astype(np.float32)
   deg, rtol, orth = 6, 0.0, 0
 
