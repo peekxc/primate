@@ -1,5 +1,6 @@
 container:
-  image: python:slim
+  # image: python:slim
+  image: quay.io/repository/pypa/manylinux_2_28_x86_64 
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
