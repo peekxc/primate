@@ -19,7 +19,7 @@ task:
   build_script: |
     python -m pip install . --verbose
   test_script: |
-    python -m pytest tests/
+    python -m pytest tests/ --cov=primate --benchmark-skip
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
@@ -27,5 +27,6 @@ task:
   install_script: |
     python -m pip install dist/primate*.whl
   test_post_script: |
-    python -m pytest tests/
+    python -m pytest tests/ --cov=primate --benchmark-skip
+    coverage report -m
   
