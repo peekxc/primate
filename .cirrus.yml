@@ -1,6 +1,7 @@
 container:
+  image: ghcr.io/getsentry/pypi-manylinux-amd64-ci
   # image: python:slim
-  image: quay.io/repository/pypa/manylinux_2_28_x86_64 
+  # image: quay.io/repository/pypa/manylinux_2_28_x86_64 
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
