@@ -8,9 +8,11 @@ env:
 
 task:
   # skip: "!changesInclude('.cirrus.yml', '**.{js,ts}')"
+  setup_python_script: 
+    export PATH=$PATH:/opt/python/cp310-cp310/bin/
   pip_cache:
     folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION  
+    fingerprint_script: echo $PYTHON_VERSION
   environment:
     CC: clang 
     CXX: clang++
