@@ -13,10 +13,23 @@
 
 namespace py = pybind11;
 
+
+// template< std::floating_point F, LinearOperator Matrix > 
+// struct MatrixFunction {
+//   using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+//   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+//   using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
+
+//   // Parameters 
+//   const Matrix& op; 
+//   std::function< F(F) > f; 
+//   const int deg;
+//   const F rtol; 
+//   const int orth;
+
+//   MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) 
+
 // PYBIND11_MODULE(_vapprox, m) {
-//   py::class_< Pet >(m, "Pet")
-//     .def(py::init<const std::string &>())
-//     .def("setName", &Pet::setName)
-//     .def("getName", &Pet::getName);
+//   _matrix_function_wrapper< float, Eigen::SparseMatrix< float > >(m); 
 // }
 

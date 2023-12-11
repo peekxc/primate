@@ -31,4 +31,14 @@ def test_vector_approx():
   assert np.max(np.abs(y_test_cpp - y_true)) < 1e-5 
 
 def test_mf_approx():
-  pass
+  from primate.diagonalize import _lanczos
+  np.random.seed(1234)
+  n = 10
+  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  deg, rtol, orth = 6, 0.0, 0
+  M = _lanczos.MatrixFunction_sparse(A_sparse, deg, rtol, orth, **dict(function="identity"))
+  
+  M.shape
+  v0 = np.random.normal(size=M)
+  M.matvec(v0)
+

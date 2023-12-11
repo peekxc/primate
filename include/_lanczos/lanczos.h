@@ -318,8 +318,8 @@ struct MatrixFunction {
   const Matrix& op; 
   std::function< F(F) > f; 
   const int deg;
-  const F rtol; 
-  const int orth;
+  F rtol; 
+  int orth;
 
   MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) 
   : op(A), f(fun), deg(lanczos_degree), rtol(lanczos_rtol), orth(add_orth) {
@@ -361,13 +361,17 @@ struct MatrixFunction {
     y_map.array() *= v_scale; // re-scale
   }   
 
-private: // Internal state to re-use
-  mutable DenseMatrix< F > Q;
-  mutable ArrayF alpha;
-  mutable ArrayF beta;
-  mutable ArrayF nodes;
-  mutable ArrayF weights;
-  mutable EigenSolver solver;  
+  auto shape() const noexcept -> std::pair< size_t, size_t > {
+    return op.shape();
+  }
+
+  private: // Internal state to re-use
+    mutable DenseMatrix< F > Q;
+    mutable ArrayF alpha;
+    mutable ArrayF beta;
+    mutable ArrayF nodes;
+    mutable ArrayF weights;
+    mutable EigenSolver solver;  
 };
 
 // Approximates the action v |-> f(A)v via the Lanczos method
@@ -383,63 +387,3 @@ void matrix_approx(
 ){
   MatrixFunction< F, Matrix >(A, sf, lanczos_degree, lanczos_rtol, orth).matvec(v, y);
 };
-
-  // using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-  // using ArrayF = Eigen::Array< F, Dynamic, 1 >;
-  // using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
-
-  // // Constants
-  // const auto A_shape = A.shape();
-  // const size_t n = A_shape.first;
-  // const size_t m = A_shape.second;
-  // const size_t ncv = lanczos_degree;
-
-  // // Pre-allocate memory needed for Lanczos iterations
-  // auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
-  // auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-  // auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-  // auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-  // auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-  // auto solver = EigenSolver(lanczos_degree);
-
-  // // Perform a lanczos iteration (populates alpha, beta)
-  // Eigen::Map< VectorF > v_map(v, m);
-  // const F v_scale = v_map.norm(); // this is needed because v will be modified! 
-  // lanczos_recurrence< F >(A, v, lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
-
-  // // std::cout << alpha << std::endl;
-  // // std::cout << beta << std::endl;
-  // // std::cout << Q << std::endl;
-
-  // // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
-  // Eigen::Map< ArrayF > a(alpha.data(), ncv);        // diagonal elements
-  // Eigen::Map< ArrayF > b(beta.data()+1, ncv-1);     // subdiagonal elements (offset by 1!)
-  // solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
-  
-  // // Retrieve the Rayleigh-Ritz values (nodes)
-  // auto theta = static_cast< ArrayF >(solver.eigenvalues());
-  // // std::cout << "theta: " << theta << std::endl;
-
-  // // Apply the spectral function (in-place)
-  // theta.unaryExpr(sf); 
-  // // std::cout << "theta f: " << theta << std::endl;
-
-  // // Get the function approximation
-  // Eigen::Map< VectorF > y_map(y, n);
-  // const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here -- static_cast< DenseMatrix< F > >( 
-  // auto v_mod = static_cast< ArrayF >(V.row(0).array());
-
-  // // std::cout << V << std::endl;
-  // // std::cout << v_mod << std::endl;
-  // v_mod *= theta;
-  // // std::cout << "scaled:" << v_mod << std::endl;
-
-  // auto tmp = static_cast< VectorF >(V * v_mod.matrix());
-  // // std::cout << "tmp: " << tmp.adjoint() << std::endl; // this is zero??? 
-  
-  // // std::cout << "Q: " << Q << std::endl;
-  // y_map = Q * tmp; // equivalent to Q V diag(sf(theta)) V^T e_1
-  
-  // // std::cout << "scaling:" << v_scale<< std::endl;
-  // // std::cout << "y before scale:" << y_map.adjoint() << std::endl;
-  // y_map.array() *= v_scale; // re-scale

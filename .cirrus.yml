@@ -4,7 +4,7 @@ env:
 linux_task:
   container:
     image: quay.io/pypa/manylinux_2_28_x86_64
-  setup_python_script: 
+  setup_python_script: |
     export PATH=$PATH:/opt/python/cp310-cp310/bin/
     alias python=/opt/python/cp310-cp310/bin/python
   pip_cache:
