@@ -72,10 +72,18 @@ jobs:
           # -Wl,-S equivalent to gcc's -Wl,--strip-debug
           # LDFLAGS: "-Wl,-S"
 
+      - name: Save wheel location  
+        run: |
+          echo "WHEEL_NAME=$(ls dist/*.whl | head -1)" >> $GITHUB_ENV
+
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: dist/*.whl
+          path: |
+            dist
+            wheelhouse
+            dist/wheelhouse
+            ${{ env.WHEEL_NAME }}
 
   # build_macos_wheels:
   #   name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
