@@ -1,7 +1,14 @@
 #ifndef _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 #define _RANDOM_GENERATOR_RANDOM_ARRAY_GENERATOR_H_
 
-#include <omp.h>   // omp_set_num_threads, omp_get_thread_num
+#ifdef _OPENMP
+   #include <omp.h>   // omp_set_num_threads, omp_get_thread_num
+#else
+   #define omp_get_thread_num() 0
+	 #define omp_set_num_threads() 0
+   #define omp_get_max_threads() 1 
+#endif
+
 #include <random>   // uniform_random_bit_generator, normal_distribution
 #include <cstdint>  // uint64_t
 #include <cmath> // isnan

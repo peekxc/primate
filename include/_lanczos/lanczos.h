@@ -4,6 +4,15 @@
 #include "_linear_operator/linear_operator.h" // LinearOperator
 #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
+
+#ifdef _OPENMP
+   #include <omp.h>   // omp_set_num_threads, omp_get_thread_num
+#else
+   #define omp_get_thread_num() 0
+	 #define omp_set_num_threads() 0
+   #define omp_get_max_threads() 1 
+#endif
+
 #include <Eigen/Core> 
 #include <Eigen/Eigenvalues> 
 
@@ -318,8 +327,8 @@ struct MatrixFunction {
   // Essentially should make this class a non-owning class rather than a copying
   // see: https://stackoverflow.com/questions/35770357/storing-const-reference-to-an-object-in-class
   const Matrix op; 
-  const int deg;
   std::function< F(F) > f; 
+  const int deg;
   F rtol; 
   int orth;
 

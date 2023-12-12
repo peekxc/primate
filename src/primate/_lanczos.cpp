@@ -178,7 +178,7 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
       m.matvec(x.data(), output.data());
       return py::cast(output);
     })
-    .def("matvec", [](const MatrixFunction< F, WrapperType >& m, const py_array< F >& x, py_array< F >& y) -> py_array< F >{
+    .def("matvec", [](const MatrixFunction< F, WrapperType >& m, const py_array< F >& x, py_array< F >& y) -> void {
       using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
       m.matvec(x.data(), y.mutable_data());
     })

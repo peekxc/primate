@@ -78,31 +78,33 @@ inc_pkg = include_directories('include')
 dependency_map = {}
 # subdir('blas') # Configure BLAS / LAPACK 
 
-## Include OpenMP (mandatory) 
-omp = dependency('openmp', required: false)
-openmp_flags = []
-if omp.found()
-  ## Handle msvc, gcc, clang, or clang-cl
-  if OS_platform == 'windows' and compiler.get_id() == 'msvc'
-    # https://devblogs.microsoft.com/cppblog/improved-openmp-support-for-cpp-in-visual-studio/
-    openmp_flags += compiler.get_supported_arguments('/openmp', '/openmp:experimental', '/openmp:llvm')
-  elif compiler.get_id() == 'gcc'
-    openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
-  elif compiler.get_id() == 'clang-cl'
-    openmp_flags += compiler.get_supported_arguments('-Xclang', '-fopenmp') 
-  elif compiler.get_id() == 'llvm' or compiler.get_id() == 'clang'
-    openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
-  endif 
-  add_project_link_arguments(openmp_flags, language : 'cpp')
-  dependency_map += { 'OpenMP' : omp }
-elif compiler.has_argument('-fopenmp')
-  _c = compiler.has_argument('-fopenmp', required: false)
-  _h = compiler.has_header('omp.h', required: true)
-  omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
-  dependency_map += { 'OpenMP' : omp }
-else
-  error('OpenMP not detected in the system.')
-endif
+## Include OpenMP (mandatory ; but exclude on windows because it's too difficult to link) 
+if OS_platform != 'windows'
+  omp = dependency('openmp', required: false)
+  openmp_flags = []
+  if omp.found()
+    ## Handle msvc, gcc, clang, or clang-cl
+    if OS_platform == 'windows' and compiler.get_id() == 'msvc'
+      # https://devblogs.microsoft.com/cppblog/improved-openmp-support-for-cpp-in-visual-studio/
+      openmp_flags += compiler.get_supported_arguments('/openmp', '/openmp:experimental', '/openmp:llvm')
+    elif compiler.get_id() == 'gcc'
+      openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
+    elif compiler.get_id() == 'clang-cl'
+      openmp_flags += compiler.get_supported_arguments('-Xclang', '-fopenmp') 
+    elif compiler.get_id() == 'llvm' or compiler.get_id() == 'clang'
+      openmp_flags += compiler.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
+    endif 
+    add_project_link_arguments(openmp_flags, language : 'cpp')
+    dependency_map += { 'OpenMP' : omp }
+  elif compiler.has_argument('-fopenmp')
+    _c = compiler.has_argument('-fopenmp', required: false)
+    _h = compiler.has_header('omp.h', required: true)
+    omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
+    dependency_map += { 'OpenMP' : omp }
+  else
+    error('OpenMP not detected in the system.')
+  endif
+endif 
 
 ## Set USE_CBLAS to 0 to use C++ implemented sparse matrix vector operations
 ## Otherwise BLAS must be linked and used

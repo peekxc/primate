@@ -75,7 +75,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: ./dist/*.whl
+          path: dist/*.whl
 
   # build_macos_wheels:
   #   name: Build ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
