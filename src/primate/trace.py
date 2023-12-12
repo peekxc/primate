@@ -31,8 +31,6 @@ def sl_trace (
 ) -> Union[float, tuple]:
   """Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). 
 
-
-
   Parameters
   ----------
   A : ndarray, sparray, or LinearOperator

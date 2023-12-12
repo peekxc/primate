@@ -326,8 +326,11 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#lanczos-on-a-bumper-sticker" id="toc-lanczos-on-a-bumper-sticker" class="nav-link active" data-scroll-target="#lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</a></li>
-  <li><a href="#surpassing-the-cubic-bound" id="toc-surpassing-the-cubic-bound" class="nav-link" data-scroll-target="#surpassing-the-cubic-bound">Surpassing the cubic bound</a></li>
-  <li><a href="#quadratic-time-and-linear-space-how" id="toc-quadratic-time-and-linear-space-how" class="nav-link" data-scroll-target="#quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</a></li>
+  <li><a href="#quadratic-time-and-linear-space-how" id="toc-quadratic-time-and-linear-space-how" class="nav-link" data-scroll-target="#quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</a>
+  <ul class="collapse">
+  <li><a href="#the-cubic-bound" id="toc-the-cubic-bound" class="nav-link" data-scroll-target="#the-cubic-bound">The cubic bound</a></li>
+  <li><a href="#solving-the-right-problem" id="toc-solving-the-right-problem" class="nav-link" data-scroll-target="#solving-the-right-problem">Solving the right problem</a></li>
+  </ul></li>
   <li><a href="#but-wait-isnt-t-arbitrary" id="toc-but-wait-isnt-t-arbitrary" class="nav-link" data-scroll-target="#but-wait-isnt-t-arbitrary">But wait, isn’t <span class="math inline">T</span> arbitrary?</a></li>
   <li><a href="#pseudocode" id="toc-pseudocode" class="nav-link" data-scroll-target="#pseudocode">Pseudocode</a></li>
   </ul>
@@ -355,7 +358,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>In 1950, Cornelius Lanczos proposed the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the world to <strong>iteratively</strong> expose the spectrum of a symmetric <span class="math inline">A</span> via <em>tridiagonalization</em>. Despite its age, the Lanczos iteration remains the standard<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> algorithm both for computing eigensets and for solving linear systems in the large-scale regime.</p>
+<p>In 1950, Cornelius Lanczos proposed the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the world to <strong>iteratively</strong> expose the spectra of symmetric operators <span class="math inline">A \in \mathbb{S}_n</span> via <em>tridiagonalization</em>. Despite its age, the Lanczos iteration remains the standard algorithm<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> both for computing eigensets and for solving linear systems in the large-scale regime. Listed among the top 10 most influential algorithms of the 20th century in <a href="https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm">an IEEE guest editorial</a>,</p>
 <!-- In fact, a [an IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) elected Krylov Subspace Iteration Methods among the top 10 most influential algorithms of the 20th century---on essentially equal footing with other well known algorithms, such as e.g. the _Fast Fourier Transform_, the _Simplex algorithm_, and _QuickSort_. 
 
 The Lanczos iteration is the de-facto standard approach to generating a _Krylov subspaces_. Given a symmetric $A \in \mathbb{R}^{n \times n}$ and a non-zero vector $v\in \mathbb{R}^n$, the order-$j$ of the pair $(A,v)$ is given as:
@@ -363,7 +366,8 @@ The Lanczos iteration is the de-facto standard approach to generating a _Krylov 
 $$\mathcal{K}_j(A, v) \triangleq \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \} $$ -->
 <!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  -->
 <!-- When Cornelius first published the method,  -->
-<p>In this post, I’ll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g.&nbsp;orthogonal polynomials, gaussian quadrature, conjugate gradient—none of these will be discussed for now.</p>
+<p><code>primate</code> offers a matrix-free<br>
+In this post, I’ll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g.&nbsp;orthogonal polynomials, gaussian quadrature, conjugate gradient—none of these will be discussed for now.</p>
 <section id="lanczos-on-a-bumper-sticker" class="level2">
 <h2 class="anchored" data-anchor-id="lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</h2>
 <p>The Lanczos method starts by expanding some non-zero <span class="math inline">v \in \mathbb{R}^n</span> via successive powers of <span class="math inline">A</span>:</p>
@@ -391,14 +395,16 @@ T_j = \mathrm{tridiag}\Bigg(
 <p>That’s pretty fortunate, because the eigen-sets of <span class="math inline">T_j</span> can be obtained in just <span class="math inline">O(j^2)</span> time<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>!</p>
 <p>To quote the lucid <a href="https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf">Lanczos introduction from Parlett</a>, <em>could anything be more simple?</em></p>
 </section>
-<section id="surpassing-the-cubic-bound" class="level2">
-<h2 class="anchored" data-anchor-id="surpassing-the-cubic-bound">Surpassing the cubic bound</h2>
-<p>Computing the eigen-decomposition <span class="math inline">A = U \Lambda U^T</span> for general symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> is essentially bounded by <span class="math inline">\Theta(n^\omega)</span> time and <span class="math inline">\Theta(n^2)</span> space, where <span class="math inline">\omega \approx 2.37\dots</span> is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective <span class="math inline">\Omega(n^3)</span> time bound. Not great!</p>
-<p>One of the main draws to the Lanczos method is its efficiency: if one can perform <span class="math inline">v \mapsto Av</span> quickly—say, in <span class="math inline">\approx O(n)</span> time—then the Lanczos method can construct <span class="math inline">\Lambda(A)</span> in <em>just</em> <span style="color: red;"><span class="math inline">O(n^2)</span> time</span> and <span style="color: red;"><span class="math inline">O(n)</span> space</span>! Moreover, entire method is <em>matrix free</em> as the only input to the algorithm is a (fast) matrix-vector product <span class="math inline">v \mapsto Av</span>: one need not store <span class="math inline">A</span> explicitly to do this for many special types of linear operators.</p>
-</section>
 <section id="quadratic-time-and-linear-space-how" class="level2">
 <h2 class="anchored" data-anchor-id="quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</h2>
 <p>Unless you know the tricks, its not obvious at all decompositions above takes just <span class="math inline">O(n^2)</span> time and <span class="math inline">O(n)</span> space to obtain. So… how does the complexity argument play out?</p>
+<section id="the-cubic-bound" class="level3">
+<h3 class="anchored" data-anchor-id="the-cubic-bound">The cubic bound</h3>
+<p>First, its important to establish that computing the eigen-decomposition <span class="math inline">A = U \Lambda U^T</span> for general symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> is essentially bounded by <span class="math inline">\Theta(n^\omega)</span> time and <span class="math inline">\Theta(n^2)</span> space, where <span class="math inline">\omega \approx 2.37\dots</span> is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective <span class="math inline">\Omega(n^3)</span> time bound.</p>
+</section>
+<section id="solving-the-right-problem" class="level3">
+<h3 class="anchored" data-anchor-id="solving-the-right-problem">Solving the right problem</h3>
+<p>In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform <span class="math inline">v \mapsto Av</span> quickly—say, in <span class="math inline">\approx O(n)</span> time—then the Lanczos method can construct <span class="math inline">\Lambda(A)</span> in <em>just</em> <span style="color: red;"><span class="math inline">O(n^2)</span> time</span> and <span style="color: red;"><span class="math inline">O(n)</span> space</span>! Moreover, entire method is <em>matrix free</em> as the only input to the algorithm is a (fast) matrix-vector product <span class="math inline">v \mapsto Av</span>: one need not store <span class="math inline">A</span> explicitly to do this for many special types of linear operators.</p>
 <p>If you squint hard enough, you can deduce that since <span class="math inline">A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T</span>, every symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> expanded this way admits a <em>three-term recurrence</em>: <span class="math display">
 \begin{align*}
 A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} \\
@@ -418,6 +424,7 @@ A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} 
 <div id="thm-line" class="theorem">
 <p><span class="theorem-title"><strong>Theorem 1 (Parlett 1994, Simon 1984) </strong></span>Given a symmetric rank-<span class="math inline">r</span> matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> whose operator <span class="math inline">x \mapsto A x</span> requires <span class="math inline">O(\eta)</span> time and <span class="math inline">O(\nu)</span> space, the Lanczos iteration computes <span class="math inline">\Lambda(A) = \{ \lambda_1, \lambda_2, \dots, \lambda_r \}</span> in <span class="math inline">O(\max\{\eta, n\}\cdot r)</span> time and <span class="math inline">O(\max\{\nu, n\})</span> space, when computation is done in exact arithmetic</p>
 </div>
+</section>
 </section>
 <section id="but-wait-isnt-t-arbitrary" class="level2">
 <h2 class="anchored" data-anchor-id="but-wait-isnt-t-arbitrary">But wait, isn’t <span class="math inline">T</span> arbitrary?</h2>

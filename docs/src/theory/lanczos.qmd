@@ -2,9 +2,11 @@
 title: "The Lanczos method"
 editor: 
     rendor-on-save: true
+bibliography: /references.bib
 ---
 
-In 1950, Cornelius Lanczos proposed the *method of minimized iterations*---now known as the *Lanczos method*---enabling the world to **iteratively** expose the spectrum of a symmetric $A$ via *tridiagonalization*. Despite its age, the Lanczos iteration remains the standard[^1] algorithm both for computing eigensets and for solving linear systems in the large-scale regime. 
+In 1950, Cornelius Lanczos proposed the *method of minimized iterations*---now known as the *Lanczos method*---enabling the world to **iteratively** expose the spectra of symmetric operators $A \in \mathbb{S}_n$ via *tridiagonalization*. Despite its age, the Lanczos iteration remains the standard algorithm[^1] both for computing eigensets and for solving linear systems in the large-scale regime. 
+Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it's fair to say the Lanczos method is one of the most important numerical methods of all time. Indeed, _Krylov methods_ listed among the top 10 most influential algorithms of the 20th century in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
 
 <!-- In fact, a [an IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) elected Krylov Subspace Iteration Methods among the top 10 most influential algorithms of the 20th century---on essentially equal footing with other well known algorithms, such as e.g. the _Fast Fourier Transform_, the _Simplex algorithm_, and _QuickSort_. 
 
@@ -15,6 +17,7 @@ $$\mathcal{K}_j(A, v) \triangleq \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \
 <!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  --> 
 <!-- When Cornelius first published the method,  -->
 
+`primate` offers a matrix-free  
 In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now. 
 
 ## Lanczos on a bumper sticker
@@ -51,16 +54,18 @@ That's pretty fortunate, because the eigen-sets of $T_j$ can be obtained in just
 
 To quote the lucid [Lanczos introduction from Parlett](https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf), _could anything be more simple?_
 
-## Surpassing the cubic bound
-
-Computing the eigen-decomposition $A = U \Lambda U^T$ for general symmetric $A \in \mathbb{R}^{n \times n}$ is essentially bounded by $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx 2.37\dots$ is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective $\Omega(n^3)$ time bound. Not great!
-
-One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
-Moreover, entire method is *matrix free*     as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators. 
-
 ## Quadratic time and linear space? How?
 
 Unless you know the tricks, its not obvious at all decompositions above takes just $O(n^2)$ time and $O(n)$ space to obtain. So... how does the complexity argument play out?
+
+### The cubic bound 
+
+First, its important to establish that computing the eigen-decomposition $A = U \Lambda U^T$ for general symmetric $A \in \mathbb{R}^{n \times n}$ is essentially bounded by $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx 2.37\dots$ is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective $\Omega(n^3)$ time bound. 
+
+### Solving the right problem
+
+In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
+Moreover, entire method is *matrix free* as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators. 
 
 If you squint hard enough, you can deduce that since $A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T$, every symmetric $A \in \mathbb{R}^{n \times n}$ expanded this way admits a *three-term recurrence*: 
 $$ 

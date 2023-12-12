@@ -1,4 +1,4 @@
-option('use_openmp', type : 'boolean', value : false, description : 'Whether to compile with OpenMP support')
+option('use_openmp', type : 'boolean', value : true, description : 'Whether to compile with OpenMP support')
 # option('blas', type: 'string', value: 'auto',
 #         description: 'Option for BLAS library selection. By default, try to find any in the order given by `blas-order`')
 # option('lapack', type: 'string', value: 'auto',

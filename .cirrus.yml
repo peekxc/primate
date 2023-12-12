@@ -4,18 +4,17 @@ env:
 linux_task:
   container:
     image: quay.io/pypa/manylinux_2_28_x86_64
-  setup_python_script: |
-    export PATH=$PATH:/opt/python/cp310-cp310/bin/
-    alias python=/opt/python/cp310-cp310/bin/python
+  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
+  env:
+    CC: clang 
+    CXX: clang++
+    PATH: ${PATH}:/opt/python/cp310-cp310/bin
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
-  environment:
-    CC: clang 
-    CXX: clang++
   before_script: |
     python -m pip install --upgrade pip
-    python -m pip install pytest pytest-cov pytest-benchmark
+    python -m pip install build pytest pytest-cov pytest-benchmark
   dependencies_script: |
     bash tools/cibw_linux.sh
   build_script: |
@@ -25,7 +24,7 @@ linux_task:
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
-    python -m pip wheel . --no-deps --wheel-dir dist/ --verbose
+    python -m pip build
   install_script: |
     python -m pip install dist/primate*.whl
   test_post_script: |
@@ -35,10 +34,14 @@ linux_task:
 windows_task:
   windows_container:
     image: cirrusci/windowsservercore:2019
+  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   setup_python_script: |
     choco install -y python311
   dependencies_script: |
     bash tools/cibw_windows.sh
+  before_script: |
+    python -m pip install --upgrade pip
+    python -m pip install build pytest pytest-cov pytest-benchmark
   build_script: |
     python -m pip install . --verbose
   test_script: |
@@ -46,7 +49,7 @@ windows_task:
   uninstall_script: |
     python -m pip uninstall primate -y
   wheel_script: |
-    python -m pip wheel . --no-deps --wheel-dir dist/ --verbose
+    python -m build 
   install_script: |
     python -m pip install dist/primate*.whl
   test_post_script: |

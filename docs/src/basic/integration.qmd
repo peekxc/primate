@@ -11,5 +11,5 @@ More generally, the basic requirements for any operator `A` to be used with e.g.
 
 <!-- Note that in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, so existing matrix implementations like [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)'s and [sparray](https://docs.scipy.org/doc/scipy/reference/sparse.html#sparse-array-classes)'s natively support the interface. -->
 
-These semantics extend to the C++ side as well via _C++20 concepts_---see the [C++ integration guide](advanced/cpp_integration.qmd). If you're using pybind11 and you want to extend `primate`'s Python API to work natively with linear operator implemented in C++, see the [pybind11 integration guide](advanced/pybind11_integration.qmd). 
+These semantics extend to the C++ side as well via _C++20 concepts_---see the [C++ integration guide](../advanced/cpp_integration.qmd). If you're using pybind11 and you want to extend `primate`'s Python API to work natively with linear operator implemented in C++, see the [pybind11 integration guide](../advanced/pybind11_integration.qmd). 
 
