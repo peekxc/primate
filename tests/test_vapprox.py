@@ -60,9 +60,27 @@ def test_mf_api():
   A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
   M = matrix_function(A_sparse)
   v0 = np.random.normal(size=n)
-  assert np.max(np.abs(M.matvec(v0) - A_sparse @ v0)) <= 1e-6
-  assert True
+  assert np.max(np.abs(M.matvec(v0) - A_sparse @ v0)) <= 1e-6, "MF matvec doesn't match identity"
+  assert M.dtype == np.float32, "dtype mismatch"
 
-  # from scipy.sparse.linalg import LinearOperator
-  # assert isinstance(M, LinearOperator)
+  from scipy.sparse.linalg import eigsh
+  ew_true = eigsh(A_sparse)[0]
+  ew_test = eigsh(M)[0]
+  assert np.allclose(ew_true, ew_test, atol=1e-5), "eigenvalues mismatch / operator doesn't register as respecting LO interface"
 
+
+# class CustomOperator:
+#   def __init__(self, A):
+#     self.A = A
+#     self.dtype = A.dtype
+#     self.shape = A.shape
+#   # def _matvec(self, v):
+#   #   return self.A @ v
+#   def matvec(self, v):
+#     return self.A @ v
+#   # def _matmat(self, V):
+#   #   return self.A @ V
+#   def matmat(self, V):
+#     return self.A @ V
+
+# A_op = CustomOperator(A_sparse)
