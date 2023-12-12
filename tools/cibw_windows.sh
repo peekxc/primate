@@ -23,6 +23,7 @@ choco install rtools -y --no-progress --force --version=4.3.5550
 
 export PATH=$PATH:/c/msys64/usr/bin:/c/msys64/mingw64/bin
 export PATH=$PATH:/c:/rtools40/ucrt64/bin
+
 # set PATH=C:\rtools40\ucrt64\bin\;%PATH%
 # g++ --version
 

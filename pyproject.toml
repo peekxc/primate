@@ -50,6 +50,7 @@ environment = { CC="/usr/local/opt/llvm/bin/clang", CXX="/usr/local/opt/llvm/bin
 [tool.cibuildwheel.windows]
 before-build = "bash {project}/tools/cibw_windows.sh"
 environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="gcc", CXX="g++"}
+# environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang", CXX="clang++"}
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 # before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\\rtools40\\ucrt64\\bin\\;%PATH%"
 # repair-wheel-command = "bash ./tools/repair_windows.sh {wheel} {dest_dir}"
