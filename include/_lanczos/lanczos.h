@@ -314,10 +314,12 @@ struct MatrixFunction {
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
 
-  // Parameters 
-  const Matrix& op; 
-  std::function< F(F) > f; 
+  // TODO: store a const pointer to op and check nullptr condition in use
+  // Essentially should make this class a non-owning class rather than a copying
+  // see: https://stackoverflow.com/questions/35770357/storing-const-reference-to-an-object-in-class
+  const Matrix op; 
   const int deg;
+  std::function< F(F) > f; 
   F rtol; 
   int orth;
 
@@ -331,6 +333,9 @@ struct MatrixFunction {
     weights = static_cast< ArrayF >(ArrayF::Zero(deg));
     solver = EigenSolver(deg);
   };
+
+  // Don't allow construction from temporaries
+  MatrixFunction(Matrix&& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) = delete;
  
   // Approximates v |-> f(A)v via a limited degree Lanczos iteration
   void matvec(const F* v, F* y) const noexcept {
@@ -351,7 +356,11 @@ struct MatrixFunction {
 
     // Apply the spectral function (in-place) to Rayleigh-Ritz values (nodes)
     auto theta = static_cast< ArrayF >(solver.eigenvalues());
-    theta.unaryExpr(f); 
+    // theta.unaryExpr(f); // this doesn't always work for some reason
+    for (int c = 0; c < theta.size(); ++c){
+      // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
+      theta[c] = f(theta[c]);
+    }
     
     // The approximation v |-> f(A)v 
     const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here 

@@ -38,7 +38,21 @@ def test_mf_approx():
   deg, rtol, orth = 6, 0.0, 0
   M = _lanczos.MatrixFunction_sparse(A_sparse, deg, rtol, orth, **dict(function="identity"))
   
-  M.shape
-  v0 = np.random.normal(size=M)
-  M.matvec(v0)
+  ## Basic checks 
+  assert M.shape == (10, 10)
+  v0 = np.random.normal(size=M.shape[0])
+  y_test = M.matvec(v0)
+  assert isinstance(y_test, np.ndarray)
+  assert np.max(np.abs(y_test - A_sparse @ v0)) < 1e-5
+
+  ## Check matrix functions
+  ew, ev = np.linalg.eigh(A_sparse.todense()) 
+  M = _lanczos.MatrixFunction_sparse(A_sparse, deg, rtol, orth, **dict(function="log"))
+  y_log_test = M.matvec(v0)
+  y_log_true = (ev @ np.diag(np.log(ew)) @ ev.T) @ v0
+  assert np.max(np.abs(M.matvec(v0) - y_log_true)) <= 0.05
+  assert np.all(y_log_test != y_test)
+
+def test_mf_api():
+  assert True
 

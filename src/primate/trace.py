@@ -5,8 +5,6 @@ from scipy.sparse.linalg import LinearOperator
 
 ## Package imports
 from .random import _engine_prefixes, _engines
-
-assert 'MatrixFunction' not in vars() and 'MatrixFunction' not in globals()
 import _lanczos
 
 ## Natively support matrix functions

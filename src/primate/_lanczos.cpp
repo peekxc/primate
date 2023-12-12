@@ -165,13 +165,10 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
     .def(py::init([wrap](const Matrix* A, const int deg, const F rtol, const int orth, const py::kwargs& kwargs) {
       const auto op = wrap(A);
       const auto sf = param_spectral_func< F >(kwargs);
-      std::cout << op.shape().first << ", " << op.shape().second << std::endl;
+      // std::cout << op.shape().first << ", " << op.shape().second << std::endl;
       return std::unique_ptr< MatrixFunction< F, WrapperType > >(new MatrixFunction(op, sf, deg, rtol, orth));
     }))
-    .def("shape", [](const MatrixFunction< F, WrapperType >& m){
-      std::cout << m.shape().first << ", " << m.shape().second << std::endl;
-    })
-    // .def_property_readonly("shape", &MatrixFunction< F, WrapperType >::shape)
+    .def_property_readonly("shape", &MatrixFunction< F, WrapperType >::shape)
     .def_readonly("deg", &MatrixFunction< F, WrapperType >::deg)
     .def_readwrite("rtol", &MatrixFunction< F, WrapperType >::rtol)
     .def_readwrite("orth", &MatrixFunction< F, WrapperType >::orth)
@@ -180,6 +177,10 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
       auto output = static_cast< ArrayF >(VectorF::Zero(m.shape().first));
       m.matvec(x.data(), output.data());
       return py::cast(output);
+    })
+    .def("matvec", [](const MatrixFunction< F, WrapperType >& m, const py_array< F >& x, py_array< F >& y) -> py_array< F >{
+      using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+      m.matvec(x.data(), y.mutable_data());
     })
     // .def_method("__repr__", &MatrixFunction::eval)
     ;  
