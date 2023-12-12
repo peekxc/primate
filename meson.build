@@ -12,14 +12,14 @@ project(
     'pkgconfig.relocatable=true'
   ]
 )
+OS_platform = host_machine.system()
+env = environment()
+
 use_openmp = get_option('use_openmp')
-if use_openmp
+if use_openmp and OS_platform != 'windows'
   add_global_arguments('-DOMP_MULTITHREADED=1', language : 'cpp')
   message('Compiling with OpenMP support')
 endif
-
-OS_platform = host_machine.system()
-env = environment()
 
 ## Import python kernel 
 py_mod = import('python')

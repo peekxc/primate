@@ -35,6 +35,8 @@ windows_task:
   windows_container:
     image: cirrusci/windowsservercore:2019
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
+  env: 
+    PATH: ${PATH}:c:\python311
   setup_python_script: |
     choco install -y python311
   dependencies_script: |

@@ -2,23 +2,15 @@
 title: "The Lanczos method"
 editor: 
     rendor-on-save: true
-bibliography: /references.bib
+bibliography: ../references.bib
 ---
 
-In 1950, Cornelius Lanczos proposed the *method of minimized iterations*---now known as the *Lanczos method*---enabling the world to **iteratively** expose the spectra of symmetric operators $A \in \mathbb{S}_n$ via *tridiagonalization*. Despite its age, the Lanczos iteration remains the standard algorithm[^1] both for computing eigensets and for solving linear systems in the large-scale regime. 
-Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it's fair to say the Lanczos method is one of the most important numerical methods of all time. Indeed, _Krylov methods_ listed among the top 10 most influential algorithms of the 20th century in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
+In 1950, Cornelius Lanczos invented the *method of minimized iterations*---now known as the *Lanczos method*---enabling the **iterative** exposure of the spectra of symmetric $A \in \mathcal{S}^n$ via *tridiagonalization*:
+$$  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T $$
+Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and for solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, _Krylov methods_ listed among the **top 10 most influential algorithms of the 20th century** in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
 
-<!-- In fact, a [an IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) elected Krylov Subspace Iteration Methods among the top 10 most influential algorithms of the 20th century---on essentially equal footing with other well known algorithms, such as e.g. the _Fast Fourier Transform_, the _Simplex algorithm_, and _QuickSort_. 
-
-The Lanczos iteration is the de-facto standard approach to generating a _Krylov subspaces_. Given a symmetric $A \in \mathbb{R}^{n \times n}$ and a non-zero vector $v\in \mathbb{R}^n$, the order-$j$ of the pair $(A,v)$ is given as:
-
-$$\mathcal{K}_j(A, v) \triangleq \mathrm{span}\{ v, Av, A^2 v, \dots, A^{j-1}v \} $$ -->
-
-<!-- Unfortunately, a naive implementation of the Lanczos method can be practically useless for computing eigenvalues accurately:  --> 
-<!-- When Cornelius first published the method,  -->
-
-`primate` offers a matrix-free  
-In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now. 
+`primate` implements Paige's[@paige] A1 variant of the _Lanczos method_, which is at the heart of most of the packages functionality. In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. 
+<!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  -->
 
 ## Lanczos on a bumper sticker
 
