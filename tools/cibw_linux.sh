@@ -13,10 +13,10 @@ if [ -n "$(command -v yum)" ]; then
   # alias python=python3.9
 elif [ -n "$(command -v apt-get)" ]; then 
   cat /etc/*-release
-  apt-get update -y
-  apt-get install -y clang libomp-dev
-  apt-get install -y libopenblas-dev
-  apt-get install -y python3-dev
+  sudo apt-get update -y
+  sudo apt-get install -y clang libomp-dev
+  sudo apt-get install -y libopenblas-dev
+  sudo apt-get install -y python3-dev
 elif [ -n "$(command -v apk)" ]; then 
   cat /etc/*-release
   apk update
