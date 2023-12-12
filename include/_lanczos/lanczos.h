@@ -1,19 +1,11 @@
 #include <concepts> 
 #include <functional> // function
 #include <algorithm>  // max
+#include "omp_support.h" // conditionally enables openmp pragmas
 #include "_linear_operator/linear_operator.h" // LinearOperator
 #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
-
-#ifdef _OPENMP
-   #include <omp.h>   // omp_set_num_threads, omp_get_thread_num
-#else
-   #define omp_get_thread_num() 0
-	 #define omp_set_num_threads() 0
-   #define omp_get_max_threads() 1 
-#endif
-
-#include <Eigen/Core> 
+#include "eigen_core.h"
 #include <Eigen/Eigenvalues> 
 
 #include <iostream>

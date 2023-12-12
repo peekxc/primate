@@ -1,16 +1,17 @@
-option('blas', type: 'string', value: 'auto',
-        description: 'Option for BLAS library selection. By default, try to find any in the order given by `blas-order`')
-option('lapack', type: 'string', value: 'auto',
-        description: 'Option for LAPACK library selection. By default, try to find any in the order given by `lapack-order`')
-option('allow-noblas', type: 'boolean', value: false,
-        description: 'If set to true, allow building with (slow!) internal fallback routines')
-option('blas-order', type: 'array',
-        value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'blis', 'blas'])
-option('lapack-order', type: 'array',
-        value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'lapack'])
-option('blas-symbol-suffix', type: 'string', value: 'auto',
-        description: 'BLAS and LAPACK symbol suffix to use, if any')
-option('use-ilp64', type: 'boolean', value: false,
-       description: 'Use ILP64 (64-bit integer) BLAS and LAPACK interfaces')
+option('use_openmp', type : 'boolean', value : false, description : 'Whether to compile with OpenMP support')
+# option('blas', type: 'string', value: 'auto',
+#         description: 'Option for BLAS library selection. By default, try to find any in the order given by `blas-order`')
+# option('lapack', type: 'string', value: 'auto',
+#         description: 'Option for LAPACK library selection. By default, try to find any in the order given by `lapack-order`')
+# option('allow-noblas', type: 'boolean', value: false,
+#         description: 'If set to true, allow building with (slow!) internal fallback routines')
+# option('blas-order', type: 'array',
+#         value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'blis', 'blas'])
+# option('lapack-order', type: 'array',
+#         value: ['accelerate', 'openblas', 'mkl', 'flexiblas', 'lapack'])
+# option('blas-symbol-suffix', type: 'string', value: 'auto',
+#         description: 'BLAS and LAPACK symbol suffix to use, if any')
+# option('use-ilp64', type: 'boolean', value: false,
+#        description: 'Use ILP64 (64-bit integer) BLAS and LAPACK interfaces')
 # option('use_nanobind', type: 'boolean', value: false, 
         # description: 'whether to create the bindings with nanobind')

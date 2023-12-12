@@ -6,12 +6,18 @@ project(
   default_options : [
     'buildtype=debugoptimized', 
     'cpp_std=c++20', 
-    'warning_level=2', 
+    'warning_level=2',
     # 'blas=openblas',
     # 'lapack=openblas', 
     'pkgconfig.relocatable=true'
   ]
 )
+use_openmp = get_option('use_openmp')
+if use_openmp
+  add_global_arguments('-DOMP_MULTITHREADED=1', language : 'cpp')
+  message('Compiling with OpenMP support')
+endif
+
 OS_platform = host_machine.system()
 env = environment()
 
@@ -79,7 +85,7 @@ dependency_map = {}
 # subdir('blas') # Configure BLAS / LAPACK 
 
 ## Include OpenMP (mandatory ; but exclude on windows because it's too difficult to link) 
-if OS_platform != 'windows'
+if get_option('use_openmp') and OS_platform != 'windows'
   omp = dependency('openmp', required: false)
   openmp_flags = []
   if omp.found()
