@@ -12,7 +12,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   LDFLAGS: "-Wl,-S"
+      CC: clang-cl
+      CXX: clang-cl
+      LDFLAGS: "-Wl,-S"
     strategy:
       fail-fast: false
       matrix:

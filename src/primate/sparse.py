@@ -27,7 +27,22 @@ def matrix_function(
         Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
     
   """
-  pass
+  if isinstance(A, np.ndarray):
+    module_func = "MatrixFunction_dense"
+  elif issparray(A): 
+    module_func = "MatrixFunction_sparse"
+  elif isinstance(A, LinearOperator):
+    module_func = "MatrixFunction_linop"
+  else:
+    raise ValueError(f"Invalid type '{type(A)}' supplied for operator A")
+  
+  #_lanczos.MatrixFunction_sparse(A_sparse, deg, rtol, orth, **dict(function="log"))
+  #_lanczos.MatrixFunction_sparse(A_sparse, deg, rtol, orth, **dict(function="log"))
+  ## Construct the instance
+  M = getattr(_lanczos, module_func)(A, deg, orth, **dict(function=fun))
+  return M
+
+
 
 # class MatrixFunction(LinearOperator):
 #   """Approximates the action v |-> f(A)v """
