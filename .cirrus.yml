@@ -2,7 +2,8 @@ env:
   CIRRUS_CLONE_SUBMODULES: true
 
 macos_task:
-  image: ghcr.io/cirruslabs/macos-ventura-base:latest
+  container:
+    image: ghcr.io/cirruslabs/macos-ventura-base:latest
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
     CC: clang 
