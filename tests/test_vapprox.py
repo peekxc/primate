@@ -54,5 +54,15 @@ def test_mf_approx():
   assert np.all(y_log_test != y_test)
 
 def test_mf_api():
+  from primate.sparse import matrix_function
+  np.random.seed(1234)
+  n = 10
+  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  M = matrix_function(A_sparse)
+  v0 = np.random.normal(size=n)
+  assert np.max(np.abs(M.matvec(v0) - A_sparse @ v0)) <= 1e-6
   assert True
+
+  # from scipy.sparse.linalg import LinearOperator
+  # assert isinstance(M, LinearOperator)
 

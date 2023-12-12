@@ -64,10 +64,10 @@ windows_task:
   windows_container:
     image: cirrusci/windowsservercore:2019
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
-  env: 
-    PATH: ${PATH}:"C:\python311"
-  setup_python_script: |
+  setup_script: |
     choco install -y python311
+  env: 
+    PATH: '%PATH%;C:\ProgramData\chocolatey\bin;C:\Python311'
   dependencies_script: |
     bash tools/cibw_windows.sh
   before_script: |

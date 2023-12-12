@@ -5,10 +5,8 @@ from scipy.sparse.linalg import LinearOperator
 
 ## Package imports
 from .random import _engine_prefixes, _engines
+from .special import _builtin_matrix_functions
 import _lanczos
-
-## Natively support matrix functions
-_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
 
 def sl_trace (
   A: Union[LinearOperator, np.ndarray],

@@ -169,17 +169,24 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
       return std::unique_ptr< MatrixFunction< F, WrapperType > >(new MatrixFunction(op, sf, deg, rtol, orth));
     }))
     .def_property_readonly("shape", &MatrixFunction< F, WrapperType >::shape)
+    .def_property_readonly("dtype", [](const MatrixFunction< F, WrapperType >& M) -> py::dtype {
+      auto dtype = pybind11::dtype(pybind11::format_descriptor< F >::format());
+      return dtype; 
+    })
     .def_readonly("deg", &MatrixFunction< F, WrapperType >::deg)
     .def_readwrite("rtol", &MatrixFunction< F, WrapperType >::rtol)
     .def_readwrite("orth", &MatrixFunction< F, WrapperType >::orth)
-    .def("matvec", [](const MatrixFunction< F, WrapperType >& m, const py_array< F >& x) -> py_array< F >{
+    .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x) -> py_array< F >{
       using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-      auto output = static_cast< ArrayF >(VectorF::Zero(m.shape().first));
-      m.matvec(x.data(), output.data());
+      auto output = static_cast< ArrayF >(VectorF::Zero(M.shape().first));
+      M.matvec(x.data(), output.data());
       return py::cast(output);
     })
-    .def("matvec", [](const MatrixFunction< F, WrapperType >& m, const py_array< F >& x, py_array< F >& y) -> void {
-      m.matvec(x.data(), y.mutable_data());
+    .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x, py_array< F >& y) -> void {
+      if (M.shape().second != x.size() || M.shape().first != y.size()){
+        throw std::invalid_argument("Input/output dimension mismatch; vector inputs must match shape of the operator.");
+      }
+      M.matvec(x.data(), y.mutable_data());
     })
     // .def_method("__repr__", &MatrixFunction::eval)
     ;  
