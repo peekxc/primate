@@ -7,7 +7,7 @@ from . import trace
 from . import stats
 from .random import rademacher, normal
 from . import diagonalize
-
+from .operator import matrix_function
 
 # __all__ = ['rademacher', 'normal']
 

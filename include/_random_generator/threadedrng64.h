@@ -1,6 +1,5 @@
-#ifndef _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
-#define _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
-
+#ifndef _RANDOM_GENERATOR_THREADEDRNG64_H_
+#define _RANDOM_GENERATOR_THREADEDRNG64_H_
 
 #include <stdint.h>  // uint64_t
 #include <cassert>  // assert
@@ -23,9 +22,9 @@ enum RbEngine { sx = 0, xs = 1, pcg = 2, lcg = 3, mt = 4 };
 struct ThreadedRNG64 {
 	static constexpr size_t num_bits = 64;
 	int num_threads;
-	const RbEngine engine_id = sx; 
+	const RbEngine engine_id; 
 	std::vector< Random64EngineConcept* > generators;
-	ThreadedRNG64(int engine = 2) : engine_id(static_cast< RbEngine >(engine)) {
+	ThreadedRNG64(int engine = 0) : engine_id(static_cast< RbEngine >(engine)) {
 		// std::uniform_random_bit_generator RBG = std::random_device;
 		int num_threads_ = 1;
 		initialize(num_threads_);
@@ -35,7 +34,7 @@ struct ThreadedRNG64 {
 	};
 	~ThreadedRNG64(){
 		for (int i = 0; i < num_threads; ++i){
-			// delete generators[i]; // todo: see if this is causing heap corruption
+			delete generators[i]; // todo: see if this is causing heap corruption
 		}
 	}
 	auto next(int thread_id) -> std::uint64_t {
@@ -56,11 +55,20 @@ struct ThreadedRNG64 {
 					generators[i] = new Random64Engine< SplitMix64 >();
 					break; 
 				case xs: 
+				static_assert(std::uniform_random_bit_generator< Random64Engine< Xoshiro256StarStar > >, "Wrapper RNG engine constraints not met");
 					generators[i] = new Random64Engine< Xoshiro256StarStar >();
 					break; 
-				case pcg: 
-					generators[i] = new Random64Engine< pcg64 >();
+				case pcg: {
+					static_assert(std::uniform_random_bit_generator< Random64Engine< Pcg64 > >, "Wrapper RNG engine constraints not met");
+					auto rne = new Random64Engine< Pcg64 >();
+					// if (seed < 0){
+					// 	rne->rng.seed(pcg_extras::seed_seq_from< std::random_device >());	
+					// } else {
+					// 	rne->rng.seed(seed);	
+					// }
+					generators[i] = rne;
 					break; 
+				}
 				case lcg:
 					generators[i] = new Random64Engine< knuth_lcg >();
 					break; 
@@ -75,7 +83,7 @@ struct ThreadedRNG64 {
 		auto rdev = std::random_device();
 		auto mt = std::mt19937(seed);
 		std::function< std::uint_fast32_t() > rd;
-		if (seed == -1){
+		if (seed < 0){
 			rd = [&rdev](){ return rdev(); };
 		} else {
 			rd = [&mt](){ return mt(); };
@@ -85,10 +93,17 @@ struct ThreadedRNG64 {
 		for (int i = 0; i < num_threads; ++i) {
 			const auto ssize = generators[i]->state_size(); 
 			// if (ssize > 0){
-			std::vector< uint32_t > seed_data(ssize, 0);
-			std::generate_n(seed_data.begin(), ssize, rd); // generate evenly-distributed 32-bit seeds
-			std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
-			generators[i]->seed(seed_gen);
+			// if (engine_id != pcg){
+			// 	const auto seed_source = pcg_extras::seed_seq_from< std::random_device >();
+			// 	generators[i]->rng.seed(seed_source);
+			// } else {
+				std::vector< uint32_t > seed_data(ssize, 0);
+				std::generate_n(seed_data.begin(), ssize, rd); // generate evenly-distributed 32-bit seeds
+				std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
+				generators[i]->seed(seed_gen);
+			// }
+			// }
+			
 			// } else {
 			// 	uint64_t seed = (uint64_t(rd()) << 32) | rd();
 			// 	generators[i]->seed(seed);
@@ -98,4 +113,4 @@ struct ThreadedRNG64 {
 };
 
 
-#endif  // _RANDOM_GENERATOR_RANDOM_NUMBER_GENERATOR_H_
+#endif  // _RANDOM_GENERATOR_THREADEDRNG64_H_

@@ -1,42 +1,44 @@
 # sl_trace { #primate.trace.sl_trace }
 
-`trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)`
+`trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='lcg', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)`
 
-Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). 
+Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ).
 
 ## Parameters
 
-| Name          | Type                                      | Description                                                                                                 | Default         |
-|---------------|-------------------------------------------|-------------------------------------------------------------------------------------------------------------|-----------------|
-| `A`           | ndarray, sparse matrix, or LinearOperator | real, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.                  | _required_      |
-| `fun`         | str or Callable                           | real-valued function defined on the spectrum of A.                                                          | `"identity"`    |
-| `maxiter`     | int                                       | Maximum number of random vectors to sample for the trace estimate.                                          | `= 10`          |
-| `deg`         | int                                       | Degree of the quadrature approximation.                                                                     | `20`            |
-| `atol`        | float                                     | Absolute tolerance to signal convergence for early-stopping. See details.                                   | `= None`        |
-| `rtol`        | float                                     | Relative tolerance to signal convergence for early-stopping. See details.                                   | `= 1e-2`        |
-| `orth`        | int                                       | Additional number of Lanczos vectors to orthogonalize against when building the Krylov basis.               | `0`             |
-| `confidence`  | float                                     | Confidence level to use with rule                                                                           | `= 0.95`        |
-| `pdf`         | 'rademacher', 'normal'                    | Choice of zero-centered distribution to sample random vectors from.                                         | ` 'rademacher'` |
-| `rng`         | str                                       | Random number generator to use. Defaults to PCG64 generator.                                                | `= "pcg"`       |
-| `seed`        | int                                       | Seed to initialize the entropy source. Use non-negative integers for reproducibility.                       | `= -1`          |
-| `num_threads` | int                                       | Number of threads to use to parallelize the computation. Use values <= 0 to maximize the number of threads. | `0`             |
-| `plot`        | bool                                      | If true, plots the samples of the trace estimate along with their convergence characteristics.              | `= False`       |
-| `kwargs`      | (dict, optional)                          | additional key-values to parameterize the chosen function 'fun'.                                            | `{}`            |
+| Name          | Type                                | Description                                                                                                 | Default          |
+|---------------|-------------------------------------|-------------------------------------------------------------------------------------------------------------|------------------|
+| `A`           | ndarray, sparray, or LinearOperator | real symmetric operator.                                                                                    | _required_       |
+| `fun`         | str or typing.Callable              | real-valued function defined on the spectrum of `A`.                                                        | `= "identity"`   |
+| `maxiter`     | int                                 | Maximum number of random vectors to sample for the trace estimate.                                          | `= 10`           |
+| `deg`         | int                                 | Degree of the quadrature approximation.                                                                     | `20`             |
+| `atol`        | float                               | Absolute tolerance to signal convergence for early-stopping. See details.                                   | `= None`         |
+| `rtol`        | float                               | Relative tolerance to signal convergence for early-stopping. See details.                                   | `= 1e-2`         |
+| `stop`        | str                                 | Early-stopping criteria to test estimator convergence. See details.                                         | `= "confidence"` |
+| `orth`        | int                                 | Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.               | `0`              |
+| `confidence`  | float                               | Confidence level to Only used when `stop` = "confidence".                                                   | `= 0.95`         |
+| `pdf`         | 'rademacher', 'normal'              | Choice of zero-centered distribution to sample random vectors from.                                         | ` 'rademacher'`  |
+| `rng`         | str                                 | Random number generator to use. Defaults to PCG64 generator.                                                | `= "pcg"`        |
+| `seed`        | int                                 | Seed to initialize the entropy source. Use non-negative integers for reproducibility.                       | `= -1`           |
+| `num_threads` | int                                 | Number of threads to use to parallelize the computation. Use values <= 0 to maximize the number of threads. | `0`              |
+| `plot`        | bool                                | If true, plots the samples of the trace estimate along with their convergence characteristics.              | `= False`        |
+| `info`        | bool                                | If True, returns a dictionary containing all relevant information about the computation.                    | `False`          |
+| `kwargs`      | dict                                | additional key-values to parameterize the chosen function 'fun'.                                            | `{}`             |
 
 ## Returns
 
-| Type             | Description                                                            |
-|------------------|------------------------------------------------------------------------|
-| float            | Estimate of the trace of the matrix function $f(A)$.                   |
-| (dict, optional) | If 'return_info = True', additional information about the computation. |
+| Type             | Description                                                     |
+|------------------|-----------------------------------------------------------------|
+| float            | Estimate of the trace of the matrix function $f(A)$.            |
+| (dict, optional) | If 'info = True', additional information about the computation. |
 
 ## See Also
 
-lanczos : the lanczos algorithm. 
+lanczos : the lanczos algorithm.
 
 
 
 ## Reference
 
-  .. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. 
+  [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.
   SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.

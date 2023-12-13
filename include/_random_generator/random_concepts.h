@@ -45,6 +45,7 @@ struct Random64Engine : public Random64EngineConcept {
     if constexpr (Stateful64Engine< T >){ return std::max(T::state_size, size_t(1)); } 
     return 1; 
   }
+  // T* get_rng(){ return &rng; } 
 };
 
 #endif

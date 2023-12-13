@@ -4,5 +4,5 @@
 
 Gaussian quadrature.
 
-Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. 
+Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A.
 These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).

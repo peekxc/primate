@@ -178,7 +178,7 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
     .def_readwrite("orth", &MatrixFunction< F, WrapperType >::orth)
     .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x) -> py_array< F >{
       using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-      if (M.shape().second != x.size()){
+      if (size_t(M.shape().second) != size_t(x.size())){
         throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator.");
       }
       auto output = static_cast< ArrayF >(VectorF::Zero(M.shape().first));
@@ -186,7 +186,7 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
       return py::cast(output);
     })
     .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x, py_array< F >& y) -> void {
-      if (M.shape().second != x.size() || M.shape().first != y.size()){
+      if (size_t(M.shape().second) != size_t(x.size()) || size_t(M.shape().first) != size_t(y.size())){
         throw std::invalid_argument("Input/output dimension mismatch; vector inputs must match shape of the operator.");
       }
       M.matvec(x.data(), y.mutable_data());

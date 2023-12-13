@@ -70,12 +70,13 @@ website:
               text: Lanczos
             section: Diagonalize 
           - contents: 
+            - href: reference/primate.trace.qmd  
+          - contents: 
             - href: reference/primate.trace.sl_trace.qmd
               text: SL Trace
             - href: reference/primate.trace.sl_gauss.qmd
               text: SL Gauss 
             section: Trace 
-            href: reference/trace.qmd
           - contents:
             - href: reference/random.rademacher.qmd
               text: Rademacher

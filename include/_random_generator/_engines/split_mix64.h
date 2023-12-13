@@ -7,21 +7,8 @@
 #include <random> // std::seed_seq
 #include <array> // array 
 
-/// \class SplitMix64
-///
-/// \brief   Pseudo-random integer generator. This class generates 64-bit
-///          integer using SplitMix64 algorithm.
-///
-/// \details The SplitMix64 algorithm is very fast but does not pass all
-///          statistical tests. This class is primarily used to initialize the
-///          states of the \c Xoshiro256StarStar class.
-///
-///          The SplitMix64 algorithm is develped by Sebastiano Vigna (2015)
-///          and the source code is available at:
-///          https://prng.di.unimi.it/splitmix64.c
-///
-/// \sa      Xoshiro256StarStar
 
+// From: https://prng.di.unimi.it/splitmix64.c
 struct SplitMix64 {
     // static constexpr typename result_type = uint64_t; 
     using result_type = uint64_t;

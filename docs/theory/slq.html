@@ -132,7 +132,7 @@ MathJax = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/slq.html">SLQ</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/lanczos.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/slq.html">SLQ</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -173,12 +173,6 @@ MathJax = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/usage.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Basic usage</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
@@ -194,12 +188,6 @@ MathJax = {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction</span></a>
-  </div>
-</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
@@ -328,7 +316,7 @@ MathJax = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/slq.html">SLQ</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/lanczos.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/slq.html">SLQ</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">SLQ Trace guide</h1>
 </div>
@@ -348,7 +336,7 @@ MathJax = {
 
 
 <p>To clarify that that means, here’s an abstract presentation of the generic SLQ procedure:</p>
-<div id="alg-slq" class="pseudocode-container" data-indent-size="1.1em" data-no-end="true" data-alg-title="Algorithm" data-line-number-punc=":" data-line-number="true" data-pseudocode-index="1" data-comment-delimiter="//">
+<div id="alg-slq" class="pseudocode-container" data-indent-size="1.1em" data-line-number="true" data-pseudocode-index="1" data-alg-title="Algorithm" data-no-end="true" data-comment-delimiter="//" data-line-number-punc=":">
 <div class="pseudocode">
 \begin{algorithm} \caption{Stochastic Lanczos Quadrature} \begin{algorithmic} \Input Symmetric operator ($A \in \mathbb{R}^{n \times n}$) \Require Number of queries ($n_v$), Degree of quadrature ($k$) \Function{SLQ}{$A$, $n_v$, $k$} \State $\Gamma \gets 0$ \For{$j = 1, 2, \dots, n_v$} \State $v_i \sim \mathcal{D}$ where $\mathcal{D}$ satisfies $\mathbb{E}(v v^\top) = I$ \State $T^{(j)}(\alpha, \beta)$ $\gets$ $\mathrm{Lanczos}(A,v_j,k+1)$ \State $[\Theta, Y] \gets \mathrm{eigh\_tridiag}(T^{(j)}(\alpha, \beta))$ \State $\tau_i \gets \langle e_1, y_i \rangle$ \State &lt; Do something with the node/weight pairs $(\theta_i, \tau_i^2)$ &gt; \EndFor \EndFunction \end{algorithmic} \end{algorithm}
 </div>

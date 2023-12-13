@@ -1,34 +1,34 @@
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
-macos_task:
-  container:
-    image: ghcr.io/cirruslabs/macos-ventura-base:latest
-  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
-  env:
-    CC: clang 
-    CXX: clang++
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION
-  before_script: |
-    python -m pip install --upgrade pip
-    python -m pip install build pytest pytest-cov pytest-benchmark
-  dependencies_script: |
-    bash tools/cibw_macos.sh
-  build_script: |
-    python -m pip install . --verbose
-  test_script: |
-    python -m pytest tests/ --cov=primate --benchmark-skip
-  uninstall_script: |
-    python -m pip uninstall primate --yes
-  wheel_script: |
-    python -m build
-  install_script: |
-    python -m pip install dist/primate*.whl
-  test_post_script: |
-    python -m pytest tests/ --cov=primate --benchmark-skip
-    coverage report -m
+# macos_task:
+#   container:
+#     image: ghcr.io/cirruslabs/macos-ventura-base:latest
+#   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
+#   env:
+#     CC: clang 
+#     CXX: clang++
+#   pip_cache:
+#     folder: ~/.cache/pip
+#     fingerprint_script: echo $PYTHON_VERSION
+#   before_script: |
+#     python -m pip install --upgrade pip
+#     python -m pip install build pytest pytest-cov pytest-benchmark
+#   dependencies_script: |
+#     bash tools/cibw_macos.sh
+#   build_script: |
+#     python -m pip install . --verbose
+#   test_script: |
+#     python -m pytest tests/ --cov=primate --benchmark-skip
+#   uninstall_script: |
+#     python -m pip uninstall primate --yes
+#   wheel_script: |
+#     python -m build
+#   install_script: |
+#     python -m pip install dist/primate*.whl
+#   test_post_script: |
+#     python -m pytest tests/ --cov=primate --benchmark-skip
+#     coverage report -m
 
 linux_task:
   container:
@@ -67,7 +67,7 @@ windows_task:
   setup_python_script: |
     choco install -y python311
   setup_clang_script: |
-    choco install -y llvm --params "clang;compiler=clang" --version 17.0.0
+    choco install -y llvm 
     clang --version
   env: 
     PATH: '%PATH%;C:\ProgramData\chocolatey\bin;C:\Python311;C:\Program Files\LLVM\bin;'

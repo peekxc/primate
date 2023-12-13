@@ -13,7 +13,7 @@ Lanczos method of minimized iterations.
 | `deg`          | int                                           | Size of the Krylov subspace to expand.                                                  | `= None`   |
 | `rtol`         | float                                         | Relative tolerance to consider the invariant subspace as converged.                     | `1e-08`    |
 | `orth`         | int                                           | maximum number of Lanczos vectors to orthogonalize vectors against.                     | `0`        |
-| `sparse_mat`   | bool                                          | Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output. | `= False ` |
+| `sparse_mat`   | bool                                          | Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output. | `= False`  |
 | `return_basis` | bool                                          | Whether to return the last 'ncv' orthogonal basis / 'Lanczos' vectors.                  | `= False`  |
 
 ## Description

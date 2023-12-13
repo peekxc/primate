@@ -28,14 +28,14 @@
 // Instantiates the function templates for generic generators
 template< std::floating_point F >
 void _random(py_module& m){
-  m.def("rademacher", [](py_array< F >& out, const int rng = 2, const int seed = -1){
+  m.def("rademacher", [](py_array< F >& out, const int rng = 0, const int seed = -1){
     auto rbg = ThreadedRNG64(1, rng, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());
     F arr_norm = 0.0; 
     generate_rademacher(array_sz, rbg, 0, data, arr_norm);
   });
-  m.def("normal", [](py_array< F >& out, const int rng = 2, const int seed = -1){
+  m.def("normal", [](py_array< F >& out, const int rng = 0, const int seed = -1){
     auto rbg = ThreadedRNG64(1, rng, seed);
     auto* data = out.mutable_data();
     auto array_sz = static_cast< size_t >(out.size());

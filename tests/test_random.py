@@ -36,6 +36,11 @@ def test_normal():
     np.sum(random.normal(1500, rng=rng))
     assert abs(cum_counts[-1]) <= 1.0, f"Normal random number generator biased more than 1% (for engine {engine})"
 
+def test_isotropic():
+  I = random.isotropic((10, 5), method="sphere")
+  assert np.allclose(np.linalg.norm(I, axis=0), np.sqrt(10))
+
+
 # 2.69
 # import timeit
 # timeit.timeit(lambda: random.rademacher(5000), number=10000)

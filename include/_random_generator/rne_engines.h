@@ -2,7 +2,8 @@
 #define _RANDOM_GENERATOR_RNE_ENGINES_H
 
 #include <random>  // mt
-#include "_engines/pcg_random.h" // pcg64 -- this adds a non-trivial amount to compile time
+// #include "_engines/pcg_random.h" // pcg64 -- this adds a non-trivial amount to compile time
+#include "_engines/pcg64.h"
 #include "_engines/split_mix64.h"  // SplitMix64
 #include "_engines/xoshiro_256_star_star.h" // Xoshiro256
 
