@@ -33,15 +33,15 @@ website:
             href: basic/install.qmd
           - text: Integration
             href: basic/integration.qmd
-          - text: Basic usage 
-            href: basic/usage.qmd
+          # - text: Basic usage 
+          #   href: basic/usage.qmd
           - text: Comparison to *imate*
             href: imate_compare.qmd
       # - text: Advanced
       - section: Theory
         contents:
-          - text: Introduction 
-            href: theory/intro.qmd
+          # - text: Introduction 
+          #   href: theory/intro.qmd
           - text: Lanczos 
             href: theory/lanczos.qmd
           - text: SLQ

@@ -131,7 +131,7 @@
     "href": "imate_compare.html",
     "title": "Comparison to imate",
     "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, genericity, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guide.",
+    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guide.",
     "crumbs": [
       "Basics",
       "Comparison to *imate*"
@@ -423,7 +423,7 @@
     "href": "theory/lanczos.html",
     "title": "The Lanczos method",
     "section": "",
-    "text": "In 1950, Cornelius Lanczos invented the method of minimized iterations—now known as the Lanczos method—enabling the iterative exposure of the spectra of symmetric A \\in \\mathcal{S}^n via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  Despite its age, the Lanczos method remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, it is listed among the top 10 most influential algorithms of the 20th century in an IEEE guest editorial.\nprimate implements Paige’s(paige?) A1 variant of the Lanczos method, which is at the heart of most of the packages functionality. In this post, I’ll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity.",
+    "text": "Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations—or even just least-squares data-fitting—decomposing linear operators over function spaces has had significant use in many areas of sciences and engineering.\nCentral to operator theory is the spectral theorem, which provides conditions under which a linear operator A : \\mathbb{R}^n \\to \\mathbb{R}^n can be diagonalized in terms of its eigenvalues and eigenvectors:  A = U \\Lambda U^{-1}\nWhen A is symmetric, it is orthogonally diagonalizable, i.e. U^{-1} = U^T and \\Lambda is real-valued. Moreover, as Cornelius Lanczos showed in 1950, its spectrum can be iteratively revealed via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  Lanczos called this approach the method of minimized iterations—it is now known as the Lanczos method, in his honor. Despite its age, the Lanczos method remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, an IEEE guest editorial places it among the top 10 most influential algorithms of the 20th century.\nAs the Lanczos method lies at the heart of primate’s design, this post introduces it, focusing in particular on its motivating principles and complexity details. For its API usage, see the lanczos page.",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -434,7 +434,7 @@
     "href": "theory/lanczos.html#lanczos-on-a-bumper-sticker",
     "title": "The Lanczos method",
     "section": "Lanczos on a bumper sticker",
-    "text": "Lanczos on a bumper sticker\nGiven any non-zero v \\in \\mathbb{R}^n, Lanczos generates a Krylov subspace via successive powers of A:\n\n\\mathcal{K}(A, v) \\triangleq \\{ \\, A^{0} v, A^{1}v, A^{2}v, \\dots, A^{n}v \\, \\}\n\nOrthogonalizing these linearly independent vectors not only yields an orthonormal basis for \\mathcal{K}(A, v), but also a change-of-basis matrix Q, allowing A to be represented by a new matrix T:\n\n\\begin{align*}\nK &= [\\, v \\mid Av \\mid A^2 v \\mid \\dots \\mid A^{n-1}v \\,] && \\\\\nQ &= [\\, q_1, q_2, \\dots, q \\,] \\gets \\mathrm{qr}(K) &&  \\\\\nT &= Q^T A Q &&\n\\end{align*}\n\nIt turns out that since A is symmetric, T is guaranteed to have a symmetric tridiagonal structure:\n\nT = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_n \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n &\n\\end{array}\n\\Bigg)\n\n\nNow, since the span of Q is invariant under A, every eigenvalue of T is an eigenvalue of A:\n T = Y \\Theta Y^T, \\Theta = \\Lambda \nTo quote the lucid Lanczos introduction from Parlett, could anything be more simple?",
+    "text": "Lanczos on a bumper sticker\nGiven any non-zero v \\in \\mathbb{R}^n, Lanczos generates a Krylov subspace via successive powers of A:\n\n\\mathcal{K}(A, v) \\triangleq \\{ \\, A^{0} v, A^{1}v, A^{2}v, \\dots, A^{n}v \\, \\}\n\nOrthogonalizing these linearly independent vectors not only yields an orthonormal basis for \\mathcal{K}(A, v), but also a change-of-basis matrix Q, allowing A to be represented by a new matrix T:\n\n\\begin{align*}\nK &= [\\, v \\mid Av \\mid A^2 v \\mid \\dots \\mid A^{n-1}v \\,] && \\\\\nQ &= [\\, q_1, q_2, \\dots, q \\,] \\gets \\mathrm{qr}(K) &&  \\\\\nT &= Q^T A Q &&\n\\end{align*}\n\nIt turns out that since A is symmetric, T is guaranteed to have a symmetric tridiagonal structure:\n\nT = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_n \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n &\n\\end{array}\n\\Bigg)\n\n\n\nNow, since \\mathrm{range}(Q) = \\mathcal{K}(A, v), the transform A \\mapsto Q^{-1} A Q is a similarity transform. Similarity is an equivalence relation on \\mathcal{S}^n, thus we can obtain \\Lambda by orthogonally diagonalizing T:\n T = Y \\Lambda(A) Y^T  \nAs T is much more structured and easier to work with than A, we have effectively solved the eigenvalue problem. To quote the Lanczos introduction from Parlett, could anything be more simple?",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -460,17 +460,6 @@
     "crumbs": [
       "Theory",
       "Lanczos"
-    ]
-  },
-  {
-    "objectID": "theory/intro.html",
-    "href": "theory/intro.html",
-    "title": "Introduction to primate",
-    "section": "",
-    "text": "primate contains an extensible implementation of a variety of methods for estimating quantities from matrix functions.\nOne such method, often used in trace estimation, is the “stochastic Lanczos quadrature” (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.",
-    "crumbs": [
-      "Theory",
-      "Introduction"
     ]
   },
   {
@@ -560,28 +549,6 @@
     ]
   },
   {
-    "objectID": "theory/intro.html#trace-estimation",
-    "href": "theory/intro.html#trace-estimation",
-    "title": "Introduction to primate",
-    "section": "Trace estimation",
-    "text": "Trace estimation\n\nTo illustrate the functionality of primate, we need some kind of matrix and some spectral quantity of interest. To sole the former, let’s start with a simple (random) positive semi-definite matrix A \\in \\mathbb{R}^{n \\times n}.\n\nimport numpy as np\nfrom primate.random import symmetric\nA = symmetric(150, psd = True)\n\nBy default, symmetricnormalizes A such that the eigenvalues are uniformly distributed in the interval [0, 1].\n\nprint(np.histogram(np.linalg.eigvalsh(A)))\n\n(array([15, 18, 12,  9, 16, 18, 21, 12, 15, 14]), array([0.00209579, 0.10135048, 0.20060517, 0.29985986, 0.39911455,\n       0.49836924, 0.59762393, 0.69687862, 0.79613331, 0.895388  ,\n       0.99464269]))\n\n\nNow, the problem to solve. Suppose, for starters, we wanted to compute the trace of A: \\mathrm{tr}(A) \\triangleq \\sum\\limits_{i=1}^n A_{ii} = \\sum\\limits_{i=1}^n \\lambda_i \nObviously, there are many ways to obtain this… here’s three:\n\nUse the built-in .trace() call\nSum the diagonal entries directly\nSum the eigenvalues\n\n\nprint(A.trace()) \nprint(np.sum(A.diagonal()))\nprint(np.sum(np.linalg.eigvalsh(A)))\n\n75.69739302999076\n75.69739302999076\n75.69739302999078\n\n\nYet another way to compute \\mathrm{tr}(A) exactly is to multiply A by a sequence of n identity vectors:\n\\mathrm{tr}(A) = \\sum\\limits_{i=1}^n e_i^T A e_i, \\quad e_i = [0, \\dots, 0, \\underset{i}{1}, 0, \\dots, 0] \n\nn = A.shape[0]\ntrace = 0.0 \nfor k in range(n): \n  v = np.eye(1, n, k=k).T\n  trace += np.take(v.T @ A @ v, 0)\nprint(trace)\n\n75.6973930299908\n\n\nPutting aside the fact that each v \\mapsto Av takes O(n^2) here, observe this last approach is pretty inefficient in general as most of the entries of v are zero. One idea, accredited first to A. Girard and then studied by M.F. Huchinson, is to use random sign vector v \\in \\{-1, +1\\}^{n}.\n\\mathtt{tr}(A) = \\mathbb{E}[v^T A v] \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i = n_v^{-1} \\cdot V^\\top A V\nLet’s see how this fares using, let’s say, \\frac{1}{2} the number of matvecs:\n\ntrace_estimate = 0.0\nfor j in range(n // 4):\n  v = np.random.choice([-1, +1], size=n)\n  trace_estimate += v @ A @ v\nprint(trace_estimate / (n // 4))\n\n75.21454150546832\n\n\nNot bad!",
-    "crumbs": [
-      "Theory",
-      "Introduction"
-    ]
-  },
-  {
-    "objectID": "theory/intro.html#the-implicit-trace-estimation-problem",
-    "href": "theory/intro.html#the-implicit-trace-estimation-problem",
-    "title": "Introduction to primate",
-    "section": "The implicit trace estimation problem",
-    "text": "The implicit trace estimation problem\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}",
-    "crumbs": [
-      "Theory",
-      "Introduction"
-    ]
-  },
-  {
     "objectID": "theory/lanczos.html#surpassing-the-cubic-bound",
     "href": "theory/lanczos.html#surpassing-the-cubic-bound",
     "title": "The Lanczos method",
@@ -607,7 +574,7 @@
     "href": "theory/lanczos.html#footnotes",
     "title": "The Lanczos method",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nA variant of the Lanczos method is actually at the heart scipy.sparse.linalg’s default eigsh solver (which is a port of ARPACK).↩︎\nIn fact, there’s a strnger↩︎",
+    "text": "Footnotes\n\n\nA variant of the Lanczos method is actually at the heart scipy.sparse.linalg’s default eigsh solver (which is a port of ARPACK).↩︎\nIn fact, there’s a strnger↩︎\nUp to a sign of the columns↩︎",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -629,7 +596,7 @@
     "href": "theory/lanczos.html#pseudocode",
     "title": "The Lanczos method",
     "section": "Pseudocode",
-    "text": "Pseudocode\n\n\nDo We Fully Understand the Symmetric Lanczos Algorithm Yet?",
+    "text": "Pseudocode\nTODO",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -717,7 +684,7 @@
     "href": "theory/lanczos.html#but-wait-isnt-t-arbitrary",
     "title": "The Lanczos method",
     "section": "But wait, isn’t T arbitrary?",
-    "text": "But wait, isn’t T arbitrary?\nUnfortunately, there is no canonical choice of T_j. Indeed, as T_n is a family with n - 1 degrees of freedom and v \\in \\mathbb{R}^n was chosen arbitrarily, there are infinitely many essentially distinct such decompositions. In contrast, the spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M.\nNot all hope is lost though. Notice that since Q is formed by an orthonormal set \\{ q_i \\}_{i=1}^n, it is orthogonal, thus we have:\n Q Q^T = I_n = [e_1, e_2, \\dots, e_n] \nBy extension, given an initial pair (A, q_1) satisfying \\lVert q_1 \\rVert = 1, we have:\n\nK_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \\, e_1 \\mid T e_1 \\mid T^2 e_1 \\mid \\dots \\mid T^{n-1} e_1 \\, ]\n\nThis is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix T \\in \\mathbb{R}^{n \\times n} has only positive elements on its first subdiagonal and there exists an orthogonal matrix Q such that Q^T A Q = T, then Q and T are uniquely determined by (A, q_1) (up to a sign of the columns).\nThus, tridiagonalizing A with respect to an arbitrary q_1 \\in \\mathbb{R}^n satisfying \\lVert q_1\\rVert = 1 determines Q.",
+    "text": "But wait, isn’t T arbitrary?\nUnfortunately, there is no canonical choice of T_j. Indeed, as T_n is a family with n - 1 degrees of freedom and v \\in \\mathbb{R}^n was chosen arbitrarily, there are infinitely many essentially distinct such decompositions. In contrast, the spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M.\nNot all hope is lost though. Notice that since Q is an orthogonal matrix, thus we have:\n Q Q^T = I_n = [e_1, e_2, \\dots, e_n] \nBy extension, given an initial pair (A, q_1) satisfying \\lVert q_1 \\rVert = 1, we have:\n\nK_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \\, e_1 \\mid T e_1 \\mid T^2 e_1 \\mid \\dots \\mid T^{n-1} e_1 \\, ]\n\nThis is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix T \\in \\mathbb{R}^{n \\times n} has only positive elements on its first subdiagonal and there exists an orthogonal matrix Q such that Q^T A Q = T, then Q and T are uniquely determined3 by (A, q_1).\nThus, tridiagonalizing A with respect to an arbitrary q_1 \\in \\mathbb{R}^n satisfying \\lVert q_1\\rVert = 1 determines Q.",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -765,6 +732,28 @@
     "crumbs": [
       "Advanced",
       "Integrating with pybind11"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#complexities",
+    "href": "theory/lanczos.html#complexities",
+    "title": "The Lanczos method",
+    "section": "Complexities",
+    "text": "Complexities\nElegant as the Lanczos method may be, what does it net us? Well, for starters, the Lanczos method can drop the complexity of obtaining the spectral decomposition by order of magnitude.\n\nTheorem 1 (Parlett 1994, Simon 1984) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nFor general A \\in \\mathbb{R}^{n \\times n}, computing the spectral-decomposition is essentially bounded by the matrix-multiplication time: \\Theta(n^\\omega) time and \\Theta(n^2) space, where \\omega \\approx 2.37\\dots is the matrix multiplication constant. If we exclude the Strassen model for computation, we get effectively a \\Omega(n^3) time and \\Omega(n^2) space bound. In contrast, when both r = n and \\eta = \\nu = n, the Theorem above implies the spectral decomposition takes just O(n^2) time and O(n) space to obtain. Unless you know the tricks, this feels like a contradiction. So… how does the complexity argument play out?\n\nSolving the right problem\n\n\nIf you squint hard enough, you can deduce that since A Q_j = Q_j T_j + \\beta_{j+1} q_{j+1} e_{j}^T, every symmetric A \\in \\mathbb{R}^{n \\times n} expanded this way admits a three-term recurrence: \n\\begin{align*}\nA q_j &= \\beta_{j\\text{-}1} q_{j\\text{-}1} + \\alpha_j q_j + \\beta_j q_{j+1} \\\\\n\\Leftrightarrow \\beta_{j} \\, q_{j+1} &= A q_j - \\alpha_j \\, q_j - \\beta_{j\\text{-}1} \\, q_{j\\text{-}1}  \n\\end{align*}\n\nThe equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions, which are given by: \n\\alpha_j = q_j^T A q_j, \\;\\; \\beta_j = \\lVert r_j \\rVert_2, \\;\\; q_{j+1} = r_j / \\beta_j\n\n\n\\text{where  } r_j = (A - \\alpha_j I)q_j - \\beta_{j\\text{-}1} q_j\n\nIn other words, if (q_{j\\text{-}1}, \\beta_j, q_j) are known, then (\\alpha_j, \\beta_{j+1}, q_{j+1}) are completely determined. This fact is fantastic from a computational point of view: no explicit call to the QR algorithm necessary2!\nNote that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then the above procedure clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nMoreover, if we only need the eigen-values \\Lambda(A) ( and not their vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!\n\n\nBut wait, isn’t T arbitrary?\nUnfortunately, there is no canonical choice of T_j. Indeed, as T_n is a family with n - 1 degrees of freedom and v \\in \\mathbb{R}^n was chosen arbitrarily, there are infinitely many essentially distinct such decompositions. In contrast, the spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M.\nNot all hope is lost though. Notice that since Q is an orthogonal matrix, thus we have:\n Q Q^T = I_n = [e_1, e_2, \\dots, e_n] \nBy extension, given an initial pair (A, q_1) satisfying \\lVert q_1 \\rVert = 1, we have:\n\nK_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \\, e_1 \\mid T e_1 \\mid T^2 e_1 \\mid \\dots \\mid T^{n-1} e_1 \\, ]\n\nThis is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix T \\in \\mathbb{R}^{n \\times n} has only positive elements on its first subdiagonal and there exists an orthogonal matrix Q such that Q^T A Q = T, then Q and T are uniquely determined3 by (A, q_1).",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#approximation",
+    "href": "theory/lanczos.html#approximation",
+    "title": "The Lanczos method",
+    "section": "Approximation",
+    "text": "Approximation\nTODO",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
     ]
   }
 ]

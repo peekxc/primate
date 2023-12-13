@@ -1,5 +1,6 @@
 ---
 title: "Introduction to `primate`"
+draft: true
 ---
 
 `primate` contains an extensible implementation of a variety of methods for estimating quantities from matrix functions.

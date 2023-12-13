@@ -5,11 +5,20 @@ editor:
 bibliography: ../references.bib
 ---
 
-In 1950, Cornelius Lanczos invented the *method of minimized iterations*---now known as the *Lanczos method*---enabling the **iterative** exposure of the spectra of symmetric $A \in \mathcal{S}^n$ via *tridiagonalization*:
-$$  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T $$
-Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, it is listed among the **top 10 most influential algorithms of the 20th century** in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
+Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations---or even just least-squares data-fitting---decomposing linear operators over function spaces has had significant use in many areas of sciences and engineering. 
 
-`primate` implements Paige's[@paige] A1 variant of the _Lanczos method_, which is at the heart of most of the packages functionality. In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. 
+Central to operator theory is the [spectral theorem](), which provides conditions under which a linear operator $A : \mathbb{R}^n \to \mathbb{R}^n$ can be _diagonalized_ in terms of its eigenvalues and eigenvectors:
+$$ A = U \Lambda U^{-1} $$ 
+
+When $A$ is symmetric, it is _orthogonally diagonalizable_, i.e. $U^{-1} = U^T$ and $\Lambda$ is real-valued.
+Moreover, as Cornelius Lanczos showed in 1950, its spectrum can be **iteratively** revealed via *tridiagonalization*:
+$$  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T $$
+Lanczos called this approach the *method of minimized iterations*---it is now known as the *Lanczos method*, in his honor.
+Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) places it among the **top 10 most influential algorithms of the 20th century**.
+
+As the Lanczos method lies at the heart of `primate`'s design, this post introduces it, focusing in particular on its motivating principles and complexity details. For its API usage, see the [lanczos](../reference/diagonalize.lanczos.qmd) page.
+
+<!-- `primate` implements Paige's[@paige] A1 variant of the _Lanczos method_, which is at the heart of most of the packages functionality. In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity.  -->
 <!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  -->
 
 ## Lanczos on a bumper sticker
@@ -43,25 +52,36 @@ T = \mathrm{tridiag}\Bigg(
 $$
 
 <!-- That's pretty fortunate, because computing the eigen-sets of _any_ tridiagonal matrix $T$ takes just $O(n^2)$ time[^2]! -->
-Now, since the span of $Q$ is invariant under $A$, every eigenvalue of $T$ is an eigenvalue of $A$:
+<!-- $Q$ is $A$-invariant[^5] ( -->
+Now, since $\mathrm{range}(Q) = \mathcal{K}(A, v)$, the transform $A \mapsto Q^{-1} A Q$ is a _similarity transform_. [Similarity](https://en.wikipedia.org/wiki/Matrix_similarity) is an equivalence relation on $\mathcal{S}^n$, thus we can obtain $\Lambda$ by _orthogonally diagonalizing_ $T$:
 
-$$ T = Y \Theta Y^T, \Theta = \Lambda $$
+$$ T = Y \Lambda(A) Y^T $$
+<!-- $$ T = Y \Theta Y^T, \mathrm{diag}(Y) = (\theta_1, \theta_2, \dots, \theta_n)$$ -->
 
+As $T$ is _much_ more structured and easier to work with than $A$, we have effectively solved the eigenvalue problem. 
+To quote the [Lanczos introduction from Parlett](https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf), _could anything be more simple?_
 
-To quote the lucid [Lanczos introduction from Parlett](https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf), _could anything be more simple?_
+## Complexities
 
-## Quadratic time and linear space? How?
+Elegant as the Lanczos method may be, what does it net us? Well, for starters, the Lanczos method can drop the complexity of obtaining the spectral decomposition by **order of magnitude**.
 
-Unless you know the tricks, its not obvious at all decompositions above takes just $O(n^2)$ time and $O(n)$ space to obtain. So... how does the complexity argument play out?
+::: {#thm-line style="background-color: #efefef;"}
 
-### The cubic bound 
+## Parlett 1994, Simon 1984
 
-First, its important to establish that computing the eigen-decomposition $A = U \Lambda U^T$ for general symmetric $A \in \mathbb{R}^{n \times n}$ is essentially bounded by $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx 2.37\dots$ is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective $\Omega(n^3)$ time bound. 
+Given a symmetric rank-$r$ matrix $A \in \mathbb{R}^{n \times n}$ whose operator $x \mapsto A x$ requires $O(\eta)$ time and $O(\nu)$ space, the Lanczos method computes $\Lambda(A)$ in $O(\max\{\eta, n\}\cdot r)$ time and $O(\max\{\nu, n\})$ space, when computation is done in exact arithmetic
+
+:::
+
+For general $A \in \mathbb{R}^{n \times n}$, computing the spectral-decomposition is essentially bounded by the matrix-multiplication time: $\Theta(n^\omega)$ time and $\Theta(n^2)$ space, where $\omega \approx 2.37\dots$ is the matrix multiplication constant. If we exclude the Strassen model for computation, we get effectively a $\Omega(n^3)$ time and $\Omega(n^2)$ space bound.
+In contrast, when both $r = n$ and $\eta = \nu = n$, the Theorem above implies the spectral decomposition takes just $O(n^2)$ time and $O(n)$ space to obtain. Unless you know the tricks, this feels like a contradiction. So... how does the complexity argument play out?
 
 ### Solving the right problem
 
-In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
-Moreover, entire method is *matrix free* as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators. 
+<!-- In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
+Moreover, entire method is *matrix free* as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators.  -->
+
+<!-- Among the main insights of the Lanczos method is that  -->
 
 If you squint hard enough, you can deduce that since $A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T$, every symmetric $A \in \mathbb{R}^{n \times n}$ expanded this way admits a *three-term recurrence*: 
 $$ 
@@ -71,7 +91,7 @@ A q_j &= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} \\
 \end{align*}
 $$
 
-The equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions: 
+The equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions, which are given by: 
 $$
 \alpha_j = q_j^T A q_j, \;\; \beta_j = \lVert r_j \rVert_2, \;\; q_{j+1} = r_j / \beta_j
 $$
@@ -86,21 +106,11 @@ Note that a symmetric tridiagonal matrix is fully characterized by its diagonal 
 
 Moreover, if we only need the eigen-_values_ $\Lambda(A)$ ( and not their vectors $U$), then we may execute the recurrence keeping at most three vectors $\{q_{j-1}, q_{j}, q_{j+1}\}$ in memory at any given time. Since each of these is $O(n)$ is size, the claim of $O(n)$ space is justified!
 
-The description above is essentially the proof of the following Theorem:
-
-::: {#thm-line}
-
-## Parlett 1994, Simon 1984
-
-Given a symmetric rank-$r$ matrix $A \in \mathbb{R}^{n \times n}$ whose operator $x \mapsto A x$ requires $O(\eta)$ time and $O(\nu)$ space, the Lanczos iteration computes $\Lambda(A) = \{ \lambda_1, \lambda_2, \dots, \lambda_r \}$ in $O(\max\{\eta, n\}\cdot r)$ time and $O(\max\{\nu, n\})$ space, when computation is done in exact arithmetic
-
-:::
-
-## But wait, isn't $T$ arbitrary? 
+### But wait, isn't $T$ arbitrary? 
 
 Unfortunately, there is no canonical choice of $T_j$. Indeed, as $T_n$ is a family with $n - 1$ degrees of freedom and $v \in \mathbb{R}^n$ was chosen arbitrarily, there are infinitely many _essentially distinct_ such decompositions. In contrast, the spectral decomposition $A = U \Lambda U^T$ identifies a diagonalizable $A$ with its spectrum $\Lambda(A)$ up to a change of basis $A \mapsto M^{-1} A M$.
 
-Not all hope is lost though. Notice that since $Q$ is formed by an orthonormal set $\{ q_i \}_{i=1}^n$, it is orthogonal, thus we have: 
+Not all hope is lost though. Notice that since $Q$ is an orthogonal matrix, thus we have: 
 
 $$ Q Q^T = I_n = [e_1, e_2, \dots, e_n] $$
 
@@ -110,11 +120,17 @@ $$
 K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 $$
 
-This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely_ determined by $(A, q_1)$ (up to a sign of the columns). 
+This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely determined_[^6] by $(A, q_1)$. 
 
-Thus, tridiagonalizing $A$ with respect to an arbitrary $q_1 \in \mathbb{R}^n$ satisfying $\lVert q_1\rVert = 1$ _determines_ $Q$. 
+<!-- Thus, tridiagonalizing $A$ with respect to an arbitrary $q_1 \in \mathbb{R}^n$ satisfying $\lVert q_1\rVert = 1$ _determines_ $Q$.  -->
+
+## Approximation
+
+TODO
 
 ## Pseudocode 
+
+TODO
 
 <!-- Alright, enough of the  -->
 
@@ -165,5 +181,5 @@ $$ *is* the QR factorization of $K_n(A, q_1)$. Thus, tridiagonalizing $A$ with r
 [^2]: tridiag ref 
 [^3]: In fact, there's a strnger 
 [^4]: testing
-
-Do We Fully Understand the Symmetric Lanczos Algorithm Yet?
+[^5]: Recall that if $S \subseteq \mathbb{R}^n$, then $S$ is called an _invariant subspace_ of $A$ or $A$-\emph{invariant} iff $x \in A \implies Ax \in S$ for all $x \in S$
+[^6]: Up to a sign of the columns

@@ -31,7 +31,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../theory/slq.html" rel="next">
-<link href="../theory/intro.html" rel="prev">
+<link href="../imate_compare.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -130,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/lanczos.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -171,12 +171,6 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/usage.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Basic usage</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
@@ -192,12 +186,6 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction</span></a>
-  </div>
-</li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link active">
@@ -326,12 +314,12 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#lanczos-on-a-bumper-sticker" id="toc-lanczos-on-a-bumper-sticker" class="nav-link active" data-scroll-target="#lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</a></li>
-  <li><a href="#quadratic-time-and-linear-space-how" id="toc-quadratic-time-and-linear-space-how" class="nav-link" data-scroll-target="#quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</a>
+  <li><a href="#complexities" id="toc-complexities" class="nav-link" data-scroll-target="#complexities">Complexities</a>
   <ul class="collapse">
-  <li><a href="#the-cubic-bound" id="toc-the-cubic-bound" class="nav-link" data-scroll-target="#the-cubic-bound">The cubic bound</a></li>
   <li><a href="#solving-the-right-problem" id="toc-solving-the-right-problem" class="nav-link" data-scroll-target="#solving-the-right-problem">Solving the right problem</a></li>
-  </ul></li>
   <li><a href="#but-wait-isnt-t-arbitrary" id="toc-but-wait-isnt-t-arbitrary" class="nav-link" data-scroll-target="#but-wait-isnt-t-arbitrary">But wait, isn’t <span class="math inline">T</span> arbitrary?</a></li>
+  </ul></li>
+  <li><a href="#approximation" id="toc-approximation" class="nav-link" data-scroll-target="#approximation">Approximation</a></li>
   <li><a href="#pseudocode" id="toc-pseudocode" class="nav-link" data-scroll-target="#pseudocode">Pseudocode</a></li>
   </ul>
 </nav>
@@ -339,7 +327,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/lanczos.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/lanczos.html">Lanczos</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">The Lanczos method</h1>
 </div>
@@ -358,8 +346,12 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>In 1950, Cornelius Lanczos invented the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the <strong>iterative</strong> exposure of the spectra of symmetric <span class="math inline">A \in \mathcal{S}^n</span> via <em>tridiagonalization</em>: <span class="math display">  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T </span> Despite its age, the Lanczos method remains the standard algorithm<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the <em>conjugate gradient</em> method, the <em>theory of orthogonal polynomials</em>, and <em>Gaussian quadrature</em>, it is one of the most important numerical methods of all time—indeed, it is listed among the <strong>top 10 most influential algorithms of the 20th century</strong> in an <a href="https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm">IEEE guest editorial</a>.</p>
-<p><code>primate</code> implements Paige’s<span class="citation" data-cites="paige">(<a href="#ref-paige" role="doc-biblioref"><strong>paige?</strong></a>)</span> A1 variant of the <em>Lanczos method</em>, which is at the heart of most of the packages functionality. In this post, I’ll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. <!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  --></p>
+<p>Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations—or even just least-squares data-fitting—decomposing linear operators over function spaces has had significant use in many areas of sciences and engineering.</p>
+<p>Central to operator theory is the <a href="">spectral theorem</a>, which provides conditions under which a linear operator <span class="math inline">A : \mathbb{R}^n \to \mathbb{R}^n</span> can be <em>diagonalized</em> in terms of its eigenvalues and eigenvectors: <span class="math display"> A = U \Lambda U^{-1} </span></p>
+<p>When <span class="math inline">A</span> is symmetric, it is <em>orthogonally diagonalizable</em>, i.e.&nbsp;<span class="math inline">U^{-1} = U^T</span> and <span class="math inline">\Lambda</span> is real-valued. Moreover, as Cornelius Lanczos showed in 1950, its spectrum can be <strong>iteratively</strong> revealed via <em>tridiagonalization</em>: <span class="math display">  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T </span> Lanczos called this approach the <em>method of minimized iterations</em>—it is now known as the <em>Lanczos method</em>, in his honor. Despite its age, the Lanczos method remains the standard algorithm<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the <em>conjugate gradient</em> method, the <em>theory of orthogonal polynomials</em>, and <em>Gaussian quadrature</em>, it is one of the most important numerical methods of all time—indeed, an <a href="https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm">IEEE guest editorial</a> places it among the <strong>top 10 most influential algorithms of the 20th century</strong>.</p>
+<p>As the Lanczos method lies at the heart of <code>primate</code>’s design, this post introduces it, focusing in particular on its motivating principles and complexity details. For its API usage, see the <a href="../reference/diagonalize.lanczos.html">lanczos</a> page.</p>
+<!-- `primate` implements Paige's[@paige] A1 variant of the _Lanczos method_, which is at the heart of most of the packages functionality. In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity.  -->
+<!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  -->
 <section id="lanczos-on-a-bumper-sticker" class="level2">
 <h2 class="anchored" data-anchor-id="lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</h2>
 <p>Given any non-zero <span class="math inline">v \in \mathbb{R}^n</span>, Lanczos generates a <em>Krylov subspace</em> via successive powers of <span class="math inline">A</span>:</p>
@@ -385,27 +377,30 @@ T = \mathrm{tridiag}\Bigg(
 \Bigg)
 </span></p>
 <!-- That's pretty fortunate, because computing the eigen-sets of _any_ tridiagonal matrix $T$ takes just $O(n^2)$ time[^2]! -->
-<p>Now, since the span of <span class="math inline">Q</span> is invariant under <span class="math inline">A</span>, every eigenvalue of <span class="math inline">T</span> is an eigenvalue of <span class="math inline">A</span>:</p>
-<p><span class="math display"> T = Y \Theta Y^T, \Theta = \Lambda </span></p>
-<p>To quote the lucid <a href="https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf">Lanczos introduction from Parlett</a>, <em>could anything be more simple?</em></p>
+<!-- $Q$ is $A$-invariant[^5] ( -->
+<p>Now, since <span class="math inline">\mathrm{range}(Q) = \mathcal{K}(A, v)</span>, the transform <span class="math inline">A \mapsto Q^{-1} A Q</span> is a <em>similarity transform</em>. <a href="https://en.wikipedia.org/wiki/Matrix_similarity">Similarity</a> is an equivalence relation on <span class="math inline">\mathcal{S}^n</span>, thus we can obtain <span class="math inline">\Lambda</span> by <em>orthogonally diagonalizing</em> <span class="math inline">T</span>:</p>
+<p><span class="math display"> T = Y \Lambda(A) Y^T </span> <!-- $$ T = Y \Theta Y^T, \mathrm{diag}(Y) = (\theta_1, \theta_2, \dots, \theta_n)$$ --></p>
+<p>As <span class="math inline">T</span> is <em>much</em> more structured and easier to work with than <span class="math inline">A</span>, we have effectively solved the eigenvalue problem. To quote the <a href="https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf">Lanczos introduction from Parlett</a>, <em>could anything be more simple?</em></p>
 </section>
-<section id="quadratic-time-and-linear-space-how" class="level2">
-<h2 class="anchored" data-anchor-id="quadratic-time-and-linear-space-how">Quadratic time and linear space? How?</h2>
-<p>Unless you know the tricks, its not obvious at all decompositions above takes just <span class="math inline">O(n^2)</span> time and <span class="math inline">O(n)</span> space to obtain. So… how does the complexity argument play out?</p>
-<section id="the-cubic-bound" class="level3">
-<h3 class="anchored" data-anchor-id="the-cubic-bound">The cubic bound</h3>
-<p>First, its important to establish that computing the eigen-decomposition <span class="math inline">A = U \Lambda U^T</span> for general symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> is essentially bounded by <span class="math inline">\Theta(n^\omega)</span> time and <span class="math inline">\Theta(n^2)</span> space, where <span class="math inline">\omega \approx 2.37\dots</span> is the matrix-multiplication constant. Conceptually, if we exclude the Strassen-model for matrix multiplication (since it is not practical anyways), this translates to an effective <span class="math inline">\Omega(n^3)</span> time bound.</p>
-</section>
+<section id="complexities" class="level2">
+<h2 class="anchored" data-anchor-id="complexities">Complexities</h2>
+<p>Elegant as the Lanczos method may be, what does it net us? Well, for starters, the Lanczos method can drop the complexity of obtaining the spectral decomposition by <strong>order of magnitude</strong>.</p>
+<div id="thm-line" class="theorem" style="background-color: #efefef;">
+<p><span class="theorem-title"><strong>Theorem 1 (Parlett 1994, Simon 1984) </strong></span>Given a symmetric rank-<span class="math inline">r</span> matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> whose operator <span class="math inline">x \mapsto A x</span> requires <span class="math inline">O(\eta)</span> time and <span class="math inline">O(\nu)</span> space, the Lanczos method computes <span class="math inline">\Lambda(A)</span> in <span class="math inline">O(\max\{\eta, n\}\cdot r)</span> time and <span class="math inline">O(\max\{\nu, n\})</span> space, when computation is done in exact arithmetic</p>
+</div>
+<p>For general <span class="math inline">A \in \mathbb{R}^{n \times n}</span>, computing the spectral-decomposition is essentially bounded by the matrix-multiplication time: <span class="math inline">\Theta(n^\omega)</span> time and <span class="math inline">\Theta(n^2)</span> space, where <span class="math inline">\omega \approx 2.37\dots</span> is the matrix multiplication constant. If we exclude the Strassen model for computation, we get effectively a <span class="math inline">\Omega(n^3)</span> time and <span class="math inline">\Omega(n^2)</span> space bound. In contrast, when both <span class="math inline">r = n</span> and <span class="math inline">\eta = \nu = n</span>, the Theorem above implies the spectral decomposition takes just <span class="math inline">O(n^2)</span> time and <span class="math inline">O(n)</span> space to obtain. Unless you know the tricks, this feels like a contradiction. So… how does the complexity argument play out?</p>
 <section id="solving-the-right-problem" class="level3">
 <h3 class="anchored" data-anchor-id="solving-the-right-problem">Solving the right problem</h3>
-<p>In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform <span class="math inline">v \mapsto Av</span> quickly—say, in <span class="math inline">\approx O(n)</span> time—then the Lanczos method can construct <span class="math inline">\Lambda(A)</span> in <em>just</em> <span style="color: red;"><span class="math inline">O(n^2)</span> time</span> and <span style="color: red;"><span class="math inline">O(n)</span> space</span>! Moreover, entire method is <em>matrix free</em> as the only input to the algorithm is a (fast) matrix-vector product <span class="math inline">v \mapsto Av</span>: one need not store <span class="math inline">A</span> explicitly to do this for many special types of linear operators.</p>
+<!-- In some applications, the eigenvectors are not needed all at once (or at all, even). One of the main draws to the Lanczos method is its efficiency: if one can perform $v \mapsto Av$ quickly---say, in $\approx O(n)$ time---then the Lanczos method can construct $\Lambda(A)$ in _just_ [$O(n^2)$ time]{style="color: red;"} and [$O(n)$ space]{style="color: red;"}! 
+Moreover, entire method is *matrix free* as the only input to the algorithm is a (fast) matrix-vector product $v \mapsto Av$: one need not store $A$ explicitly to do this for many special types of linear operators.  -->
+<!-- Among the main insights of the Lanczos method is that  -->
 <p>If you squint hard enough, you can deduce that since <span class="math inline">A Q_j = Q_j T_j + \beta_{j+1} q_{j+1} e_{j}^T</span>, every symmetric <span class="math inline">A \in \mathbb{R}^{n \times n}</span> expanded this way admits a <em>three-term recurrence</em>: <span class="math display">
 \begin{align*}
 A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} \\
 \Leftrightarrow \beta_{j} \, q_{j+1} &amp;= A q_j - \alpha_j \, q_j - \beta_{j\text{-}1} \, q_{j\text{-}1}  
 \end{align*}
 </span></p>
-<p>The equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions: <span class="math display">
+<p>The equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions, which are given by: <span class="math display">
 \alpha_j = q_j^T A q_j, \;\; \beta_j = \lVert r_j \rVert_2, \;\; q_{j+1} = r_j / \beta_j
 </span></p>
 <p><span class="math display">
@@ -414,26 +409,27 @@ A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} 
 <p>In other words, if (<span class="math inline">q_{j\text{-}1}, \beta_j, q_j</span>) are known, then (<span class="math inline">\alpha_j</span>, <span class="math inline">\beta_{j+1}, q_{j+1}</span>) are completely determined. This fact is fantastic from a computational point of view: no explicit call to the QR algorithm necessary<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>!</p>
 <p>Note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just <span class="math inline">O(n)</span> space. If we assume that <span class="math inline">v \mapsto Av \sim O(n)</span>, then the above procedure clearly takes at most <span class="math inline">O(n^2)</span> time, since there are most <span class="math inline">n</span> such vectors <span class="math inline">\{q_i\}_{i=1}^n</span> to generate!</p>
 <p>Moreover, if we only need the eigen-<em>values</em> <span class="math inline">\Lambda(A)</span> ( and not their vectors <span class="math inline">U</span>), then we may execute the recurrence keeping at most three vectors <span class="math inline">\{q_{j-1}, q_{j}, q_{j+1}\}</span> in memory at any given time. Since each of these is <span class="math inline">O(n)</span> is size, the claim of <span class="math inline">O(n)</span> space is justified!</p>
-<p>The description above is essentially the proof of the following Theorem:</p>
-<div id="thm-line" class="theorem">
-<p><span class="theorem-title"><strong>Theorem 1 (Parlett 1994, Simon 1984) </strong></span>Given a symmetric rank-<span class="math inline">r</span> matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> whose operator <span class="math inline">x \mapsto A x</span> requires <span class="math inline">O(\eta)</span> time and <span class="math inline">O(\nu)</span> space, the Lanczos iteration computes <span class="math inline">\Lambda(A) = \{ \lambda_1, \lambda_2, \dots, \lambda_r \}</span> in <span class="math inline">O(\max\{\eta, n\}\cdot r)</span> time and <span class="math inline">O(\max\{\nu, n\})</span> space, when computation is done in exact arithmetic</p>
-</div>
 </section>
-</section>
-<section id="but-wait-isnt-t-arbitrary" class="level2">
-<h2 class="anchored" data-anchor-id="but-wait-isnt-t-arbitrary">But wait, isn’t <span class="math inline">T</span> arbitrary?</h2>
+<section id="but-wait-isnt-t-arbitrary" class="level3">
+<h3 class="anchored" data-anchor-id="but-wait-isnt-t-arbitrary">But wait, isn’t <span class="math inline">T</span> arbitrary?</h3>
 <p>Unfortunately, there is no canonical choice of <span class="math inline">T_j</span>. Indeed, as <span class="math inline">T_n</span> is a family with <span class="math inline">n - 1</span> degrees of freedom and <span class="math inline">v \in \mathbb{R}^n</span> was chosen arbitrarily, there are infinitely many <em>essentially distinct</em> such decompositions. In contrast, the spectral decomposition <span class="math inline">A = U \Lambda U^T</span> identifies a diagonalizable <span class="math inline">A</span> with its spectrum <span class="math inline">\Lambda(A)</span> up to a change of basis <span class="math inline">A \mapsto M^{-1} A M</span>.</p>
-<p>Not all hope is lost though. Notice that since <span class="math inline">Q</span> is formed by an orthonormal set <span class="math inline">\{ q_i \}_{i=1}^n</span>, it is orthogonal, thus we have:</p>
+<p>Not all hope is lost though. Notice that since <span class="math inline">Q</span> is an orthogonal matrix, thus we have:</p>
 <p><span class="math display"> Q Q^T = I_n = [e_1, e_2, \dots, e_n] </span></p>
 <p>By extension, given an initial pair <span class="math inline">(A, q_1)</span> satisfying <span class="math inline">\lVert q_1 \rVert = 1</span>, we have:</p>
 <p><span class="math display">
 K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 </span></p>
-<p>This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely</em> determined by <span class="math inline">(A, q_1)</span> (up to a sign of the columns).</p>
-<p>Thus, tridiagonalizing <span class="math inline">A</span> with respect to an arbitrary <span class="math inline">q_1 \in \mathbb{R}^n</span> satisfying <span class="math inline">\lVert q_1\rVert = 1</span> <em>determines</em> <span class="math inline">Q</span>.</p>
+<p>This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely determined</em><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> by <span class="math inline">(A, q_1)</span>.</p>
+<!-- Thus, tridiagonalizing $A$ with respect to an arbitrary $q_1 \in \mathbb{R}^n$ satisfying $\lVert q_1\rVert = 1$ _determines_ $Q$.  -->
+</section>
+</section>
+<section id="approximation" class="level2">
+<h2 class="anchored" data-anchor-id="approximation">Approximation</h2>
+<p>TODO</p>
 </section>
 <section id="pseudocode" class="level2">
 <h2 class="anchored" data-anchor-id="pseudocode">Pseudocode</h2>
+<p>TODO</p>
 <!-- Alright, enough of the  -->
 <!-- 
 ## The Lanczos Iteration
@@ -476,7 +472,6 @@ Unfortunately, unlike the spectral decomposition $A = V \Lambda V^T$---which ide
 \end{equation}
 $$ *is* the QR factorization of $K_n(A, q_1)$. Thus, tridiagonalizing $A$ with respect to a unit-norm $q_1$ determines $Q$. Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are *uniquely* determined by $(A, q_1)$.
  -->
-<p>Do We Fully Understand the Symmetric Lanczos Algorithm Yet?</p>
 
 
 </section>
@@ -487,6 +482,7 @@ $$ *is* the QR factorization of $K_n(A, q_1)$. Thus, tridiagonalizing $A$ with r
 <ol>
 <li id="fn1"><p>A variant of the Lanczos method is actually at the heart <code>scipy.sparse.linalg</code>’s default <code>eigsh</code> solver (which is a port of <a href="https://en.wikipedia.org/wiki/ARPACK">ARPACK</a>).<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>In fact, there’s a strnger<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Up to a sign of the columns<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1032,8 +1028,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../theory/intro.html" class="pagination-link  aria-label=" introduction"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
+      <a href="../imate_compare.html" class="pagination-link  aria-label=" comparison="" to="" *imate*"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Comparison to <em>imate</em></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
