@@ -7,42 +7,46 @@ bibliography: ../references.bib
 
 In 1950, Cornelius Lanczos invented the *method of minimized iterations*---now known as the *Lanczos method*---enabling the **iterative** exposure of the spectra of symmetric $A \in \mathcal{S}^n$ via *tridiagonalization*:
 $$  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T $$
-Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and for solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, _Krylov methods_ listed among the **top 10 most influential algorithms of the 20th century** in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
+Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, it is listed among the **top 10 most influential algorithms of the 20th century** in an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm).
 
 `primate` implements Paige's[@paige] A1 variant of the _Lanczos method_, which is at the heart of most of the packages functionality. In this post, I'll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. 
 <!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  -->
 
 ## Lanczos on a bumper sticker
 
-The Lanczos method starts by expanding some non-zero $v \in \mathbb{R}^n$ via successive powers of $A$:
+Given any non-zero $v \in \mathbb{R}^n$, Lanczos generates a _Krylov subspace_ via successive powers of $A$:
 
 $$
-v \mapsto \{ \, A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v \, \}
+\mathcal{K}(A, v) \triangleq \{ \, A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v \, \}
 $$
 
-If we collect these vectors into a matrix, orthogonalize them, and then use them to rotate $A$, we get the following trio of matrices:
+Orthogonalizing these [linearly independent](https://en.wikipedia.org/wiki/Linear_independence) vectors not only yields an orthonormal basis for $\mathcal{K}(A, v)$, but also a _change-of-basis_ matrix $Q$, allowing $A$ to be represented by a new matrix $T$:
 
 $$ 
 \begin{align*}
-K_j &= [\, v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}v \,] && \\
-Q_j &= [\, q_1, q_2, \dots, q_j \,] \gets \mathrm{qr}(K_j) &&  \\
-T_j &= Q_j^T A Q_j &&
+K &= [\, v \mid Av \mid A^2 v \mid \dots \mid A^{n-1}v \,] && \\
+Q &= [\, q_1, q_2, \dots, q \,] \gets \mathrm{qr}(K) &&  \\
+T &= Q^T A Q &&
 \end{align*}
 $$
 
-Since $A$ is symmetric, it turns out $T_j$ will be a _symmetric tridiagonal matrix_ for all $j \leq n$:
+It turns out that since $A$ is symmetric, $T$ is guaranteed to have a _symmetric tridiagonal structure_:
 
 $$
-T_j = \mathrm{tridiag}\Bigg(
+T = \mathrm{tridiag}\Bigg(
 \begin{array}{ccccccccc} 
-& \beta_2 & & \beta_3 & & \cdot & & \beta_j & \\
-\alpha_1 & & \alpha_2 & & \cdot & & \cdot & & \alpha_j \\
-& \beta_2 & & \beta_3 & & \cdot & & \beta_j &
+& \beta_2 & & \beta_3 & & \cdot & & \beta_n & \\
+\alpha_1 & & \alpha_2 & & \cdot & & \cdot & & \alpha_n \\
+& \beta_2 & & \beta_3 & & \cdot & & \beta_n &
 \end{array}
 \Bigg)
 $$
 
-That's pretty fortunate, because the eigen-sets of $T_j$ can be obtained in just $O(j^2)$ time[^2]!
+<!-- That's pretty fortunate, because computing the eigen-sets of _any_ tridiagonal matrix $T$ takes just $O(n^2)$ time[^2]! -->
+Now, since the span of $Q$ is invariant under $A$, every eigenvalue of $T$ is an eigenvalue of $A$:
+
+$$ T = Y \Theta Y^T, \Theta = \Lambda $$
+
 
 To quote the lucid [Lanczos introduction from Parlett](https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf), _could anything be more simple?_
 
@@ -106,7 +110,7 @@ $$
 K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 $$
 
-This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely_ determined by $(A, q_1)$. 
+This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely_ determined by $(A, q_1)$ (up to a sign of the columns). 
 
 Thus, tridiagonalizing $A$ with respect to an arbitrary $q_1 \in \mathbb{R}^n$ satisfying $\lVert q_1\rVert = 1$ _determines_ $Q$. 
 

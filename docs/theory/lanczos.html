@@ -358,33 +358,35 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>In 1950, Cornelius Lanczos invented the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the <strong>iterative</strong> exposure of the spectra of symmetric <span class="math inline">A \in \mathcal{S}^n</span> via <em>tridiagonalization</em>: <span class="math display">  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T </span> Despite its age, the Lanczos method remains the standard algorithm<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> both for computing eigensets and for solving linear systems in the large-scale regime. Having intrinsic connections to the <em>conjugate gradient</em> method, the <em>theory of orthogonal polynomials</em>, and <em>Gaussian quadrature</em>, it is one of the most important numerical methods of all time—indeed, <em>Krylov methods</em> listed among the <strong>top 10 most influential algorithms of the 20th century</strong> in an <a href="https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm">IEEE guest editorial</a>.</p>
+<p>In 1950, Cornelius Lanczos invented the <em>method of minimized iterations</em>—now known as the <em>Lanczos method</em>—enabling the <strong>iterative</strong> exposure of the spectra of symmetric <span class="math inline">A \in \mathcal{S}^n</span> via <em>tridiagonalization</em>: <span class="math display">  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T </span> Despite its age, the Lanczos method remains the standard algorithm<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the <em>conjugate gradient</em> method, the <em>theory of orthogonal polynomials</em>, and <em>Gaussian quadrature</em>, it is one of the most important numerical methods of all time—indeed, it is listed among the <strong>top 10 most influential algorithms of the 20th century</strong> in an <a href="https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm">IEEE guest editorial</a>.</p>
 <p><code>primate</code> implements Paige’s<span class="citation" data-cites="paige">(<a href="#ref-paige" role="doc-biblioref"><strong>paige?</strong></a>)</span> A1 variant of the <em>Lanczos method</em>, which is at the heart of most of the packages functionality. In this post, I’ll describe the basic theory behind the Lanczos method, with a focus on its time and space complexity. <!-- In general, the Lanczos method is intrinsically connected to other mathematical constructions, e.g. orthogonal polynomials, gaussian quadrature, conjugate gradient---none of these will be discussed for now.  --></p>
 <section id="lanczos-on-a-bumper-sticker" class="level2">
 <h2 class="anchored" data-anchor-id="lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</h2>
-<p>The Lanczos method starts by expanding some non-zero <span class="math inline">v \in \mathbb{R}^n</span> via successive powers of <span class="math inline">A</span>:</p>
+<p>Given any non-zero <span class="math inline">v \in \mathbb{R}^n</span>, Lanczos generates a <em>Krylov subspace</em> via successive powers of <span class="math inline">A</span>:</p>
 <p><span class="math display">
-v \mapsto \{ \, A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v \, \}
+\mathcal{K}(A, v) \triangleq \{ \, A^{0} v, A^{1}v, A^{2}v, \dots, A^{n}v \, \}
 </span></p>
-<p>If we collect these vectors into a matrix, orthogonalize them, and then use them to rotate <span class="math inline">A</span>, we get the following trio of matrices:</p>
+<p>Orthogonalizing these <a href="https://en.wikipedia.org/wiki/Linear_independence">linearly independent</a> vectors not only yields an orthonormal basis for <span class="math inline">\mathcal{K}(A, v)</span>, but also a <em>change-of-basis</em> matrix <span class="math inline">Q</span>, allowing <span class="math inline">A</span> to be represented by a new matrix <span class="math inline">T</span>:</p>
 <p><span class="math display">
 \begin{align*}
-K_j &amp;= [\, v \mid Av \mid A^2 v \mid \dots \mid A^{j-1}v \,] &amp;&amp; \\
-Q_j &amp;= [\, q_1, q_2, \dots, q_j \,] \gets \mathrm{qr}(K_j) &amp;&amp;  \\
-T_j &amp;= Q_j^T A Q_j &amp;&amp;
+K &amp;= [\, v \mid Av \mid A^2 v \mid \dots \mid A^{n-1}v \,] &amp;&amp; \\
+Q &amp;= [\, q_1, q_2, \dots, q \,] \gets \mathrm{qr}(K) &amp;&amp;  \\
+T &amp;= Q^T A Q &amp;&amp;
 \end{align*}
 </span></p>
-<p>Since <span class="math inline">A</span> is symmetric, it turns out <span class="math inline">T_j</span> will be a <em>symmetric tridiagonal matrix</em> for all <span class="math inline">j \leq n</span>:</p>
+<p>It turns out that since <span class="math inline">A</span> is symmetric, <span class="math inline">T</span> is guaranteed to have a <em>symmetric tridiagonal structure</em>:</p>
 <p><span class="math display">
-T_j = \mathrm{tridiag}\Bigg(
+T = \mathrm{tridiag}\Bigg(
 \begin{array}{ccccccccc}
-&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_j &amp; \\
-\alpha_1 &amp; &amp; \alpha_2 &amp; &amp; \cdot &amp; &amp; \cdot &amp; &amp; \alpha_j \\
-&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_j &amp;
+&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_n &amp; \\
+\alpha_1 &amp; &amp; \alpha_2 &amp; &amp; \cdot &amp; &amp; \cdot &amp; &amp; \alpha_n \\
+&amp; \beta_2 &amp; &amp; \beta_3 &amp; &amp; \cdot &amp; &amp; \beta_n &amp;
 \end{array}
 \Bigg)
 </span></p>
-<p>That’s pretty fortunate, because the eigen-sets of <span class="math inline">T_j</span> can be obtained in just <span class="math inline">O(j^2)</span> time<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>!</p>
+<!-- That's pretty fortunate, because computing the eigen-sets of _any_ tridiagonal matrix $T$ takes just $O(n^2)$ time[^2]! -->
+<p>Now, since the span of <span class="math inline">Q</span> is invariant under <span class="math inline">A</span>, every eigenvalue of <span class="math inline">T</span> is an eigenvalue of <span class="math inline">A</span>:</p>
+<p><span class="math display"> T = Y \Theta Y^T, \Theta = \Lambda </span></p>
 <p>To quote the lucid <a href="https://apps.dtic.mil/sti/tr/pdf/ADA289614.pdf">Lanczos introduction from Parlett</a>, <em>could anything be more simple?</em></p>
 </section>
 <section id="quadratic-time-and-linear-space-how" class="level2">
@@ -409,7 +411,7 @@ A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} 
 <p><span class="math display">
 \text{where  } r_j = (A - \alpha_j I)q_j - \beta_{j\text{-}1} q_j
 </span></p>
-<p>In other words, if (<span class="math inline">q_{j\text{-}1}, \beta_j, q_j</span>) are known, then (<span class="math inline">\alpha_j</span>, <span class="math inline">\beta_{j+1}, q_{j+1}</span>) are completely determined. This fact is fantastic from a computational point of view: no explicit call to the QR algorithm necessary<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>!</p>
+<p>In other words, if (<span class="math inline">q_{j\text{-}1}, \beta_j, q_j</span>) are known, then (<span class="math inline">\alpha_j</span>, <span class="math inline">\beta_{j+1}, q_{j+1}</span>) are completely determined. This fact is fantastic from a computational point of view: no explicit call to the QR algorithm necessary<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>!</p>
 <p>Note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just <span class="math inline">O(n)</span> space. If we assume that <span class="math inline">v \mapsto Av \sim O(n)</span>, then the above procedure clearly takes at most <span class="math inline">O(n^2)</span> time, since there are most <span class="math inline">n</span> such vectors <span class="math inline">\{q_i\}_{i=1}^n</span> to generate!</p>
 <p>Moreover, if we only need the eigen-<em>values</em> <span class="math inline">\Lambda(A)</span> ( and not their vectors <span class="math inline">U</span>), then we may execute the recurrence keeping at most three vectors <span class="math inline">\{q_{j-1}, q_{j}, q_{j+1}\}</span> in memory at any given time. Since each of these is <span class="math inline">O(n)</span> is size, the claim of <span class="math inline">O(n)</span> space is justified!</p>
 <p>The description above is essentially the proof of the following Theorem:</p>
@@ -427,7 +429,7 @@ A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} 
 <p><span class="math display">
 K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 </span></p>
-<p>This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely</em> determined by <span class="math inline">(A, q_1)</span>.</p>
+<p>This is actually QR factorization! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely</em> determined by <span class="math inline">(A, q_1)</span> (up to a sign of the columns).</p>
 <p>Thus, tridiagonalizing <span class="math inline">A</span> with respect to an arbitrary <span class="math inline">q_1 \in \mathbb{R}^n</span> satisfying <span class="math inline">\lVert q_1\rVert = 1</span> <em>determines</em> <span class="math inline">Q</span>.</p>
 </section>
 <section id="pseudocode" class="level2">
@@ -484,8 +486,7 @@ $$ *is* the QR factorization of $K_n(A, q_1)$. Thus, tridiagonalizing $A$ with r
 
 <ol>
 <li id="fn1"><p>A variant of the Lanczos method is actually at the heart <code>scipy.sparse.linalg</code>’s default <code>eigsh</code> solver (which is a port of <a href="https://en.wikipedia.org/wiki/ARPACK">ARPACK</a>).<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>tridiag ref<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>In fact, there’s a strnger<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>In fact, there’s a strnger<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

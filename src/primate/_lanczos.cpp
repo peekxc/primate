@@ -178,6 +178,9 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
     .def_readwrite("orth", &MatrixFunction< F, WrapperType >::orth)
     .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x) -> py_array< F >{
       using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
+      if (M.shape().second != x.size()){
+        throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator.");
+      }
       auto output = static_cast< ArrayF >(VectorF::Zero(M.shape().first));
       M.matvec(x.data(), output.data());
       return py::cast(output);
