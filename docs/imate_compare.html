@@ -345,43 +345,48 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td>Parallel support</td>
-<td>CPU only</td>
-<td>CPU &amp; GPU</td>
+<td>Matrix support</td>
+<td>Symmetric only</td>
+<td>Symmetric or Rectangular</td>
 </tr>
 <tr class="even">
-<td>Function support</td>
-<td>Arbitrary</td>
-<td>Package supported<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></td>
+<td>Parallel support</td>
+<td>CPU only<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></td>
+<td>CPU / GPU</td>
 </tr>
 <tr class="odd">
+<td>Function support</td>
+<td>Arbitrary</td>
+<td>Package supported<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></td>
+</tr>
+<tr class="even">
 <td>Operator support</td>
 <td>Arbitrary</td>
 <td>Matrix-derived</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Linking strategy</td>
 <td>Header only</td>
-<td>Shared libraries</td>
+<td>Dynamically linked</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>C++ version</td>
 <td><span class="math inline">\geq</span> C++20</td>
 <td>Any</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>FFI</td>
 <td>Pybind11</td>
 <td>Cython</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Build tool</td>
 <td>Meson</td>
 <td>CMake</td>
 </tr>
 </tbody>
 </table>
-<p>One motivation for developing <code>primate</code> was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like <a href="https://en.cppreference.com/w/cpp/language/function_template">function templates</a>, <a href="https://en.wikipedia.org/wiki/Type_erasure">type erasure</a>, and <a href="https://en.wikipedia.org/wiki/Header-only">header-only</a> definitions. These modifications not only simplify access to the SLQ method from <em>user</em> (i.e.&nbsp;dependent) packages, but they enable native support for arbitrary types adhering to SciPys <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html"><code>LinearOperator</code></a> abstract interface. For more details on this, see the integration guide.</p>
+<p>One motivation for developing <code>primate</code> was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like <a href="https://en.cppreference.com/w/cpp/language/function_template">function templates</a>, <a href="https://en.wikipedia.org/wiki/Type_erasure">type erasure</a>, and <a href="https://en.wikipedia.org/wiki/Header-only">header-only</a> definitions. These modifications not only simplify access to the SLQ method from <em>user</em> (i.e.&nbsp;dependent) packages, but they enable native support for arbitrary types adhering to SciPys <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html"><code>LinearOperator</code></a> abstract interface. For more details on this, see the integration guides.</p>
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 <!-- - `imate` supports multiple trace estimation approaches, e.g. decompositional methods. `primate` only supports the SLQ method.  
 - `imate` supports both CPU parallelism and GPU parallelism. `primate` only supports CPU parallelism.
@@ -398,8 +403,9 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 
 <ol>
-<li id="fn1"><p>Before v0.2, much of <code>primate</code>’s code was essentially ported and refactored from <code>imate</code>. The code for v0.2+ has been re-written using <a href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> the library.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>See <a href="https://ameli.github.io/imate/api.html#functions">imates documentation</a> for the list of supported functions.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Before v0.2, much of <code>primate</code>’s code was essentially ported and refactored from <code>imate</code>. The code for v0.2+ has been re-written using the <a href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> template C++ library.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>In theory, there is nothing stopping on from using e.g.&nbsp;GPU-based tensor libraries to accelerate matrix-vector products. Indeed, <code>primate</code> was designed to work with essentially any operator matching the interface, see the <a href="./advanced/cpp_integration.html">C++ integration guide</a>. However, nativ GPU support in the form of CUDA- or ROCm-implemented Linear operators is not provided.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>See <a href="https://ameli.github.io/imate/api.html#functions">imates documentation</a> for the list of supported functions.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

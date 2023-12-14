@@ -95,7 +95,7 @@
     "href": "reference/diagonalize.lanczos.html",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method of minimized iterations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-08\n\n\north\nint\nmaximum number of Lanczos vectors to orthogonalize vectors against.\n0\n\n\nsparse_mat\nbool\nWhether to collect the diagonal and off-diagonal terms into a sparse matrix for output.\n= False\n\n\nreturn_basis\nbool\nWhether to return the last ‘ncv’ orthogonal basis / ‘Lanczos’ vectors.\n= False\n\n\n\n\n\n\nThis function implements the Lanczos method, or as Lanczos called it, the method of minimized iterations.",
+    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method of tridiagonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | ndarray | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n= 1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\n= False\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\n= False\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\n= None\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\n(a,b) : tuple\nThe diagonal and off-diagonal of the tridiagonal matrix.\n\n\nndarray\nIf return_basis is True, the orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase orth and deg, Note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -107,7 +107,7 @@
     "href": "reference/diagonalize.lanczos.html#parameters",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-08\n\n\north\nint\nmaximum number of Lanczos vectors to orthogonalize vectors against.\n0\n\n\nsparse_mat\nbool\nWhether to collect the diagonal and off-diagonal terms into a sparse matrix for output.\n= False\n\n\nreturn_basis\nbool\nWhether to return the last ‘ncv’ orthogonal basis / ‘Lanczos’ vectors.\n= False",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | ndarray | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n= 1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\n= False\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\n= False\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\n= None",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -131,7 +131,7 @@
     "href": "imate_compare.html",
     "title": "Comparison to imate",
     "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guide.",
+    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guides.",
     "crumbs": [
       "Basics",
       "Comparison to *imate*"
@@ -328,7 +328,7 @@
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of tridiagonalization.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
     "crumbs": [
       "API Reference"
     ]
@@ -358,7 +358,7 @@
     "href": "reference/index.html#diagonalize",
     "title": "Function reference",
     "section": "",
-    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of minimized iterations.",
+    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of tridiagonalization.",
     "crumbs": [
       "API Reference"
     ]
@@ -577,7 +577,7 @@
     "href": "imate_compare.html#footnotes",
     "title": "Comparison to imate",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using Eigen the library.↩︎\nSee imates documentation for the list of supported functions.↩︎",
+    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nIn theory, there is nothing stopping on from using e.g. GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface, see the C++ integration guide. However, nativ GPU support in the form of CUDA- or ROCm-implemented Linear operators is not provided.↩︎\nSee imates documentation for the list of supported functions.↩︎",
     "crumbs": [
       "Basics",
       "Comparison to *imate*"
@@ -745,6 +745,54 @@
     "text": "Approximation\nTODO",
     "crumbs": [
       "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/diagonalize.lanczos.html#examples",
+    "href": "reference/diagonalize.lanczos.html#examples",
+    "title": "diagonalize.lanczos",
+    "section": "Examples",
+    "text": "Examples\n  ::: {#af54fa09 .cell execution_count=1}\n  ``` {.python .cell-code}\n          print(\"hello\")\n  ```\n  \n  ::: {.cell-output .cell-output-stdout}\n  ```\n  hello\n  ```\n  :::\n  :::",
+    "crumbs": [
+      "API Reference",
+      "Diagonalize",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/diagonalize.lanczos.html#returns",
+    "href": "reference/diagonalize.lanczos.html#returns",
+    "title": "diagonalize.lanczos",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\n(a,b) : tuple\nThe diagonal and off-diagonal of the tridiagonal matrix.\n\n\nndarray\nIf return_basis is True, the orthogonal basis for the Krylov subspace.",
+    "crumbs": [
+      "API Reference",
+      "Diagonalize",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/diagonalize.lanczos.html#see-also",
+    "href": "reference/diagonalize.lanczos.html#see-also",
+    "title": "diagonalize.lanczos",
+    "section": "",
+    "text": "scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.",
+    "crumbs": [
+      "API Reference",
+      "Diagonalize",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/diagonalize.lanczos.html#notes",
+    "href": "reference/diagonalize.lanczos.html#notes",
+    "title": "diagonalize.lanczos",
+    "section": "",
+    "text": "No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase orth and deg, Note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "crumbs": [
+      "API Reference",
+      "Diagonalize",
       "Lanczos"
     ]
   }

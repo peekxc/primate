@@ -18,33 +18,31 @@ def lanczos(
 ) -> tuple:
 	"""Lanczos method of tridiagonalization.
 
-	This function implements Paige's A27 variant[1]_ of the Lanczos method.
+	This function implements Paiges A27 variant of the Lanczos method with support for varying degrees of re-orthogonalization. 
 
 	Parameters
 	----------
-	A : LinearOperator | ndarray | sparray
+	A : LinearOperator or ndarray or sparray
 	    Symmetric operator to tridiagonalize.
-	v0 : ndarray, default = None
+	v0 : ndarray, default=None
 	    Initial vector to orthogonalize against.
-	deg : int, default = None
+	deg : int, default=None
 	    Size of the Krylov subspace to expand.
-	rtol : float, default = 1e-8
+	rtol : float, default=1e-8
 	    Relative tolerance to consider the invariant subspace as converged.
 	orth : int, default=0
 	    Additional number of Lanczos vectors to orthogonalize against.
-	sparse_mat : bool, default = False
+	sparse_mat : bool, default=False
 	    Whether to output the diagonal and off-diagonal terms as a sparse matrix.
-	return_basis : bool, default = False
+	return_basis : bool, default=False
 	    Whether to return the `orth` + 2 Lanczos vectors.
-	dtype : dtype, default = None
-	                The precision dtype to specialize the computation.
+	dtype : dtype, default=None
+	  	The precision dtype to specialize the computation.
 
 	Returns
 	-------
-	(a,b) : tuple
-	    The diagonal and off-diagonal of the tridiagonal matrix.
-	Q : ndarray
-	                If `return_basis` is True, the orthogonal basis for the Krylov subspace.
+	A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If `return_basis` is
+	True, then the tuple `(a,b), Q` is returned, where `Q` represents orthogonal basis for the Krylov subspace.
 
 	See Also
 	--------
@@ -53,35 +51,13 @@ def lanczos(
 
 	Notes
 	-----
-	No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase `orth` and `deg`,
-	Note the complexity of the iteration scales linearly with `deg` and quadratically with `orth`.
+	No checking for performed for ghost, converged, or 'locked' eigenvalues. To increase the accuracy of the 
+	eigenvalue approximation, increase `orth` and `deg`, though note the complexity of the iteration scales linearly 
+	with `deg` and quadratically with `orth`.
 
 	Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization.
 
 	.. [1] Paige, Christopher C. "Computational variants of the Lanczos method for the eigenproblem." IMA Journal of Applied Mathematics 10.3 (1972): 373-381.
-
-	Examples
-	----------
-	```{python}
-	import numpy as np 
-	from scipy.linalg import eigh_tridiagonal
-	from primate.diagonalize import lanczos
-  
-	## Generate a random symmetric matrix
-  A = np.random.normal(size=(100,100))
-	A = (A + A.T) / 2
-
-	## Perform the Lanczos expansion on the Krylov subspace (A, v0)
-  v0 = np.random.uniform(size=n)
-  (a,b) = lanczos(A, v0)
-  
-	## Rayleigh-Ritz approximations via eigh_tridiagonal
-	rr = eigh_tridiagonal(a, b, eigvals_only=True)
-
-	## Compare with true eigenvalues
-	ew = np.linalg.eigh(A)[0]
-	assert npp.allclose(rr, ew, atol=1e-3)
-	```
 	"""
 	## Basic parameter validation
 	n: int = A.shape[0]

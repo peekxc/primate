@@ -70,8 +70,6 @@ website:
               text: Lanczos
             section: Diagonalize 
           - contents: 
-            - href: reference/primate.trace.qmd  
-          - contents: 
             - href: reference/primate.trace.sl_trace.qmd
               text: SL Trace
             - href: reference/primate.trace.sl_gauss.qmd

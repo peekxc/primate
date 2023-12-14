@@ -300,7 +300,9 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#primate.diagonalize.lanczos" id="toc-primate.diagonalize.lanczos" class="nav-link active" data-scroll-target="#primate.diagonalize.lanczos">diagonalize.lanczos</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -314,14 +316,14 @@ ul.task-list li input[type="checkbox"] {
 <section id="primate.diagonalize.lanczos" class="level1">
 <h1>diagonalize.lanczos</h1>
 <p><code>diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)</code></p>
-<p>Lanczos method of minimized iterations.</p>
+<p>Lanczos method of tridiagonalization.</p>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
 <col style="width: 9%">
-<col style="width: 28%">
-<col style="width: 54%">
+<col style="width: 36%">
+<col style="width: 46%">
 <col style="width: 7%">
 </colgroup>
 <thead>
@@ -335,7 +337,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>A</code></td>
-<td>scipy.sparse.linalg.LinearOperator | sparray</td>
+<td>scipy.sparse.linalg.LinearOperator | ndarray | sparray</td>
 <td>Symmetric operator to tridiagonalize.</td>
 <td><em>required</em></td>
 </tr>
@@ -355,32 +357,69 @@ ul.task-list li input[type="checkbox"] {
 <td><code>rtol</code></td>
 <td>float</td>
 <td>Relative tolerance to consider the invariant subspace as converged.</td>
-<td><code>1e-08</code></td>
+<td><code>= 1e-8</code></td>
 </tr>
 <tr class="odd">
 <td><code>orth</code></td>
 <td>int</td>
-<td>maximum number of Lanczos vectors to orthogonalize vectors against.</td>
+<td>Additional number of Lanczos vectors to orthogonalize against.</td>
 <td><code>0</code></td>
 </tr>
 <tr class="even">
 <td><code>sparse_mat</code></td>
 <td>bool</td>
-<td>Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output.</td>
+<td>Whether to output the diagonal and off-diagonal terms as a sparse matrix.</td>
 <td><code>= False</code></td>
 </tr>
 <tr class="odd">
 <td><code>return_basis</code></td>
 <td>bool</td>
-<td>Whether to return the last ‘ncv’ orthogonal basis / ‘Lanczos’ vectors.</td>
+<td>Whether to return the <code>orth</code> + 2 Lanczos vectors.</td>
 <td><code>= False</code></td>
+</tr>
+<tr class="even">
+<td><code>dtype</code></td>
+<td>dtype</td>
+<td>The precision dtype to specialize the computation.</td>
+<td><code>= None</code></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="description" class="level2">
-<h2 class="anchored" data-anchor-id="description">Description</h2>
-<p>This function implements the Lanczos method, or as Lanczos called it, the <em>method of minimized iterations</em>.</p>
+<section id="returns" class="level2">
+<h2 class="anchored" data-anchor-id="returns">Returns</h2>
+<table class="table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 83%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>(a,b) : tuple</td>
+<td>The diagonal and off-diagonal of the tridiagonal matrix.</td>
+</tr>
+<tr class="even">
+<td>ndarray</td>
+<td>If <code>return_basis</code> is True, the orthogonal basis for the Krylov subspace.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See Also</h2>
+<p>scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.</p>
+</section>
+<section id="notes" class="level2">
+<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<p>No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase <code>orth</code> and <code>deg</code>, Note the complexity of the iteration scales linearly with <code>deg</code> and quadratically with <code>orth</code>.</p>
+<p>Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization.</p>
+<p>.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.</p>
 
 
 </section>
