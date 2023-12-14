@@ -8,20 +8,21 @@ Notable differences between the two packages include:
 
 | **Feature**      | `primate`             | `imate`                |
 |------------------|-----------------------|------------------------|
-| Parallel support | CPU only              | CPU & GPU              |
+| Matrix support   | Symmetric only        | Symmetric or Rectangular |
+| Parallel support | CPU only[^3]          | CPU / GPU              |
 | Function support | Arbitrary             | Package supported[^2]  |
 | Operator support | Arbitrary             | Matrix-derived         |
-| Linking strategy | Header only           | Shared libraries       |
+| Linking strategy | Header only           | Dynamically linked     |
 | C++ version      | $\geq$ C++20          | Any                    |
 | FFI              | Pybind11              | Cython                 |
 | Build tool       | Meson                 | CMake                  |
 
-One motivation for developing `primate` was to modularize and streamline access to various parts of the SLQ method, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
-These modifications not only simplify access to the SLQ method from *user* (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. For more details on this, see the integration guide. 
+One motivation for developing `primate` was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
+These modifications not only simplify access to the SLQ method from *user* (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. For more details on this, see the integration guides. 
 
-[^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) the library.
+[^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using the [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) template C++ library.
 [^2]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
-
+[^3]: In theory, there is nothing stopping on from using e.g. GPU-based tensor libraries to accelerate matrix-vector products. Indeed, `primate` was designed to work with essentially any operator matching the interface, see the [C++ integration guide](advanced/cpp_integration.qmd). However, nativ GPU support in the form of CUDA- or ROCm-implemented Linear operators is not provided.
 
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 

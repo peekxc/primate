@@ -2,20 +2,54 @@
 
 `diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)`
 
-Lanczos method of minimized iterations.
+Lanczos method of tridiagonalization.
 
-## Parameters
+      This function implements Paige's A27 variant[1]_ of the Lanczos method. 
 
-| Name           | Type                                          | Description                                                                             | Default    |
-|----------------|-----------------------------------------------|-----------------------------------------------------------------------------------------|------------|
-| `A`            | scipy.sparse.linalg.LinearOperator \| sparray | Symmetric operator to tridiagonalize.                                                   | _required_ |
-| `v0`           | ndarray                                       | Initial vector to orthogonalize against.                                                | `= None`   |
-| `deg`          | int                                           | Size of the Krylov subspace to expand.                                                  | `= None`   |
-| `rtol`         | float                                         | Relative tolerance to consider the invariant subspace as converged.                     | `1e-08`    |
-| `orth`         | int                                           | maximum number of Lanczos vectors to orthogonalize vectors against.                     | `0`        |
-| `sparse_mat`   | bool                                          | Whether to collect the diagonal and off-diagonal terms into a sparse matrix for output. | `= False`  |
-| `return_basis` | bool                                          | Whether to return the last 'ncv' orthogonal basis / 'Lanczos' vectors.                  | `= False`  |
+      Parameters
+      ----------
+      A : LinearOperator | ndarray | sparray
+          Symmetric operator to tridiagonalize.
+      v0 : ndarray, default = None
+          Initial vector to orthogonalize against.
+      deg : int, default = None
+          Size of the Krylov subspace to expand.
+      rtol : float, default = 1e-8
+          Relative tolerance to consider the invariant subspace as converged.
+      orth : int, default=0
+          Additional number of Lanczos vectors to orthogonalize against.
+      sparse_mat : bool, default = False
+          Whether to output the diagonal and off-diagonal terms as a sparse matrix.
+      return_basis : bool, default = False
+          Whether to return the `orth` + 2 Lanczos vectors.
+      dtype : dtype, default = None
+                      The precision dtype to specialize the computation. 
 
-## Description
+      Returns
+      -------
+      (a,b) : tuple
+          The diagonal and off-diagonal of the tridiagonal matrix.
+      Q : ndarray
+                      If `return_basis` is True, the orthogonal basis for the Krylov subspace.
 
-This function implements the Lanczos method, or as Lanczos called it, the _method of minimized iterations_.
+      See Also
+      --------
+      scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.
+      operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.
+
+      Notes
+      -----
+      No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase `orth` and `deg`, 
+      Note the complexity of the iteration scales linearly with `deg` and quadratically with `orth`.
+
+      Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization. 
+
+      .. [1] Paige, Christopher C. "Computational variants of the Lanczos method for the eigenproblem." IMA Journal of Applied Mathematics 10.3 (1972): 373-381.
+
+
+
+##       Examples
+
+      ```{python}
+              print("hello")
+      ```

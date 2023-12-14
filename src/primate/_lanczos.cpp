@@ -57,7 +57,7 @@ auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
     } else if (matrix_func == "inv"){
       f = [](F eigenvalue) -> F {  return 1.0/eigenvalue; };
     } else if (matrix_func == "exp"){
-      F t = kwargs_map.contains("t") ? kwargs_map["t"].cast< F >() : 0.0;
+      F t = kwargs_map.contains("t") ? kwargs_map["t"].cast< F >() : 1.0;
       f = [t](F eigenvalue) -> F {  return std::exp(t*eigenvalue); };  
     } else if (matrix_func == "smoothstep"){
       F a = kwargs_map.contains("a") ? kwargs_map["a"].cast< F >() : 0.0;
@@ -92,6 +92,24 @@ auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
     throw std::invalid_argument("No matrix function supplied.");
   }
   return f; 
+}
+
+template< std::floating_point F, typename WrapperType > 
+auto matmat(const MatrixFunction< F, WrapperType >& M, const py_array< F >& X) -> py_array< F >{
+  if (size_t(X.ndim() == 1)){
+    if (size_t(M.shape().second) != size_t(X.size())){ throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator."); }
+    auto Y = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(M.shape().second, 1));
+    M.matmat(X.data(), Y.data(), 1);
+    return py::cast(Y);
+  } else if (X.ndim() == 2){
+    if (size_t(M.shape().second) != size_t(X.shape(0))){ throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator."); }
+    const auto k = X.shape(1);
+    auto Y = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(M.shape().second, k));
+    M.matmat(X.data(), Y.data(), k);
+    return py::cast(Y);
+  } else {
+    throw std::invalid_argument("Input dimension mismatch; input must be 1 or 2-dimensional.");
+  }
 }
 
 // Template function for generating module definitions for a given Operator / precision 
@@ -191,14 +209,18 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
       }
       M.matvec(x.data(), y.mutable_data());
     })
-    // .def_method("__repr__", &MatrixFunction::eval)
+    .def("matmat", &matmat< F, WrapperType >)
+    .def("__matmul__", &matmat< F, WrapperType >) // see: https://peps.python.org/pep-0465/
     ;  
 } 
 
 PYBIND11_MODULE(_lanczos, m) {
   // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
-  _lanczos_wrapper< float, Eigen::MatrixXf >(m, "dense", eigen_dense_wrapper< float >);
-  _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparse", eigen_sparse_wrapper< float >);
+  _lanczos_wrapper< float, DenseMatrix < float > >(m, "denseF", eigen_dense_wrapper< float >);
+  _lanczos_wrapper< double, DenseMatrix < double > >(m, "denseD", eigen_dense_wrapper< double >);
+
+  _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparseF", eigen_sparse_wrapper< float >);
+  _lanczos_wrapper< double, Eigen::SparseMatrix< double > >(m, "sparseD", eigen_sparse_wrapper< double >);
 };
 
 

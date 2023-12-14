@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.sparse import csc_array
-from typing import *
+from typing import Callable
 from primate.diagonalize import lanczos
 from scipy.linalg import eigh_tridiagonal
 
@@ -25,7 +25,7 @@ def lanczos_base(A, v0: np.ndarray = None, k: int = None, tol: float = 1e-8):
     qp, qc = qc, qn
   return alpha, beta
 
-## Paige's A1 variant without additional re-orthogonalization
+## Paige's A(2,7) variant without additional re-orthogonalization
 def lanczos_paige(A, v: np.ndarray, k: int, tol: float = 1e-8):
   assert k <= A.shape[0], "Can perform at most k = n iterations"
   n = A.shape[0]
@@ -70,6 +70,7 @@ def girard_hutch(A, f: Callable, nv: int = 150, estimates: bool = False, **kwarg
 def approx_matvec(A, v: np.ndarray, k: int = None, f: Callable = None):
   k = A.shape[1] if k is None else int(k)
   (a,b), Q = lanczos(A, v, deg=k, orth=0, return_basis=True)
+  Q = Q[:,:k]
   rw, V = eigh_tridiagonal(a,b, eigvals_only=False)  # lanczos_quadrature(A, v, )
   rw = rw if f is None else f(rw)
   y = np.linalg.norm(v) * (Q @ V @ (V[0,:] * rw))

@@ -4,7 +4,7 @@ requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy'] # 'pythran-op
 
 [project]
 name = "primate"
-version = "0.2.8"
+version = "0.2.9"
 readme = "README.md"
 classifiers = [
 	"Intended Audience :: Science/Research",
@@ -24,7 +24,7 @@ dependencies = [
 license = {file = "LICENSE"}
 include = [
 	{ path = "primate/**/*.so", format = "wheel" },
-	{ path = "primate/**/*.pyd", format = "wheel" },
+	{ path = "primate/**/*.pyd", format = "wheel" }
 ]
 
 [tool.meson-python.args]

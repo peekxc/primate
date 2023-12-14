@@ -59,6 +59,7 @@ def matrix_function(
 	## Get the dtype; infer it if it's not available
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
 	assert (f_dtype.type == np.float32 or f_dtype.type == np.float64), "Only 32- or 64-bit floating point numbers are supported."
+	module_func += "F" if f_dtype.type == np.float32 else "D"
 
 	## Argument checking
 	rtol = np.finfo(f_dtype).eps if rtol is None else f_dtype.type(rtol)
@@ -67,7 +68,7 @@ def matrix_function(
 
 	## Parameterize the matrix function and trace call
 	if isinstance(fun, str):
-		assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+		assert fun in _builtin_matrix_functions, f"If given as a string, 'fun' must be one of {str(_builtin_matrix_functions)}."
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
 		kwargs["function"] = "generic"

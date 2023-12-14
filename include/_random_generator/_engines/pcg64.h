@@ -8,7 +8,7 @@
 #include <cassert>  // assert
 #include <ctime>    // std::time
 #include <random>   // std::seed_seq
-#include <iostream> 
+#include <array>    // array
 
 struct Pcg64 { 
   using result_type = uint64_t;
@@ -22,9 +22,9 @@ struct Pcg64 {
     inc = (state << 1u) | 1u;
   };
 
-  void seed(std::seed_seq& state_) {
+  void seed(std::seed_seq& seed_s) {
     std::array< std::uint32_t, 2 > seeds = { 0, 0 }; 
-    state_.generate(seeds.begin(), seeds.end());
+    seed_s.generate(seeds.begin(), seeds.end());
     state = static_cast< std::uint64_t >(seeds[0]);
     state = state << 32; 
     state = state | static_cast< std::uint64_t >(seeds[1]);

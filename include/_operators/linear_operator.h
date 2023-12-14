@@ -1,6 +1,6 @@
 
-#ifndef _LINEAR_OPERATOR_H
-#define _LINEAR_OPERATOR_H
+#ifndef _OPERATORS_H
+#define _OPERATORS_H
 
 #include <type_traits>
 #include <concepts>

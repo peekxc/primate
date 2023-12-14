@@ -2,7 +2,7 @@ from typing import *
 import numpy as np 
 
 ## Natively support matrix functions
-_builtin_matrix_functions = ["identity", "sqrt", "exp", "pow", "log", "numrank", "smoothstep", "gaussian"]
+_builtin_matrix_functions = ["identity", "abs", "sqrt", "log", "inv", "exp", "smoothstep", "numrank", "gaussian"]
 
 def soft_sign(x: np.ndarray = None, q: int = 1):
   """Soft-sign function.

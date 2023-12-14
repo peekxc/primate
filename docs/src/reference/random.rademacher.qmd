@@ -2,7 +2,7 @@
 
 `random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)`
 
-Generates random vectors from the rademacher distribution. 
+Generates random vectors from the rademacher distribution.
 
 ## Parameters
 

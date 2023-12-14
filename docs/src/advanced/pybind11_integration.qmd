@@ -119,10 +119,10 @@ That's it. The module `_custom_trace` will now have an exported `trace_slq` meth
 For explanatory purposes, the following code outline how to call the trace estimator to compute the log determinant using a custom user-implemented operator `LinOp`: 
 
 ```cpp
-#include <cmath>                              // std::log
-#include <_linear_operator/linear_operator.h> // LinearOperator
-#include <_lanczos/lanczos.h>                 // sl_trace
-#include "LinOp.h"                            // custom class
+#include <cmath>                           // std::log
+#include <_operators/linear_operator.h>    // LinearOperator
+#include <_lanczos/lanczos.h>              // sl_trace
+#include "LinOp.h"                         // custom class
 
 void slq_log_det(LinOp A, ...){ 
   static_assert(LinearOperator< LinOp >);  // Constraint check

@@ -2,7 +2,7 @@
 #include <functional> // function
 #include <algorithm>  // max
 #include "omp_support.h" // conditionally enables openmp pragmas
-#include "_linear_operator/linear_operator.h" // LinearOperator
+#include "_operators/linear_operator.h" // LinearOperator
 #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
 #include "eigen_core.h"
@@ -33,7 +33,7 @@ double erf_inv(double x) noexcept {
   } 
 }
 
-// Paige's A1 variant of the Lanczos method
+// Paige's A27 variant of the Lanczos method
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
 // Precondition: orth < ncv <= k and ncv >= 2.
 template< std::floating_point F, LinearOperator Matrix >
@@ -209,7 +209,7 @@ template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG >
 void sl_trace(
   const Matrix& mat, const std::function< F(F) > sf, 
   RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
-  const int lanczos_degree, const float lanczos_rtol, const int orth, const int ncv,
+  const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
   const F atol, const F rtol, 
   const int num_threads,
   const bool use_CLT, 
@@ -306,7 +306,7 @@ void sl_quadrature(
   };
 
   // Execute the stochastic Lanczos quadrature
-  slq< float >(mat, quad_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
+  slq< F >(mat, quad_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
 template< std::floating_point F, LinearOperator Matrix > 
@@ -370,6 +370,14 @@ struct MatrixFunction {
     y_map = Q * static_cast< VectorF >(V * v_mod.matrix()); // equivalent to Q V diag(sf(theta)) V^T e_1
     y_map.array() *= v_scale; // re-scale
   }   
+
+  void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    Eigen::Map< const DenseMatrix< F > > XM(X, op.shape().second, k);
+    Eigen::Map< DenseMatrix< F > > YM(Y, op.shape().first, k);
+    for (size_t j = 0; j < k; ++j){
+      matvec(XM.col(j).data(), YM.col(j).data());
+    }
+  }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
     return op.shape();

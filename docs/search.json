@@ -11,7 +11,7 @@
     "href": "reference/primate.trace.sl_trace.html",
     "title": "sl_trace",
     "section": "",
-    "text": "trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg', seed=-1, num_threads=0, verbose=False, plot=False, **kwargs)\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n.. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
+    "text": "trace.sl_trace(A, fun='identity', maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='lcg', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n= \"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n= \"confidence\"\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to Only used when stop = “confidence”.\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n[1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -23,7 +23,7 @@
     "href": "reference/primate.trace.sl_trace.html#parameters",
     "title": "sl_trace",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparse matrix, or LinearOperator\nreal, square, symmetric operator given as a ndarray, a sparse matrix, or a LinearOperator.\nrequired\n\n\nfun\nstr or Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to use with rule\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\nkwargs\n(dict, optional)\nadditional key-values to parameterize the chosen function ‘fun’.\n{}",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n= \"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n= 10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\n= None\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n= 1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n= \"confidence\"\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to Only used when stop = “confidence”.\n= 0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\nstr\nRandom number generator to use. Defaults to PCG64 generator.\n= \"pcg\"\n\n\nseed\nint\nSeed to initialize the entropy source. Use non-negative integers for reproducibility.\n= -1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Use values &lt;= 0 to maximize the number of threads.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\n= False\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -35,7 +35,7 @@
     "href": "reference/primate.trace.sl_trace.html#returns",
     "title": "sl_trace",
     "section": "",
-    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘return_info = True’, additional information about the computation.",
+    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -59,7 +59,7 @@
     "href": "reference/primate.trace.sl_trace.html#reference",
     "title": "sl_trace",
     "section": "",
-    "text": ".. [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
+    "text": "[1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -390,22 +390,14 @@
     "href": "reference/trace.html",
     "title": "trace",
     "section": "",
-    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
+    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature."
   },
   {
     "objectID": "reference/trace.html#functions",
     "href": "reference/trace.html#functions",
     "title": "trace",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature.",
-    "crumbs": [
-      "API Reference",
-      "Trace"
-    ]
+    "text": "Name\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature."
   },
   {
     "objectID": "basic/integration.html",

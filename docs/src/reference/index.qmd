@@ -14,8 +14,8 @@ Randomized module
 
 | | |
 | --- | --- |
-| [random.rademacher](random.rademacher.qmd#primate.random.rademacher) | Generates random vectors from the rademacher distribution.  |
-| [random.normal](random.normal.qmd#primate.random.normal) | Generates random vectors from the rademacher distribution.  |
+| [random.rademacher](random.rademacher.qmd#primate.random.rademacher) | Generates random vectors from the rademacher distribution. |
+| [random.normal](random.normal.qmd#primate.random.normal) | Generates random vectors from the rademacher distribution. |
 
 ## Diagonalize
 
@@ -23,7 +23,7 @@ Diagonalization methods
 
 | | |
 | --- | --- |
-| [diagonalize.lanczos](diagonalize.lanczos.qmd#primate.diagonalize.lanczos) | Lanczos method of minimized iterations. |
+| [diagonalize.lanczos](diagonalize.lanczos.qmd#primate.diagonalize.lanczos) | Lanczos method of tridiagonalization. |
 
 ## Misc
 
