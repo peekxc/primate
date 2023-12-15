@@ -95,7 +95,7 @@
     "href": "reference/diagonalize.lanczos.html",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method of tridiagonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | ndarray | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n= 1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\n= False\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\n= False\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\n= None\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\n(a,b) : tuple\nThe diagonal and off-diagonal of the tridiagonal matrix.\n\n\nndarray\nIf return_basis is True, the orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase orth and deg, Note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method of tridiagonalization.\nThis function implements Paiges A27 variant[^1] of the Lanczos method with support for varying degrees of re-orthogonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg, though note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n\n\n\n[^1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -107,7 +107,7 @@
     "href": "reference/diagonalize.lanczos.html#parameters",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator | ndarray | sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\n= None\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\n= None\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n= 1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\n= False\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\n= False\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\n= None",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -765,7 +765,7 @@
     "href": "reference/diagonalize.lanczos.html#returns",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Type\nDescription\n\n\n\n\n(a,b) : tuple\nThe diagonal and off-diagonal of the tridiagonal matrix.\n\n\nndarray\nIf return_basis is True, the orthogonal basis for the Krylov subspace.",
+    "text": "Type\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -789,7 +789,19 @@
     "href": "reference/diagonalize.lanczos.html#notes",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase orth and deg, Note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "text": "No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg, though note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.",
+    "crumbs": [
+      "API Reference",
+      "Diagonalize",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/diagonalize.lanczos.html#references",
+    "href": "reference/diagonalize.lanczos.html#references",
+    "title": "diagonalize.lanczos",
+    "section": "",
+    "text": "[^1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
       "Diagonalize",

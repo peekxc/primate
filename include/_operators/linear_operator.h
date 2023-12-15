@@ -51,6 +51,11 @@ concept Operator =
   AdjointAdditiveOperator< T, F >
 ;
 
+template < typename T, typename F = typename T::value_type >
+concept QuadOperator = requires(T op, const F* input) {
+  { op.quad(input) } -> std::convertible_to< F >; // v^T A v ; todo: make optional if matvec available?
+}
+
 // Represents the operator (A + tB) for parameter T = { t1, t2, ..., tn }
 template < typename T, typename F = typename T::value_type >
 concept AffineOperator = requires(T op, F t) {

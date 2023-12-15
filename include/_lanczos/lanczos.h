@@ -7,7 +7,7 @@
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
 #include "eigen_core.h"
 #include <Eigen/Eigenvalues> 
-
+#include "_trace/girard.h"
 #include <iostream>
 
 using std::function; 
@@ -126,6 +126,8 @@ auto lanczos_quadrature(
   std::copy(theta.begin(), theta.end(), nodes);
   std::copy(tau.begin(), tau.end(), weights);
 };
+
+
 
 // Stochastic Lanczos quadrature method
 // std::function<F(int,F*,F*)>
@@ -280,6 +282,9 @@ void sl_trace(
   slq< F >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
+
+
+
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG > 
 void sl_quadrature(
   const Matrix& mat, 
@@ -321,18 +326,20 @@ struct MatrixFunction {
   const Matrix op; 
   std::function< F(F) > f; 
   const int deg;
+  const int ncv; 
   F rtol; 
   int orth;
 
-  MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) 
-  : op(A), f(fun), deg(lanczos_degree), rtol(lanczos_rtol), orth(add_orth) {
-    // Pre-allocate memory needed for Lanczos iterations
-    Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(A.shape().first, deg));
+  MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv) 
+  : op(A), f(fun), deg(lanczos_degree), rtol(lanczos_rtol), orth(_orth), ncv(_ncv) {
+    // Pre-allocate all but Q memory needed for Lanczos iterations
     alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
     weights = static_cast< ArrayF >(ArrayF::Zero(deg));
     solver = EigenSolver(deg);
+
+    // Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(A.shape().first, deg));
   };
 
   // Don't allow construction from temporaries
@@ -377,6 +384,23 @@ struct MatrixFunction {
     for (size_t j = 0; j < k; ++j){
       matvec(XM.col(j).data(), YM.col(j).data());
     }
+  }
+
+  // Approximates v^T A v
+  auto quad(const F* v) const noexcept -> F {
+
+    // Save copy of v + its norm 
+    Eigen::Map< const VectorF > v_map(v, op.shape().second);
+    const F v_scale = v_map.norm(); 
+    VectorF v_copy = v_map; // save copy
+
+    // Execute lanczos method + Golub-Welsch algorithm
+    lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+    lanczos_quadrature< F >(alpha.data(), beta.data(), deg, solver, nodes.data(), weights.data());
+    
+    // Apply f to the nodes and sum
+    std::transform(nodes.begin(), nodes.end(), nodes.begin(), f);
+    return (nodes * weights).sum();
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {

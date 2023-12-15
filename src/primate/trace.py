@@ -2,13 +2,14 @@ from typing import Union, Callable
 from numbers import Integral
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
+from scipy.linalg import solve_triangular
 
 ## Package imports
 from .random import _engine_prefixes, _engines, isotropic
 from .special import _builtin_matrix_functions
 import _lanczos
 
-def sl_trace(
+def girard(
 	A: Union[LinearOperator, np.ndarray],
 	fun: Union[str, Callable] = "identity",
 	maxiter: int = 200,
@@ -27,47 +28,55 @@ def sl_trace(
 	plot: bool = False,
 	**kwargs,
 ) -> Union[float, tuple]:
-	"""Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ).
+	"""Estimates the trace of a matrix $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
+
+	This function uses up to `maxiter` random isotropic vectors to form an unbiased estimator of the trace of `A`. 
+	The estimator is obtained by averaging quadratic forms of $A$ (or $f(A)$), rescaling as necessary.  
+	
+	Notes
+	-----
+	For matrix functions, the Lanczos method up to degree `deg` is used to approximate the action of $f(A)$. By default, 
+
 
 	Parameters
 	----------
 	A : ndarray, sparray, or LinearOperator
 	    real symmetric operator.
-	fun : str or Callable, default = "identity"
+	fun : str or Callable, default="identity"
 	    real-valued function defined on the spectrum of `A`.
-	maxiter : int, default = 10
+	maxiter : int, default=10
 	    Maximum number of random vectors to sample for the trace estimate.
-	deg  : int, default = 20
+	deg  : int, default=20
 	    Degree of the quadrature approximation.
-	atol : float, default = None
+	atol : float, default=None
 	    Absolute tolerance to signal convergence for early-stopping. See details.
-	rtol : float, default = 1e-2
+	rtol : float, default=1e-2
 	    Relative tolerance to signal convergence for early-stopping. See details.
-	stop : str, default = "confidence"
+	stop : str, default="confidence"
 	    Early-stopping criteria to test estimator convergence. See details.
-	orth: int, default = 0
+	orth: int, default=0
 	    Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
-	confidence : float, default = 0.95
+	confidence : float, default=0.95
 	    Confidence level to Only used when `stop` = "confidence".
-	pdf : { 'rademacher', 'normal' }, default = "rademacher"
+	pdf : { 'rademacher', 'normal' }, default="rademacher"
 	    Choice of zero-centered distribution to sample random vectors from.
-	rng : str, default = "pcg"
-	    Random number generator to use. Defaults to PCG64 generator.
-	seed : int, default = -1
-	    Seed to initialize the entropy source. Use non-negative integers for reproducibility.
-	num_threads: int, default = 0
-	    Number of threads to use to parallelize the computation. Use values <= 0 to maximize the number of threads.
-	plot : bool, default = False
+	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' }, default="pcg64"
+	    Random number generator to use (PCG64 by default).
+	seed : int, default=-1
+	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
+	num_threads: int, default=0
+	    Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide.
+	plot : bool, default=False
 	    If true, plots the samples of the trace estimate along with their convergence characteristics.
-	info: bool, default = False
+	info: bool, default=False
 	    If True, returns a dictionary containing all relevant information about the computation.
 	kwargs : dict, optional
 	    additional key-values to parameterize the chosen function 'fun'.
 
 	Returns
 	-------
-	trace_estimate : float
-	    Estimate of the trace of the matrix function $f(A)$.
+	estimate : float
+	    Estimate of the trace of $A$, if `fun = "identity"`, otherwise estimates the trace of $f(A)$.
 	info : dict, optional
 	    If 'info = True', additional information about the computation.
 
@@ -136,20 +145,24 @@ def sl_trace(
 
 	## Make the actual call
 	estimates = _lanczos.stochastic_trace(A, *sl_trace_args, **kwargs)
+	
+	## Re-scale and determine the estimate
 	estimates *= A.shape[1]
+	trace_estimate = np.mean(estimates) # todo: consider winsorizing?
+	
+	## If only the point-estimate is required, return it
+	if not info and not plot: 
+		return trace_estimate
 
-	## Plot the trace estimates
+	## Otherwise build the info
+	info = {"estimate": trace_estimate, "samples": estimates}
 	if plot:
 		from bokeh.plotting import show
 		from .plotting import figure_trace
-
-		show(figure_trace(estimates))
-
-	## If requested, create the info dictionary; o/w just return the point-estimate
-	trace_estimate = np.mean(estimates)
-	if not info:
-		return trace_estimate
-	info = {"estimate": trace_estimate, "samples": estimates}
+		p = figure_trace(estimates)
+		show(p)
+		info['figure'] = figure_trace(estimates)
+	
 	return trace_estimate, info
 
 def sl_gauss(
@@ -162,10 +175,38 @@ def sl_gauss(
 	orth: int = 0,
 	num_threads: int = 0,
 ) -> np.ndarray:
-	"""Gaussian quadrature.
+	"""Stochastic Gaussian quadrature approximation.
 
-	Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A.
-	These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).
+	Computes a set of sample nodes and weights for the degree-k orthogonal polynomial approximating the 
+	cumulative spectral measure of `A`. This function can be used to approximate the spectral density of `A`, 
+	or to approximate the spectral sum of any function applied to the spectrum of `A`.
+
+	Parameters
+	----------
+	A : ndarray, sparray, or LinearOperator
+	    real symmetric operator.
+	n : int, default=150
+	    Number of random vectors to sample for the quadrature estimate.
+	deg  : int, default=20
+	    Degree of the quadrature approximation.
+	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' }, default="pcg64"
+	    Random number generator to use (PCG64 by default).
+	seed : int, default=-1
+	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
+	pdf : { 'rademacher', 'normal' }, default="rademacher"
+	    Choice of zero-centered distribution to sample random vectors from.
+	orth: int, default=0
+		Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
+	num_threads: int, default=0
+	    Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide.
+
+	Returns
+	-------
+	trace_estimate : float
+	    Estimate of the trace of the matrix function $f(A)$.
+	info : dict, optional
+	    If 'info = True', additional information about the computation.
+
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
@@ -208,7 +249,6 @@ def sl_gauss(
 
 def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method: str):
 	"""Helper for xtrace function"""
-	from scipy.linalg import solve_triangular
 	diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
 
 	## Invert R
