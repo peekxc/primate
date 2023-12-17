@@ -1,6 +1,10 @@
+#ifndef _ORTHOGONALIZE_ORTHOGONALIZE_H
+#define _ORTHOGONALIZE_ORTHOGONALIZE_H
+
 #include <concepts> // std::floating_point
 #include "eigen_core.h" // DenseMatrix, EigenCore
 #include <Eigen/QR>
+
 
 // Emulate python modulus behavior since C++ '%' is not a true modulus
 constexpr inline auto mod(int a, int b) noexcept -> int {
@@ -14,7 +18,7 @@ constexpr inline auto mod(int a, int b) noexcept -> int {
 // Eigen::Ref use based on: https://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class
 template< std::floating_point F >
 void orth_vector(
-  Ref< ColVector< F > > v,                   // input/output vector
+  Ref< Vector< F > > v,                   // input/output vector
   const Ref< const DenseMatrix< F > >& U,    // matrix of vectors to project onto
   const int start_idx,                       // starting column index
   const int p,                               // number of projections
@@ -54,3 +58,5 @@ void modified_gram_schmidt(Eigen::Ref< DenseMatrix< F > > U, [[maybe_unused]] co
     U.col(k) /= R(k,k);
   }
 }
+
+#endif

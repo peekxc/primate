@@ -4,8 +4,7 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import issparse
 
 from .special import _builtin_matrix_functions
-import _lanczos
-
+import _operators
 
 def matrix_function(
 	A: Union[LinearOperator, np.ndarray],
@@ -48,11 +47,11 @@ def matrix_function(
 
 	## Parameterize the type of matrix function
 	if isinstance(A, np.ndarray):
-		module_func = "MatrixFunction_dense"
+		module_func = "Dense"
 	elif issparse(A):
-		module_func = "MatrixFunction_sparse"
+		module_func = "Sparse"
 	elif isinstance(A, LinearOperator):
-		module_func = "MatrixFunction_linop"
+		module_func = "Generic"
 	else:
 		raise ValueError(f"Invalid type '{type(A)}' supplied for operator A")
 
@@ -77,5 +76,6 @@ def matrix_function(
 		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
 
 	## Construct the instance
-	M = getattr(_lanczos, module_func)(A, deg, rtol, orth, **kwargs)
+	module_func += "_MatrixFunction"
+	M = getattr(_operators, module_func)(A, deg, rtol, orth, **kwargs)
 	return M

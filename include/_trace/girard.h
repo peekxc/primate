@@ -1,12 +1,37 @@
+#ifndef _TRACE_HUTCH_H
+#define _TRACE_HUTCH_H
+
 #include <concepts> 
 #include <functional> // function
 #include <algorithm>  // max
+#include <cmath> // constants
 #include "omp_support.h" // conditionally enables openmp pragmas
 #include "_operators/linear_operator.h" // LinearOperator
 #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
-#include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
+#include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array, Distribution
 #include "eigen_core.h"
 #include <Eigen/Eigenvalues> 
+
+template < int Iterate = 3 >
+double erf_inv(double x) noexcept {
+  // Strategy: solve f(y) = x - erf(y) = 0 for given x with Newton's method.
+  // f'(y) = -erf'(y) = -2/sqrt(pi) e^(-y^2)
+  // Has quadratic convergence, achieving machine precision with ~three iterations.
+  if constexpr(Iterate == 0){
+    // Specialization to get initial estimate; accurate to about 1e-3.
+    // Based on https://stackoverflow.com/questions/27229371/inverse-error-function-in-c
+    const double a = std::log((1 - x) * (1 + x));
+    const double b = std::fma(0.5, a, 4.120666747961526);
+    const double c = 6.47272819164 * a;
+    return std::copysign(std::sqrt(-b + std::sqrt(std::fma(b, b, -c))), x);
+  } else {
+    const double x0 = erf_inv< Iterate - 1 >(x); // compile-time recurse
+    const double fx0 = x - std::erf(x0);
+    const double pi = std::acos(-1);
+    double fpx0 = -2.0 / std::sqrt(pi) * std::exp(-x0 * x0);
+    return x0 - fx0 / fpx0; // = x1
+  } 
+}
 
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typename Lambda >
 void monte_carlo_quad(
@@ -19,6 +44,7 @@ void monte_carlo_quad(
   const int num_threads,                        // Number of threads used to parallelize the computation   
   const int seed                                // Seed for random number generator for determinism
 ){
+  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   
   // Constants
@@ -40,6 +66,10 @@ void monte_carlo_quad(
   #pragma omp parallel shared(stop_flag)
   {
     int tid = omp_get_thread_num(); // thread-id 
+    
+    auto q_norm = static_cast< F >(0.0);
+    auto q = static_cast< VectorF >(VectorF::Zero(m)); 
+    
     #pragma omp for schedule(dynamic, chunk_size)
     for (i = 0; i < nv; ++i){
       if (stop_flag){ continue; }
@@ -47,13 +77,14 @@ void monte_carlo_quad(
       // Generate isotropic vector (w/ unit norm)
       generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
       
-      // Apply quadratic form
+      // Apply quadratic form, using quad() if available
       F sample = 0.0;  
       if constexpr (QuadOperator< Matrix >){
         sample = A.quad(q.data()); // x^T A x
       } else {
-        // ArrayF = ArrayF
-        // sample = 
+        auto y = static_cast< VectorF >(VectorF::Zero(n));
+        A.matvec(q.data(), y.data()); 
+        sample = y.dot(q);
       }
       
       // Run the user-supplied function (parallel section!)
@@ -68,18 +99,15 @@ void monte_carlo_quad(
   }
 }
 
-
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG >
 void girard(
-  const Matrix& mat,
+  const Matrix& A,
   RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
   const F atol, const F rtol, 
   const int num_threads,
   const bool use_CLT, 
   F* estimates
 ){  
-  using VectorF = Eigen::Array< F, Dynamic, 1>;
-
   // Save the sample estimates
   const auto save_sample = [&estimates](int i, F sample, [[maybe_unused]] F* q){
     estimates[i] = sample;
@@ -96,7 +124,7 @@ void girard(
     F mu_est = 0.0, vr_est = 0.0; 
     F mu_pre = 0.0, vr_pre = 0.0; 
     int n = 0; // number of estimates computed
-    const auto z = std::sqrt(2.0) * erf_inv(0.95);
+    const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
     early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n, z, atol, rtol](int i) -> bool {
       ++n; 
       const F denom = (1.0 / F(n));
@@ -130,7 +158,7 @@ void girard(
       return atol_check || rtol_check;
     };
   }
-
-  monte_carlo_quad(A, save_sample, early_stop, nv, dist, rbg, num_threads, seed);
+  monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed);
 }
-  
+
+#endif

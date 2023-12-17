@@ -5,8 +5,8 @@ from math import prod
 from numbers import Integral
 from scipy.spatial.distance import squareform
 
-_engines = ["splitmix64", "xoshiro256**", "pcg64", "lcg64", "mt64"]
-_engine_prefixes = ["sx", "xs", "pcg", "lcg", "mt"]
+_engines = ["splitmix64", "xoshiro256**", "pcg64", "mt64"]
+_engine_prefixes = ["sx", "xs", "pcg", "mt"]
 _iso_distributions = ["rademacher", "normal", "sphere", "xtrace"]
 
 def symmetric(n: int, dist: str = "normal", psd: bool = True, ew: np.ndarray = None):

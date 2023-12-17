@@ -8,10 +8,11 @@ from scipy.linalg import solve_triangular
 from .random import _engine_prefixes, _engines, isotropic
 from .special import _builtin_matrix_functions
 import _lanczos
+import _trace
 
-def girard(
+def hutch(
 	A: Union[LinearOperator, np.ndarray],
-	fun: Union[str, Callable] = "identity",
+	fun: Union[str, Callable] = None,
 	maxiter: int = 200,
 	deg: int = 20,
 	atol: float = None,
@@ -20,7 +21,7 @@ def girard(
 	orth: int = 0,
 	confidence: float = 0.95,
 	pdf: str = "rademacher",
-	rng: str = "lcg",
+	rng: str = "pcg64",
 	seed: int = -1,
 	num_threads: int = 0,
 	verbose: bool = False,
@@ -131,7 +132,9 @@ def girard(
 	atol /= A.shape[1]
 
 	## Parameterize the matrix function and trace call
-	if isinstance(fun, str):
+	if fun is None: 
+		kwargs["function"] = "None"
+	elif isinstance(fun, str):
 		assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
@@ -144,7 +147,7 @@ def girard(
 	sl_trace_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, atol, rtol, num_threads, use_clt)
 
 	## Make the actual call
-	estimates = _lanczos.stochastic_trace(A, *sl_trace_args, **kwargs)
+	estimates = _trace.hutch(A, *sl_trace_args, **kwargs)
 	
 	## Re-scale and determine the estimate
 	estimates *= A.shape[1]

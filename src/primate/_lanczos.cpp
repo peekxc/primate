@@ -122,52 +122,19 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
     
 
     return py::cast(estimates);
-  });
-
-  // Matrix function approximation 
-  using WrapperType = decltype(wrap(static_cast< const Matrix* >(nullptr)));
-  py::class_< MatrixFunction< F, WrapperType > >(m, (std::string("MatrixFunction_") + suffix).c_str())
-    .def(py::init([wrap](const Matrix* A, const int deg, const F rtol, const int orth, const py::kwargs& kwargs) {
-      const auto op = wrap(A);
-      const auto sf = param_spectral_func< F >(kwargs);
-      // std::cout << op.shape().first << ", " << op.shape().second << std::endl;
-      return std::unique_ptr< MatrixFunction< F, WrapperType > >(new MatrixFunction(op, sf, deg, rtol, orth));
-    }))
-    .def_property_readonly("shape", &MatrixFunction< F, WrapperType >::shape)
-    .def_property_readonly("dtype", [](const MatrixFunction< F, WrapperType >& M) -> py::dtype {
-      auto dtype = pybind11::dtype(pybind11::format_descriptor< F >::format());
-      return dtype; 
-    })
-    .def_readonly("deg", &MatrixFunction< F, WrapperType >::deg)
-    .def_readwrite("rtol", &MatrixFunction< F, WrapperType >::rtol)
-    .def_readwrite("orth", &MatrixFunction< F, WrapperType >::orth)
-    .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x) -> py_array< F >{
-      using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-      if (size_t(M.shape().second) != size_t(x.size())){
-        throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator.");
-      }
-      auto output = static_cast< ArrayF >(VectorF::Zero(M.shape().first));
-      M.matvec(x.data(), output.data());
-      return py::cast(output);
-    })
-    .def("matvec", [](const MatrixFunction< F, WrapperType >& M, const py_array< F >& x, py_array< F >& y) -> void {
-      if (size_t(M.shape().second) != size_t(x.size()) || size_t(M.shape().first) != size_t(y.size())){
-        throw std::invalid_argument("Input/output dimension mismatch; vector inputs must match shape of the operator.");
-      }
-      M.matvec(x.data(), y.mutable_data());
-    })
-    .def("matmat", &matmat< F, WrapperType >)
-    .def("__matmul__", &matmat< F, WrapperType >) // see: https://peps.python.org/pep-0465/
-    ;  
+  }); 
 } 
 
 PYBIND11_MODULE(_lanczos, m) {
-  // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
-  _lanczos_wrapper< float, DenseMatrix < float > >(m, "denseF", eigen_dense_wrapper< float >);
-  _lanczos_wrapper< double, DenseMatrix < double > >(m, "denseD", eigen_dense_wrapper< double >);
+  // m.def("lanczos", [](DenseEigenLinearOperator* M){
 
-  _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparseF", eigen_sparse_wrapper< float >);
-  _lanczos_wrapper< double, Eigen::SparseMatrix< double > >(m, "sparseD", eigen_sparse_wrapper< double >);
+  // });
+  // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
+  // _lanczos_wrapper< float, DenseMatrix < float > >(m, "denseF", eigen_dense_wrapper< float >);
+  // _lanczos_wrapper< double, DenseMatrix < double > >(m, "denseD", eigen_dense_wrapper< double >);
+
+  // _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparseF", eigen_sparse_wrapper< float >);
+  // _lanczos_wrapper< double, Eigen::SparseMatrix< double > >(m, "sparseD", eigen_sparse_wrapper< double >);
 };
 
 

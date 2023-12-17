@@ -54,7 +54,12 @@ concept Operator =
 template < typename T, typename F = typename T::value_type >
 concept QuadOperator = requires(T op, const F* input) {
   { op.quad(input) } -> std::convertible_to< F >; // v^T A v ; todo: make optional if matvec available?
-}
+};
+
+template < typename T, typename F = typename T::value_type >
+concept SupportsMatrixMult = requires(T op, const F* input, F* output, const int k) {
+  { op.matmat(input, output, k) };
+};
 
 // Represents the operator (A + tB) for parameter T = { t1, t2, ..., tn }
 template < typename T, typename F = typename T::value_type >

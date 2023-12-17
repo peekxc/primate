@@ -9,7 +9,7 @@ template< std::floating_point F >
 struct PyLinearOperator {
   using value_type = F;
   const py::object _op; 
-  PyLinearOperator(const py::object& op) : _op(op) {
+  PyLinearOperator(const py::object op) : _op(op) {
     if (!py::hasattr(op, "matvec")) { throw std::invalid_argument("Supplied object is missing 'matvec' attribute."); }
     if (!py::hasattr(op, "shape")) { throw std::invalid_argument("Supplied object is missing 'shape' attribute."); }
     // if (!op.has_attr("dtype")) { throw std::invalid_argument("Supplied object is missing 'dtype' attribute."); }
@@ -22,6 +22,23 @@ struct PyLinearOperator {
     py::array_t< F > output = matvec_out.cast< py::array_t< F > >();
     std::copy(output.data(), output.data() + output.size(), out);
   }
+
+  // auto matmat(const F* X, F* Y) const {
+  //   if (py::hasattr(op, "matvec")){ 
+  //     return; 
+  //   } else {
+
+  //   }
+  //   Eigen::Map< const DenseMatrix< F > > XM(X, op->shape().second, k);
+  //   Eigen::Map< DenseMatrix< F > > YM(Y, op->shape().first, k);
+  //   for (size_t j = 0; j < k; ++j){
+  //     matvec(XM.col(j).data(), YM.col(j).data());
+  //   }
+  //   // py_array< F > input({ static_cast<py::ssize_t>(shape().second) }, inp);
+  //   // py::object matvec_out = _op.attr("matvec")(input);
+  //   // py::array_t< F > output = matvec_out.cast< py::array_t< F > >();
+  //   // std::copy(output.data(), output.data() + output.size(), out);
+  // }
 
   auto matvec(const py_array< F >& input) const -> py_array< F > {
     auto out = std::vector< F >(static_cast< size_t >(shape().first), 0);
