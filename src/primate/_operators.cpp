@@ -66,6 +66,15 @@ auto py_matmat(const Matrix& M, const py_array< F >& X) -> py_array< F >{
   }
 }
 
+template< std::floating_point F, LinearOperator Matrix >
+auto py_quad(const Matrix& A, const py_array< F >& x) -> F {
+  if (size_t(A.shape().second) != size_t(x.size())){
+    throw std::invalid_argument("Input dimension mismatch; vector inputs must match shape of the operator.");
+  }
+  return A.quad(x.data());
+}
+
+
 // template< std::floating_point F, typename WrapperFunc >
 // requires std::invocable< WrapperFunc, const Matrix* >
 // template< std::floating_point F, class Op, LinearOperator Matrix >
@@ -134,15 +143,50 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
       auto dtype = pybind11::dtype(pybind11::format_descriptor< F >::format());
       return dtype; 
     })
+    .def_property("fun", [](const OP_t& M){
+      return py::cpp_function(M.f);
+    }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
+      if (py::isinstance< py::str >(fun)) {
+        kwargs["function"] = fun; 
+        M.f = param_spectral_func< F >(kwargs);
+      } else {
+        // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
+        std::function< F(F) > f = py::cast< std::function< F(F) > >(fun);
+        using fn_type = F(*)(F);
+        const auto *result = f.template target< fn_type >();
+        if (!result) {
+          // std::cout << "Failed to convert to function ptr! Falling back to pyfunc" << std::endl;
+          M.f = [fun](F x) -> F { return fun(x).template cast< F >(); };
+        } else {
+          // std::cout << "Native cpp function detected!" << std::endl;
+          M.f = f; 
+        }
+        // if (py::isinstance< py::function >(fun)){
+        // std::cout << "Python function detected!" << std::endl;
+        // M.f = [fun](F x) -> F { return fun(x).template cast< F >(); };
+        // } else {
+        //   throw std::invalid_argument("Invalid argument type; must be string or Callable");
+        // }
+      }
+    })
     .def_readonly("deg", &OP_t::deg)
+    .def_readonly("ncv", &OP_t::ncv)
     .def_readwrite("rtol", &OP_t::rtol)
     .def_readwrite("orth", &OP_t::orth)
     .def("matvec", &py_matvec< F, OP_t >)
     .def("matvec", &py_matvec_inplace< F, OP_t >)
     .def("matmat", &py_matmat< F, OP_t >)
     .def("__matmul__", &py_matmat< F, OP_t >)
+    .def("quad", &py_quad< F, OP_t >)
+    .def_property_readonly("nodes", [](const OP_t& M){ return py::cast(M.nodes); })
+    .def_property_readonly("weights", [](const OP_t& M){ return py::cast(M.weights); })
+    .def_property_readonly("_alpha", [](const OP_t& M){ return py::cast(M.alpha); })
+    .def_property_readonly("_beta", [](const OP_t& M){ return py::cast(M.beta); })
+    .def_property_readonly("krylov_basis", [](const OP_t& M){ return py::cast(M.Q); })
     ; 
 }
+
+float native_exp(float x) { return std::exp(x); }
 
 PYBIND11_MODULE(_operators, m) {
   m.doc() = "operators module";
@@ -154,35 +198,8 @@ PYBIND11_MODULE(_operators, m) {
   
   _matrix_function_wrapper< float, py::object, PyLinearOperator< float > >(m, "GenericF");
   _matrix_function_wrapper< double, py::object, PyLinearOperator< double > >(m, "GenericD");
-  // _operators_wrapper< float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m, "Dense");
-  // _matrix_function_wrapper< float, DenseEigenLinearOperator< float > >(m, "Dense");
 
-  // _operators_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m, "Sparse");
-  // _matrix_function_wrapper< float, SparseEigenLinearOperator< float > >(m, "Sparse");
-
-  // Handle generic py::objects separately
-  // PyLinearOperator
-  // _operators_wrapper< float, py::object, PyLinearOperator< float > >(m, "LinOp");
-  // _matrix_function_wrapper< float, PyLinearOperator< float > >(m, "LinOp");
-  
-  // py::class_< MatrixFunction< F, Matrix > >(m, cls_name)
-  //   .def(py::init([](const Matrix* A, const int deg, const F rtol, const int orth, const int ncv, const py::kwargs& kwargs) {
-  //     const auto sf = param_spectral_func< F >(kwargs);
-  //     return std::unique_ptr< OP_t >(new OP_t(A, sf, deg, rtol, orth, ncv));
-  //   }))
-  //   .def_property_readonly("shape", &OP_t::shape)
-  //   .def_property_readonly("dtype", [](const OP_t& M) -> py::dtype {
-  //     auto dtype = pybind11::dtype(pybind11::format_descriptor< F >::format());
-  //     return dtype; 
-  //   })
-  //   .def_readonly("deg", &OP_t::deg)
-  //   .def_readwrite("rtol", &OP_t::rtol)
-  //   .def_readwrite("orth", &OP_t::orth)
-  //   .def("matvec", &py_matvec< F, OP_t >)
-  //   .def("matvec", &py_matvec_inplace< F, OP_t >)
-  //   .def("matmat", &py_matmat< F, OP_t >)
-  //   .def("__matmul__", &py_matmat< F, OP_t >)
-  //   ; 
+  m.def("exp", &native_exp);
 };
 
 // Extra to not lose: 

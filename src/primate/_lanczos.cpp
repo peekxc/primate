@@ -6,6 +6,7 @@
 #include "_random_generator/vector_generator.h"
 #include "_lanczos/lanczos.h"
 #include "eigen_operators.h"
+#include "pylinop.h"
 #include "spectral_functions.h"
 #include <type_traits> // result_of
 #include <cmath> // constants
@@ -58,16 +59,15 @@ auto matmat(const MatrixFunction< F, WrapperType >& M, const py_array< F >& X) -
 }
 
 // Template function for generating module definitions for a given Operator / precision 
-template< std::floating_point F, class Matrix, typename WrapperFunc >
-requires std::invocable< WrapperFunc, const Matrix* >
-void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap = std::identity()){
+template< std::floating_point F, class Matrix, LinearOperator Wrapper >
+void _lanczos_wrapper(py::module& m){
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
-  m.def("lanczos", [wrap]( // keep wrap pass by value!
-    const Matrix* A, 
+  m.def("lanczos", []( // keep wrap pass by value!
+    const Matrix& A, 
     py_array< F > v, const int lanczos_degree, const F lanczos_rtol, const int orth,
     py_array< F >& alpha, py_array< F >& beta, py_array< F >& Q 
   ){ 
-    const auto op = wrap(A);
+    const auto op = Wrapper(A);
     const size_t ncv = static_cast< size_t >(Q.shape(1));
     lanczos_recurrence(
       op, v.mutable_data(), lanczos_degree, lanczos_rtol, orth, 
@@ -80,49 +80,48 @@ void _lanczos_wrapper(py::module& m, const std::string suffix, WrapperFunc wrap 
     lanczos_quadrature(a.data(), b.data(), k, solver, output.col(0).data(), output.col(1).data());
     return py::cast(output); 
   });
-  m.def("function_approx", [wrap](
-    const Matrix* A, 
+  m.def("function_approx", [](
+    const Matrix& A, 
     py_array< F > v, 
     const int lanczos_degree, const F lanczos_rtol, const int orth,
     const py::kwargs& kwargs
   ){
-    const auto op = wrap(A);
+    const auto op = Wrapper(A);
     const auto sf = param_spectral_func< F >(kwargs);
     F* v_inp = v.mutable_data();
     auto y_out = static_cast< ArrayF >(ArrayF::Zero(op.shape().second));
     matrix_approx(op, sf, v_inp, lanczos_degree, lanczos_rtol, orth, y_out.data());
     return py::cast(y_out);
   });
-  m.def("stochastic_quadrature", [wrap](
-    const Matrix* A, 
+  m.def("stochastic_quadrature", [](
+    const Matrix& A, 
     const int nv, const int dist, const int engine_id, const int seed,
     const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
     const int num_threads
   ) -> py_array< F > {
-    const auto op = wrap(A);
+    const auto op = Wrapper(A);
     auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
     auto quad_nw = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(lanczos_degree * nv, 2));
     sl_quadrature(op, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, quad_nw.data());
     return py::cast(quad_nw);
   });
-  m.def("stochastic_trace", [wrap](
-    const Matrix* A, 
-    const int nv, const int dist, const int engine_id, const int seed,
-    const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
-    const F atol, const F rtol, 
-    const int num_threads, 
-    const bool use_clt, 
-    const py::kwargs& kwargs
-  ) -> py_array< F > {
-    const auto op = wrap(A);
-    const auto sf = param_spectral_func< F >(kwargs);
-    auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
-    auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
-    // sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, use_clt, estimates.data());
-    
-
-    return py::cast(estimates);
-  }); 
+  // m.def("stochastic_trace", [wrap](
+  //   const Matrix& A, 
+  //   const int nv, const int dist, const int engine_id, const int seed,
+  //   const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
+  //   const F atol, const F rtol, 
+  //   const int num_threads, 
+  //   const bool use_clt, 
+  //   const py::kwargs& kwargs
+  // ) -> py_array< F > {
+  //   const auto op = Wrapper(A);
+  //   const auto sf = param_spectral_func< F >(kwargs);
+  //   auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
+  //   auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
+  //   // sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, use_clt, estimates.data());
+  
+  //   return py::cast(estimates);
+  // }); 
 } 
 
 PYBIND11_MODULE(_lanczos, m) {
@@ -134,7 +133,16 @@ PYBIND11_MODULE(_lanczos, m) {
   // _lanczos_wrapper< double, DenseMatrix < double > >(m, "denseD", eigen_dense_wrapper< double >);
 
   // _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparseF", eigen_sparse_wrapper< float >);
-  // _lanczos_wrapper< double, Eigen::SparseMatrix< double > >(m, "sparseD", eigen_sparse_wrapper< double >);
+  // _lanczos_wrapper< double, Eigen::SparseMatrix< double >, Eigen >(m);
+
+  _lanczos_wrapper< float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m);
+  _lanczos_wrapper< double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m);
+
+  _lanczos_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m);
+  _lanczos_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double > >(m);
+  
+  _lanczos_wrapper< float, py::object, PyLinearOperator< float > >(m);
+  _lanczos_wrapper< double, py::object, PyLinearOperator< double > >(m);
 };
 
 

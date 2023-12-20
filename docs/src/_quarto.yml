@@ -97,7 +97,7 @@ quartodoc:
       contents:
         - name: trace 
           children: separate
-          members: ["sl_trace", "sl_gauss"]
+          members: ["hutch", "sl_gauss"]
     - title: Random
       desc: "Randomized module"
       contents:

@@ -11,28 +11,11 @@ The heart of this generic progammming design is [C++20 concepts](https://en.cppr
 
 <!-- ## The `LinearOperator` interface -->
 
-To get started calling any matrix-free function provided by `primate`, such `sl_trace` or `lanczos`, simply pass any type with a `.shape()` and `.matvec()` member functions defined like so: 
+<!-- ## The `LinearOperator` concept -->
 
-```cpp
-class LinOp {
-  int nrow, ncol;
-  
-  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}
-  
-  void matvec(const float* input, float* output) const {
-    ... // implementation details 
-  }
-
-  void shape() const { return std::make_pair(nrow, ncol); }
-}
-```
-
-It's up to you to ensure `shape()` yields the correct size; `primate` will supply vectors to `input` of size `.shape().second` (number of columns) and guarantees the pointer to the `output` will be at least `shape().first` (number of rows), no more. 
-
-## The `LinearOperator` concept
-
-`primate`'s generic API is enabled through [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). 
-Thus, the more exact statement is that any type respecting the `LinearOperator` [concept](https://en.cppreference.com/w/cpp/language/constraints) shown below can be passed: 
+`primate`'s generic API is enabled through [function templates](https://en.cppreference.com/w/cpp/language/function_template) specialized using [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). 
+In other words, a function `F` requiring concept `C` will compile with _any_ type `T` so long as `T` respects the constraints imposed by `C`. 
+For example, generically, any type `T` respecting the `LinearOperator`_concept_ shown below can be passed to the _Lanczos_ method: 
 
 ```cpp
 using FP = std::floating_point; 
@@ -43,12 +26,14 @@ concept LinearOperator = requires(T A, const float_t* v, float_t* o) {
 };
 ```
 
-An instance `A` of type `T` is said to support the `LinearOperator` concept if it has: 
+In english, an instance `A` of type `T` is said to support the `LinearOperator` concept if it has: 
 
 1. A method $Av \mapsto o$, with signature `A.matvec(const float_t* v, float_t* o)` 
-2. A method yielding $(\mathrm{card}(o), \mathrm{card}(v))$, with signature`A.shape() -> pair< ... >`
+2. A method yielding $(\mathrm{card}(o), \mathrm{card}(v))$, with signature `A.shape() -> pair< ... >`
 
-`shape()` should yield a pair `(n,m)` representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.
+`shape()` should return a pair `(n,m)` representing the sizes of the output and input vectors, respectively. Note in the matrix setting this corresponds to the number of rows and columns.
+
+<!-- This enables, amongst other functionalities, `primate`'s functions to have zero-cost support for essentially any operator, even those external to the package.  -->
 
 ## Other Concepts
 
@@ -60,6 +45,7 @@ Depending on the problem at hand, the supplied operator may need to meet other c
 | `AdjointOperator`         | $A^T v \mapsto o$         | `A.rmatvec(v, o)`           | `LinearOperator` |
 | `AdditiveOperator`        | $o \gets o + \alpha Av$ | `A.matvec_add(v, alpha, o)` | `LinearOperator` |
 | `AffineOperator`          | Sets $t$ s.t. $A + tB$  | `A.set_parameter(t)`        | `LinearOperator` |
+| `QuadOperator`            | $v^T A v$              | `A.quad(v)`                  | NA               |
 
-Respecting these constraints is opt-in: if your operator is symmetric and you only need access to the _Lanczos_ method, then any satisfying the `LinearOperator` concept is sufficient. 
+The exported methods in `primate` only need the minimum constraints to be satisfied to compile: if you need access to the _Lanczos_ method, then just supporting the `LinearOperator` concept is sufficient. On the other hand, adding support for other constraints can optimize the efficiency of certain methods; for example, the `hutch` method technically only requires a `LinearOperator` to do trace estimation (via `matvec` calls), but will also compile and prefer calling `quad` with a `QuadOperator` as input. In such a situaton, if your operator has an efficient quadratic form $v \mapsto v^T A v$, then implementing `quad` may improve the performance of `hutch`. 
 <!-- However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h](). -->

@@ -69,4 +69,18 @@ concept AffineOperator = requires(T op, F t) {
   // { op.get_num_parameters() } -> std::convertible_to< size_t >;
 } && Operator< T, F >;
 
+// TODO: fix 
+template < typename T >
+concept HasOp = requires(T op) {
+  requires std::is_member_object_pointer<decltype(&T::op)>::value;
+};
+
+// Used for hard-type checking
+// From: https://stackoverflow.com/questions/44012938/how-to-tell-if-a-type-is-an-instance-of-a-specific-template-class
+// template <class, template <class, class...> class>
+// struct is_instance : public std::false_type {};
+
+// template <class...Ts, template <class, class...> class U>
+// struct is_instance<U<Ts...>, U> : public std::true_type {};
+
 #endif

@@ -8,5 +8,5 @@
 
 | Name | Description |
 | --- | --- |
-| [sl_trace](primate.trace.sl_trace.qmd#primate.trace.sl_trace) | Estimates the trace of a matrix function $f(A)$ using stochastic Lanczos quadrature (SLQ). |
-| [sl_gauss](primate.trace.sl_gauss.qmd#primate.trace.sl_gauss) | Gaussian quadrature. |
+| [hutch](primate.trace.hutch.qmd#primate.trace.hutch) | Estimates the trace of a matrix $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator. |
+| [sl_gauss](primate.trace.sl_gauss.qmd#primate.trace.sl_gauss) | Stochastic Gaussian quadrature approximation. |

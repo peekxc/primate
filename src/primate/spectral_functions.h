@@ -3,9 +3,12 @@
 
 #include <concepts> 
 #include <string> 
-#include <functional>  // function
+#include <functional>  // function, identity
 #include <unordered_map> // unordered_map 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+#include <pybind11/functional.h>
 
 namespace py = pybind11;
 
@@ -51,8 +54,8 @@ auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
       };  
     } else if (matrix_func == "generic"){
       if (kwargs_map.contains("matrix_func")){
-        py::function g = kwargs_map["matrix_func"].cast< py::function >();
-        f = [&g](F val) -> F { return g(val).template cast< F >(); };
+        py::function g = kwargs_map["matrix_func"].cast< py::function >(); 
+        f = [g](F val) -> F { return g(val).template cast< F >(); }; // make sure to copy g
       } else {
         f = std::identity();
       }

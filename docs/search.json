@@ -95,7 +95,7 @@
     "href": "reference/diagonalize.lanczos.html",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method of tridiagonalization.\nThis function implements Paiges A27 variant[^1] of the Lanczos method with support for varying degrees of re-orthogonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg, though note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n\n\n\n[^1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method for matrix tridiagonalization.\nThis function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,\nwith additional modifications to support varying degrees of re-orthogonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg. Note the number of matvecs with A scales linearly with deg and the number of inner-products scales quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n\n\n\n\nPaige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -107,7 +107,7 @@
     "href": "reference/diagonalize.lanczos.html#parameters",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nAdditional number of Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the diagonal and off-diagonal terms as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -131,7 +131,7 @@
     "href": "imate_compare.html",
     "title": "Comparison to imate",
     "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access to the SLQ method from user (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys LinearOperator abstract interface. For more details on this, see the integration guides.",
+    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access from user (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the LinearOperator concept. For more details on this, see the integration guides.",
     "crumbs": [
       "Basics",
       "Comparison to *imate*"
@@ -328,7 +328,7 @@
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of tridiagonalization.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method for matrix tridiagonalization.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
     "crumbs": [
       "API Reference"
     ]
@@ -358,7 +358,7 @@
     "href": "reference/index.html#diagonalize",
     "title": "Function reference",
     "section": "",
-    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method of tridiagonalization.",
+    "text": "Diagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method for matrix tridiagonalization.",
     "crumbs": [
       "API Reference"
     ]
@@ -378,7 +378,7 @@
     "href": "reference/primate.trace.sl_gauss.html",
     "title": "sl_gauss",
     "section": "",
-    "text": "sl_gauss\ntrace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)\nGaussian quadrature.\nComputes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).",
+    "text": "trace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)\nStochastic Gaussian quadrature approximation.\nComputes a set of sample nodes and weights for the degree-k orthogonal polynomial approximating the cumulative spectral measure of A. This function can be used to approximate the spectral density of A, or to approximate the spectral sum of any function applied to the spectrum of A.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nn\nint\nNumber of random vectors to sample for the quadrature estimate.\n150\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’\nRandom number generator to use (PCG64 by default).\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Setting num_threads &lt; 1 to let OpenMP decide.\n0\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation.",
     "crumbs": [
       "API Reference",
       "Trace",
@@ -390,21 +390,21 @@
     "href": "reference/trace.html",
     "title": "trace",
     "section": "",
-    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature."
+    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nsl_gauss\nStochastic Gaussian quadrature approximation."
   },
   {
     "objectID": "reference/trace.html#functions",
     "href": "reference/trace.html#functions",
     "title": "trace",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nsl_trace\nEstimates the trace of a matrix function f(A) using stochastic Lanczos quadrature (SLQ).\n\n\nsl_gauss\nGaussian quadrature."
+    "text": "Name\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nsl_gauss\nStochastic Gaussian quadrature approximation."
   },
   {
     "objectID": "basic/integration.html",
     "href": "basic/integration.html",
     "title": "Integration",
     "section": "",
-    "text": "primate supports a variety of matrix-types of the box, including numpy ndarray’s, compressed sparse matrices (a lá SciPy), and LinearOperators—the latter enables the use of matrix free operators.\nMore generally, the basic requirements for any operator A to be used with e.g. the Lanczos method in primate are:\n\nA method A.matvec(input: ndarray) -&gt; ndarray implementing v \\mapsto Av\nA method A.shape() -&gt; tuple[int, int] giving the output/input dimensions of A\n\n\nThese semantics extend to the C++ side as well via C++20 concepts—see the C++ integration guide. If you’re using pybind11 and you want to extend primate’s Python API to work natively with linear operator implemented in C++, see the pybind11 integration guide.",
+    "text": "primate supports a variety of matrix-types of the box, including numpy ndarray’s, compressed sparse matrices (a lá SciPy), and LinearOperators—the latter enables the use of matrix free operators.\nOutside of the natively types above, the basic requirements for any operator A to be used with e.g. the Lanczos method in primate are:\n\nA method A.matvec(input: ndarray) -&gt; ndarray implementing v \\mapsto Av\nAn attribute A.shape -&gt; tuple[int, int] giving the output/input dimensions of A\n\n\n\nHere’s an example of a simple operator representing a Diagonal matrix, which inherits a .matvec() method by following the subclassing rules of SciPy’s LinearOperator:\nimport numpy as np \nfrom numpy.typing import ArrayLike\nfrom scipy.sparse.linalg import LinearOperator \n\nclass DiagonalOp(LinearOperator):\n  diag: np.ndarray = None\n  \n  def __init__(self, d: ArrayLike, dtype = None):\n    self.diag = np.array(d)\n    self.shape = (len(d), len(d))\n    self.dtype = np.dtype('float32') if dtype is None else dtype\n\n  def _matvec(self, x: ArrayLike) -&gt; np.ndarray:\n    out = self.diag * np.ravel(x)\n    return out.reshape(x.shape)",
     "crumbs": [
       "Basics",
       "Integration"
@@ -415,7 +415,7 @@
     "href": "theory/lanczos.html",
     "title": "The Lanczos method",
     "section": "",
-    "text": "Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations—or even just least-squares data-fitting—decomposing linear operators over function spaces has had significant use in many areas of sciences and engineering.\nCentral to operator theory is the spectral theorem, which provides conditions under which a linear operator A : \\mathbb{R}^n \\to \\mathbb{R}^n can be diagonalized in terms of its eigenvalues and eigenvectors:  A = U \\Lambda U^{-1}\nWhen A is symmetric, it is orthogonally diagonalizable, i.e. U^{-1} = U^T and \\Lambda is real-valued. Moreover, as Cornelius Lanczos showed in 1950, its spectrum can be iteratively revealed via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  Lanczos called this approach the method of minimized iterations—it is now known as the Lanczos method, in his honor. Despite its age, the Lanczos method remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, an IEEE guest editorial places it among the top 10 most influential algorithms of the 20th century.\nAs the Lanczos method lies at the heart of primate’s design, this post introduces it, focusing in particular on its motivating principles and complexity details. For its API usage, see the lanczos page.",
+    "text": "Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations, or even just fitting polynomials to data via least-squares, decomposing linear operators has had significant use in many areas of sciences and engineering.\nCentral to operator theory is the spectral theorem, which provides conditions under which a linear operator A : \\mathbb{R}^n \\to \\mathbb{R}^n can be diagonalized in terms of its eigenvalues and eigenvectors:  A = U \\Lambda U^{-1}\nIn the case where A is symmetric, the eigen-decomposition is not only guarenteed to exist, but its canonical form may be obtained via orthogonal diagonalization. Such matrices are among the most commonly encountered matrices in applications.\nIn 1950, Cornelius Lanczos studied an alternative means of decomposition via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  The algorithm by which one produces such a T is now known as the Lanczos method. Despite its age, the Lanczos method remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, an IEEE guest editorial places it among the top 10 most influential algorithms of the 20th century.\nAs the Lanczos method lies at the heart of primate’s design, this post introduces it, with a focus on its motivating principles and computational details. For its API usage, see the lanczos page.",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -426,7 +426,7 @@
     "href": "theory/lanczos.html#lanczos-on-a-bumper-sticker",
     "title": "The Lanczos method",
     "section": "Lanczos on a bumper sticker",
-    "text": "Lanczos on a bumper sticker\nGiven any non-zero v \\in \\mathbb{R}^n, Lanczos generates a Krylov subspace via successive powers of A:\n\n\\mathcal{K}(A, v) \\triangleq \\{ \\, A^{0} v, A^{1}v, A^{2}v, \\dots, A^{n}v \\, \\}\n\nOrthogonalizing these linearly independent vectors not only yields an orthonormal basis for \\mathcal{K}(A, v), but also a change-of-basis matrix Q, allowing A to be represented by a new matrix T:\n\n\\begin{align*}\nK &= [\\, v \\mid Av \\mid A^2 v \\mid \\dots \\mid A^{n-1}v \\,] && \\\\\nQ &= [\\, q_1, q_2, \\dots, q \\,] \\gets \\mathrm{qr}(K) &&  \\\\\nT &= Q^T A Q &&\n\\end{align*}\n\nIt turns out that since A is symmetric, T is guaranteed to have a symmetric tridiagonal structure:\n\nT = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_n \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n &\n\\end{array}\n\\Bigg)\n\n\n\nNow, since \\mathrm{range}(Q) = \\mathcal{K}(A, v), the transform A \\mapsto Q^{-1} A Q is a similarity transform. Similarity is an equivalence relation on \\mathcal{S}^n, thus we can obtain \\Lambda by orthogonally diagonalizing T:\n T = Y \\Lambda(A) Y^T  \nAs T is much more structured and easier to work with than A, we have effectively solved the eigenvalue problem. To quote the Lanczos introduction from Parlett, could anything be more simple?",
+    "text": "Lanczos on a bumper sticker\nGiven any non-zero v \\in \\mathbb{R}^n, Lanczos generates a Krylov subspace via successive powers of A:\n\n\\mathcal{K}(A, v) \\triangleq \\{ \\, A^{0} v, A^{1}v, A^{2}v, \\dots, A^{n}v \\, \\}\n\nThese vectors are independent, so orthogonalizing them not only yields an orthonormal basis for \\mathcal{K}(A, v) but also a change-of-basis matrix Q, allowing A to be represented by a new matrix T:\n\n\\begin{align*}\nK &= [\\, v \\mid Av \\mid A^2 v \\mid \\dots \\mid A^{n-1}v \\,] && \\\\\nQ &= [\\, q_1, q_2, \\dots, q \\,] \\gets \\mathrm{qr}(K) &&  \\\\\nT &= Q^T A Q &&\n\\end{align*}\n\nIt turns out that since A is symmetric, T is guaranteed to have a symmetric tridiagonal structure:\n\nT = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_n \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n &\n\\end{array}\n\\Bigg)\n\n\n\nSince \\mathrm{range}(Q) = \\mathcal{K}(A, v), the change-of-basis A \\mapsto Q^{-1} A Q is in fact a similarity transform, which are known to be equivalence relations on \\mathcal{S}^n—thus we can obtain \\Lambda by diagonalizing T:\n T = Y \\Lambda Y^T  \nAs T is quite structured, it can be easily diagonalized, thus we have effectively solved the eigenvalue problem. To quote the Lanczos introduction from Parlett, could anything be more simple?",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -566,7 +566,7 @@
     "href": "theory/lanczos.html#footnotes",
     "title": "The Lanczos method",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nA variant of the Lanczos method is actually at the heart scipy.sparse.linalg’s default eigsh solver (which is a port of ARPACK).↩︎\nIn fact, there’s a strnger↩︎\nUp to a sign of the columns↩︎",
+    "text": "Footnotes\n\n\nA variant of the Lanczos method is actually at the heart scipy.sparse.linalg’s default eigsh solver (which is a port of ARPACK).↩︎\nThe spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M↩︎\nThe spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M↩︎\nFor general A \\in \\mathbb{R}^{n \\times n}, computing the spectral-decomposition is essentially bounded by the matrix-multiplication time: \\Theta(n^\\omega) time and \\Theta(n^2) space, where \\omega \\approx 2.37\\dots is the matrix multiplication constant. If we exclude the Strassen model for computation, we get effectively a \\Omega(n^3) time and \\Omega(n^2) space bound.↩︎",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -577,7 +577,7 @@
     "href": "imate_compare.html#footnotes",
     "title": "Comparison to imate",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nIn theory, there is nothing stopping on from using e.g. GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface, see the C++ integration guide. However, nativ GPU support in the form of CUDA- or ROCm-implemented Linear operators is not provided.↩︎\nSee imates documentation for the list of supported functions.↩︎",
+    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nprimate does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface.↩︎\nSee imates documentation for the list of supported functions.↩︎",
     "crumbs": [
       "Basics",
       "Comparison to *imate*"
@@ -588,7 +588,7 @@
     "href": "theory/lanczos.html#pseudocode",
     "title": "The Lanczos method",
     "section": "Pseudocode",
-    "text": "Pseudocode\nTODO",
+    "text": "Pseudocode\nThere are several ways to implement the Lanczos method, some of which are “better” than others. Below is pseudocode equivalent to Paige’s A27 variant, which has been shown to have a variety of attractive properties.\nThere are many extensions that modify the Lanczos method to make it more robust, more computationally efficient, etc., though many of these have non-trivial implications on the space and time complexities.",
     "crumbs": [
       "Theory",
       "Lanczos"
@@ -687,7 +687,7 @@
     "href": "advanced/cpp_integration.html",
     "title": "C++ Integration",
     "section": "",
-    "text": "To get started calling any matrix-free function provided by primate, such sl_trace or lanczos, simply pass any type with a .shape() and .matvec() member functions defined like so:\nIt’s up to you to ensure shape() yields the correct size; primate will supply vectors to input of size .shape().second (number of columns) and guarantees the pointer to the output will be at least shape().first (number of rows), no more.",
+    "text": "primate’s generic API is enabled through C++20 concepts. Generically, any type T respecting the LinearOperator concept shown below can be passed:\nAn instance A of type T is said to support the LinearOperator concept if it has:\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
     "crumbs": [
       "Advanced",
       "Usage from C++"
@@ -697,8 +697,8 @@
     "objectID": "advanced/cpp_integration.html#the-linearoperator-concept",
     "href": "advanced/cpp_integration.html#the-linearoperator-concept",
     "title": "C++ Integration",
-    "section": "The LinearOperator concept",
-    "text": "The LinearOperator concept\nprimate’s generic API is enabled through C++20 concepts. Thus, the more exact statement is that any type respecting the LinearOperator concept shown below can be passed:\nusing FP = std::floating_point; \ntemplate &lt; typename T, FP float_t = typename T::value_type &gt;\nconcept LinearOperator = requires(T A, const float_t* v, float_t* o) {\n  { A.matvec(v, o) }; // o = A v\n  { A.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nAn instance A of type T is said to support the LinearOperator concept if it has:\n\nA method Av \\mapsto o, with signature A.matvec(const float_t* v, float_t* o)\nA method yielding (\\mathrm{card}(o), \\mathrm{card}(v)), with signatureA.shape() -&gt; pair&lt; ... &gt;\n\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
+    "section": "",
+    "text": "primate’s generic API is enabled through C++20 concepts. Thus, the more exact statement is that any type respecting the LinearOperator concept shown below can be passed:\nusing FP = std::floating_point; \ntemplate &lt; typename T, FP float_t = typename T::value_type &gt;\nconcept LinearOperator = requires(T A, const float_t* v, float_t* o) {\n  { A.matvec(v, o) }; // o = A v\n  { A.shape() } -&gt; std::convertible_to&lt; std::pair&lt; size_t, size_t &gt; &gt;;\n};\nAn instance A of type T is said to support the LinearOperator concept if it has:\n\nA method Av \\mapsto o, with signature A.matvec(const float_t* v, float_t* o)\nA method yielding (\\mathrm{card}(o), \\mathrm{card}(v)), with signatureA.shape() -&gt; pair&lt; ... &gt;\n\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
     "crumbs": [
       "Advanced",
       "Usage from C++"
@@ -709,7 +709,7 @@
     "href": "advanced/cpp_integration.html#other-concepts",
     "title": "C++ Integration",
     "section": "Other Concepts",
-    "text": "Other Concepts\nDepending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:\n\n\n\n\n\n\n\n\n\nConcept\nSupports\nSignature\nRequires\n\n\n\n\nLinearOperator\nA v \\mapsto o\nA.matvec(v, o)\nNA\n\n\nAdjointOperator\nA^T v \\mapsto o\nA.rmatvec(v, o)\nLinearOperator\n\n\nAdditiveOperator\no \\gets o + \\alpha Av\nA.matvec_add(v, alpha, o)\nLinearOperator\n\n\nAffineOperator\nSets t s.t. A + tB\nA.set_parameter(t)\nLinearOperator\n\n\n\nRespecting these constraints is opt-in: if your operator is symmetric and you only need access to the Lanczos method, then any satisfying the LinearOperator concept is sufficient.",
+    "text": "Other Concepts\nDepending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:\n\n\n\n\n\n\n\n\n\nConcept\nSupports\nSignature\nRequires\n\n\n\n\nLinearOperator\nA v \\mapsto o\nA.matvec(v, o)\nNA\n\n\nAdjointOperator\nA^T v \\mapsto o\nA.rmatvec(v, o)\nLinearOperator\n\n\nAdditiveOperator\no \\gets o + \\alpha Av\nA.matvec_add(v, alpha, o)\nLinearOperator\n\n\nAffineOperator\nSets t s.t. A + tB\nA.set_parameter(t)\nLinearOperator\n\n\nQuadOperator\nv^T A v\nA.quad(v)\nNA\n\n\n\nThe exported methods in primate only need the minimum constraints to be satisfied to compile: if you need access to the Lanczos method, then just supporting the LinearOperator concept is sufficient. On the other hand, adding support for other constraints can optimize the efficiency of certain methods; for example, the hutch method technically only requires a LinearOperator to do trace estimation (via matvec calls), but will also compile and prefer calling quad with a QuadOperator as input. In such a situaton, if your operator has an efficient quadratic form v \\mapsto v^T A v, then implementing quad may improve the performance of hutch.",
     "crumbs": [
       "Advanced",
       "Usage from C++"
@@ -789,7 +789,7 @@
     "href": "reference/diagonalize.lanczos.html#notes",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg, though note the complexity of the iteration scales linearly with deg and quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.",
+    "text": "No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg. Note the number of matvecs with A scales linearly with deg and the number of inner-products scales quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
@@ -801,11 +801,154 @@
     "href": "reference/diagonalize.lanczos.html#references",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "[^1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "text": "Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
       "Diagonalize",
       "Lanczos"
+    ]
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html",
+    "href": "reference/primate.trace.hutch.html",
+    "title": "hutch",
+    "section": "",
+    "text": "trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\nThis function uses up to maxiter random isotropic vectors to form an unbiased estimator of the trace of A. The estimator is obtained by averaging quadratic forms of A (or f(A)), rescaling as necessary.\n\n\nFor matrix functions, the Lanczos method up to degree deg is used to approximate the action of f(A). By default,\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\nNone\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n\"confidence\"\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to Only used when stop = “confidence”.\n0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’\nRandom number generator to use (PCG64 by default).\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Setting num_threads &lt; 1 to let OpenMP decide.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\nFalse\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nfloat\nEstimate of the trace of A, if fun = \"identity\", otherwise estimates the trace of f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation.\n\n\n\n\n\n\nlanczos : the lanczos algorithm.\n\n\n\n[1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099."
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html#notes",
+    "href": "reference/primate.trace.hutch.html#notes",
+    "title": "hutch",
+    "section": "",
+    "text": "For matrix functions, the Lanczos method up to degree deg is used to approximate the action of f(A). By default,"
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html#parameters",
+    "href": "reference/primate.trace.hutch.html#parameters",
+    "title": "hutch",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n10\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See details.\nNone\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See details.\n1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n\"confidence\"\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nconfidence\nfloat\nConfidence level to Only used when stop = “confidence”.\n0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’\nRandom number generator to use (PCG64 by default).\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Setting num_threads &lt; 1 to let OpenMP decide.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\nFalse\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}"
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html#returns",
+    "href": "reference/primate.trace.hutch.html#returns",
+    "title": "hutch",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of A, if fun = \"identity\", otherwise estimates the trace of f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation."
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html#see-also",
+    "href": "reference/primate.trace.hutch.html#see-also",
+    "title": "hutch",
+    "section": "",
+    "text": "lanczos : the lanczos algorithm."
+  },
+  {
+    "objectID": "reference/primate.trace.hutch.html#reference",
+    "href": "reference/primate.trace.hutch.html#reference",
+    "title": "hutch",
+    "section": "",
+    "text": "[1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099."
+  },
+  {
+    "objectID": "reference/primate.trace.sl_gauss.html#parameters",
+    "href": "reference/primate.trace.sl_gauss.html#parameters",
+    "title": "sl_gauss",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nn\nint\nNumber of random vectors to sample for the quadrature estimate.\n150\n\n\ndeg\nint\nDegree of the quadrature approximation.\n20\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’\nRandom number generator to use (PCG64 by default).\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against when building the Krylov basis.\n0\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Setting num_threads &lt; 1 to let OpenMP decide.\n0",
+    "crumbs": [
+      "API Reference",
+      "Trace",
+      "SL Gauss"
+    ]
+  },
+  {
+    "objectID": "reference/primate.trace.sl_gauss.html#returns",
+    "href": "reference/primate.trace.sl_gauss.html#returns",
+    "title": "sl_gauss",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\nfloat\nEstimate of the trace of the matrix function f(A).\n\n\n(dict, optional)\nIf ‘info = True’, additional information about the computation.",
+    "crumbs": [
+      "API Reference",
+      "Trace",
+      "SL Gauss"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#the-iteration-part",
+    "href": "theory/lanczos.html#the-iteration-part",
+    "title": "The Lanczos method",
+    "section": "The “iteration” part",
+    "text": "The “iteration” part\nLanczos originally referred to his algorithm as the method of minimized iterations, and indeed nowadays it is often called an iterative method. Where’s the iterative component?\nIf you squint hard enough, you can deduce that for every j \\in [1, n): A Q_j = Q_j T_j + \\beta_{j+1} q_{j+1} e_{j}^T Equating the j-th columns on each side of the equation and rearranging yields a three-term recurrence: \n\\begin{align*}\nA q_j &= \\beta_{j\\text{-}1} q_{j\\text{-}1} + \\alpha_j q_j + \\beta_j q_{j+1} \\\\\n\\Leftrightarrow \\beta_{j} \\, q_{j+1} &= A q_j - \\alpha_j \\, q_j - \\beta_{j\\text{-}1} \\, q_{j\\text{-}1}  \n\\end{align*}\n\nThe equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions; they are given below: \n\\alpha_j = q_j^T A q_j, \\;\\; \\beta_j = \\lVert r_j \\rVert_2, \\;\\; q_{j+1} = r_j / \\beta_j\n\n\n\\text{where  } r_j = (A - \\alpha_j I)q_j - \\beta_{j\\text{-}1} q_j\n\nIn other words, if (q_{j\\text{-}1}, \\beta_j, q_j) are known, then (\\alpha_j, \\beta_{j+1}, q_{j+1}) are completely determined. In theory, this means we can iteratively generate both Q and T using just a couple vectors at a time—no need to explicitly call to the QR algorithm as shown above. Pretty nifty, eh!",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#complexity-analysis",
+    "href": "theory/lanczos.html#complexity-analysis",
+    "title": "The Lanczos method",
+    "section": "Complexity analysis",
+    "text": "Complexity analysis\nElegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?\nLet’s start by establishing a baseline on its complexity:\n\nTheorem 1 (Parlett 1994) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nAs its clear from the theorem, if we specialize it such that r = n and \\eta = \\nu = n, then the Lanczos method requires just O(n^2) time and O(n) space to execute. In other words, the Lanczos method drops both the time and space complexity4 of obtaining spectral information by order of magnitude over similar eigen-algorithms that decompose A directly.\nTo see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then carrying out the recurrence clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nNow, if we need to store all of Y or Q explicitly, we clearly need O(n^2) space to do so. However, if we only need the eigen-values \\Lambda(A) (and not their eigen-vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#rayleigh-ritz-approximations",
+    "href": "theory/lanczos.html#rayleigh-ritz-approximations",
+    "title": "The Lanczos method",
+    "section": "Rayleigh-Ritz approximations",
+    "text": "Rayleigh-Ritz approximations\nSuppose instead of constructing the full T \\in \\mathbb{R}^{n \\times n}, we stop at the j^{\\text{th}} iteration, where 1 \\leq j &lt; n.\n\nT_j = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_j & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_j \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_j &\n\\end{array}\n\\Bigg)\n\nIt is natural to assume that the eigenvalues of T_j approximate some of eigenvalues of \\Lambda(A). This intuition not only turns out to be true, but in fact the eigenvalues of T_j are known to be optimal approximations of \\Lambda(A) under many appealing notions of optimality. Thus, if we need only to approximate the spectrum of A, we may potentially do so using just j &lt;&lt; n iterations; indeed, this is the hallmark of the iterative approach to obtaining eigenvalues:",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#wait-isnt-t-arbitrary",
+    "href": "theory/lanczos.html#wait-isnt-t-arbitrary",
+    "title": "The Lanczos method",
+    "section": "Wait, isn’t T arbitrary?",
+    "text": "Wait, isn’t T arbitrary?\nUnfortunately—and unlike the spectral decomposition2—there is no canonical choice of T. Indeed, as T is a family with n - 1 degrees of freedom and v \\in \\mathbb{R}^n was chosen arbitrarily, there are infinitely many essentially distinct such decompositions.\nNot all hope is lost though, as it turns out that T is actually fully characterized by v. To see this, notice that since Q is an orthogonal matrix, we have:\n Q Q^T = I_n = [e_1, e_2, \\dots, e_n] \nBy extension, given an initial pair (A, q_1) satisfying \\lVert q_1 \\rVert = 1, the following holds:\n\nK_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \\, e_1 \\mid T e_1 \\mid T^2 e_1 \\mid \\dots \\mid T^{n-1} e_1 \\, ]\n\n…this is actually a QR factorization, which is essentially unique! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix T \\in \\mathbb{R}^{n \\times n} has only positive elements on its first subdiagonal and there exists an orthogonal matrix Q such that Q^T A Q = T, then Q and T are uniquely determined3 by (A, q_1).",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#finite-precision",
+    "href": "theory/lanczos.html#finite-precision",
+    "title": "The Lanczos method",
+    "section": "Finite-precision",
+    "text": "Finite-precision\nThough elegant as the Lanczos method is, the complexity statements and much of the theory holds only in exact arith",
+    "crumbs": [
+      "Theory",
+      "Lanczos"
+    ]
+  },
+  {
+    "objectID": "basic/integration.html#python-usage",
+    "href": "basic/integration.html#python-usage",
+    "title": "Integration",
+    "section": "",
+    "text": "primate supports a variety of matrix-types of the box, including numpy ndarray’s, compressed sparse matrices (a lá SciPy), and LinearOperators—the latter enables the use of matrix free operators.\nOutside of the natively types above, the basic requirements for any operator A to be used with e.g. the Lanczos method in primate are:\n\nA method A.matvec(input: ndarray) -&gt; ndarray implementing v \\mapsto Av\nAn attribute A.shape -&gt; tuple[int, int] giving the output/input dimensions of A\n\n\n\nHere’s an example of a simple operator representing a Diagonal matrix, which inherits a .matvec() method by following the subclassing rules of SciPy’s LinearOperator:\nimport numpy as np \nfrom numpy.typing import ArrayLike\nfrom scipy.sparse.linalg import LinearOperator \n\nclass DiagonalOp(LinearOperator):\n  diag: np.ndarray = None\n  \n  def __init__(self, d: ArrayLike, dtype = None):\n    self.diag = np.array(d)\n    self.shape = (len(d), len(d))\n    self.dtype = np.dtype('float32') if dtype is None else dtype\n\n  def _matvec(self, x: ArrayLike) -&gt; np.ndarray:\n    out = self.diag * np.ravel(x)\n    return out.reshape(x.shape)",
+    "crumbs": [
+      "Basics",
+      "Integration"
+    ]
+  },
+  {
+    "objectID": "basic/integration.html#c-usage",
+    "href": "basic/integration.html#c-usage",
+    "title": "Integration",
+    "section": "C++ usage",
+    "text": "C++ usage\nSimilarly, to get started calling any matrix-free function provided by primate on the C++ side, such hutch or lanczos, simply pass any type with .shape() and .matvec() member functions:\nclass LinOp {\n  int nrow, ncol;\n  \n  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}\n  \n  void matvec(const float* input, float* output) const {\n    ... // implementation details \n  }\n\n  void shape() const { return std::make_pair(nrow, ncol); }\n}\nIt’s up to you to ensure shape() yields the correct size; primate will supply vectors to input of size .shape().second (number of columns) and guarantees the pointer to the output will be at least shape().first (number of rows), no more.\nTo read more about how semantics extend to the C++ side as well via C++20 concepts—see the C++ integration guide. If you’re using pybind11 and you want to extend primate’s Python API to work natively with linear operator implemented in C++, see the pybind11 integration guide.",
+    "crumbs": [
+      "Basics",
+      "Integration"
     ]
   }
 ]

@@ -3,6 +3,7 @@ from numbers import Integral
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 from scipy.linalg import solve_triangular
+from numbers import Real
 
 ## Package imports
 from .random import _engine_prefixes, _engines, isotropic
@@ -130,6 +131,7 @@ def hutch(
 
 	## Adjust tolerance for the quadrature estimates
 	atol /= A.shape[1]
+	assert not np.isnan(atol), "Absolute tolerance is NAN!"
 
 	## Parameterize the matrix function and trace call
 	if fun is None: 
@@ -139,19 +141,22 @@ def hutch(
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
 		kwargs["function"] = "generic"
+		assert isinstance(fun(0.0), Real), "Spectral function must return a real-valued number"
 		kwargs["matrix_func"] = fun
 	else:
 		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
 
 	## Collect the arguments processed so far
-	sl_trace_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, atol, rtol, num_threads, use_clt)
+	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, atol, rtol, num_threads, use_clt)
 
 	## Make the actual call
-	estimates = _trace.hutch(A, *sl_trace_args, **kwargs)
+	# print(hutch_args)
+	# print(kwargs)
+	trace_estimate, estimates = _trace.hutch(A, *hutch_args, **kwargs)
 	
 	## Re-scale and determine the estimate
-	estimates *= A.shape[1]
-	trace_estimate = np.mean(estimates) # todo: consider winsorizing?
+	# estimates *= A.shape[1]
+	# trace_estimate = np.mean(estimates) # todo: consider winsorizing?
 	
 	## If only the point-estimate is required, return it
 	if not info and not plot: 

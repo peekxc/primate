@@ -62,11 +62,13 @@ def matrix_function(
 
 	## Argument checking
 	rtol = np.finfo(f_dtype).eps if rtol is None else f_dtype.type(rtol)
-	orth = int(orth) 
-	deg = int(max(deg, 2))  # Should be at least two
+	orth = np.clip(orth, 0, deg)
+	deg = np.clip(deg, 2, A.shape[0])   # Should be at least two
 
 	## Parameterize the matrix function and trace call
-	if isinstance(fun, str):
+	if fun is None: 
+		kwargs["function"] = "None"
+	elif isinstance(fun, str):
 		assert fun in _builtin_matrix_functions, f"If given as a string, 'fun' must be one of {str(_builtin_matrix_functions)}."
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
@@ -77,5 +79,5 @@ def matrix_function(
 
 	## Construct the instance
 	module_func += "_MatrixFunction"
-	M = getattr(_operators, module_func)(A, deg, rtol, orth, **kwargs)
+	M = getattr(_operators, module_func)(A, deg, rtol, orth, deg, **kwargs)
 	return M

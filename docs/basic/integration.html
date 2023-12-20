@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -257,7 +291,7 @@ ul.task-list li input[type="checkbox"] {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../reference/trace.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -309,7 +343,14 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#python-usage" id="toc-python-usage" class="nav-link active" data-scroll-target="#python-usage">Python usage</a></li>
+  <li><a href="#c-usage" id="toc-c-usage" class="nav-link" data-scroll-target="#c-usage">C++ usage</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -333,16 +374,64 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="python-usage" class="level2">
+<h2 class="anchored" data-anchor-id="python-usage">Python usage</h2>
 <p><code>primate</code> supports a variety of matrix-types of the box, including numpy <code>ndarray</code>’s, compressed <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> (a lá SciPy), and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperators</a>—the latter enables the use of <em>matrix free</em> operators.</p>
-<p>More generally, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method in <code>primate</code> are:</p>
+<p>Outside of the natively types above, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method in <code>primate</code> are:</p>
 <ol type="1">
 <li>A method <code>A.matvec(input: ndarray) -&gt; ndarray</code> implementing <span class="math inline">v \mapsto Av</span></li>
-<li>A method <code>A.shape() -&gt; tuple[int, int]</code> giving the output/input dimensions of <span class="math inline">A</span></li>
+<li>An attribute <code>A.shape -&gt; tuple[int, int]</code> giving the output/input dimensions of <span class="math inline">A</span></li>
 </ol>
 <!-- Note that in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, so existing matrix implementations like [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)'s and [sparray](https://docs.scipy.org/doc/scipy/reference/sparse.html#sparse-array-classes)'s natively support the interface. -->
-<p>These semantics extend to the C++ side as well via <em>C++20 concepts</em>—see the <a href="../advanced/cpp_integration.html">C++ integration guide</a>. If you’re using pybind11 and you want to extend <code>primate</code>’s Python API to work natively with linear operator implemented in C++, see the <a href="../advanced/pybind11_integration.html">pybind11 integration guide</a>.</p>
+<!-- Using [PyLops](adthedocs.io/en/stable/index.html) terminology, any self-adjoint operator supporting _forward model_ of matrix-vector multiplication is compatible with most of `primate`'s API.  -->
+<p>Here’s an example of a simple operator representing a Diagonal matrix, which inherits a <code>.matvec()</code> method by following the subclassing rules of <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPy’s LinearOperator</a>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.typing <span class="im">import</span> ArrayLike</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse.linalg <span class="im">import</span> LinearOperator </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DiagonalOp(LinearOperator):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  diag: np.ndarray <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, d: ArrayLike, dtype <span class="op">=</span> <span class="va">None</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.diag <span class="op">=</span> np.array(d)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.shape <span class="op">=</span> (<span class="bu">len</span>(d), <span class="bu">len</span>(d))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.dtype <span class="op">=</span> np.dtype(<span class="st">'float32'</span>) <span class="cf">if</span> dtype <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> dtype</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> _matvec(<span class="va">self</span>, x: ArrayLike) <span class="op">-&gt;</span> np.ndarray:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> <span class="va">self</span>.diag <span class="op">*</span> np.ravel(x)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out.reshape(x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- Sure enough, you 
+
+```python
+from scipy.sparse.linalg import eigsh
+
+D = DiagonalOp(np.arange(10))
+np.allclose(
+  eigsh(DiagonalOp(v), k = 9, return_eigenvectors=False),
+  np.arange(1, 10)
+) 
+## True
+``` -->
+</section>
+<section id="c-usage" class="level2">
+<h2 class="anchored" data-anchor-id="c-usage">C++ usage</h2>
+<p>Similarly, to get started calling any matrix-free function provided by <code>primate</code> on the C++ side, such <code>hutch</code> or <code>lanczos</code>, simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  LinOp<span class="op">(</span><span class="dt">int</span> nr<span class="op">,</span> <span class="dt">int</span> nc<span class="op">)</span> <span class="op">:</span> nrow<span class="op">(</span>nr<span class="op">),</span> ncol<span class="op">(</span>nc<span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> matvec<span class="op">(</span><span class="at">const</span> <span class="dt">float</span><span class="op">*</span> input<span class="op">,</span> <span class="dt">float</span><span class="op">*</span> output<span class="op">)</span> <span class="at">const</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span> <span class="co">// implementation details </span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">(</span>nrow<span class="op">,</span> ncol<span class="op">);</span> <span class="op">}</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It’s up to you to ensure <code>shape()</code> yields the correct size; <code>primate</code> will supply vectors to <code>input</code> of size <code>.shape().second</code> (number of columns) and guarantees the pointer to the <code>output</code> will be at least <code>shape().first</code> (number of rows), no more.</p>
+<p>To read more about how semantics extend to the C++ side as well via <em>C++20 concepts</em>—see the <a href="../advanced/cpp_integration.html">C++ integration guide</a>. If you’re using pybind11 and you want to extend <code>primate</code>’s Python API to work natively with linear operator implemented in C++, see the <a href="../advanced/pybind11_integration.html">pybind11 integration guide</a>.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
