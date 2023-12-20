@@ -14,22 +14,22 @@ def matrix_function(
 	orth: int = 0,
 	**kwargs,
 ) -> LinearOperator:
-	"""Constructs an operator approximating the action v |-> f(A)v
+	"""Constructs an operator approximating the action $v \mapsto f(A)v$
 
-	This function constructs an operator that uses the Lanczos method to approximates the action of
-	matrix-vector multiplication with the matrix function f(A) for some choice of `fun`.
+	This function constructs an operator that uses the Lanczos quadrature method to approximate the action of
+	matrix-vector multiplication with the matrix function $f(A)$ for any choice of `fun`.
 
 	Parameters:
 	-----------
 	  A : ndarray, sparray, or LinearOperator
 	      real symmetric operator.
-	  fun : str or Callable, default = "identity"
+	  fun : str or Callable, default="identity"
 	      real-valued function defined on the spectrum of `A`.
-	  deg : int, default = 20
+	  deg : int, default=20
 	      Degree of the Krylov expansion.
-	  rtol : float, default = 1e-8
+	  rtol : float, default=1e-8
 	      Relative tolerance to consider two Lanczos vectors are numerically orthogonal.
-	  orth: int, default = 0
+	  orth: int, default=0
 	      Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
 	  kwargs : dict, optional
 	    additional key-values to parameterize the chosen function 'fun'.
@@ -38,6 +38,12 @@ def matrix_function(
 	--------
 	  operator : LinearOperator
 	      Operator approximating the action of `fun` on the spectrum of `A`
+
+	Notes: 
+	------
+	The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with the 
+	Golub-Welsch algorithm for computing the `deg`-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi 
+	matrix. The underlying tridiagonal eigen-computation uses implicit symmetric QR steps with Wilkinson shifts.
 
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]

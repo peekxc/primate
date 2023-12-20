@@ -8,6 +8,7 @@ profiling
 **/**.DS_Store
 wheelhouse
 todo
+benchmarks
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

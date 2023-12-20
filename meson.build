@@ -51,13 +51,13 @@ _cpp_args = compiler.get_supported_arguments(
 )
 
 ## Release only 
-_cpp_args += compiler.get_supported_arguments(
-  '-flto=thin', 
-  '-O3', 
-  '-DNDEBUG',
-  '-Wl,-s',       # strip
-  '-march=native'
-)       
+# _cpp_args += compiler.get_supported_arguments(
+#   '-flto=thin', 
+#   '-O3', 
+#   '-DNDEBUG',
+#   '-Wl,-s',       # strip
+#   '-march=native'
+# )       
 
 ## Require C++20 for concepts
 concept_code = '''

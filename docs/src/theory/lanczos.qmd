@@ -106,6 +106,8 @@ $$
 
 ...this is actually a _QR_ factorization, which is [essentially unique](https://www.math.purdue.edu/~kkloste/cs515fa14/qr-uniqueness.pdf)! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix $T \in \mathbb{R}^{n \times n}$ has only positive elements on its first subdiagonal and there exists an orthogonal matrix $Q$ such that $Q^T A Q = T$, then $Q$ and $T$ are _uniquely determined_[^6] by $(A, q_1)$. 
 
+<!-- Moreover, so long as $T$ has non-zero subdiagonal entries, its the eigenvalues must be distinct -->
+
 ## Complexity analysis 
 
 Elegant and as theoretically founded as the Lanczos method may be, is it efficient in practice? 
