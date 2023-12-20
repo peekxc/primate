@@ -42,7 +42,6 @@ void _trace_wrapper(py::module& m){
       if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
       if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
       const auto sf = param_spectral_func< F >(kwargs);
-      std::cout << "sf(1): " << sf(1.0) << std::endl; 
       const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv);
       mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data());
     }
@@ -56,10 +55,14 @@ void _trace_wrapper(py::module& m){
 PYBIND11_MODULE(_trace, m) {
   m.doc() = "trace estimator module";
   _trace_wrapper< true, float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m);
+  _trace_wrapper< true, double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m);
+  
   _trace_wrapper< true, float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m);
+  _trace_wrapper< true, double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double > >(m);
   
   // Note we cannot multi-thread arbitrary calls to Python due to the GIL
   _trace_wrapper< false, float, py::object, PyLinearOperator< float > >(m);
+  _trace_wrapper< false, double, py::object, PyLinearOperator< double > >(m);
   // // LinearOperator exports
   // _trace_wrapper< false, float, py::object >(m, linearoperator_wrapper< float >);
   // _trace_wrapper< false, double, py::object >(m, linearoperator_wrapper< double >);

@@ -187,81 +187,6 @@ void slq (
   }
 }
 
-template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG >
-void sl_trace(
-  const Matrix& mat, const std::function< F(F) > sf, 
-  RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
-  const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
-  const F atol, const F rtol, 
-  const int num_threads,
-  const bool use_CLT, 
-  F* estimates
-){      
-  using VectorF = Eigen::Array< F, Dynamic, 1>;
-
-  // Parameterize the trace function (run in parallel)
-  // const auto N = mat.shape().second;
-  const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
-    Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
-    Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
-    // for (int c = 0; c < lanczos_degree; ++c){
-    //   // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
-    //   nodes_v[c] = sf(nodes_v[c]);
-    // }
-    nodes_v.unaryExpr(sf);
-    estimates[i] = (nodes_v * weights_v).sum();
-  };
-  
-  // Type-erased function since the call is cheap
-  std::function< bool (int) > early_stop; 
-  if (atol == 0.0 && rtol == 0.0){
-    early_stop = [](int i) -> bool { return false; };
-  } else if (use_CLT){
-    // Parameterize when to stop using either the CLT over the given confidence level or 
-    // This runs in critical section of the SLQ, so we can depend sequential execution (but i will vary!)
-    // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
-    F mu_est = 0.0, vr_est = 0.0; 
-    F mu_pre = 0.0, vr_pre = 0.0; 
-    int n = 0; // number of estimates computed
-    const auto z = std::sqrt(2.0) * erf_inv(0.95);
-    early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n, z, atol, rtol](int i) -> bool {
-      ++n; 
-      const F denom = (1.0 / F(n));
-      const F L = n > 2 ? F(n-2) / F(n-1) : 0.0;
-      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
-      mu_pre = n == 1 ? mu_est : mu_pre;
-      vr_est = L * vr_pre + denom * std::pow(estimates[i] - mu_pre, 2); // update sample variance
-      mu_pre = mu_est;
-      vr_pre = vr_est;
-      if (n < 3){
-        return false; 
-      } else {
-        const auto sd_est = std::sqrt(vr_est);
-        const auto margin_of_error = z * sd_est / std::sqrt(F(n)); // todo: remove sqrt's 
-        // std::cout << "n: " << n << ", mu: " << mu_est << ", ci: [" << mu_est - margin_of_error << ", " << mu_est + margin_of_error << "]";
-        // std::cout << "margin/atol: " << margin_of_error << ", " << atol << "\n";
-        return margin_of_error <= atol || std::abs(sd_est / mu_est) <= rtol;
-      }
-    };
-  } else {
-    // Use traditional iteration checking, akin to scipy.integrate.quadrature
-    F mu_est = 0.0, mu_pre = 0.0;
-    int n = 0; 
-    early_stop = [&n, &estimates, &mu_est, &mu_pre, atol, rtol](int i) -> bool {
-      ++n; 
-      const F denom = (1.0 / F(n));
-      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
-      const bool atol_check = std::abs(mu_est - mu_pre) <= atol;
-      const bool rtol_check = (std::abs(mu_est - mu_pre) / mu_est) <= rtol; 
-      mu_pre = mu_est; 
-      return atol_check || rtol_check;
-    };
-  }
-  
-  // Execute the stochastic Lanczos quadrature with the trace function 
-  slq< F >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
-}
-
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG > 
 void sl_quadrature(
   const Matrix& mat, 
@@ -338,6 +263,7 @@ struct MatrixFunction {
 
     // By default, Q is not allocated in constructor, as quad may used less memory
     // For all calls after the first matvec(), Eigen promises this is a no-op
+    // Note we *need* Q to have exactly deg columns for the matvec approx
     if (Q.cols() < deg){ Q.resize(op.shape().first, deg); }
   
     // Inputs / outputs 
@@ -357,10 +283,6 @@ struct MatrixFunction {
     // Apply the spectral function (in-place) to Rayleigh-Ritz values (nodes)
     auto theta = static_cast< ArrayF >(solver.eigenvalues());
     // theta.unaryExpr(f); // this doesn't always work for some reason
-    // for (int c = 0; c < theta.size(); ++c){
-    //   // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
-    //   theta[c] = f(theta[c]);
-    // }
     std::transform(theta.begin(), theta.end(), theta.begin(), f);
     
     // The approximation v |-> f(A)v 
@@ -430,83 +352,5 @@ void matrix_approx(
 ){
   MatrixFunction< F, Matrix >(A, sf, lanczos_degree, lanczos_rtol, orth, lanczos_degree).matvec(v, y);
 };
-
-
-// template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typename Lambda >
-// void slq2 (
-//   const Matrix& A,                            // Any linear operator supporting .matvec() and .shape() methods
-//   const Lambda& f,                            // Thread-safe function with signature f(int i, F* nodes, F* weights)
-//   const std::function< bool(int) >& stop_check, // Function to check for convergence or early-stopping (takes no arguments)
-//   const int nv,                               // Number of sample vectors to generate
-//   const Distribution dist,                    // Isotropic distribution used to generate random vectors
-//   RBG& rng,                                   // Random bit generator
-//   const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
-//   const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
-//   const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
-//   const int ncv,                              // Number of Lanczos vectors to keep in memory (per-thread)
-//   const int num_threads,                      // Number of threads used to parallelize the computation   
-//   const int seed                              // Seed for random number generator for determinism
-// ){   
-//   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
-//   using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
-//   if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
-//   if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
-
-//   // Constants
-//   const auto A_shape = A.shape();
-//   const size_t n = A_shape.first;
-//   const size_t m = A_shape.second;
-
-//   // Set the number of threads + initialize multi-threaded RNG
-//   const auto nt = num_threads <= 0 ? omp_get_max_threads() : num_threads;
-//   omp_set_num_threads(nt);
-//   rng.initialize(nt, seed);
-
-//   // Using square-root of max possible chunk size for parallel schedules
-//   unsigned int chunk_size = std::max(int(sqrt(nv / nt)), 1);
-  
-//   // Monte-Carlo ensemble sampling
-//   int i;
-//   volatile bool stop_flag = false; // early-stop flag for convergence checking
-//   #pragma omp parallel shared(stop_flag)
-//   {
-//     int tid = omp_get_thread_num(); // thread-id 
-
-//     // Pre-allocate memory needed for Lanczos iterations
-//     // MatrixFunction()
-//     // auto q_norm = static_cast< F >(0.0);
-//     // auto q = static_cast< ArrayF >(ArrayF::Zero(m)); 
-//     // auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
-//     // auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-//     // auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
-//     // auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-//     // auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
-//     // auto solver = EigenSolver(lanczos_degree);
-    
-//     // Run in parallel 
-//     #pragma omp for schedule(dynamic, chunk_size)
-//     for (i = 0; i < nv; ++i){
-//       if (stop_flag){ continue; }
-
-//       // Generate isotropic vector (w/ unit norm)
-//       generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
-      
-//       // Perform a lanczos iteration (populates alpha, beta)
-//       lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
-
-//       // Obtain nodes + weights via quadrature algorithm
-//       lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, solver, nodes.data(), weights.data());
-
-//       // Run the user-supplied function (parallel section!)
-//       f(i, q.data(), Q.data(), nodes.data(), weights.data());
-      
-//       // If supplied, check early-stopping condition
-//       #pragma omp critical
-//       {
-//         stop_flag = stop_check(i);
-//       }
-//     }
-//   }
-// }
 
 #endif 

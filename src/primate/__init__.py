@@ -21,15 +21,15 @@ def get_include():
   Notes: 
     When using `distutils`, for example in `setup.py`:
       ```python
-      import primate as pyim
+      import primate
       ...
-      Extension('extension_name', ..., include_dirs=[pyim.get_include()])
+      Extension('extension_name', ..., include_dirs=[primate.get_include()])
       ...
       ```
     Or with `meson-python`, for example in `meson.build`:
       ```meson
       ...
-      run_command(py, ['-c', 'import primate as pyim; print(pyim.get_include())', check : true).stdout().strip()
+      run_command(py, ['-c', 'import primate; print(primate.get_include())', check : true).stdout().strip()
       ...
       ```
   """

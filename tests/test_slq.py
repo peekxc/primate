@@ -55,18 +55,3 @@ def test_stochastic_quadrature():
   # from bokeh.plotting import show
   # from primate.plotting import figure_trace
   # show(figure_trace(n * quad_ests))
-
-
-def test_slq_trace_f():
-  # from primate.trace import sl_trace, _lanczos
-  # np.random.seed(1234)
-  # n = 30
-  # A = symmetric(n, psd=True, ew = np.linspace(1/n, 1, n))
-  # sl_trace(A, "identity")
-  # np.log(np.linalg.det(A))
-  # np.mean(sl_trace(A, "log", 200))
-  # est.mean()
-  assert True
-  # np.isclose(np.mean(sl_trace(A, fun="numrank")), np.linalg.matrix_rank(A.todense())
-
-

@@ -20,16 +20,16 @@ namespace py = pybind11;
 template< typename F >
 using py_array = py::array_t< F, py::array::f_style | py::array::forcecast >;
 
-#define LANCZOS_PARAMS \
-  py_array< float >& v, \
-  const int num_steps, const float lanczos_tol, const int orthogonalize, \
-  py_array< float >& alpha, py_array< float >& beta, py::array_t< float, py::array::f_style >& Q 
+// #define LANCZOS_PARAMS \
+//   py_array< float >& v, \
+//   const int num_steps, const float lanczos_tol, const int orthogonalize, \
+//   py_array< float >& alpha, py_array< float >& beta, py::array_t< float, py::array::f_style >& Q 
 
-// These arugments must match the names of their corresponding parameters 
-#define LANCZOS_ARGS \
-  v, num_steps, lanczos_tol, orthogonalize\
-  orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, \
-  alpha, beta, Q
+// // These arugments must match the names of their corresponding parameters 
+// #define LANCZOS_ARGS \
+//   v, num_steps, lanczos_tol, orthogonalize\
+//   orthogonalize, lanczos_degree, lanczos_tol, min_num_samples, max_num_samples, \
+//   alpha, beta, Q
 
 // #define TRACE_PYBIND_PARAMS \
 //   py::arg("parameters"), py::arg("num_inqueries"), \
@@ -105,35 +105,9 @@ void _lanczos_wrapper(py::module& m){
     sl_quadrature(op, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, quad_nw.data());
     return py::cast(quad_nw);
   });
-  // m.def("stochastic_trace", [wrap](
-  //   const Matrix& A, 
-  //   const int nv, const int dist, const int engine_id, const int seed,
-  //   const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
-  //   const F atol, const F rtol, 
-  //   const int num_threads, 
-  //   const bool use_clt, 
-  //   const py::kwargs& kwargs
-  // ) -> py_array< F > {
-  //   const auto op = Wrapper(A);
-  //   const auto sf = param_spectral_func< F >(kwargs);
-  //   auto rbg = ThreadedRNG64(num_threads, engine_id, seed);
-  //   auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
-  //   // sl_trace(op, sf, rbg, nv, dist, engine_id, seed, lanczos_degree, lanczos_rtol, orth, ncv, atol, rtol, num_threads, use_clt, estimates.data());
-  
-  //   return py::cast(estimates);
-  // }); 
 } 
 
 PYBIND11_MODULE(_lanczos, m) {
-  // m.def("lanczos", [](DenseEigenLinearOperator* M){
-
-  // });
-  // m.def("lanczos", _lanczos_wrapper< float, Eigen::MatrixXf, eigen_dense_wrapper< float > >);
-  // _lanczos_wrapper< float, DenseMatrix < float > >(m, "denseF", eigen_dense_wrapper< float >);
-  // _lanczos_wrapper< double, DenseMatrix < double > >(m, "denseD", eigen_dense_wrapper< double >);
-
-  // _lanczos_wrapper< float, Eigen::SparseMatrix< float > >(m, "sparseF", eigen_sparse_wrapper< float >);
-  // _lanczos_wrapper< double, Eigen::SparseMatrix< double >, Eigen >(m);
 
   _lanczos_wrapper< float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m);
   _lanczos_wrapper< double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m);
@@ -202,66 +176,8 @@ PYBIND11_MODULE(_lanczos, m) {
 //   }
 // }
 
-
-// template< std::floating_point F, LinearOperator Matrix >
-// auto lanczos(
-//   const Matrix& A,            // Symmetric linear operator 
-//   F* q,                       // vector to expand the Krylov space K(A, q)
-//   const int k,                // Dimension of the Krylov subspace to capture
-//   const int orth,             // Number of additional vectors to orthogonalize againt 
-//   const F lanczos_tol,        // Tolerance of residual error for early-stopping the iteration.
-//   F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
-//   F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1
-//   F* lanczos_vectors,         // Output Lanczos vector (may be unused by caller)  
-//   const size_t ncv            // Number of Lanczos vectors allocated
-// ) -> void {                  
-//   const auto A_shape = A.shape();
-//   const size_t n = A_shape.first;
-//   const size_t m = A_shape.second;
-  
-//   // Number of Lanczos vectors to keep in memory
-//   const size_t ncv_actual = 
-//     (orth == 0 || orth == 1) ? 2 :         // Minimum orthogonalization
-//     (orthogonalize < 0 || orthogonalize > k) ? size_t(k) :   // Full reorthogonalization
-//     static_cast< size_t >(orthogonalize);                    // Partial orthogonalization (0 < orthogonalize < m)
-  
-//   // Allocate lanczos vectors and apply the recurrence
-//   // auto Q = (DenseMatrix< F >) DenseMatrix< F >::Zero(n, ncv); // Lanczos vectors
-//   // auto Q_ref = Eigen::Ref< DenseMatrix < F > >(Q);
-//   // Eigen::Map< DenseMatrix< F > > Q_ref; 
-//   lanczos_recurrence(A, q, k, ncv, lanczos_tol, alpha, beta, lanczos_vectors);
-// }
-
-// template< std::floating_point F, LinearOperator Matrix >
-// auto lanczos_Q(
-//   const Matrix& A,            // Symmetric linear operator 
-//   F* q,                       // vector to expand the Krylov space K(A, q)
-//   const int k,                // Dimension of the Krylov subspace to capture
-//   const F lanczos_tol,        // Tolerance of residual error for early-stopping the iteration.
-//   const int orthogonalize,    // Number of lanczos vectors to keep numerically orthonormal in-memory
-//   F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
-//   F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1
-//   Ref< DenseMatrix < F > > Q  // Output Lanczos vectors
-// ) -> void {                  
-//   const auto A_shape = A.shape();
-//   const size_t n = A_shape.first;
-//   const size_t m = A_shape.second;
-  
 //   // Number of Lanczos vectors to keep in memory
 //   const size_t ncv = 
 //     (orthogonalize == 0 || orthogonalize == 1) ? 2 :         // Minimum orthogonalization
 //     (orthogonalize < 0 || orthogonalize > k) ? size_t(k) :   // Full reorthogonalization
 //     static_cast< size_t >(orthogonalize);                    // Partial orthogonalization (0 < orthogonalize < m)
-  
-//   lanczos_recurrence(A, q, k, lanczos_tol, alpha, beta, Q);
-// }
-
-
-// template< std::floating_point F >
-// void eigsh_tridiagonal(py_array< float >& alpha, py_array< float >& beta, bool eigenvectors = false){
-//   auto t_solver =  Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >(); 
-
-//   auto Eigen::DecompositionOptions::EigenvaluesOnly; // ComputeEigenvectors
-
-
-// }

@@ -102,14 +102,15 @@ double erf_inv(double x) noexcept {
 //   }
 // }
 
+// Work-around to avoid copying for the multi-threaded build
 template< LinearOperator Matrix > 
 auto get_matrix(const Matrix& A){
+  // const auto M = is_instance< Matrix, MatrixFunction >{} ? 
   if constexpr(HasOp< Matrix >){
     return MatrixFunction(A.op, A.f, A.deg, A.rtol, A.orth, A.ncv);
   } else {
     return A; 
   } 
-  // const auto M = is_instance< Matrix, MatrixFunction >{} ? 
 }
    
 // std::function< bool(int) >
@@ -210,11 +211,6 @@ auto hutch(
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
     mu_est = est.sum() / nv;  
-
-    // #pragma omp parallel for reduction (+:mu_est)
-    // for (int i=0; i < nv; i++) {
-    //   mu_est += estimates[i];
-    // } 
     return mu_est;
   } else if (use_CLT){
     // Parameterize when to stop using either the CLT over the given confidence level or 

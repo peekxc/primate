@@ -37,11 +37,15 @@ def test_trace_import():
 
 def test_trace_basic():
   from primate.trace import hutch
+  np.random.seed(1234)
   n = 10 
   A = symmetric(n)
-  tr_est = hutch(A, maxiter=100)
+  tr_test1 = hutch(A, maxiter=100, seed=5, num_threads=1)
+  tr_test2 = hutch(A, maxiter=100, seed=5, num_threads=1)
   tr_true = A.trace()
-  assert np.isclose(tr_est, tr_true, atol=tr_true*0.05)
+  assert tr_test1 == tr_test2, "Builds not reproducible!"
+  assert np.isclose(tr_test1, tr_true, atol=tr_true*0.05)
+
 
 def test_trace_inputs():
   from primate.trace import hutch
@@ -119,5 +123,4 @@ def test_trace_mf():
   tr_true = A.trace()
   assert np.isclose(tr_est, tr_true, atol=tr_true*0.05)
 
-  
   tr_est, info = hutch(A, fun=lambda x: x, maxiter=10, seed=5, num_threads=1, info=True)

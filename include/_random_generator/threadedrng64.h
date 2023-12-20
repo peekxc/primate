@@ -8,8 +8,6 @@
 #include <functional> // std::function 
 #include "random_concepts.h" // LightRandom64Engine, Random64Engine
 #include "rne_engines.h" // all the engines
-// #include "./xoshiro_256_star_star.h"  // Xoshiro256StarStar
-// #include "./pcg_random.h" // PCG 
 
 enum RbEngine { sx = 0, xs = 1, pcg = 2, mt = 3 };
 
@@ -60,7 +58,7 @@ struct ThreadedRNG64 {
 					break; 
 				case pcg: {
 					static_assert(std::uniform_random_bit_generator< Random64Engine< Pcg64 > >, "Wrapper RNG engine constraints not met");
-					generators[i] = new Random64Engine< Pcg64 >();;
+					generators[i] = new Random64Engine< Pcg64 >();
 					break; 
 				} 
 				case mt: 

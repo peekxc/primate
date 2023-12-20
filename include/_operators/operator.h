@@ -3,7 +3,7 @@
 
 #include "linear_operator.h"
 
-// TODO: USe CRTP to make the code DRY
+// TODO: Use CRTP to make the code DRY
 // template< LinearOperator Matrix >
 // struct Operator {
   
