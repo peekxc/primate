@@ -27,11 +27,16 @@ include = [
 	{ path = "primate/**/*.pyd", format = "wheel" }
 ]
 
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"]
+doc = ["quartodoc"]
+dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
+
 [tool.meson-python.args]
 setup = ['--default-library=static']
 
 [tool.cibuildwheel]
-test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badge
+test-requires = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"] # coverage-badge
 # test-command = "coverage run --source={package} -m pytest {package}/tests" # "coverage report -m"
 test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
 build-verbosity = 1

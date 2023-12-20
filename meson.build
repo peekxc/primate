@@ -45,8 +45,8 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-unused-parameter', 
   '-fPIC', 
   '-fvisibility=hidden',
-  # '-flto=thin'        # release only: thin LTO 
-  # '-flto'             # release only: monolithic LTO 
+  '-flto=thin',        # release only: thin LTO 
+  # '-flto',             # release only: monolithic LTO 
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
 

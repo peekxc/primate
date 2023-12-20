@@ -52,10 +52,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install pytest pytest-cov coverage-badge coveralls pytest-benchmark
     - name: Install package
       run: |
-        pip install --verbose .
+        python -m pip install -e '.[test]' --verbose
       env:
         CC: /usr/local/opt/llvm/bin/clang
         CXX: /usr/local/opt/llvm/bin/clang++
