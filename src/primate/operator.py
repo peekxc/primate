@@ -14,7 +14,7 @@ def matrix_function(
 	orth: int = 0,
 	**kwargs,
 ) -> LinearOperator:
-	"""Constructs an operator approximating the action $v \mapsto f(A)v$
+	"""Constructs an operator approximating the action $v \\mapsto f(A)v$
 
 	This function constructs an operator that uses the Lanczos quadrature method to approximate the action of
 	matrix-vector multiplication with the matrix function $f(A)$ for any choice of `fun`.
