@@ -15,11 +15,10 @@ linux_task:
     fingerprint_script: echo $PYTHON_VERSION
   before_script: |
     python -m pip install --upgrade pip
-    python -m pip install build pytest pytest-cov pytest-benchmark
   dependencies_script: |
     bash tools/cibw_linux.sh
   build_script: |
-    python -m pip install . --verbose
+    python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
   uninstall_script: |

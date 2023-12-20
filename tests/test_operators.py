@@ -137,7 +137,7 @@ def test_mf_eigen():
   M = matrix_function(A_sparse)
   ew_true = eigsh(A_sparse)[0]
   ew_test = eigsh(M)[0]
-  assert np.allclose(ew_true, ew_test, atol=1e-5), "eigenvalues mismatch / operator doesn't register as respecting LO interface"
+  assert np.allclose(ew_true, ew_test, atol=1e-5), f"eigenvalues mismatch error = {np.max(np.abs(ew_true - ew_test)):0.5f}/ operator doesn't register as respecting LO interface"
 
 def test_mf_matmat():
   from primate.operator import matrix_function
