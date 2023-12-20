@@ -26,10 +26,6 @@ def test_vector_approx():
   y_test = approx_matvec(A_sparse, v0, deg)
   assert np.allclose(y_true, y_test, atol=1e-5)
 
-  ## Test more efficient implementation works
-  y_test_cpp = _lanczos.function_approx(A_sparse, v0, deg, rtol, orth, **dict(function="identity"))
-  assert np.max(np.abs(y_test_cpp - y_true)) < 1e-5 
-
 def test_mf_basic():
   from primate.operator import _operators
   np.random.seed(1234)
@@ -185,9 +181,8 @@ def test_mf_trace():
   for fun, f in zip(["identity", "inv", "log", "exp"], [lambda x: x, np.reciprocal, np.log, np.exp]):
     M = matrix_function(A, fun=fun)
     tr_true = np.sum(f(ew))
-    tr_test = np.mean([M.quad(rademacher(size=n)) for _ in range(500)])
+    tr_test = np.mean([M.quad(rademacher(size=n, seed=s+1)) for s in range(500)])
     assert np.isclose(tr_true, tr_test, atol=abs(tr_true * 0.05))
-
 
 # class CustomOperator:
 #   def __init__(self, A):
