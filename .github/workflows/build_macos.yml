@@ -51,10 +51,11 @@ jobs:
         brew info openblas
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python -m pip install --upgrade pip build ninja 
+        python -m pip install pytest pytest-cov pytest-benchmark bokeh 
     - name: Install package
       run: |
-        python -m pip install -e '.[test]' --verbose
+        python -m pip install . --verbose
       env:
         CC: /usr/local/opt/llvm/bin/clang
         CXX: /usr/local/opt/llvm/bin/clang++
