@@ -5,6 +5,7 @@ project(
   meson_version: '>= 1.1.0',
   default_options : [
     'buildtype=debugoptimized', 
+    'b_ndebug=if-release',
     'cpp_std=c++20', 
     'warning_level=2',
     # 'blas=openblas',
@@ -45,10 +46,18 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-unused-parameter', 
   '-fPIC', 
   '-fvisibility=hidden',
-  # '-flto=thin'        # release only: thin LTO 
-  # '-flto'             # release only: monolithic LTO 
+  # '-flto',             # release only: monolithic LTO 
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
+
+## Release only 
+# _cpp_args += compiler.get_supported_arguments(
+#   '-flto=thin', 
+#   '-O3', 
+#   '-DNDEBUG',
+#   '-Wl,-s',       # strip
+#   '-march=native'
+# )       
 
 ## Require C++20 for concepts
 concept_code = '''

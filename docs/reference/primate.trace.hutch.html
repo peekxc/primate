@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - C++ Integration</title>
+<title>primate</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -64,8 +30,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../advanced/pybind11_integration.html" rel="next">
-<link href="../theory/slq.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -164,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Advanced</a></li><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Usage from C++</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -245,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../advanced/cpp_integration.html" class="sidebar-item-text sidebar-link active">
+  <a href="../advanced/cpp_integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Usage from C++</span></a>
   </div>
 </li>
@@ -347,106 +311,184 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#other-concepts" id="toc-other-concepts" class="nav-link active" data-scroll-target="#other-concepts">Other Concepts</a></li>
+  <li><a href="#primate.trace.hutch" id="toc-primate.trace.hutch" class="nav-link active" data-scroll-target="#primate.trace.hutch">hutch</a>
+  <ul class="collapse">
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Advanced</a></li><li class="breadcrumb-item"><a href="../advanced/cpp_integration.html">Usage from C++</a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title">C++ Integration</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<!-- `primate`'s matrix-free API can handle effectively _any_ linear operator type that [supports the interface](integration/cpp_integration.qmd). What's perhaps surprising is that this generality is essentially zero-cost: no abstract base classes, no type erasure, no fancy [delegate pattern](https://simoncoenen.com/blog/programming/CPP_Delegates). Just supply a type with defined `.shape()` and a `.matvec()` methods and you're good to go! 
-
-The heart of this generic progammming design is [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints). To make things most concrete, this guide delves into the `LinearOperator` concept, and gives an example of how to create a suitable operator for the `sl_trace` method. -->
-<!-- To use `primate` from C++,  
-`primate` uses [C++20 concepts](https://en.cppreference.com/w/cpp/language/constraints) to be generic in its API.  -->
-<!-- ## The `LinearOperator` interface -->
-<!-- ## The `LinearOperator` concept -->
-<p><code>primate</code>’s generic API is enabled through <a href="https://en.cppreference.com/w/cpp/language/constraints">C++20 concepts</a>. Generically, any type <code>T</code> respecting the <code>LinearOperator</code> <a href="https://en.cppreference.com/w/cpp/language/constraints">concept</a> shown below can be passed:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> FP <span class="op">=</span> <span class="bu">std::</span>floating_point<span class="op">;</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span> <span class="kw">typename</span> T<span class="op">,</span> FP <span class="dt">float_t</span> <span class="op">=</span> <span class="kw">typename</span> T<span class="op">::</span><span class="dt">value_type</span> <span class="op">&gt;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">concept</span> LinearOperator <span class="op">=</span> <span class="kw">requires</span><span class="op">(</span>T A<span class="op">,</span> <span class="at">const</span> <span class="dt">float_t</span><span class="op">*</span> v<span class="op">,</span> <span class="dt">float_t</span><span class="op">*</span> o<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> A<span class="op">.</span>matvec<span class="op">(</span>v<span class="op">,</span> o<span class="op">)</span> <span class="op">};</span> <span class="co">// o = A v</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">{</span> A<span class="op">.</span>shape<span class="op">()</span> <span class="op">}</span> <span class="op">-&gt;</span> <span class="bu">std::</span>convertible_to<span class="op">&lt;</span> <span class="bu">std::</span>pair<span class="op">&lt;</span> <span class="dt">size_t</span><span class="op">,</span> <span class="dt">size_t</span> <span class="op">&gt;</span> <span class="op">&gt;;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>An instance <code>A</code> of type <code>T</code> is said to support the <code>LinearOperator</code> concept if it has:</p>
-<ol type="1">
-<li>A method <span class="math inline">Av \mapsto o</span>, with signature <code>A.matvec(const float_t* v, float_t* o)</code></li>
-<li>A method yielding <span class="math inline">(\mathrm{card}(o), \mathrm{card}(v))</span>, with signature<code>A.shape() -&gt; pair&lt; ... &gt;</code></li>
-</ol>
-<p><code>shape()</code> should yield a pair <code>(n,m)</code> representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.</p>
-<section id="other-concepts" class="level2">
-<h2 class="anchored" data-anchor-id="other-concepts">Other Concepts</h2>
-<p>Depending on the problem at hand, the supplied operator may need to meet other constraints. Here’s a short list additional operator concepts:</p>
+<section id="primate.trace.hutch" class="level1">
+<h1>hutch</h1>
+<p><code>trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)</code></p>
+<p>Estimates the trace of a matrix <span class="math inline">A</span> or matrix function <span class="math inline">f(A)</span> via a Girard-Hutchinson estimator.</p>
+<p>This function uses up to <code>maxiter</code> random isotropic vectors to form an unbiased estimator of the trace of <code>A</code>. The estimator is obtained by averaging quadratic forms of <span class="math inline">A</span> (or <span class="math inline">f(A)</span>), rescaling as necessary.</p>
+<section id="notes" class="level2">
+<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<p>For matrix functions, the Lanczos method up to degree <code>deg</code> is used to approximate the action of <span class="math inline">f(A)</span>. By default,</p>
+</section>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 23%">
+<col style="width: 7%">
 <col style="width: 28%">
-<col style="width: 22%">
+<col style="width: 54%">
+<col style="width: 8%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Concept</th>
-<th>Supports</th>
-<th>Signature</th>
-<th>Requires</th>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>LinearOperator</code></td>
-<td><span class="math inline">A v \mapsto o</span></td>
-<td><code>A.matvec(v, o)</code></td>
-<td>NA</td>
+<td><code>A</code></td>
+<td>ndarray, sparray, or LinearOperator</td>
+<td>real symmetric operator.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="even">
-<td><code>AdjointOperator</code></td>
-<td><span class="math inline">A^T v \mapsto o</span></td>
-<td><code>A.rmatvec(v, o)</code></td>
-<td><code>LinearOperator</code></td>
+<td><code>fun</code></td>
+<td>str or typing.Callable</td>
+<td>real-valued function defined on the spectrum of <code>A</code>.</td>
+<td><code>"identity"</code></td>
 </tr>
 <tr class="odd">
-<td><code>AdditiveOperator</code></td>
-<td><span class="math inline">o \gets o + \alpha Av</span></td>
-<td><code>A.matvec_add(v, alpha, o)</code></td>
-<td><code>LinearOperator</code></td>
+<td><code>maxiter</code></td>
+<td>int</td>
+<td>Maximum number of random vectors to sample for the trace estimate.</td>
+<td><code>10</code></td>
 </tr>
 <tr class="even">
-<td><code>AffineOperator</code></td>
-<td>Sets <span class="math inline">t</span> s.t. <span class="math inline">A + tB</span></td>
-<td><code>A.set_parameter(t)</code></td>
-<td><code>LinearOperator</code></td>
+<td><code>deg</code></td>
+<td>int</td>
+<td>Degree of the quadrature approximation.</td>
+<td><code>20</code></td>
 </tr>
 <tr class="odd">
-<td><code>QuadOperator</code></td>
-<td><span class="math inline">v^T A v</span></td>
-<td><code>A.quad(v)</code></td>
-<td>NA</td>
+<td><code>atol</code></td>
+<td>float</td>
+<td>Absolute tolerance to signal convergence for early-stopping. See details.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>rtol</code></td>
+<td>float</td>
+<td>Relative tolerance to signal convergence for early-stopping. See details.</td>
+<td><code>1e-2</code></td>
+</tr>
+<tr class="odd">
+<td><code>stop</code></td>
+<td>str</td>
+<td>Early-stopping criteria to test estimator convergence. See details.</td>
+<td><code>"confidence"</code></td>
+</tr>
+<tr class="even">
+<td><code>orth</code></td>
+<td>int</td>
+<td>Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="odd">
+<td><code>confidence</code></td>
+<td>float</td>
+<td>Confidence level to Only used when <code>stop</code> = “confidence”.</td>
+<td><code>0.95</code></td>
+</tr>
+<tr class="even">
+<td><code>pdf</code></td>
+<td>‘rademacher’, ‘normal’</td>
+<td>Choice of zero-centered distribution to sample random vectors from.</td>
+<td><code>'rademacher'</code></td>
+</tr>
+<tr class="odd">
+<td><code>rng</code></td>
+<td>‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’</td>
+<td>Random number generator to use (PCG64 by default).</td>
+<td><code>'splitmix64'</code></td>
+</tr>
+<tr class="even">
+<td><code>seed</code></td>
+<td>int</td>
+<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
+<td><code>-1</code></td>
+</tr>
+<tr class="odd">
+<td><code>num_threads</code></td>
+<td>int</td>
+<td>Number of threads to use to parallelize the computation. Setting <code>num_threads</code> &lt; 1 to let OpenMP decide.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>plot</code></td>
+<td>bool</td>
+<td>If true, plots the samples of the trace estimate along with their convergence characteristics.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><code>info</code></td>
+<td>bool</td>
+<td>If True, returns a dictionary containing all relevant information about the computation.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><code>kwargs</code></td>
+<td>dict</td>
+<td>additional key-values to parameterize the chosen function ‘fun’.</td>
+<td><code>{}</code></td>
 </tr>
 </tbody>
 </table>
-<p>The exported methods in <code>primate</code> only need the minimum constraints to be satisfied to compile: if you need access to the <em>Lanczos</em> method, then just supporting the <code>LinearOperator</code> concept is sufficient. On the other hand, adding support for other constraints can optimize the efficiency of certain methods; for example, the <code>hutch</code> method technically only requires a <code>LinearOperator</code> to do trace estimation (via <code>matvec</code> calls), but will also compile and prefer calling <code>quad</code> with a <code>QuadOperator</code> as input. In such a situaton, if your operator has an efficient quadratic form <span class="math inline">v \mapsto v^T A v</span>, then implementing <code>quad</code> may improve the performance of <code>hutch</code>. <!-- However, if you e.g. want to compute the trace of the _gramian_ $f(A^T A)$ of a given operator via _Golub-Kahan_,the operator must also satisfy the `AdjointOperator` concept. For a full list of the supported concepts, see [linearoperator.h](). --></p>
+</section>
+<section id="returns" class="level2">
+<h2 class="anchored" data-anchor-id="returns">Returns</h2>
+<table class="table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 84%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>float</td>
+<td>Estimate of the trace of <span class="math inline">A</span>, if <code>fun = "identity"</code>, otherwise estimates the trace of <span class="math inline">f(A)</span>.</td>
+</tr>
+<tr class="even">
+<td>(dict, optional)</td>
+<td>If ‘info = True’, additional information about the computation.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See Also</h2>
+<p>lanczos : the lanczos algorithm.</p>
+</section>
+<section id="reference" class="level2">
+<h2 class="anchored" data-anchor-id="reference">Reference</h2>
+<p>[1] Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -991,18 +1033,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../theory/slq.html" class="pagination-link  aria-label=" slq"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">SLQ</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../advanced/pybind11_integration.html" class="pagination-link" aria-label="Integrating with pybind11">
-        <span class="nav-page-text">Integrating with pybind11</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

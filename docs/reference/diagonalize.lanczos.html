@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/primate.trace.qmd" rel="next">
+<link href="../reference/primate.trace.sl_trace.html" rel="next">
 <link href="../reference/index.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -303,6 +303,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -316,14 +317,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="primate.diagonalize.lanczos" class="level1">
 <h1>diagonalize.lanczos</h1>
 <p><code>diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)</code></p>
-<p>Lanczos method of tridiagonalization.</p>
+<p>Lanczos method for matrix tridiagonalization.</p>
+<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,<br>
+with additional modifications to support varying degrees of re-orthogonalization.</p>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
-<col style="width: 9%">
-<col style="width: 36%">
-<col style="width: 46%">
+<col style="width: 10%">
+<col style="width: 37%">
+<col style="width: 44%">
 <col style="width: 7%">
 </colgroup>
 <thead>
@@ -337,7 +340,7 @@ ul.task-list li input[type="checkbox"] {
 <tbody>
 <tr class="odd">
 <td><code>A</code></td>
-<td>scipy.sparse.linalg.LinearOperator | ndarray | sparray</td>
+<td>scipy.sparse.linalg.LinearOperator or ndarray or sparray</td>
 <td>Symmetric operator to tridiagonalize.</td>
 <td><em>required</em></td>
 </tr>
@@ -345,43 +348,43 @@ ul.task-list li input[type="checkbox"] {
 <td><code>v0</code></td>
 <td>ndarray</td>
 <td>Initial vector to orthogonalize against.</td>
-<td><code>= None</code></td>
+<td><code>None</code></td>
 </tr>
 <tr class="odd">
 <td><code>deg</code></td>
 <td>int</td>
 <td>Size of the Krylov subspace to expand.</td>
-<td><code>= None</code></td>
+<td><code>None</code></td>
 </tr>
 <tr class="even">
 <td><code>rtol</code></td>
 <td>float</td>
 <td>Relative tolerance to consider the invariant subspace as converged.</td>
-<td><code>= 1e-8</code></td>
+<td><code>1e-8</code></td>
 </tr>
 <tr class="odd">
 <td><code>orth</code></td>
 <td>int</td>
-<td>Additional number of Lanczos vectors to orthogonalize against.</td>
+<td>Number of additional Lanczos vectors to orthogonalize against.</td>
 <td><code>0</code></td>
 </tr>
 <tr class="even">
 <td><code>sparse_mat</code></td>
 <td>bool</td>
-<td>Whether to output the diagonal and off-diagonal terms as a sparse matrix.</td>
-<td><code>= False</code></td>
+<td>Whether to output the tridiagonal matrix as a sparse matrix.</td>
+<td><code>False</code></td>
 </tr>
 <tr class="odd">
 <td><code>return_basis</code></td>
 <td>bool</td>
 <td>Whether to return the <code>orth</code> + 2 Lanczos vectors.</td>
-<td><code>= False</code></td>
+<td><code>False</code></td>
 </tr>
 <tr class="even">
 <td><code>dtype</code></td>
 <td>dtype</td>
 <td>The precision dtype to specialize the computation.</td>
-<td><code>= None</code></td>
+<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
@@ -390,8 +393,8 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="returns">Returns</h2>
 <table class="table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 83%">
+<col style="width: 88%">
+<col style="width: 12%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -401,12 +404,12 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td>(a,b) : tuple</td>
-<td>The diagonal and off-diagonal of the tridiagonal matrix.</td>
+<td>A tuple <code>(a,b)</code> parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If <code>return_basis</code> is</td>
+<td></td>
 </tr>
 <tr class="even">
-<td>ndarray</td>
-<td>If <code>return_basis</code> is True, the orthogonal basis for the Krylov subspace.</td>
+<td>True, then the tuple <code>(a,b), Q</code> is returned, where <code>Q</code> represents orthogonal basis for the Krylov subspace.</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -417,9 +420,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="notes" class="level2">
 <h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<p>No checking for ghost- or otherwise degenerate eigenvalues is performed. To increase the accuracy of the eigenvalue approximation, increase <code>orth</code> and <code>deg</code>, Note the complexity of the iteration scales linearly with <code>deg</code> and quadratically with <code>orth</code>.</p>
+<p>No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase <code>orth</code> and <code>deg</code>. Note the number of matvecs with <code>A</code> scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
 <p>Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization.</p>
-<p>.. [1] Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ol type="1">
+<li>Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.</li>
+</ol>
 
 
 </section>
@@ -974,8 +982,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/primate.trace.qmd" class="pagination-link" aria-label="">
-        <span class="nav-page-text"></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/primate.trace.sl_trace.html" class="pagination-link" aria-label="SL Trace">
+        <span class="nav-page-text">SL Trace</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

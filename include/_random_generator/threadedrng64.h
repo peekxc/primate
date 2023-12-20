@@ -8,10 +8,8 @@
 #include <functional> // std::function 
 #include "random_concepts.h" // LightRandom64Engine, Random64Engine
 #include "rne_engines.h" // all the engines
-// #include "./xoshiro_256_star_star.h"  // Xoshiro256StarStar
-// #include "./pcg_random.h" // PCG 
 
-enum RbEngine { sx = 0, xs = 1, pcg = 2, lcg = 3, mt = 4 };
+enum RbEngine { sx = 0, xs = 1, pcg = 2, mt = 3 };
 
 // Thread-safe random number generator
 // This class constructs n_thread copies of a given *random number engine* type (a state machine with a transition + output function) using 
@@ -60,18 +58,9 @@ struct ThreadedRNG64 {
 					break; 
 				case pcg: {
 					static_assert(std::uniform_random_bit_generator< Random64Engine< Pcg64 > >, "Wrapper RNG engine constraints not met");
-					auto rne = new Random64Engine< Pcg64 >();
-					// if (seed < 0){
-					// 	rne->rng.seed(pcg_extras::seed_seq_from< std::random_device >());	
-					// } else {
-					// 	rne->rng.seed(seed);	
-					// }
-					generators[i] = rne;
+					generators[i] = new Random64Engine< Pcg64 >();
 					break; 
-				}
-				case lcg:
-					generators[i] = new Random64Engine< knuth_lcg >();
-					break; 
+				} 
 				case mt: 
 					generators[i] = new Random64Engine< std::mt19937_64 >();
 					break; 
@@ -92,22 +81,10 @@ struct ThreadedRNG64 {
 		// Saturate the full state of the generators with entropy
 		for (int i = 0; i < num_threads; ++i) {
 			const auto ssize = generators[i]->state_size(); 
-			// if (ssize > 0){
-			// if (engine_id != pcg){
-			// 	const auto seed_source = pcg_extras::seed_seq_from< std::random_device >();
-			// 	generators[i]->rng.seed(seed_source);
-			// } else {
-				std::vector< uint32_t > seed_data(ssize, 0);
-				std::generate_n(seed_data.begin(), ssize, rd); // generate evenly-distributed 32-bit seeds
-				std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
-				generators[i]->seed(seed_gen);
-			// }
-			// }
-			
-			// } else {
-			// 	uint64_t seed = (uint64_t(rd()) << 32) | rd();
-			// 	generators[i]->seed(seed);
-			// }
+			std::vector< uint32_t > seed_data(ssize, 0);
+			std::generate_n(seed_data.begin(), ssize, rd); // generate evenly-distributed 32-bit seeds
+			std::seed_seq seed_gen(std::begin(seed_data), std::end(seed_data));
+			generators[i]->seed(seed_gen);
 		}
 	};
 };

@@ -71,6 +71,22 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -297,7 +313,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#primate.trace.sl_gauss" id="toc-primate.trace.sl_gauss" class="nav-link active" data-scroll-target="#primate.trace.sl_gauss">sl_gauss</a></li>
+  <li><a href="#primate.trace.sl_gauss" id="toc-primate.trace.sl_gauss" class="nav-link active" data-scroll-target="#primate.trace.sl_gauss">sl_gauss</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -310,10 +330,104 @@ ul.task-list li input[type="checkbox"] {
 <section id="primate.trace.sl_gauss" class="level1">
 <h1>sl_gauss</h1>
 <p><code>trace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)</code></p>
-<p>Gaussian quadrature.</p>
-<p>Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A. These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).</p>
+<p>Stochastic Gaussian quadrature approximation.</p>
+<p>Computes a set of sample nodes and weights for the degree-k orthogonal polynomial approximating the cumulative spectral measure of <code>A</code>. This function can be used to approximate the spectral density of <code>A</code>, or to approximate the spectral sum of any function applied to the spectrum of <code>A</code>.</p>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 28%">
+<col style="width: 54%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>A</code></td>
+<td>ndarray, sparray, or LinearOperator</td>
+<td>real symmetric operator.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>n</code></td>
+<td>int</td>
+<td>Number of random vectors to sample for the quadrature estimate.</td>
+<td><code>150</code></td>
+</tr>
+<tr class="odd">
+<td><code>deg</code></td>
+<td>int</td>
+<td>Degree of the quadrature approximation.</td>
+<td><code>20</code></td>
+</tr>
+<tr class="even">
+<td><code>rng</code></td>
+<td>‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘lcg64’, ‘mt64’</td>
+<td>Random number generator to use (PCG64 by default).</td>
+<td><code>'splitmix64'</code></td>
+</tr>
+<tr class="odd">
+<td><code>seed</code></td>
+<td>int</td>
+<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
+<td><code>-1</code></td>
+</tr>
+<tr class="even">
+<td><code>pdf</code></td>
+<td>‘rademacher’, ‘normal’</td>
+<td>Choice of zero-centered distribution to sample random vectors from.</td>
+<td><code>'rademacher'</code></td>
+</tr>
+<tr class="odd">
+<td><code>orth</code></td>
+<td>int</td>
+<td>Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>num_threads</code></td>
+<td>int</td>
+<td>Number of threads to use to parallelize the computation. Setting <code>num_threads</code> &lt; 1 to let OpenMP decide.</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level2">
+<h2 class="anchored" data-anchor-id="returns">Returns</h2>
+<table class="table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 78%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>float</td>
+<td>Estimate of the trace of the matrix function <span class="math inline">f(A)</span>.</td>
+</tr>
+<tr class="even">
+<td>(dict, optional)</td>
+<td>If ‘info = True’, additional information about the computation.</td>
+</tr>
+</tbody>
+</table>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

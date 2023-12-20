@@ -2,7 +2,28 @@
 
 `trace.sl_gauss(A, n=150, deg=20, pdf='rademacher', rng='pcg', seed=-1, orth=0, num_threads=0)`
 
-Gaussian quadrature.
+Stochastic Gaussian quadrature approximation.
 
-Computes the sample nodes and weights for the degree k orthogonal polynomial approximating the cumulative spectral measure mu(t) of A.
-These nodes/weights represent the quadrature rule for the Riemann-Stieltjes integral w.r.t. mu(t).
+Computes a set of sample nodes and weights for the degree-k orthogonal polynomial approximating the 
+cumulative spectral measure of `A`. This function can be used to approximate the spectral density of `A`, 
+or to approximate the spectral sum of any function applied to the spectrum of `A`.
+
+## Parameters
+
+| Name          | Type                                                   | Description                                                                                              | Default         |
+|---------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------|
+| `A`           | ndarray, sparray, or LinearOperator                    | real symmetric operator.                                                                                 | _required_      |
+| `n`           | int                                                    | Number of random vectors to sample for the quadrature estimate.                                          | `150`           |
+| `deg`         | int                                                    | Degree of the quadrature approximation.                                                                  | `20`            |
+| `rng`         | 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' | Random number generator to use (PCG64 by default).                                                       | ` 'splitmix64'` |
+| `seed`        | int                                                    | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.                        | `-1`            |
+| `pdf`         | 'rademacher', 'normal'                                 | Choice of zero-centered distribution to sample random vectors from.                                      | ` 'rademacher'` |
+| `orth`        | int                                                    | Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.            | `0`             |
+| `num_threads` | int                                                    | Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide. | `0`             |
+
+## Returns
+
+| Type             | Description                                                     |
+|------------------|-----------------------------------------------------------------|
+| float            | Estimate of the trace of the matrix function $f(A)$.            |
+| (dict, optional) | If 'info = True', additional information about the computation. |

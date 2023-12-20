@@ -9,10 +9,10 @@ using Eigen::MatrixXf;
 using Eigen::MatrixXd;
 
 template< typename F >
-using ColVector = Eigen::Matrix< F, Dynamic, 1 >;
+using Vector = Eigen::Matrix< F, Dynamic, 1 >;
 
 template< typename F >
-using RowVector = Eigen::Matrix< F, 1, Dynamic >;
+using Array = Eigen::Array< F, Dynamic, 1 >;
 
 template< typename F >
 using DenseMatrix = Eigen::Matrix< F, Dynamic, Dynamic >;

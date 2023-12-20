@@ -16,9 +16,10 @@ def lanczos(
 	seed: int = None,
 	dtype=None,
 ) -> tuple:
-	"""Lanczos method of tridiagonalization.
+	"""Lanczos method for matrix tridiagonalization.
 
-	This function implements Paiges A27 variant of the Lanczos method with support for varying degrees of re-orthogonalization. 
+	This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,  
+	with additional modifications to support varying degrees of re-orthogonalization. 
 
 	Parameters
 	----------
@@ -31,9 +32,9 @@ def lanczos(
 	rtol : float, default=1e-8
 	    Relative tolerance to consider the invariant subspace as converged.
 	orth : int, default=0
-	    Additional number of Lanczos vectors to orthogonalize against.
+	    Number of additional Lanczos vectors to orthogonalize against.
 	sparse_mat : bool, default=False
-	    Whether to output the diagonal and off-diagonal terms as a sparse matrix.
+	    Whether to output the tridiagonal matrix as a sparse matrix.
 	return_basis : bool, default=False
 	    Whether to return the `orth` + 2 Lanczos vectors.
 	dtype : dtype, default=None
@@ -52,12 +53,14 @@ def lanczos(
 	Notes
 	-----
 	No checking for performed for ghost, converged, or 'locked' eigenvalues. To increase the accuracy of the 
-	eigenvalue approximation, increase `orth` and `deg`, though note the complexity of the iteration scales linearly 
-	with `deg` and quadratically with `orth`.
+	eigenvalue approximation, increase `orth` and `deg`. Note the number of matvecs with `A` scales linearly 
+	with `deg` and the number of inner-products scales quadratically with `orth`.
 
 	Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization.
 
-	.. [1] Paige, Christopher C. "Computational variants of the Lanczos method for the eigenproblem." IMA Journal of Applied Mathematics 10.3 (1972): 373-381.
+	References
+	----------
+	1. Paige, Christopher C. "Computational variants of the Lanczos method for the eigenproblem." IMA Journal of Applied Mathematics 10.3 (1972): 373-381.
 	"""
 	## Basic parameter validation
 	n: int = A.shape[0]
@@ -73,7 +76,7 @@ def lanczos(
 
 	## Determine number of projections + lanczos vectors
 	orth: int = deg if orth < 0 or orth > deg else orth
-	ncv: int = max(orth, 2) if not (return_basis) else n
+	ncv: int = np.clip(orth, 2, deg) if not (return_basis) else n
 
 	## Generate the starting vector if none is specified
 	if v0 is None:

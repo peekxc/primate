@@ -23,7 +23,7 @@ Diagonalization methods
 
 | | |
 | --- | --- |
-| [diagonalize.lanczos](diagonalize.lanczos.qmd#primate.diagonalize.lanczos) | Lanczos method of tridiagonalization. |
+| [diagonalize.lanczos](diagonalize.lanczos.qmd#primate.diagonalize.lanczos) | Lanczos method for matrix tridiagonalization. |
 
 ## Misc
 

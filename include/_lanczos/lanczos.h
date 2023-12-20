@@ -1,3 +1,6 @@
+#ifndef _LANCZOS_LANCZOS_H
+#define _LANCZOS_LANCZOS_H
+
 #include <concepts> 
 #include <functional> // function
 #include <algorithm>  // max
@@ -7,31 +10,10 @@
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array
 #include "eigen_core.h"
 #include <Eigen/Eigenvalues> 
-
+#include "_trace/hutch.h"
 #include <iostream>
 
 using std::function; 
-
-template < int Iterate = 3 >
-double erf_inv(double x) noexcept {
-  // Strategy: solve f(y) = x - erf(y) = 0 for given x with Newton's method.
-  // f'(y) = -erf'(y) = -2/sqrt(pi) e^(-y^2)
-  // Has quadratic convergence, achieving machine precision with ~three iterations.
-  if constexpr(Iterate == 0){
-    // Specialization to get initial estimate; accurate to about 1e-3.
-    // Based on https://stackoverflow.com/questions/27229371/inverse-error-function-in-c
-    const double a = std::log((1 - x) * (1 + x));
-    const double b = std::fma(0.5, a, 4.120666747961526);
-    const double c = 6.47272819164 * a;
-    return std::copysign(std::sqrt(-b + std::sqrt(std::fma(b, b, -c))), x);
-  } else {
-    const double x0 = erf_inv< Iterate - 1 >(x); // compile-time recurse
-    const double fx0 = x - std::erf(x0);
-    const double pi = std::acos(-1);
-    double fpx0 = -2.0 / std::sqrt(pi) * std::exp(-x0 * x0);
-    return x0 - fx0 / fpx0; // = x1
-  } 
-}
 
 // Paige's A27 variant of the Lanczos method
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
@@ -75,7 +57,7 @@ void lanczos_recurrence(
 
     // Re-orthogonalize q_n against previous ncv-1 lanczos vectors
     if (orth > 0) {
-      auto qn = Eigen::Ref< ColVector< F > >(v);          
+      auto qn = Eigen::Ref< Vector< F > >(v);          
       orth_vector(qn, Q_ref, c, orth, true);
     }
 
@@ -205,81 +187,6 @@ void slq (
   }
 }
 
-template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG >
-void sl_trace(
-  const Matrix& mat, const std::function< F(F) > sf, 
-  RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
-  const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
-  const F atol, const F rtol, 
-  const int num_threads,
-  const bool use_CLT, 
-  F* estimates
-){      
-  using VectorF = Eigen::Array< F, Dynamic, 1>;
-
-  // Parameterize the trace function (run in parallel)
-  // const auto N = mat.shape().second;
-  const auto trace_f = [lanczos_degree, &sf, &estimates](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
-    Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);     // no-op
-    Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1); // no-op
-    // for (int c = 0; c < lanczos_degree; ++c){
-    //   // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
-    //   nodes_v[c] = sf(nodes_v[c]);
-    // }
-    nodes_v.unaryExpr(sf);
-    estimates[i] = (nodes_v * weights_v).sum();
-  };
-  
-  // Type-erased function since the call is cheap
-  std::function< bool (int) > early_stop; 
-  if (atol == 0.0 && rtol == 0.0){
-    early_stop = [](int i) -> bool { return false; };
-  } else if (use_CLT){
-    // Parameterize when to stop using either the CLT over the given confidence level or 
-    // This runs in critical section of the SLQ, so we can depend sequential execution (but i will vary!)
-    // See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
-    F mu_est = 0.0, vr_est = 0.0; 
-    F mu_pre = 0.0, vr_pre = 0.0; 
-    int n = 0; // number of estimates computed
-    const auto z = std::sqrt(2.0) * erf_inv(0.95);
-    early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n, z, atol, rtol](int i) -> bool {
-      ++n; 
-      const F denom = (1.0 / F(n));
-      const F L = n > 2 ? F(n-2) / F(n-1) : 0.0;
-      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
-      mu_pre = n == 1 ? mu_est : mu_pre;
-      vr_est = L * vr_pre + denom * std::pow(estimates[i] - mu_pre, 2); // update sample variance
-      mu_pre = mu_est;
-      vr_pre = vr_est;
-      if (n < 3){
-        return false; 
-      } else {
-        const auto sd_est = std::sqrt(vr_est);
-        const auto margin_of_error = z * sd_est / std::sqrt(F(n)); // todo: remove sqrt's 
-        // std::cout << "n: " << n << ", mu: " << mu_est << ", ci: [" << mu_est - margin_of_error << ", " << mu_est + margin_of_error << "]";
-        // std::cout << "margin/atol: " << margin_of_error << ", " << atol << "\n";
-        return margin_of_error <= atol || std::abs(sd_est / mu_est) <= rtol;
-      }
-    };
-  } else {
-    // Use traditional iteration checking, akin to scipy.integrate.quadrature
-    F mu_est = 0.0, mu_pre = 0.0;
-    int n = 0; 
-    early_stop = [&n, &estimates, &mu_est, &mu_pre, atol, rtol](int i) -> bool {
-      ++n; 
-      const F denom = (1.0 / F(n));
-      mu_est = denom * (estimates[i] + (n - 1) * mu_pre);
-      const bool atol_check = std::abs(mu_est - mu_pre) <= atol;
-      const bool rtol_check = (std::abs(mu_est - mu_pre) / mu_est) <= rtol; 
-      mu_pre = mu_est; 
-      return atol_check || rtol_check;
-    };
-  }
-  
-  // Execute the stochastic Lanczos quadrature with the trace function 
-  slq< F >(mat, trace_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
-}
-
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG > 
 void sl_quadrature(
   const Matrix& mat, 
@@ -311,23 +218,28 @@ void sl_quadrature(
 
 template< std::floating_point F, LinearOperator Matrix > 
 struct MatrixFunction {
+  // static const bool owning = false;
+  using value_type = F;
   using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
 
-  // TODO: store a const pointer to op and check nullptr condition in use
-  // Essentially should make this class a non-owning class rather than a copying
-  // see: https://stackoverflow.com/questions/35770357/storing-const-reference-to-an-object-in-class
-  const Matrix op; 
+  // Use non-owning class here rather than copy-constructor to make parallizing easier
+  // See: https://stackoverflow.com/questions/35770357/storing-const-reference-to-an-object-in-class
+  // Also see: https://zpjiang.me/2020/01/20/const-reference-vs-pointer/
+  const Matrix& op; 
+  // const Matrix op; 
+
+  // Fields
   std::function< F(F) > f; 
   const int deg;
+  const int ncv; 
   F rtol; 
   int orth;
 
-  MatrixFunction(const Matrix& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) 
-  : op(A), f(fun), deg(lanczos_degree), rtol(lanczos_rtol), orth(add_orth) {
-    // Pre-allocate memory needed for Lanczos iterations
-    Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(A.shape().first, deg));
+  MatrixFunction(const Matrix& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv) 
+  : op(A), f(fun), deg(lanczos_degree), ncv(std::max(_ncv, 2)), rtol(lanczos_rtol), orth(_orth) {
+    // Pre-allocate all but Q memory needed for Lanczos iterations
     alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
@@ -335,12 +247,25 @@ struct MatrixFunction {
     solver = EigenSolver(deg);
   };
 
-  // Don't allow construction from temporaries
-  MatrixFunction(Matrix&& A, std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int add_orth) = delete;
+  MatrixFunction(Matrix&& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv) 
+  : op(std::move(A)), f(fun), deg(lanczos_degree), ncv(std::max(_ncv, 2)), rtol(lanczos_rtol), orth(_orth) {
+    // Pre-allocate all but Q memory needed for Lanczos iterations
+    alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
+    beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
+    nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
+    weights = static_cast< ArrayF >(ArrayF::Zero(deg));
+    solver = EigenSolver(deg);
+  };
  
   // Approximates v |-> f(A)v via a limited degree Lanczos iteration
   void matvec(const F* v, F* y) const noexcept {
-    
+    // if (op == nullptr){ return; }
+
+    // By default, Q is not allocated in constructor, as quad may used less memory
+    // For all calls after the first matvec(), Eigen promises this is a no-op
+    // Note we *need* Q to have exactly deg columns for the matvec approx
+    if (Q.cols() < deg){ Q.resize(op.shape().first, deg); }
+  
     // Inputs / outputs 
     Eigen::Map< const VectorF > v_map(v, op.shape().second);
     Eigen::Map< VectorF > y_map(y, op.shape().first);
@@ -358,10 +283,7 @@ struct MatrixFunction {
     // Apply the spectral function (in-place) to Rayleigh-Ritz values (nodes)
     auto theta = static_cast< ArrayF >(solver.eigenvalues());
     // theta.unaryExpr(f); // this doesn't always work for some reason
-    for (int c = 0; c < theta.size(); ++c){
-      // std::cout << nodes_v[c] << " -> " << sf(nodes_v[c]) << std::endl; 
-      theta[c] = f(theta[c]);
-    }
+    std::transform(theta.begin(), theta.end(), theta.begin(), f);
     
     // The approximation v |-> f(A)v 
     const auto V = static_cast< DenseMatrix< F > >(solver.eigenvectors()); // maybe dont cast here 
@@ -372,6 +294,7 @@ struct MatrixFunction {
   }   
 
   void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    // if (op == nullptr){ return; }
     Eigen::Map< const DenseMatrix< F > > XM(X, op.shape().second, k);
     Eigen::Map< DenseMatrix< F > > YM(Y, op.shape().first, k);
     for (size_t j = 0; j < k; ++j){
@@ -379,29 +302,55 @@ struct MatrixFunction {
     }
   }
 
+  // Approximates v^T A v
+  auto quad(const F* v) const noexcept -> F {
+    // if (op == nullptr){ return; }
+
+    // Only allocate NCV columns as necessary -- no-op after first resizing
+    if (Q.cols() < ncv){ Q.resize(op.shape().first, ncv); }
+
+    // Save copy of v + its norm 
+    Eigen::Map< const VectorF > v_map(v, op.shape().second);
+    const F v_scale = v_map.norm(); 
+    VectorF v_copy = v_map; // save copy; needs to be norm-1 for Lanczos + quad to work
+    v_copy.normalize();
+
+    // Execute lanczos method + Golub-Welsch algorithm
+    lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+    lanczos_quadrature< F >(alpha.data(), beta.data(), deg, solver, nodes.data(), weights.data());
+    
+    // Apply f to the nodes and sum
+    std::transform(nodes.begin(), nodes.end(), nodes.begin(), f);
+    return std::pow(v_scale, 2) * (nodes * weights).sum();
+  }
+
+  // Returns (rows, columns)
   auto shape() const noexcept -> std::pair< size_t, size_t > {
+    // if (op == nullptr){ return std::make_pair< size_t, size_t >(0, 0); }
     return op.shape();
   }
 
-  private: // Internal state to re-use
-    mutable DenseMatrix< F > Q;
-    mutable ArrayF alpha;
-    mutable ArrayF beta;
-    mutable ArrayF nodes;
-    mutable ArrayF weights;
-    mutable EigenSolver solver;  
+  // private: // Internal state to re-use
+  mutable DenseMatrix< F > Q;
+  mutable ArrayF alpha;
+  mutable ArrayF beta;
+  mutable ArrayF nodes;
+  mutable ArrayF weights;
+  mutable EigenSolver solver;  
 };
 
 // Approximates the action v |-> f(A)v via the Lanczos method
 template< std::floating_point F, LinearOperator Matrix > 
 void matrix_approx(
   const Matrix& A,                            // LinearOperator 
-  const std::function< F(F) > sf,             // the spectral function 
+  std::function< F(F) > sf,             // the spectral function 
   const F* v,                                 // the input vector
   const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
   const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
   const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
   F* y                                        // Output vector
 ){
-  MatrixFunction< F, Matrix >(A, sf, lanczos_degree, lanczos_rtol, orth).matvec(v, y);
+  MatrixFunction< F, Matrix >(A, sf, lanczos_degree, lanczos_rtol, orth, lanczos_degree).matvec(v, y);
 };
+
+#endif 

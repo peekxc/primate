@@ -51,6 +51,16 @@ concept Operator =
   AdjointAdditiveOperator< T, F >
 ;
 
+template < typename T, typename F = typename T::value_type >
+concept QuadOperator = requires(T op, const F* input) {
+  { op.quad(input) } -> std::convertible_to< F >; // v^T A v ; todo: make optional if matvec available?
+};
+
+template < typename T, typename F = typename T::value_type >
+concept SupportsMatrixMult = requires(T op, const F* input, F* output, const int k) {
+  { op.matmat(input, output, k) };
+};
+
 // Represents the operator (A + tB) for parameter T = { t1, t2, ..., tn }
 template < typename T, typename F = typename T::value_type >
 concept AffineOperator = requires(T op, F t) {
@@ -58,5 +68,19 @@ concept AffineOperator = requires(T op, F t) {
   { op.set_parameter(t) };
   // { op.get_num_parameters() } -> std::convertible_to< size_t >;
 } && Operator< T, F >;
+
+// TODO: fix 
+template < typename T >
+concept HasOp = requires(T op) {
+  requires std::is_member_object_pointer<decltype(&T::op)>::value;
+};
+
+// Used for hard-type checking
+// From: https://stackoverflow.com/questions/44012938/how-to-tell-if-a-type-is-an-instance-of-a-specific-template-class
+// template <class, template <class, class...> class>
+// struct is_instance : public std::false_type {};
+
+// template <class...Ts, template <class, class...> class U>
+// struct is_instance<U<Ts...>, U> : public std::true_type {};
 
 #endif

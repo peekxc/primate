@@ -18,11 +18,11 @@ Notable differences between the two packages include:
 | Build tool       | Meson                 | CMake                  |
 
 One motivation for developing `primate` was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
-These modifications not only simplify access to the SLQ method from *user* (i.e. dependent) packages, but they enable native support for arbitrary types adhering to SciPys [`LinearOperator`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html) abstract interface. For more details on this, see the integration guides. 
+These modifications not only simplify access from *user* (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the [LinearOperator concept](advanced/cpp_integration.qmd). For more details on this, see the integration guides. 
 
 [^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using the [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) template C++ library.
 [^2]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
-[^3]: In theory, there is nothing stopping on from using e.g. GPU-based tensor libraries to accelerate matrix-vector products. Indeed, `primate` was designed to work with essentially any operator matching the interface, see the [C++ integration guide](advanced/cpp_integration.qmd). However, nativ GPU support in the form of CUDA- or ROCm-implemented Linear operators is not provided.
+[^3]: `primate` does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, `primate` was [designed](advanced/cpp_integration.qmd) to work with essentially any operator matching the interface. 
 
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 

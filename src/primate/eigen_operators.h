@@ -1,33 +1,46 @@
+#ifndef EIGEN_OPERATORS_H
+#define EIGEN_OPERATORS_H
+
 #include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <eigen_core.h> // Vector, Array, DenseMatrix
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
 namespace py = pybind11;
 
 // ## TODO: use CRTP to craft a set of template classes, e.g. 
-// 
 
-
+// Storing const should be safe for parallel execution, right?
 template< std::floating_point F >
 struct DenseEigenLinearOperator {
   using value_type = F;
-  const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic > A;  
-  DenseEigenLinearOperator(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >& _mat) : A(_mat){}
+  const DenseMatrix< F > A;  
+  DenseEigenLinearOperator(const DenseMatrix< F > _mat) : A(_mat){}
 
   void matvec(const F* inp, F* out) const noexcept {
-    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
+    auto input = Eigen::Map< const Vector< F > >(inp, A.cols(), 1); // this should be a no-op
+    auto output = Eigen::Map< Vector< F > >(out, A.rows(), 1); // this should be a no-op
     output = A * input; 
   }
 
   void rmatvec(const F* inp, F* out) const noexcept {
-    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+    auto input = Eigen::Map< const Vector< F > >(inp, A.rows(), 1); // this should be a no-op
+    auto output = Eigen::Map< Vector< F > >(out, A.cols(), 1); // this should be a no-op
     output = A.adjoint() * input; 
+  }
+
+  void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    Eigen::Map< const DenseMatrix< F > > XM(X, A.cols(), k);
+    Eigen::Map< DenseMatrix< F > > YM(Y, A.rows(), k);
+    YM = A * XM;
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
     return std::make_pair((size_t) A.rows(), (size_t) A.cols());
   }
+
+  // auto quad(const F* inp) const noexcept -> F {
+  //   auto input = Eigen::Map< const Vector< F > >(inp, A.rows(), 1); //  no-op
+  // }
 };
 
 // TODO: store only lower/upper part for symmetric? http://www.eigen.tuxfamily.org/dox/group__TutorialSparse.html
@@ -35,7 +48,7 @@ template< std::floating_point F >
 struct SparseEigenLinearOperator {
   using value_type = F;
   const Eigen::SparseMatrix< F > A;  
-  SparseEigenLinearOperator(const Eigen::SparseMatrix< F >& _mat) : A(_mat){}
+  SparseEigenLinearOperator(const Eigen::SparseMatrix< F > _mat) : A(_mat){}
 
   void matvec(const F* inp, F* out) const noexcept {
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
@@ -47,6 +60,12 @@ struct SparseEigenLinearOperator {
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
     auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
     output = A.adjoint() * input; 
+  }
+
+  void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    Eigen::Map< const DenseMatrix< F > > XM(X, A.cols(), k);
+    Eigen::Map< DenseMatrix< F > > YM(Y, A.rows(), k);
+    YM = A * XM;
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
@@ -87,8 +106,6 @@ struct SparseEigenAffineOperator {
   }
 };
 
-
-
 template< std::floating_point F >
 auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
   return SparseEigenLinearOperator< F >(*A);
@@ -111,3 +128,5 @@ template< std::floating_point F >
 auto linearoperator_wrapper(const py::object* A){
   return PyLinearOperator< F >(*A);
 }
+
+#endif 
