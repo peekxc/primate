@@ -3,7 +3,7 @@ build-backend = 'mesonpy'
 requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy'] # 'pythran-openblas'  "cmake". nanobind
 
 [project]
-name = "primate"
+name = "scikit-primate"
 version = "0.3.1"
 readme = "README.md"
 classifiers = [

@@ -66,7 +66,7 @@ _cpp_args += compiler.get_supported_arguments(
   '-O3', 
   '-DNDEBUG',
   '-Wl,-s',       # strip
-  # '-march=native'
+  # '-march=native' # either this or lto seems to not work on multiple builds
 )
 
 ## Require C++20 for concepts

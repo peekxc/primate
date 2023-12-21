@@ -1,5 +1,5 @@
 import importlib.metadata
-__version__ = importlib.metadata.version("primate")
+__version__ = importlib.metadata.version("scikit-primate")
 
 from . import plotting 
 from . import ortho
