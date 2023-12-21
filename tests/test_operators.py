@@ -17,7 +17,7 @@ def test_vector_approx():
   from sanity import approx_matvec
   np.random.seed(1234)
   n = 10
-  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  A_sparse = csc_array(symmetric(n, pd = True), dtype=np.float32)
   v0 = np.random.uniform(size=n).astype(np.float32)
   deg, rtol, orth = 6, 0.0, 0
 
@@ -30,7 +30,7 @@ def test_mf_basic():
   from primate.operator import _operators
   np.random.seed(1234)
   n = 10
-  A = symmetric(n, psd = True).astype(np.float32)
+  A = symmetric(n, pd = True).astype(np.float32)
   deg, rtol, orth = 6, 0.0, 0
   M = _operators.DenseF_MatrixFunction(A, deg, rtol, orth, 0, **dict(function="identity"))
   
@@ -46,7 +46,7 @@ def test_mf_quad():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 15
-  A = symmetric(n, psd = True).astype(np.float32)
+  A = symmetric(n, pd = True).astype(np.float32)
   M = matrix_function(A, fun='identity')
 
   ## M quad matches v0 when v0 has norm 1 
@@ -73,7 +73,7 @@ def test_mf_trace_quad():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 10
-  A = symmetric(n, psd = True).astype(np.float32)
+  A = symmetric(n, pd = True).astype(np.float32)
   M = matrix_function(A, fun='identity')
   tr_true = A.trace()
 
@@ -95,7 +95,7 @@ def test_mf_api():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 10
-  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  A_sparse = csc_array(symmetric(n, pd = True), dtype=np.float32)
   M = matrix_function(A_sparse)
   v0 = np.random.normal(size=n)
   assert np.max(np.abs(M.matvec(v0) - A_sparse @ v0)) <= 1e-5, "MF matvec doesn't match identity"
@@ -108,7 +108,7 @@ def test_mf_pyfun():
   from primate.operator import _operators
   np.random.seed(1234)
   n = 10
-  A = symmetric(n, psd = True).astype(np.float32)
+  A = symmetric(n, pd = True).astype(np.float32)
   M = matrix_function(A, fun="log")
   assert M.fun(1.0) == 0.0
   M = matrix_function(A, fun=lambda x: np.log(x))
@@ -133,7 +133,7 @@ def test_mf_eigen():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 10
-  A_sparse = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  A_sparse = csc_array(symmetric(n, pd = True), dtype=np.float32)
   M = matrix_function(A_sparse)
   ew_true = eigsh(A_sparse)[0]
   ew_test = eigsh(M)[0]
@@ -143,7 +143,7 @@ def test_mf_matmat():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 10
-  A = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  A = csc_array(symmetric(n, pd = True), dtype=np.float32)
   v = np.random.uniform(size=n).astype(np.float32)
   M = matrix_function(A, "identity")
   assert hasattr(M, "matmat") and hasattr(M, "__matmul__")
@@ -160,7 +160,7 @@ def test_mf_approx():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 10
-  A = csc_array(symmetric(n, psd = True), dtype=np.float32)
+  A = csc_array(symmetric(n, pd = True), dtype=np.float32)
   v = np.random.uniform(size=n).astype(np.float32)
 
   ## Get the eigenvalues and eigenvectors
@@ -176,7 +176,7 @@ def test_mf_trace():
   from primate.random import rademacher
   np.random.seed(1234)
   n = 10
-  A = symmetric(n, psd = True).astype(np.float32)
+  A = symmetric(n, pd = True).astype(np.float32)
   ew = np.linalg.eigvalsh(A)
   for fun, f in zip(["identity", "inv", "log", "exp"], [lambda x: x, np.reciprocal, np.log, np.exp]):
     M = matrix_function(A, fun=fun)

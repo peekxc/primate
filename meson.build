@@ -50,6 +50,15 @@ _cpp_args = compiler.get_supported_arguments(
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
 
+## Debug only 
+_cpp_args += compiler.get_supported_arguments(
+  '-O1',
+  # '-fsanitize=address', 
+  # '-fno-omit-frame-pointer',
+  '-DNDEBUG',
+  '-Wall'
+)
+
 ## Release only 
 # _cpp_args += compiler.get_supported_arguments(
 #   '-flto=thin', 
