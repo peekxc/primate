@@ -9,7 +9,7 @@ _engines = ["splitmix64", "xoshiro256**", "pcg64", "mt64"]
 _engine_prefixes = ["sx", "xs", "pcg", "mt"]
 _iso_distributions = ["rademacher", "normal", "sphere", "xtrace"]
 
-def symmetric(n: int, dist: str = "normal", psd: bool = True, ew: np.ndarray = None):
+def symmetric(n: int, dist: str = "normal", pd: bool = True, ew: np.ndarray = None):
 	N: int = n * (n - 1) // 2
 	if dist == "uniform":
 		A = squareform(np.random.uniform(size=N))
@@ -19,8 +19,8 @@ def symmetric(n: int, dist: str = "normal", psd: bool = True, ew: np.ndarray = N
 		np.einsum("ii->i", A)[:] = np.random.random(n)
 	else:
 		raise ValueError(f"Invalid distribution {dist} supplied")
-	ew = np.random.uniform(size=n, low=-1.0, high=1.0) if ew is None else np.array(ew)
-	if psd:
+	ew = np.random.uniform(size=n, low=-1.0 + np.finfo(np.float32).eps, high=1.0) if ew is None else np.array(ew)
+	if pd:
 		ew = (ew + 1.0) / 2.0
 	Q, R = np.linalg.qr(A)
 	A = Q @ np.diag(ew) @ Q.T

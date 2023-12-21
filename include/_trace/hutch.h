@@ -4,7 +4,7 @@
 #include <concepts> 
 #include <functional> // function
 #include <algorithm>  // max
-#include <cmath> // constants
+#include <cmath> // constants, isnan
 #include "omp_support.h" // conditionally enables openmp pragmas
 #include "_operators/linear_operator.h" // LinearOperator
 #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
@@ -35,72 +35,6 @@ double erf_inv(double x) noexcept {
     return x0 - fx0 / fpx0; // = x1
   } 
 }
-
-// template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typename Lambda >
-// void monte_carlo_quad(
-//   const Matrix& A,                              // Any linear operator supporting .matvec() and .shape() methods
-//   const Lambda& f,                              // Thread-safe function with signature f(int i, F sample, F* q)
-//   const std::function< bool(int) >& stop_check, // Function to check for convergence or early-stopping (takes no arguments)
-//   const int nv,                                 // Number of sample vectors to generate
-//   const Distribution dist,                      // Isotropic distribution used to generate random vectors
-//   RBG& rng,                                     // Random bit generator
-//   const int num_threads,                        // Number of threads used to parallelize the computation   
-//   const int seed                                // Seed for random number generator for determinism
-// ){
-//   using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-//   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
-  
-//   // Constants
-//   const auto A_shape = A.shape();
-//   const size_t n = A_shape.first;
-//   const size_t m = A_shape.second;
-
-//   // Set the number of threads + initialize multi-threaded RNG
-//   const auto nt = num_threads <= 0 ? omp_get_max_threads() : num_threads;
-//   omp_set_num_threads(nt);
-//   rng.initialize(nt, seed);
-
-//   // Using square-root of max possible chunk size for parallel schedules
-//   unsigned int chunk_size = std::max(int(sqrt(nv / nt)), 1);
-  
-//   // Monte-Carlo ensemble sampling
-//   int i;
-//   volatile bool stop_flag = false; // early-stop flag for convergence checking
-//   #pragma omp parallel shared(stop_flag)
-//   {
-//     int tid = omp_get_thread_num(); // thread-id 
-    
-//     auto q_norm = static_cast< F >(0.0);
-//     auto q = static_cast< VectorF >(VectorF::Zero(m));
-    
-//     #pragma omp for schedule(dynamic, chunk_size)
-//     for (i = 0; i < nv; ++i){
-//       if (stop_flag){ continue; }
-
-//       // Generate isotropic vector (w/ unit norm)
-//       generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
-      
-//       // Apply quadratic form, using quad() if available
-//       F sample = 0.0;  
-//       if constexpr (QuadOperator< Matrix >){
-//         sample = A.quad(q.data()); // x^T A x
-//       } else {
-//         auto y = static_cast< VectorF >(VectorF::Zero(n));
-//         A.matvec(q.data(), y.data()); 
-//         sample = y.dot(q);
-//       }
-      
-//       // Run the user-supplied function (parallel section!)
-//       f(i, sample, q.data());
-      
-//       // If supplied, check early-stopping condition
-//       #pragma omp critical
-//       {
-//         stop_flag = stop_check(i);
-//       }
-//     }
-//   }
-// }
 
 // Work-around to avoid copying for the multi-threaded build
 template< LinearOperator Matrix > 
@@ -221,6 +155,7 @@ auto hutch(
     int n_samples = 0; // number of estimates computed
     const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
     const auto early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n_samples, z, atol, rtol](int i) -> bool {
+      if (isnan(estimates[i])){ return false; }
       ++n_samples; 
       const F denom = (1.0 / F(n_samples));
       const F L = n_samples > 2 ? F(n_samples-2) / F(n_samples-1) : 0.0;
@@ -248,6 +183,7 @@ auto hutch(
     F mu_est = 0.0, mu_pre = 0.0;
     int n_samples = 0; 
     const auto early_stop = [&estimates, &n_samples, &mu_est, &mu_pre, atol, rtol](int ii) -> bool { // &estimates, &n_samples, &mu_est, &mu_pre, atol, rtol
+      if (isnan(estimates[ii])){ return false; }
       ++n_samples; 
       const F denom = (1.0 / F(n_samples));
       mu_est = denom * (estimates[ii] + (n_samples - 1) * mu_pre);

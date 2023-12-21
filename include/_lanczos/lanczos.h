@@ -273,6 +273,7 @@ struct MatrixFunction {
     // Lanczos iteration: save v norm 
     const F v_scale = v_map.norm(); 
     VectorF v_copy = v_map; // save copy
+    std::cout << v_copy << std::endl;
     lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), deg); 
     
     // Note: Maps are used here to offset the pointers; they should be no-ops anyways

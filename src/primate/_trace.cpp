@@ -29,7 +29,7 @@ void _trace_wrapper(py::module& m){
       throw std::invalid_argument("No matrix function supplied");
     }
     const auto op = Wrapper(A);
-    const auto matrix_func = kwargs["function"].cast< std::string >(); 
+    const auto matrix_func = kwargs["function"].template cast< std::string >(); 
     const auto num_threads_ = multithreaded ? num_threads : 1; 
 
     auto rng = ThreadedRNG64(num_threads_, engine_id, seed);

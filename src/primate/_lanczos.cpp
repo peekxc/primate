@@ -61,7 +61,7 @@ auto matmat(const MatrixFunction< F, WrapperType >& M, const py_array< F >& X) -
 // Template function for generating module definitions for a given Operator / precision 
 template< std::floating_point F, class Matrix, LinearOperator Wrapper >
 void _lanczos_wrapper(py::module& m){
-  using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  // using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   m.def("lanczos", []( // keep wrap pass by value!
     const Matrix& A, 
     py_array< F > v, const int lanczos_degree, const F lanczos_rtol, const int orth,

@@ -14,14 +14,14 @@ sys.path.insert(0, rel_dir + '/tests')
 def test_xtrace_trace():
   np.random.seed(1234)
   n = 100
-  A = csc_array(random.symmetric(n, psd = True), dtype=np.float32)
+  A = csc_array(random.symmetric(n, pd = True), dtype=np.float32)
   assert np.isclose(A.trace(), xtrace(A), atol=1e-5)
 
 def test_xtrace_mf():
   from primate.operator import matrix_function
   np.random.seed(1234)
   n = 100
-  A = random.symmetric(n, psd = True)
+  A = random.symmetric(n, pd = True)
   ew, ev = np.linalg.eigh(A)
   for fun_name, fun in zip(["identity", "log", "inv", "exp"], [lambda x: x, np.log, np.reciprocal, np.exp]):
     M = matrix_function(A, fun_name)

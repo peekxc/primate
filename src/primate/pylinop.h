@@ -47,7 +47,7 @@ struct PyLinearOperator {
   }
 
   auto shape() const -> pair< size_t, size_t > { 
-    return _op.attr("shape").cast< std::pair< size_t, size_t > >();
+    return _op.attr("shape").template cast< std::pair< size_t, size_t > >();
   }
 
   auto dtype() const -> py::dtype {
