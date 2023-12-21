@@ -1,18 +1,22 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
-#include <pybind11/numpy.h>
-#include <pybind11/stl.h>
-#include <pybind11/functional.h>
-#include "_random_generator/vector_generator.h"
-#include "_lanczos/lanczos.h"
-#include "eigen_operators.h"
-#include "pylinop.h"
-#include "spectral_functions.h"
 #include <type_traits> // result_of
 #include <cmath> // constants
 #include <iostream>
 #include <stdio.h>
 #include <functional>
+
+#include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
+#include <pybind11/numpy.h>
+#include <pybind11/stl.h>
+#include <pybind11/functional.h>
+
+#include "_random_generator/vector_generator.h"
+#include "_random_generator/threadedrng64.h"
+#include "_lanczos/lanczos.h"
+#include "_trace/hutch.h"
+#include "eigen_operators.h"
+#include "pylinop.h"
+#include "spectral_functions.h"
 
 namespace py = pybind11;
 

@@ -6,8 +6,9 @@
 #include <cmath> // isnan
 #include <bitset>   // bitset
 #include "omp_support.h" // conditionally enables openmp pragmas
-#include "threadedrng64.h"	// ThreadSafeRBG
-#include "rne_engines.h"		// all the engines
+#include "random_concepts.h" // ThreadSafeRBG
+// #include "threadedrng64.h"	
+// #include "rne_engines.h"		// all the engines
 
 using IndexType = unsigned int;
 using LongIndexType = unsigned long;

@@ -36,8 +36,8 @@ def test_accuracy():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
   n = 30
-  A = symmetric(n)
-  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+  A = symmetric(n).astype(np.float64)
+  alpha, beta = np.zeros(n, dtype=np.float64), np.zeros(n, dtype=np.float64)
   
   ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
   tol = np.zeros(30)
@@ -46,8 +46,8 @@ def test_accuracy():
     alpha, beta = lanczos(A, v0=v0, rtol=1e-8, orth=n-1)
     ew_true = np.sort(eigsh(A, k=n-1, return_eigenvectors=False))
     ew_test = np.sort(eigh_tridiagonal(alpha, beta, eigvals_only=True))
-    tol[i] = np.mean(np.abs(ew_test[1:] - ew_true))
-  assert np.all(tol < 1e-5)
+    tol[i] = np.max(np.abs(ew_test[1:] - ew_true))
+  assert np.all(tol < 1e-12)
 
 def test_high_degree():
   from primate.diagonalize import lanczos

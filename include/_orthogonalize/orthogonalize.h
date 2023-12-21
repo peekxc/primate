@@ -34,9 +34,10 @@ void orth_vector(
   const int diff = reverse ? -1 : 1; 
   for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
     const auto u_norm = U.col(i).squaredNorm();      // norm of u_i
-    const auto proj_len = std::abs(v.dot(U.col(i))); // < v, u_i > 
-    if (u_norm > tol && proj_len > tol){ // u_norm > tol should protect against nan vectors
-      v -= (proj_len / u_norm) * U.col(i);
+    const auto s_proj = v.dot(U.col(i)); // < v, u_i > 
+    // should protect against nan and 0 vectors, even is isnan(u_norm) is true
+    if (u_norm > tol && std::abs(s_proj) > tol){ 
+      v -= (s_proj / u_norm) * U.col(i);
     }
   }
 }

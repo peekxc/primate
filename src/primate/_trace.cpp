@@ -1,10 +1,12 @@
+#include <pybind11/pybind11.h>
+
 #include "_lanczos/lanczos.h"
 #include "_trace/hutch.h"
+#include "_random_generator/threadedrng64.h"
 #include "eigen_operators.h"    // Eigen wrappers
 #include "pylinop.h"            // py::object LinearOperator wrapper
 #include "spectral_functions.h" // to parameterize the functions
 
-#include <pybind11/pybind11.h>
 namespace py = pybind11;
 
 // NOTE: all matrices should be cast to Fortran ordering for compatibility with Eigen

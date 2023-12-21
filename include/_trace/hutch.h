@@ -6,8 +6,8 @@
 #include <algorithm>  // max
 #include <cmath> // constants, isnan
 #include "omp_support.h" // conditionally enables openmp pragmas
-#include "_operators/linear_operator.h" // LinearOperator
-#include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
+// #include "_operators/linear_operator.h" // LinearOperator
+// #include "_orthogonalize/orthogonalize.h"   // orth_vector, mod
 #include "_random_generator/vector_generator.h" // ThreadSafeRBG, generate_array, Distribution
 #include "_lanczos/lanczos.h"
 #include "eigen_core.h"
@@ -86,8 +86,8 @@ void monte_carlo_quad(
     auto q = static_cast< VectorF >(VectorF::Zero(m));
     
     // Parameterize the matrix function
-    // TODO: this is a somewhat poorly designed way to get around copying matrices / matrix functions, 
-    // as the former is read-only and can be shared amongst threads, but the latter needs thread-specific storage
+    // TODO: this is not a great way to avoid copying matrices / matrix functions, but is needed as 
+    // the former is read-only and can be shared amongst threads, but the latter needs thread-specific storage
     const auto M = get_matrix(A); 
 
     #pragma omp for schedule(dynamic, chunk_size)
@@ -201,6 +201,114 @@ auto hutch(
     return mu_est * A.shape().first; 
   }
   // Don't pull down monte_carlo_quad; the early-stop defs need to be local scope for some reason!
+}
+
+
+// Stochastic Lanczos quadrature method
+// std::function<F(int,F*,F*)>
+template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typename Lambda >
+void slq (
+  const Matrix& A,                            // Any linear operator supporting .matvec() and .shape() methods
+  const Lambda& f,                            // Thread-safe function with signature f(int i, F* nodes, F* weights)
+  const std::function< bool(int) >& stop_check, // Function to check for convergence or early-stopping (takes no arguments)
+  const int nv,                               // Number of sample vectors to generate
+  const Distribution dist,                    // Isotropic distribution used to generate random vectors
+  RBG& rng,                                   // Random bit generator
+  const int lanczos_degree,                   // Polynomial degree of the Krylov expansion
+  const F lanczos_rtol,                       // residual tolerance to consider subspace A-invariant
+  const int orth,                             // Number of vectors to re-orthogonalize against <= lanczos_degree
+  const int ncv,                              // Number of Lanczos vectors to keep in memory (per-thread)
+  const int num_threads,                      // Number of threads used to parallelize the computation   
+  const int seed                              // Seed for random number generator for determinism
+){   
+  using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  using EigenSolver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >; 
+  if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
+  if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
+
+  // Constants
+  const auto A_shape = A.shape();
+  const size_t n = A_shape.first;
+  const size_t m = A_shape.second;
+
+  // Set the number of threads + initialize multi-threaded RNG
+  const auto nt = num_threads <= 0 ? omp_get_max_threads() : num_threads;
+  omp_set_num_threads(nt);
+  rng.initialize(nt, seed);
+
+  // Using square-root of max possible chunk size for parallel schedules
+  unsigned int chunk_size = std::max(int(sqrt(nv / nt)), 1);
+  
+  // Monte-Carlo ensemble sampling
+  int i;
+  volatile bool stop_flag = false; // early-stop flag for convergence checking
+  #pragma omp parallel shared(stop_flag)
+  {
+    int tid = omp_get_thread_num(); // thread-id 
+
+    // Pre-allocate memory needed for Lanczos iterations
+    auto q_norm = static_cast< F >(0.0);
+    auto q = static_cast< ArrayF >(ArrayF::Zero(m)); 
+    auto Q = static_cast< DenseMatrix< F > >(DenseMatrix< F >::Zero(n, ncv));
+    auto alpha = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+    auto beta = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree+1));
+    auto nodes = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+    auto weights = static_cast< ArrayF >(ArrayF::Zero(lanczos_degree));
+    auto solver = EigenSolver(lanczos_degree);
+    
+    // Run in parallel 
+    #pragma omp for schedule(dynamic, chunk_size)
+    for (i = 0; i < nv; ++i){
+      if (stop_flag){ continue; }
+
+      // Generate isotropic vector (w/ unit norm)
+      generate_isotropic< F >(dist, m, rng, tid, q.data(), q_norm);
+      
+      // Perform a lanczos iteration (populates alpha, beta)
+      lanczos_recurrence< F >(A, q.data(), lanczos_degree, lanczos_rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
+
+      // Obtain nodes + weights via quadrature algorithm
+      lanczos_quadrature< F >(alpha.data(), beta.data(), lanczos_degree, solver, nodes.data(), weights.data());
+
+      // Run the user-supplied function (parallel section!)
+      f(i, q.data(), Q.data(), nodes.data(), weights.data());
+      
+      // If supplied, check early-stopping condition
+      #pragma omp critical
+      {
+        stop_flag = stop_check(i);
+      }
+    }
+  }
+}
+
+template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG > 
+void sl_quadrature(
+  const Matrix& mat, 
+  RBG& rbg, const int nv, const int dist, const int engine_id, const int seed,
+  const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
+  const int num_threads, 
+  F* quad_nw
+){
+  using VectorF = Eigen::Array< F, Dynamic, 1>;
+
+  // Parameterize the quadrature function
+  Eigen::Map< DenseMatrix< F >> quad_nw_map(quad_nw, lanczos_degree * nv, 2);
+  const auto quad_f = [lanczos_degree, &quad_nw_map](int i, [[maybe_unused]] F* q, [[maybe_unused]] F* Q, F* nodes, F* weights){
+    // printf("iter %0d, tid %0d, q[0] = %.4g, nodes[0] = %.4g\n", i, omp_get_thread_num(), q[0], nodes[0]);
+    Eigen::Map< VectorF > nodes_v(nodes, lanczos_degree, 1);        // no-op
+    Eigen::Map< VectorF > weights_v(weights, lanczos_degree, 1);    // no-op
+    quad_nw_map.block(i*lanczos_degree, 0, lanczos_degree, 1) = nodes_v;
+    quad_nw_map.block(i*lanczos_degree, 1, lanczos_degree, 1) = weights_v;
+  };
+
+  // Parameterize when to stop (run in critical section)
+  constexpr auto early_stop = [](int i) -> bool {
+    return false; 
+  };
+
+  // Execute the stochastic Lanczos quadrature
+  slq< F >(mat, quad_f, early_stop, nv, static_cast< Distribution >(dist), rbg, lanczos_degree, lanczos_rtol, orth, ncv, num_threads, seed);
 }
 
 #endif
