@@ -30,7 +30,7 @@ void lanczos_recurrence(
   F* V,                       // Output matrix for Lanczos vectors (column-major)
   const size_t ncv            // Number of Lanczos vectors pre-allocated (must be at least 2)
 ){
-  using ColVectorF = Eigen::Matrix< F, Dynamic, 1 >;
+  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
 
   // Constants `
   const auto A_shape = A.shape();
@@ -40,12 +40,14 @@ void lanczos_recurrence(
 
   // Allocation / views
   Eigen::Map< DenseMatrix< F > > Q(V, n, ncv);  // Lanczos vectors 
-  Eigen::Map< ColVectorF > v(q, m, 1);          // map initial vector (no-op)
+  Eigen::Map< VectorF > v(q, m, 1);          // map initial vector (no-op)
   Q.col(0) = v.normalized();                    // load normalized v0 into Q  
 
   // In the following, beta[j] means beta[j-1] in the Demmel text
   const auto Q_ref = Eigen::Ref< const DenseMatrix< F > >(Q); 
   std::array< int, 3 > pos = { static_cast< int >(ncv - 1), 0, 1 };
+  Q.col(pos[0]) = static_cast< VectorF >(VectorF::Zero(n)); // Ensure previous is 0
+    
   for (int j = 0; j < k; ++j) {
 
     // Apply the three-term recurrence

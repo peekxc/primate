@@ -2,6 +2,7 @@
 #define _ORTHOGONALIZE_ORTHOGONALIZE_H
 
 #include <concepts> // std::floating_point
+// #include <cmath> // std::isnan
 #include "eigen_core.h" // DenseMatrix, EigenCore
 #include <Eigen/QR>
 
@@ -32,9 +33,9 @@ void orth_vector(
   // If projection or the target vector is near-zero, ignore and continue, as numerical orthogonality is already met
   const int diff = reverse ? -1 : 1; 
   for (int i = mod(start_idx, m), c = 0; c < p; ++c, i = mod(i + diff, m)){
-    const auto u_norm = U.col(i).squaredNorm();     // norm of u_i
-    const auto proj_len = v.dot(U.col(i));          // < v, u_i > 
-    if (std::min(std::abs(proj_len), u_norm) > tol){
+    const auto u_norm = U.col(i).squaredNorm();      // norm of u_i
+    const auto proj_len = std::abs(v.dot(U.col(i))); // < v, u_i > 
+    if (u_norm > tol && proj_len > tol){ // u_norm > tol should protect against nan vectors
       v -= (proj_len / u_norm) * U.col(i);
     }
   }
