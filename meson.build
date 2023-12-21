@@ -51,22 +51,23 @@ _cpp_args = compiler.get_supported_arguments(
 )
 
 ## Debug only 
-_cpp_args += compiler.get_supported_arguments(
-  '-O1',
-  # '-fsanitize=address', 
-  # '-fno-omit-frame-pointer',
-  '-DNDEBUG',
-  '-Wall'
-)
+# _cpp_args += compiler.get_supported_arguments(
+#   '-O1',
+#   # '-fsanitize=address', 
+#   # '-fno-omit-frame-pointer',
+#   '-DNDEBUG',
+#   '-Wall'
+# )
 
 ## Release only 
-# _cpp_args += compiler.get_supported_arguments(
-#   '-flto=thin', 
-#   '-O3', 
-#   '-DNDEBUG',
-#   '-Wl,-s',       # strip
-#   '-march=native'
-# )       
+_cpp_args += compiler.get_supported_arguments(
+  # '-flto=thin',
+  # '-flto', 
+  '-O3', 
+  '-DNDEBUG',
+  '-Wl,-s',       # strip
+  # '-march=native' # either this or lto seems to not work on multiple builds
+)
 
 ## Require C++20 for concepts
 concept_code = '''
