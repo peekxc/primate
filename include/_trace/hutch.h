@@ -155,7 +155,7 @@ auto hutch(
     int n_samples = 0; // number of estimates computed
     const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
     const auto early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n_samples, z, atol, rtol](int i) -> bool {
-      if (isnan(estimates[i])){ return false; }
+      if (std::isnan(estimates[i])){ return false; }
       ++n_samples; 
       const F denom = (1.0 / F(n_samples));
       const F L = n_samples > 2 ? F(n_samples-2) / F(n_samples-1) : 0.0;
@@ -183,7 +183,7 @@ auto hutch(
     F mu_est = 0.0, mu_pre = 0.0;
     int n_samples = 0; 
     const auto early_stop = [&estimates, &n_samples, &mu_est, &mu_pre, atol, rtol](int ii) -> bool { // &estimates, &n_samples, &mu_est, &mu_pre, atol, rtol
-      if (isnan(estimates[ii])){ return false; }
+      if (std::isnan(estimates[ii])){ return false; }
       ++n_samples; 
       const F denom = (1.0 / F(n_samples));
       mu_est = denom * (estimates[ii] + (n_samples - 1) * mu_pre);
