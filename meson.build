@@ -62,11 +62,11 @@ _cpp_args = compiler.get_supported_arguments(
 ## Release only 
 _cpp_args += compiler.get_supported_arguments(
   # '-flto=thin',
-  '-flto', 
+  # '-flto', 
   '-O3', 
   '-DNDEBUG',
   '-Wl,-s',       # strip
-  '-march=native'
+  # '-march=native'
 )
 
 ## Require C++20 for concepts
