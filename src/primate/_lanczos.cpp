@@ -78,10 +78,11 @@ void _lanczos_wrapper(py::module& m){
       alpha.mutable_data(), beta.mutable_data(), Q.mutable_data(), ncv
     );
   });
-  m.def("quadrature", [](py_array< F > a, py_array< F > b, const int k) -> py_array< F > {
+  m.def("quadrature", [](py_array< F > a, py_array< F > b, const int k, const int method = 0) -> py_array< F > {
     auto output = DenseMatrix< F >(k, 2); // [nodes, weights]
     auto solver = Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >(k);
-    lanczos_quadrature(a.data(), b.data(), k, solver, output.col(0).data(), output.col(1).data());
+    const auto wm = static_cast< weight_method >(method);
+    lanczos_quadrature(a.data(), b.data(), k, solver, output.col(0).data(), output.col(1).data(), wm);
     return py::cast(output); 
   });
   // m.def("function_approx", [](

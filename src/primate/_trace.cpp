@@ -21,7 +21,7 @@ void _trace_wrapper(py::module& m){
   m.def("hutch", [](
     const Matrix& A, 
     const int nv, const int dist, const int engine_id, const int seed,
-    const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv,
+    const int lanczos_degree, const F lanczos_rtol, const int orth, const int ncv, const int method, 
     const F atol, const F rtol, 
     const int num_threads, 
     const bool use_clt, 
@@ -44,7 +44,7 @@ void _trace_wrapper(py::module& m){
       if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
       if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
       const auto sf = param_spectral_func< F >(kwargs);
-      const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv);
+      const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv, static_cast< weight_method >(method));
       mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data());
     }
     return py::make_tuple(mu_est, py::cast(estimates));

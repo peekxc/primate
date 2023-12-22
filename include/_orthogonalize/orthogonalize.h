@@ -12,6 +12,19 @@ constexpr inline auto mod(int a, int b) noexcept -> int {
   return (b + (a % b)) % b; 
 }
 
+template< std::floating_point F >
+inline auto orth_poly_weight(const F x, const F mu_rec_sqrt, const F* a, const F* b, F* tbl, const int n) noexcept -> F { 
+  // const auto mu_rec_sqrt = 1.0 / std::sqrt(mu)
+  tbl[0] = mu_rec_sqrt;
+  tbl[1] = (x - a[0]) * mu_rec_sqrt / b[1];
+  F w = std::pow(tbl[0], 2) + std::pow(tbl[1], 2);
+  for (int i = 2; i < n; ++i){ 
+    tbl[i] = (((x - a[i-1]) * tbl[i-1]) - b[i-1] * tbl[i-2]) / b[i];
+    w += std::pow(tbl[i], 2);
+  }
+  return 1.0 / w;
+}
+
 // Orthogonalizes v with respect to columns in U via modified gram schmidt
 // Cyclically projects v onto the columns U[:,i:(i+p)] = u_i, u_{i+1}, ..., u_{i+p}, removing from v the components 
 // of the vector projections. If any index i, ..., i+p exceeds the number of columns of U, the indices are cycled. 

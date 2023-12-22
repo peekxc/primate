@@ -11,19 +11,42 @@
 #include "omp_support.h" // conditionally enables openmp pragmas
 #include "eigen_core.h"
 #include <Eigen/Eigenvalues>
-// #include <iostream>
+#include <iostream>
 
 using std::function; 
 
+template< typename T >
+using AdjSolver = Eigen::SelfAdjointEigenSolver< T >;
+
+// Krylov dimension 'deg' should be at least 1 and at most dimension of the operator
+// Precondition: None
+constexpr int param_deg(const int deg, const std::pair< size_t, size_t > dim){
+  return std::max(1, std::min(deg, int(dim.first)));
+} 
+
+// Need to allocate at least 2 Lanczos vectors, should never need more than 
+// Precondition: deg = param_deg(deg)
+constexpr int param_ncv(const int ncv, const int deg, const std::pair< size_t, size_t > dim){
+  return std::min(std::max(ncv, 2), std::min(deg, int(dim.first)));
+} 
+
+// Orth should be strictly less than ncv, as there are only ncv Lanczos vectors in memory
+// If negative or larger than the Krylov dimension, orthogonalize against the maximal number of distinct Lanczos vectors 
+// Precondition: deg = param_deg(deg) and ncv = param_ncv(ncv)
+constexpr int param_orth(const int orth, const int deg, const int ncv, const std::pair< size_t, size_t > dim){
+  if (orth < 0 || orth > deg){ return std::min(deg, ncv - 1); }
+  return std::min(orth, ncv - 1); // should only orthogonalize against in-memory Lanczos vectors
+} 
+
 // Paige's A27 variant of the Lanczos method
 // Computes the first k elements (a,b) := (alpha,beta) of the tridiagonal matrix T(a,b) where T = Q^T A Q
-// Precondition: orth < ncv <= k and ncv >= 2.
+// Precondition: orth < ncv <= deg and ncv >= 2.
 template< std::floating_point F, LinearOperator Matrix >
 void lanczos_recurrence(
   const Matrix& A,            // Symmetric linear operator 
   F* q,                       // vector to expand the Krylov space K(A, q)
-  const int k,                // Dimension of the Krylov subspace to capture
-  const F lanczos_rtol,       // Tolerance of residual error for early-stopping the iteration.
+  const int deg,              // Dimension of the Krylov subspace to capture
+  const F rtol,               // Tolerance of residual error for early-stopping the iteration.
   const int orth,             // Number of *additional* vectors to orthogonalize against 
   F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
   F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1
@@ -36,7 +59,7 @@ void lanczos_recurrence(
   const auto A_shape = A.shape();
   const size_t n = A_shape.first;
   const size_t m = A_shape.second;
-  const F residual_tol = std::sqrt(n) * lanczos_rtol;
+  const F residual_tol = std::sqrt(n) * rtol;
 
   // Setup views
   Eigen::Map< DenseMatrix< F > > Q(V, n, ncv);                // Lanczos vectors 
@@ -48,7 +71,7 @@ void lanczos_recurrence(
   Q.col(pos[0]) = static_cast< VectorF >(VectorF::Zero(n));   // Ensure previous is 0
   Q.col(0) = v.normalized();                                  // load normalized v0 into Q  
 
-  for (int j = 0; j < k; ++j) {
+  for (int j = 0; j < deg; ++j) {
 
     // Apply the three-term recurrence
     auto [p,c,n] = pos;                   // previous, current, next
@@ -57,7 +80,7 @@ void lanczos_recurrence(
     alpha[j] = Q.col(c).dot(v);           // projection size of < qc, qn > 
     v -= alpha[j] * Q.col(c);             // subtract projected components
 
-    // Re-orthogonalize q_n against previous ncv-1 lanczos vectors
+    // Re-orthogonalize q_n against previous orth lanczos vectors, up to ncv-1
     if (orth > 0) {
       auto qn = Eigen::Ref< Vector< F > >(v);          
       orth_vector(qn, Q_ref, c, orth, true);
@@ -65,7 +88,7 @@ void lanczos_recurrence(
 
     // Early-stop criterion is when K_j(A, v) is near invariant subspace.
     beta[j+1] = v.norm();
-    if (beta[j+1] < residual_tol || (j+1) == k) { // additional break prevents overriding qn
+    if (beta[j+1] < residual_tol || (j+1) == deg) { // additional break prevents overriding qn
       break;
     }
     Q.col(n) = v / beta[j+1]; // normalize such that Q stays orthonormal
@@ -76,16 +99,23 @@ void lanczos_recurrence(
   }
 }
 
+enum weight_method { golub_welsch = 0, fttr = 1 };
 
+// NOTE: one idea to reduce memory is to use the matching moment idea
+// - Take T - \lambda I for some eigenvalue \lambda; then dim(null(T- \lambda I)) = 1, thus 
+// - we can solve for (T - \lambda I)x = 0 for x repeatedly, for all \lambda, and take x[0] to be the quadrature weight
+
+// FTTR 
 // Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator
 template< std::floating_point F >
 auto lanczos_quadrature(
-  const F* alpha,                   // Input diagonal elements of T of size k
-  const F* beta,                    // Output subdiagonal elements of T of size k, whose non-zeros start at index 1
-  const int k,                      // Size of input / output elements 
-  Eigen::SelfAdjointEigenSolver< DenseMatrix< F > >& solver, // assumes this has been allocated
-  F* nodes,                         // Output nodes of the quadrature
-  F* weights                        // Output weights of the quadrature
+  const F* alpha,                           // Input diagonal elements of T of size k
+  const F* beta,                            // Output subdiagonal elements of T of size k, whose non-zeros start at index 1
+  const int k,                              // Size of input / output elements 
+  AdjSolver< DenseMatrix< F > >& solver,    // Solver to use. Assumes workspace has been allocated
+  F* nodes,                                 // Output nodes of the quadrature
+  F* weights,                               // Output weights of the quadrature
+  const weight_method method = golub_welsch  // The method of computing the weights 
 ) -> void {
   using VectorF = Eigen::Array< F, Dynamic, 1>;
 
@@ -93,22 +123,30 @@ auto lanczos_quadrature(
   Eigen::Map< const VectorF > a(alpha, k);        // diagonal elements
   Eigen::Map< const VectorF > b(beta+1, k-1);     // subdiagonal elements (offset by 1!)
 
-  // Compute the eigen-decomposition from the tridiagonal matrix
-  solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
-  
-  // Retrieve the Rayleigh-Ritz values (nodes)
-  auto theta = static_cast< VectorF >(solver.eigenvalues());
-  
-  // Retrieve the first components of the eigenvectors (weights)
-  // NOTE: one idea to reduce memory is to use the matching moment idea
-  // - Take T - \lambda I for some eigenvalue \lambda; then dim(null(T- \lambda I)) = 1, thus 
-  // - we can solve for (T - \lambda I)x = 0 for x repeatedly, for all \lambda, and take x[0] to be the quadrature weight
-  auto tau = static_cast< VectorF >(solver.eigenvectors().row(0));
-  tau *= tau;
-  
-  // Copy the quadrature nodes and weights to the output
-  std::copy(theta.begin(), theta.end(), nodes);
-  std::copy(tau.begin(), tau.end(), weights);
+  // Golub-Welsch approach: just compute eigen-decomposition from T using QR steps
+  if (method == golub_welsch){
+    // std::cout << " GW ";
+    solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
+    auto theta = static_cast< VectorF >(solver.eigenvalues()); // Rayleigh-Ritz values == nodes
+    auto tau = static_cast< VectorF >(solver.eigenvectors().row(0));
+    tau *= tau;
+    std::copy(theta.begin(), theta.end(), nodes);
+    std::copy(tau.begin(), tau.end(), weights);
+  } else {
+    // std::cout << " FTTR ";
+  // Uses the Foward Three Term Recurrence (FTTR) approach 
+    solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::EigenvaluesOnly);
+    auto theta = static_cast< VectorF >(solver.eigenvalues()); // Rayleigh-Ritz values == nodes
+    std::copy(theta.begin(), theta.end(), nodes);
+    
+    // Compute weights via FTTR
+    const F mu_0 = theta.abs().sum();
+    const F mu_rec_sqrt = 1.0 / std::sqrt(mu_0);
+    auto tbl = std::vector< F >(k, 0.0);
+    for (int i = 0; i < k; ++i){
+      weights[i] = orth_poly_weight(theta[i], mu_rec_sqrt, alpha, beta, tbl.data(), k) / mu_0;
+    }
+  }
 };
 
 template< std::floating_point F, LinearOperator Matrix > 
@@ -131,9 +169,16 @@ struct MatrixFunction {
   const int ncv; 
   F rtol; 
   int orth;
+  weight_method wgt_method; 
 
-  MatrixFunction(const Matrix& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv) 
-  : op(A), f(fun), deg(lanczos_degree), ncv(std::max(_ncv, 2)), rtol(lanczos_rtol), orth(_orth) {
+  MatrixFunction(const Matrix& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv, weight_method _method = golub_welsch) 
+  : op(A), f(fun), 
+    deg(param_deg(lanczos_degree, A.shape())), 
+    ncv(param_ncv(_ncv, deg, A.shape())), 
+    rtol(lanczos_rtol), 
+    orth(param_orth(_orth, deg, ncv, A.shape())), 
+    wgt_method(_method) 
+  {
     // Pre-allocate all but Q memory needed for Lanczos iterations
     alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
@@ -142,8 +187,13 @@ struct MatrixFunction {
     solver = EigenSolver(deg);
   };
 
-  MatrixFunction(Matrix&& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv) 
-  : op(std::move(A)), f(fun), deg(lanczos_degree), ncv(std::max(_ncv, 2)), rtol(lanczos_rtol), orth(_orth) {
+  MatrixFunction(Matrix&& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv, weight_method _method = golub_welsch) 
+  : op(std::move(A)), f(fun), 
+    deg(param_deg(lanczos_degree, A.shape())), 
+    ncv(param_ncv(_ncv, deg, A.shape())), 
+    rtol(lanczos_rtol), 
+    orth(param_orth(_orth, deg, ncv, A.shape())), 
+    wgt_method(_method) {
     // Pre-allocate all but Q memory needed for Lanczos iterations
     alpha = static_cast< ArrayF >(ArrayF::Zero(deg+1));
     beta = static_cast< ArrayF >(ArrayF::Zero(deg+1));
@@ -212,11 +262,14 @@ struct MatrixFunction {
     v_copy.normalize();
 
     // Execute lanczos method + Golub-Welsch algorithm
-    lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), ncv); 
-    lanczos_quadrature< F >(alpha.data(), beta.data(), deg, solver, nodes.data(), weights.data());
-    
+    lanczos_recurrence< F >(op, v_copy.data(), deg, rtol, orth, alpha.data(), beta.data(), Q.data(), ncv);   
+    lanczos_quadrature< F >(alpha.data(), beta.data(), deg, solver, nodes.data(), weights.data(), wgt_method);
+  
     // Apply f to the nodes and sum
     std::transform(nodes.begin(), nodes.end(), nodes.begin(), f);
+    // std::cout << "f(nodes): " << nodes << std::endl;
+    // std::cout << "quad: " << F((nodes * weights).sum()) << std::endl; 
+    // std::cout << "vscale**2 " << std::pow(v_scale, 2) << std::endl; 
     return std::pow(v_scale, 2) * (nodes * weights).sum();
   }
 

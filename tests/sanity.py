@@ -91,63 +91,112 @@ def orthogonal_polynomial_value(x, k, theta, gamma):
     p_0 = p_k
   return p_k
 
-from scipy.sparse import spdiags
-alpha = np.array([1,1,1])
-beta = np.array([1,1,0])
-T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=3, n=3).todense()
-ew, ev = np.linalg.eigh(T)
+# from scipy.sparse import spdiags
+# alpha = np.array([1,1,1])
+# beta = np.array([1,1,0])
+# T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=3, n=3).todense()
+# ew, ev = np.linalg.eigh(T)
 
-a = alpha 
-b = np.append(0, beta)
-mu_0 = np.sum(np.abs(ew))
-p0 = lambda x: 1 / np.sqrt(mu_0)
-p1 = lambda x: (x - a[0])*p0(x) / b[1]
-p2 = lambda x: ((x - a[1])*p1(x) - b[1] * p0(x)) / b[2]
-p = lambda x: np.array([p0(x), p1(x), p2(x)])
-weights_fttr = np.reciprocal([np.sum(p(lam) ** 2) for lam in ew])
+# a = alpha 
+# b = np.append(0, beta[:-1])
+# mu_0 = np.sum(np.abs(ew))
+# p0 = lambda x: 1 / np.sqrt(mu_0)
+# p1 = lambda x: (x - a[0])*p0(x) / b[1]
+# p2 = lambda x: ((x - a[1])*p1(x) - b[1] * p0(x)) / b[2]
+# p = lambda x: np.array([p0(x), p1(x), p2(x)])
+# weights_fttr = np.reciprocal([np.sum(p(lam) ** 2) for lam in ew])
 
-## Forward three-term recurrence relation (fttr)
-np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
-
-
-## Phase 2: expand and test
-## needs a = [...] and b = [0, ...] both of length n
-## i should be in [0, n-1]
-n = 10
-alpha = np.random.uniform(size=n, low=0, high=1)
-beta = np.append(np.random.uniform(size=n-1, low=0, high=1), 0)
-T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=n, n=n).todense()
-ew, ev = np.linalg.eigh(T)
-
-a = alpha 
-b = np.append(0, beta[:-1])
-mu_0 = np.sum(np.abs(ew))
-
-def orth_poly(x: float, i: int, mu: float, a: np.ndarray, b: np.ndarray, ):
-  z = 0
-  if i < 0: 
-    z = 0
-  elif i == 0: 
-    z = 1 / np.sqrt(mu_0)
-  elif i == 1: 
-    z = (x - a[0]) * (1 / np.sqrt(mu_0)) / b[1]
-  elif i < len(a): 
-    z = (x - a[i-1]) * orth_poly(x, i - 1, mu, a, b) 
-    z -= b[i-1] * orth_poly(x, i - 2, mu, a, b) 
-    z /= b[i]
-  else:
-    z = 0
-  return z
-
-V = np.array([[orth_poly(lam, i, mu_0, a, b) for i in range(n)] for lam in ew]).T
-weights_fttr = np.reciprocal(np.sum(V ** 2, axis=0))
-
-np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
+# ## Forward three-term recurrence relation (fttr)
+# np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
 
 
-# p2 = lambda x: ((x - alpha[1]) * p0(x)) / beta[1]
+# ## Phase 2: expand and test
+# ## needs a = [...] and b = [0, ...] both of length n
+# ## i should be in [0, n-1]
+# n = 5
+# alpha = np.random.uniform(size=n, low=0, high=1)
+# beta = np.append(np.random.uniform(size=n-1, low=0, high=1), 0)
+# T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=n, n=n).todense()
+# ew, ev = np.linalg.eigh(T)
+
+# a = alpha 
+# b = np.append(0, beta[:-1])
+# mu_0 = np.sum(np.abs(ew))
+
+# def orth_poly(x: float, i: int, mu: float, a: np.ndarray, b: np.ndarray):
+#   # print(f"x: {x:.2f}, i: {i})")
+#   z = 0
+#   if i < 0: 
+#     z = 0
+#   elif i == 0: 
+#     z = 1 / np.sqrt(mu)
+#   elif i == 1: 
+#     z = (x - a[0]) * (1 / np.sqrt(mu)) / b[1]
+#   elif i < len(a): 
+#     z = (x - a[i-1]) * orth_poly(x, i - 1, mu, a, b) 
+#     z -= b[i-1] * orth_poly(x, i - 2, mu, a, b) 
+#     z /= b[i]
+#   else:
+#     z = 0
+#   return z
+
+# mu_0 * np.ravel(ev[0,:])**2
+
+# def orth_poly_tbl(x: float, mu: float, a: np.ndarray, b: np.ndarray, n: int):
+#   # print(f"x: {x:.2f}, i: {i})")
+#   tbl = np.zeros(n)
+#   for i in range(n):
+#     if i == 0: 
+#       tbl[i] = 1 / np.sqrt(mu)
+#     elif i == 1: 
+#       tbl[i] = (x - a[0]) * (1 / np.sqrt(mu)) / b[1]
+#     elif i < n: 
+#       z = (x - a[i-1]) * tbl[i-1]
+#       z -= b[i-1] * tbl[i-2]
+#       z /= b[i]
+#       tbl[i] = z
+#   return tbl
+
+# def orth_poly_weight(x: float, mu: float, a: np.ndarray, b: np.ndarray, n: int):
+#   tbl = np.zeros(n)
+#   tbl[0] = 1 / np.sqrt(mu)
+#   tbl[1] = (x - a[0]) * (1 / np.sqrt(mu)) / b[1]
+#   w = tbl[0]**2 + tbl[1]**2
+#   for i in range(2, n): 
+#     z = (x - a[i-1]) * tbl[i-1]
+#     z -= b[i-1] * tbl[i-2]
+#     z /= b[i]
+#     tbl[i] = z
+#     w += z**2
+#   return 1.0 / w
+
+# # p0(ew[0])
+# # p1(ew[0])
+# # p2(ew[0])
+
+# ## ground truth
+# mu_0 * np.ravel(ev[0,:])**2
+
+# ## to mimick 
+# arr = np.array([orth_poly(ew[0], i, mu_0, a, b)**2 for i in range(n)])
+# np.reciprocal(np.sum(arr))
+
+# ## Nice solution 
+# arr2 = orth_poly_tbl(ew[0], mu_0, a, b, len(a))**2
+# np.reciprocal(np.sum(arr2))
+
+# ## Even better
+# [orth_poly_weight(lam, mu_0, a, b, n) for lam in ew]
+
+# # V = np.array([[orth_poly(lam, i, mu_0, a, b, np.zeros(len(a))) for i in range(n)] for lam in ew]).T
+# # weights_fttr = np.reciprocal(np.sum(V ** 2, axis=0))
+
+# np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
 
 
-ev[0,:]
-1 / np.sqrt(np.sum(np.abs(ew)))
-orthogonal_polynomial_value(0.5, 1, alpha, beta[:2])
+# # p2 = lambda x: ((x - alpha[1]) * p0(x)) / beta[1]
+
+
+# ev[0,:]
+# 1 / np.sqrt(np.sum(np.abs(ew)))
+# orthogonal_polynomial_value(0.5, 1, alpha, beta[:2])

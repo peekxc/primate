@@ -183,6 +183,17 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
     .def_property_readonly("_alpha", [](const OP_t& M){ return py::cast(M.alpha); })
     .def_property_readonly("_beta", [](const OP_t& M){ return py::cast(M.beta); })
     .def_property_readonly("krylov_basis", [](const OP_t& M){ return py::cast(M.Q); })
+    .def_property("method", [](const OP_t& M){
+      return M.wgt_method == golub_welsch ? "golub_welsch" : "fttr";
+    }, [](OP_t& M, std::string method){
+      if (method == "golub_welsch"){
+        M.wgt_method = golub_welsch; 
+      } else if (method == "fttr"){
+        M.wgt_method = fttr;
+      } else {
+        throw std::invalid_argument("Invalid method supplied. Must be one of 'golub_welsch' or 'fttr'.");
+      }
+    })
     ; 
 }
 
