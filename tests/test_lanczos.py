@@ -57,7 +57,6 @@ def test_high_degree():
   alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
   
   ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
-  tol = np.zeros(30)
   for k in range(2, 30):
     v0 = np.random.choice([-1.0, +1.0], size=A.shape[1])
     alpha, beta = lanczos(A, v0=v0, rtol=1e-7, deg=k, orth=0)
@@ -73,7 +72,25 @@ def test_quadrature():
 
   ## Test the near-equivalence of the weights and nodes
   alpha, beta = lanczos(A, v0, deg=n, orth=n)  
-  nw_test = _lanczos.quadrature(alpha, np.append(0, beta), n)
+  nw_test = _lanczos.quadrature(alpha, np.append(0, beta), n, 0)
   nw_true = lanczos_quadrature(A, v=v0, k=n, orth=n)
   assert np.allclose(nw_true[0], nw_test[:,0], atol=1e-6)
   assert np.allclose(nw_true[1], nw_test[:,1], atol=1e-6)
+
+def test_quadrature_methods():
+  from primate.diagonalize import _lanczos
+  n = 3
+  a, b = [1,1,1], [0,1,1]
+  nw_test1 = _lanczos.quadrature(a, b, n, 0)
+  nw_test2 = _lanczos.quadrature(a, b, n, 1)
+  assert np.allclose(nw_test1, nw_test2)
+
+  from primate.diagonalize import lanczos, _lanczos
+  n = 50 
+  A = symmetric(n)
+  a, b = lanczos(A, deg=n)
+  a, b = a, np.append([0], b)
+  quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
+  quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
+  assert np.isclose(quad1, quad2, atol=0.5)
+

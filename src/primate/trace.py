@@ -20,6 +20,7 @@ def hutch(
 	rtol: float = None,
 	stop: str = ["confidence", "change"],
 	orth: int = 0,
+	quad: str = "golub_welsch",
 	confidence: float = 0.95,
 	pdf: str = "rademacher",
 	rng: str = "pcg64",
@@ -58,6 +59,8 @@ def hutch(
 	    Early-stopping criteria to test estimator convergence. See details.
 	orth: int, default=0
 	    Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
+	quad: { 'golub_welsch', 'fttr' }, default='golub_welsch'
+			Method used to obtain the weights of the Gaussian quadrature.  
 	confidence : float, default=0.95
 	    Confidence level to Only used when `stop` = "confidence".
 	pdf : { 'rademacher', 'normal' }, default="rademacher"
@@ -118,6 +121,9 @@ def hutch(
 		f_dtype.type == np.float32 or f_dtype.type == np.float64
 	), "Only 32- or 64-bit floating point numbers are supported."
 
+	assert quad in ["golub_welsch", "fttr"]
+	quad_id = 0 if quad == "golub_welsch" else 1
+
 	## Argument checking
 	nv = int(maxiter)  # Number of random vectors to generate
 	seed = int(seed)  # Seed should be an integer
@@ -147,7 +153,7 @@ def hutch(
 		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
 
 	## Collect the arguments processed so far
-	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, atol, rtol, num_threads, use_clt)
+	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt)
 
 	## Make the actual call
 	# print(hutch_args)

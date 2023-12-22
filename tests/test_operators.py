@@ -184,6 +184,25 @@ def test_mf_trace():
     tr_test = np.mean([M.quad(rademacher(size=n, seed=s+1)) for s in range(500)])
     assert np.isclose(tr_true, tr_test, atol=abs(tr_true * 0.05))
 
+def test_mf_quad_method():
+  from primate.operator import matrix_function
+  from primate.random import rademacher
+  np.random.seed(1234)
+  n = 100
+  A = symmetric(n, pd = True).astype(np.float32)
+  M = matrix_function(A, fun="identity")
+  for _ in range(30):
+    M.method = "golub_welsch"
+    assert M.method == "golub_welsch"
+    # v = rademacher(size=100)
+    v = np.random.normal(size=100, loc=0, scale=10)
+    gh_quad = M.quad(v)
+    M.method = "fttr"
+    assert M.method == "fttr"
+    ft_quad = M.quad(v)
+    assert np.isclose(ft_quad, gh_quad, atol=abs(0.01*gh_quad))
+
+
 # class CustomOperator:
 #   def __init__(self, A):
 #     self.A = A

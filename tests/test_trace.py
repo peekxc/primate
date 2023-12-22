@@ -121,8 +121,33 @@ def test_trace_mf():
   tr_est = hutch(A, fun="identity", maxiter=100, num_threads=1, seed = 5)
   tr_true = A.trace()
   assert np.isclose(tr_est, tr_true, atol=tr_true*0.05)
-  tr_est, info = hutch(A, fun=lambda x: x, maxiter=100, seed=5, num_threads=1, info=True)
+  tr_est = hutch(A, fun=lambda x: x, maxiter=100, num_threads=1, seed = 5)
   assert np.isclose(tr_est, tr_true, atol=tr_true*0.05)
+
+def test_trace_fftr():
+  from primate.trace import hutch
+  n = 50 
+  A = symmetric(n)
+
+  ## Test the fttr against the golub_welsch
+  tr_est1, info1 = hutch(A, fun="identity", maxiter=100, seed=5, num_threads=1, info=True, quad="golub_welsch")
+  tr_est2, info2 = hutch(A, fun="identity", maxiter=100, seed=5, num_threads=1, info=True, quad="fttr")
+  assert np.isclose(tr_est1, tr_est2, atol=tr_est1*0.01)
+
+  ## Test accuracy
+  assert np.isclose(A.trace(), tr_est1, atol=tr_est1*0.025)
+
+  # from primate.diagonalize import lanczos, _lanczos
+  # v0 = np.array([-1, 1, 1,-1, 1,-1, 1,-1,-1, 1]) / np.sqrt(10)
+  # a, b = lanczos(A, v0=v0, deg=10)
+  # a, b = a, np.append([0], b)
+  # _lanczos.quadrature(a, b, 10, 0)
+
+
+  # from primate.operator import matrix_function
+  # M = matrix_function(A, fun="identity")
+  # M.method = "fttr"
+  # M.quad(np.random.choice([-1.0, +1.0], size=n))
 
   ## TODO 
   # tr_est, info = hutch(A, fun=lambda x: x, maxiter=100, seed=5, num_threads=1, info=True)

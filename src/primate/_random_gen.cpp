@@ -25,6 +25,7 @@
   using py_module = py::module;
 #endif
 
+// TODO: see https://stackoverflow.com/questions/64139525/numpy-implementing-a-custom-rng
 // Instantiates the function templates for generic generators
 template< std::floating_point F >
 void _random(py_module& m){

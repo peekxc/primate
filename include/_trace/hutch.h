@@ -41,7 +41,7 @@ template< LinearOperator Matrix >
 auto get_matrix(const Matrix& A){
   // const auto M = is_instance< Matrix, MatrixFunction >{} ? 
   if constexpr(HasOp< Matrix >){
-    return MatrixFunction(A.op, A.f, A.deg, A.rtol, A.orth, A.ncv);
+    return MatrixFunction(A.op, A.f, A.deg, A.rtol, A.orth, A.ncv, A.wgt_method);
   } else {
     return A; 
   } 
@@ -140,11 +140,9 @@ auto hutch(
   if (atol == 0.0 && rtol == 0.0){
     const auto early_stop = [](int i) -> bool { return false; };
     monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed);
-    F mu_est = 0.0;
-
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
-    mu_est = est.sum() / nv;  
+    F mu_est = est.sum() / nv;  
     return mu_est;
   } else if (use_CLT){
     // Parameterize when to stop using either the CLT over the given confidence level or 
