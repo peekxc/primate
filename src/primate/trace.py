@@ -208,6 +208,10 @@ def hutch(
 	info_dict["confidence"] = confidence
 	return info_dict["estimate"], info_dict
 
+
+# TODO: implemented hutch++
+# def hutchpp():
+
 def sl_gauss(
 	A: Union[LinearOperator, np.ndarray],
 	n: int = 150,

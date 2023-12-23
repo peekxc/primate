@@ -17,6 +17,9 @@ elif [ -n "$(command -v apt-get)" ]; then
   sudo apt-get install -y clang libomp-dev
   sudo apt-get install -y libopenblas-dev
   sudo apt-get install -y python3-dev
+  sudo wget https://apt.llvm.org/llvm.sh
+  chmod u+x llvm.sh
+  sudo ./llvm.sh 17 -y
 elif [ -n "$(command -v apk)" ]; then 
   cat /etc/*-release
   apk update
