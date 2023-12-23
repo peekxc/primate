@@ -19,7 +19,7 @@ elif [ -n "$(command -v apt-get)" ]; then
   sudo apt-get install -y python3-dev
   sudo wget https://apt.llvm.org/llvm.sh
   chmod u+x llvm.sh
-  sudo ./llvm.sh 17 -y
+  sudo yes | ./llvm.sh 17
 elif [ -n "$(command -v apk)" ]; then 
   cat /etc/*-release
   apk update
