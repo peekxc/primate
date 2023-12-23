@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - Quickstart</title>
+<title>primate -</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -106,22 +72,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -165,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Quickstart</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -349,101 +299,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Quickstart</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p>To start using <code>primate</code>,</p>
-<div id="53da7fac" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Random positive definite matrix</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(n<span class="op">=</span><span class="dv">250</span>, pd<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">## Log-determinant</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>logdet_test, info <span class="op">=</span> hutch(A, fun<span class="op">=</span><span class="st">"log"</span>, maxiter<span class="op">=</span><span class="dv">100</span>, info<span class="op">=</span><span class="va">True</span>, plot<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>logdet_true <span class="op">=</span> np.<span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A)))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet </span><span class="sc">{</span>logdet_true<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet: </span><span class="sc">{</span>logdet_test<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Generating targets:   0%|          | 0/5 eta ?                                              Writing build.ninja:   0%|          | 0/41 eta ?                                                </code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-  <div id="d8ccc440-5a6e-4a22-9d38-a058e707791e" data-root-id="p1140" style="display: contents;"></div>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/javascript">
-(function(root) {
-  function embed_document(root) {
-  const docs_json = {"cbe18d15-1c92-45e4-8717-9cab74940b52":{"version":"3.2.2","title":"Bokeh Application","roots":[{"type":"object","name":"Row","id":"p1140","attributes":{"children":[{"type":"object","name":"Figure","id":"p1001","attributes":{"width":450,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p1002"},"y_range":{"type":"object","name":"DataRange1d","id":"p1003"},"x_scale":{"type":"object","name":"LinearScale","id":"p1011"},"y_scale":{"type":"object","name":"LinearScale","id":"p1012"},"title":{"type":"object","name":"Title","id":"p1004","attributes":{"text":"Stochastic trace estimates"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1036","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1030","attributes":{"selected":{"type":"object","name":"Selection","id":"p1031","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1032"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAA=="},"shape":[100],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"sf4ngRqIb8DqstPezFlowGV3la/64WvAlrtNLWKgbcDqBt07SLJywC5nEg2wgm7Ar0C3PCvoZ8BQQPbBvkZpwE1EpauSVHDAl9JZnSgwcMCy35Rk03BqwOSp9VBTOG/AO6XCCAnLcMDlxVhIfpRtwK+OP/zj1WvAg4XrHoWpZsB0KWYrbtNswAsvs2OypmvATheSsBXuasAoK0yUVUtrwNfkRB6Tu3DAwK8zJ5kgbsCdEsF7+sRqwGdiW8yPVm3AnLsajx6ia8AsAFM+SjlrwJZgp24xdGnAQ/t/5SAmb8DPXL8S8ntswCxuBW+G3XDA39WzGiupZ8CgBwLoFKpuwP7AhW6PdWjAvnCC5kUJasCbxBAeLXRswPg1JoR7D27AV0ZjLEzmbsDFtN9E4zptwFcNjUkNfnLAItNVOsDtbsBQDrv1YetrwNpDAun+hW3ACMtAyyxDb8CJa1Wh5G5qwJnYwI3kYXDAIC1/Jpu+bcCiYa2moNhpwHkfaLuKs27ABUgFp3dsbsAiosCD0cZuwO8QoGNJVmvA8dHCreZbbsCaJlPAk4VvwBF7UJwU2mzAIQ7CcfEAasBuTT7DecluwGU7x/yPZ3HAkd2GD6R/asCyrxT7CQprwN5i+EgKDG3AsV+Udx1RacC/GHsA4kFwwBaMCWu+lmvA1nI9tXBmbsCFKe2bdmBtwGGwJU1dNXDAst9tuvgbbcCTlnBa3s1rwIIzUFvqRWzAP08ffcg4b8BlHQfhtH9rwL6WB/WtnmnAR4aaMh6jbMD/M5OsxxttwGC50i1wd2rARXyoQAm0bMCO0UnhdIJpwEnFz83l/mzAiYeKFmK3a8Cr1WCp2rhtwODKry59wG7AS52lUUYDbMBMMxcgFtVpwMEha4nzyG3A0MCeE1A6cMAPmmSSZYxnwPFHP2YXQG3AJinfvwFRa8C81tm/axFwwIb3T7n9gG7AgZxfdCcGcMCp1Gu6+qlpwH76uyN8u2/A0j9D9wZwbcDby2lHkTRswIsIRiR3+WvA8dBe+BtXa8DwFGxF5gRrwMKLL+SDtmzAeokObqV/bMA="},"shape":[100],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1037","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1038"}}},"glyph":{"type":"object","name":"Scatter","id":"p1033","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1034","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1035","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1047","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1041","attributes":{"selected":{"type":"object","name":"Selection","id":"p1042","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1043"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAA=="},"shape":[100],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"sf4ngRqIb8DO2P2v8/BrwABjMAX262vAJrk3DxFZbMBK/YSKKihuwEXk8cpAN27AVagy24ZQbcBUGwvYTc9swOtD2ZDXPG3APuc7iDCNbcCmQ1v5ykRtwCvMUqtrbm3Aul9qZD3AbcBzQrJ0Hb1twJpYZiiinG3AaKvOV3AtbcClhcjrJChtwGTkqgC7Em3AVGAVudr1bMDeUAtEh+BswLfccnR2GG3ACc81CHgkbcB//kZmDgptwKiCMnU+DW3AN2bVD7j+bMCsicaHR+1swDpixaxZzGzA+nmnpdfhbMB0kwAlVN5swHwvxcTRB23AReLMz3nbbMBwi46o7ulswIRe6yJgx2zASRu7t7mybMD0Yf828LBswEkEJPmsumzAVkSiRrHJbMAITszaq8xswNLwD31mAm3ArknLIa8ObcBbyy5GlAdtwI6jJ9CWCm3ASbzm4c8XbcBz+hEsVghtwGHcep2RHW3AeqaL0hEhbcDpr2sYMA9twDzy0PvxF23AQFfCCeUebcAIOhSHXydtwLe21flAHm3AoB4kx1wkbcAwoWhm2y9twDkle8FELm3At8d3GHsfbcD2wBaAFidtwBTo/fZ9QG3AjXnC5VY0bcAVTxbM8SptwOBGTfBtKm3A+dVW2UYabcDNwkSDXShtwBuN8ob9IW3AsrirUw8nbcA7h3lo8SdtwPvbl12XNG3AZdTfSzk0bcC4T7wx9C5twKkXg5aTK23ASFr6VxQzbcCFGGOM8ixtwJvvSApOIG3A/JJUB5cebcDrqcBOjR5twBbTEkR/FW3AbF/s+TYUbcDd7+YGWQhtwKFb4wI6CG3Ay4zLd/YDbcDm0ANSOQZtwBmbsBivC23AsNygn3UIbcC83ZJmlv5swMmt5CD/AG3AqhNAaWQLbcBwekMlCPtswOfd+VrT+2zAHzNls/n2bMAxx/j0GABtwNcO9MNfBG3Ajhr5nOYMbcCqTmFPegNtwEFIYjP2Cm3AvfNhcQkMbcCmskHPxAltwIsTz6ruBm3A+4azAnsCbcBZzDLcR/1swJtu3d6Q/GzA/zN/E1H7bMA="},"shape":[100],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1048","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1049"}}},"glyph":{"type":"object","name":"Line","id":"p1044","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":2.0}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1045","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":2.0}},"muted_glyph":{"type":"object","name":"Line","id":"p1046","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":2.0}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1010","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1023"},{"type":"object","name":"WheelZoomTool","id":"p1024"},{"type":"object","name":"BoxZoomTool","id":"p1025","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1026","attributes":{"syncable":false,"level":"overlay","visible":false,"left_units":"canvas","right_units":"canvas","bottom_units":"canvas","top_units":"canvas","line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5}}}},{"type":"object","name":"SaveTool","id":"p1027"},{"type":"object","name":"ResetTool","id":"p1028"},{"type":"object","name":"HelpTool","id":"p1029"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1018","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1019","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1020"},"axis_label":"Trace estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p1021"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1013","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1014","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1015"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1016"}}}],"center":[{"type":"object","name":"Grid","id":"p1017","attributes":{"axis":{"id":"p1013"}}},{"type":"object","name":"Grid","id":"p1022","attributes":{"dimension":1,"axis":{"id":"p1018"}}},{"type":"object","name":"Legend","id":"p1039","attributes":{"location":"top_left","items":[{"type":"object","name":"LegendItem","id":"p1040","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p1036"}]}},{"type":"object","name":"LegendItem","id":"p1050","attributes":{"label":{"type":"value","value":"mean estimate"},"renderers":[{"id":"p1047"}]}}]}},{"type":"object","name":"Band","id":"p1054","attributes":{"source":{"type":"object","name":"ColumnDataSource","id":"p1051","attributes":{"selected":{"type":"object","name":"Selection","id":"p1052","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1053"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAA=="},"shape":[100],"dtype":"int32","order":"little"}],["lower",{"type":"ndarray","array":{"type":"bytes","data":"o3wgnEB3csDsiVkKdcJvwNv0tzoXCm/AcTbEakQMb8BWytiIMklwwPqSRdrONXDAHj1cfAZbb8Dj8ziFDrhuwB1CjHikCW/AXZ4L3ldCb8Bid9c+muVuwBmVFkZ8/W7AbBZRIKY/b8CvaATMky5vwOXvX2GRAW/ADeqUBQqHbsBqQDr/bHduwG4fdMmQWG7A60Ahvf8ybsCPnKGHpBVuwGiM7ZwgRm7AoRSNozJLbsAo2neMTipuwIAj/+lsJ27AiMtAATMTbsDm2oH+Y/xtwIM9nb5k1m3AX0Q8dhfnbcA5Bk2+CN9twHoW4s41BG7A8pjOLcPTbcC3dyX/Tt5twA7Bg0wFuG3ALk8gKc6fbcBNL/ZWm5ptwGKD/WwToW3AIPdtNfWsbcDGSoco7axtwCZG9P7C323APiWzzELpbcCMEdhXed9twHTHBPTl323AL18PUqDqbcBRFNDOvdhtwNcO3x+l623A7TRkwOTsbcDQ3uzx1NhtwLPWMkl6323AVQ0PbWHkbcDbw1nM3+ptwI816CXU323A+XkXJRHkbcDJ3uOTvu1twHOQA7pj6m3AD3POP+LZbcAU1L+r0d9twGJ9BneY923A8XfXjNvpbcCUovz26t5twIUSyozl3G3AX6mUbEbLbcAtfsEv7tdtwF5pABIo0G3ABdiOKtzTbcAogSqlaNNtwE3iMsvA3m3ALlDHahzdbcAaLXU7mNZtwIVgUIH/0W3A1Dk92k7YbcC+6cMfAtFtwCCNre44w23Acr6nRWPAbcCJCo67QL9twA+9+oEftW3At0/ye8mybcClaJ0S46VtwE+Ud7LApG3AAjXzu36fbcC/9s7zx6BtwH+aQbtIpW3AFRfMwR6hbcAz1mdkU5ZtwKIFIjXUl23Af8azrlWhbcAAnhiYGZBtwMAR9dkIkG3A69UQAVeKbcAd88G4oZJtwOFLOYsXlm3AdqQL3NCdbcB/vHlimpNtwB9ViV9Pmm3ACRtO5Z6abcDGRSqkmZdtwPdjNeUFlG3A8rQik9eObcAUwfaf7IhtwNp/saCAh23AqOY0jI6FbcA="},"shape":[100],"dtype":"float64","order":"little"}],["upper",{"type":"ndarray","array":{"type":"bytes","data":"GwQPyrMhasCwJ6JVch9owCXRqM/UzWjA2zurs92lacDoZVgD8L1rwJaiWOHjAmzAjBMJOgdGa8DFQt0qjeZqwLlFJqkKcGvAHzBsMgnYa8DqD9+z+6NrwD0DjxBb32vACKmDqNRAbMA3HGAdp0tswE/BbO+yN2zAw2wIqtbTa8DgylbY3NhrwFqp4TflzGvAvX8JtbW4a8AtBXUAaqtrwAYt+EvM6mvAcYnebL39a8DWIhZAzulrwNDhZQAQ82vA5gBqHj3qa8ByOAsRK95rwPGG7ZpOwmvAla8S1Zfca8CvILSLn91rwH5IqLptC2zAmCvLcTDja8Apn/dRjvVrwPr7Uvm61mvAZOdVRqXFa8CblAgXRcdrwDCFSoVG1GvAjJHWV23ma8BKURGNauxrwH6bK/sJJWzAHm7jdhs0bMAqhYU0ry9swKh/SqxHNWzAYxm+cf9EbMCV4FOJ7jdswOupFht+T2zABxiz5D5VbMACgeo+i0VswMUNb65pUGzAK6F1pmhZbMA1sM5B32NswN83w82tXGzAR8MwaahkbMCXY+04+HFswP+58sglcmzAXxwh8RNlbMDYrW1UW25swMZS9XZjiWzAKXutPtJ+bMCW+y+h+HZswDt70FP2d2zAkwIZRkdpbMBtB8jWzHhswNiw5PvSc2zAX5nIfEJ6bMBOjcgrenxswKnV/O9timzAnFj4LFaLbMBWcgMoUIdswM3OtasnhWzAvHq31dmNbMBMRwL54ohswBZS5CVjfWzAhmcBycp8bMBNSfPh2X1swB3pKgbfdWzAIW/md6R1bMAVdzD7zmpswPMiT1Oza2zAlOSjM25obMANqziwqmtswLObH3YVcmzAS6J1fcxvbMBF5b1o2WZswPBVpwwqamzA1WDMI3N1bMDgVm6y9mVswA6q/tudZ2zAU5C5ZZxjbMBFmy8xkG1swM3RrvyncmzAppDmXfx7bMDV4Eg8WnNswGM7Owede2zAccx1/XN9bMCGH1n673tswB/DaHDXeWzABFlEch52bMCe124Yo3FswFxdCR2hcWzAVoHJmhNxbMA="},"shape":[100],"dtype":"float64","order":"little"}]]}}},"lower":{"type":"field","field":"lower"},"upper":{"type":"field","field":"upper"},"base":{"type":"field","field":"x"},"line_color":"black","fill_color":"yellow","fill_alpha":0.3}}]}},{"type":"object","name":"Column","id":"p1139","attributes":{"children":[{"type":"object","name":"Figure","id":"p1058","attributes":{"width":400,"height":150,"x_range":{"type":"object","name":"Range1d","id":"p1117","attributes":{"end":100}},"y_range":{"type":"object","name":"Range1d","id":"p1116","attributes":{"end":-0.01,"bounds":[0,1]}},"x_scale":{"type":"object","name":"LinearScale","id":"p1068"},"y_scale":{"type":"object","name":"LinearScale","id":"p1069"},"title":{"type":"object","name":"Title","id":"p1061","attributes":{"text":"Error"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1124","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1118","attributes":{"selected":{"type":"object","name":"Selection","id":"p1119","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1120"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAA=="},"shape":[100],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"CiYTuLzrxb+JWNgW/33BvwecxrOklby/Kw2t8/xhuL8Yylp/GoC0v5c3bjx/rbK/Z2KRcejSsb8MNRsu/vawvzXwICphha+/oEC9L/uVrb94uq2BSHusv1TR9IdNHqu/HcKLnEvGqb/Geene4tiovzwOZu2HG6i/gmEV1IOwp78kZ9v3nf+mv55copAyaqa/h4YHpOfmpb88jOs6s2ilv8M3jDxzvKS/j1/F0g06pL/dsibEOtqjvzYvtz4XbaO/WkO2GSYSo78R78d1nb6iv2ZoJDXyeaK/RQ+VvjYXor9nC0YU1Mihv2M74HdQY6G/FvBXEDc1ob9Ve3R/Xuegv0ETVERJuaC/DbheM7aFoL9dAPMc3UmgvxqtWPgYCqC/dTYWF/STn7/1mqRQpyWfv6+TYMjRhZ6/UvlPn8kWnr/9ba6Mi7+dvxajw5tKYZ2/IiL+dR/8nL9LeqKVl7acvyXSIFDBT5y/yp3oTC39m793ge6qlMGbv7v/+Ejobpu/6JfIY2Ugm78rjxGvytKav4CRPnF0l5q/Jp4IISlQmr80f+J0Cwaav/Q4pGx5yZm/eBVO7Siamb8UInOdwViZv8kJl1DECZm/JsehRJncmL+V4UXnXq6Yv8p547nteZi/1Xa6VtRTmL/fNG/LvRWYv3UVo+zW6Ze/aQYS07K1l78+I69tHYaXv7GoeWA1Tpe//AdW584hl7+z7qMmQPqWvylUKW0c0pa/taS34miilr+qZIXSLn6WvyQv6kHAX5a/dqFWcbE5lr9EcY60JROWv2dSaVgs9JW/om0jqQnQlb/AAY9bhLSVvzmyYpjfkJW/EtPqCfhwlb8OIRAi5UyVvxqpacAmJ5W/FFYNpl0Ilb8KmiYQ8+6Uv/ayEyI6zZS/458LemimlL/QnRhDLJOUvygoxwlBdJS/zA3mu9JZlL8NEz1EGzaUvzqTB6lRFpS/jCfJfR/0k781eHIZu96Tv4lFcV43vpO/oAUsjIiik7/TFZCTiImTv3o3gplQcZO/aDvicY9ak78ALma9q0STvwR4JPsqLJO/u+CsPGMUk78="},"shape":[100],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1125","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1126"}}},"glyph":{"type":"object","name":"Line","id":"p1121","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"gray","line_width":2.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1122","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"gray","line_alpha":0.1,"line_width":2.5}},"muted_glyph":{"type":"object","name":"Line","id":"p1123","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"gray","line_alpha":0.2,"line_width":2.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1067","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1080"},{"type":"object","name":"WheelZoomTool","id":"p1081"},{"type":"object","name":"BoxZoomTool","id":"p1082","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1083","attributes":{"syncable":false,"level":"overlay","visible":false,"left_units":"canvas","right_units":"canvas","bottom_units":"canvas","top_units":"canvas","line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5}}}},{"type":"object","name":"SaveTool","id":"p1084"},{"type":"object","name":"ResetTool","id":"p1085"},{"type":"object","name":"HelpTool","id":"p1086"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1075","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1076","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"NumeralTickFormatter","id":"p1115","attributes":{"format":"0%"}},"axis_label":"relative error","major_label_policy":{"type":"object","name":"AllLabels","id":"p1078"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1070","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1071","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1072"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p1073"}}}],"center":[{"type":"object","name":"Grid","id":"p1074","attributes":{"axis":{"id":"p1070"}}},{"type":"object","name":"Grid","id":"p1079","attributes":{"dimension":1,"axis":{"id":"p1075"}}}]}},{"type":"object","name":"Figure","id":"p1087","attributes":{"width":400,"height":150,"x_range":{"id":"p1117"},"y_range":{"type":"object","name":"DataRange1d","id":"p1089"},"x_scale":{"type":"object","name":"LinearScale","id":"p1096"},"y_scale":{"type":"object","name":"LinearScale","id":"p1097"},"title":{"type":"object","name":"Title","id":"p1094"},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1133","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1127","attributes":{"selected":{"type":"object","name":"Selection","id":"p1128","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1129"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAA=="},"shape":[100],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"V+pj3JqZRUDuiN3SCow+QNmOPKwJ8ThAV+pj3JqZNUARu2Q51FEzQHoNykznojFAS6ZMCf1TMEDuiN3SCowuQB/jL3vOzCxA8HH7XHVSK0C/O8NX9AwqQNmOPKwJ8ShAIGtrvov2J0DFYyJ1ZRcnQKp0mY/zTiZAV+pj3JqZJUBNrBs3gfQkQJ+wk4xcXSRAagm+QFDSI0ARu2Q51FEjQBT7qoei2iJAgll0talrIkCWug1jAgQiQHoNykznoiFAElW2Fq9HIUChE7Vrx/EgQJC0fR2xoCBAS6ZMCf1TIEBMLMeUSQsgQMXfnEOBjB9AodU2wCsJH0DuiN3SCoweQDpRDDOlFB5AqHymLI6iHUASq9n+YzUdQB/jL3vOzBxARVl22X1oHEC1l1+3KQgcQHmqijyQqxtA8HH7XHVSG0Akxig1ovwaQMV8pHvkqRpAvlwUBQ5aGkC/O8NX9AwaQMFOhkxwwhlAX84Ru116GUDk3CUwmzQZQNmOPKwJ8RhArcKWaYyvGEBYOrGoCHAYQAfbT4JlMhhAIGtrvov2F0Afs2evZbwXQE1nDRHfgxdAAWvV6uRMF0DFYyJ1ZRcXQLqpEgFQ4xZAdcyf4pSwFkDQb8pcJX8WQKp0mY/zThZAzGy6Z/IfFkDya5ePFfIVQGSIu2FRxRVAV+pj3JqZFUCfPR+W524VQDPKYLMtRRVALHnv3GMcFUBNrBs3gfQUQIgbqVl9zRRAffFbSFCnFEArJxps8oEUQJ+wk4xcXRRAtG5lyoc5FEDFE6yZbRYUQBM//bwH9BNAagm+QFDSE0D3GM92QbETQM8Vh/LVkBNA6gb1hAhxE0ARu2Q51FETQL/sH1I0MxNAq0xnRSQVE0DqDp+6n/cSQBT7qoei2hJAm1p2rii+EkD9caRaLqISQBt7Zt+vhhJAgll0talrEkB9fSV5GFESQEuhp+j4NhJABT1R4kcdEkCWug1jAgQSQM2b4YQl6xFAc+mEfa7SEUAKZBKdmroRQHoNykznohFA5L7lDZKLEUBkl354mHQRQNUngjr4XRFAElW2Fq9HEUA="},"shape":[100],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1134","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1135"}}},"glyph":{"type":"object","name":"Line","id":"p1130","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"}}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1131","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1}},"muted_glyph":{"type":"object","name":"Line","id":"p1132","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1095","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1108"},{"type":"object","name":"WheelZoomTool","id":"p1109"},{"type":"object","name":"BoxZoomTool","id":"p1110","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1111","attributes":{"syncable":false,"level":"overlay","visible":false,"left_units":"canvas","right_units":"canvas","bottom_units":"canvas","top_units":"canvas","line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5}}}},{"type":"object","name":"SaveTool","id":"p1112"},{"type":"object","name":"ResetTool","id":"p1113"},{"type":"object","name":"HelpTool","id":"p1114"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1103","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1104","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1105"},"axis_label":"absolute error","major_label_policy":{"type":"object","name":"AllLabels","id":"p1106"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1098","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1099","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1100"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1101"}}}],"center":[{"type":"object","name":"Grid","id":"p1102","attributes":{"axis":{"id":"p1098"}}},{"type":"object","name":"Grid","id":"p1107","attributes":{"dimension":1,"axis":{"id":"p1103"}}}]}}]}}]}}]}};
-  const render_items = [{"docid":"cbe18d15-1c92-45e4-8717-9cab74940b52","roots":{"p1140":"d8ccc440-5a6e-4a22-9d38-a058e707791e"},"root_ids":["p1140"]}];
-  root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
-  }
-  if (root.Bokeh !== undefined) {
-    embed_document(root);
-  } else {
-    let attempts = 0;
-    const timer = setInterval(function(root) {
-      if (root.Bokeh !== undefined) {
-        clearInterval(timer);
-        embed_document(root);
-      } else {
-        attempts++;
-        if (attempts > 100) {
-          clearInterval(timer);
-          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
-        }
-      }
-    }, 10, root)
-  }
-})(window);
-</script>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Logdet -233.24266127357356
-Logdet: -231.85364699215265</code></pre>
-</div>
-</div>
-<p>We can see that, after about <span class="math inline">\approx 20</span> samples we can get a decent approximation of the log-determinant.</p>
-<div id="c5d8e58f" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> timeit </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>hutch(A, maxiter<span class="op">=</span><span class="dv">20</span>, deg<span class="op">=</span><span class="dv">5</span>, fun<span class="op">=</span><span class="st">"log"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>timeit.timeit(<span class="kw">lambda</span>: hutch(A, maxiter<span class="op">=</span><span class="dv">20</span>, deg<span class="op">=</span><span class="dv">5</span>, fun<span class="op">=</span><span class="st">"log"</span>), number <span class="op">=</span> <span class="dv">1000</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>timeit.timeit(<span class="kw">lambda</span>: np.<span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A))), number <span class="op">=</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>3.5682643959880807</code></pre>
-</div>
-</div>
-<div id="6d031432" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operator <span class="im">import</span> matrix_function</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>M.quad(np.ones(M.shape[<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<pre><code>-240.86281453036028</code></pre>
-</div>
-</div>
+<p>This page gives a walk-through of how to use <code>primate</code> to do implicit trace estimation.</p>
 
 
 

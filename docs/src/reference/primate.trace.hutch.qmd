@@ -1,6 +1,6 @@
 # hutch { #primate.trace.hutch }
 
-`trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], orth=0, confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)`
+`trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='fttr', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)`
 
 Estimates the trace of a matrix $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
 
@@ -15,24 +15,26 @@ For matrix functions, the Lanczos method up to degree `deg` is used to approxima
 
 ## Parameters
 
-| Name          | Type                                                   | Description                                                                                              | Default         |
-|---------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------|-----------------|
-| `A`           | ndarray, sparray, or LinearOperator                    | real symmetric operator.                                                                                 | _required_      |
-| `fun`         | str or typing.Callable                                 | real-valued function defined on the spectrum of `A`.                                                     | `"identity"`    |
-| `maxiter`     | int                                                    | Maximum number of random vectors to sample for the trace estimate.                                       | `10`            |
-| `deg`         | int                                                    | Degree of the quadrature approximation.                                                                  | `20`            |
-| `atol`        | float                                                  | Absolute tolerance to signal convergence for early-stopping. See details.                                | `None`          |
-| `rtol`        | float                                                  | Relative tolerance to signal convergence for early-stopping. See details.                                | `1e-2`          |
-| `stop`        | str                                                    | Early-stopping criteria to test estimator convergence. See details.                                      | `"confidence"`  |
-| `orth`        | int                                                    | Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.            | `0`             |
-| `confidence`  | float                                                  | Confidence level to Only used when `stop` = "confidence".                                                | `0.95`          |
-| `pdf`         | 'rademacher', 'normal'                                 | Choice of zero-centered distribution to sample random vectors from.                                      | ` 'rademacher'` |
-| `rng`         | 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' | Random number generator to use (PCG64 by default).                                                       | ` 'splitmix64'` |
-| `seed`        | int                                                    | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.                        | `-1`            |
-| `num_threads` | int                                                    | Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide. | `0`             |
-| `plot`        | bool                                                   | If true, plots the samples of the trace estimate along with their convergence characteristics.           | `False`         |
-| `info`        | bool                                                   | If True, returns a dictionary containing all relevant information about the computation.                 | `False`         |
-| `kwargs`      | dict                                                   | additional key-values to parameterize the chosen function 'fun'.                                         | `{}`            |
+| Name          | Type                                                   | Description                                                                                    | Default         |
+|---------------|--------------------------------------------------------|------------------------------------------------------------------------------------------------|-----------------|
+| `A`           | ndarray, sparray, or LinearOperator                    | real symmetric operator.                                                                       | _required_      |
+| `fun`         | str or typing.Callable                                 | real-valued function defined on the spectrum of `A`.                                           | `"identity"`    |
+| `maxiter`     | int                                                    | Maximum number of random vectors to sample for the trace estimate.                             | `10`            |
+| `deg`         | int                                                    | Degree of the quadrature approximation. Must be at least 1.                                    | `20`            |
+| `atol`        | float                                                  | Absolute tolerance to signal convergence for early-stopping. See notes.                        | `None`          |
+| `rtol`        | float                                                  | Relative tolerance to signal convergence for early-stopping. See notes.                        | `1e-2`          |
+| `stop`        | str                                                    | Early-stopping criteria to test estimator convergence. See details.                            | `"confidence"`  |
+| `ncv`         | int                                                    | Number of Lanczos vectors to allocate. Must be at least 2.                                     | `2`             |
+| `orth`        | int                                                    | Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`.        | `0`             |
+| `quad`        | str                                                    | Method used to obtain the weights of the Gaussian quadrature. See notes.                       | `'fttr'`        |
+| `confidence`  | float                                                  | Confidence level to consider estimator as converged. Only used when `stop` = "confidence".     | `0.95`          |
+| `pdf`         | 'rademacher', 'normal'                                 | Choice of zero-centered distribution to sample random vectors from.                            | ` 'rademacher'` |
+| `rng`         | 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' | Random number generator to use.                                                                | ` 'splitmix64'` |
+| `seed`        | int                                                    | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.              | `-1`            |
+| `num_threads` | int                                                    | Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.     | `0`             |
+| `plot`        | bool                                                   | If true, plots the samples of the trace estimate along with their convergence characteristics. | `False`         |
+| `info`        | bool                                                   | If True, returns a dictionary containing all relevant information about the computation.       | `False`         |
+| `kwargs`      | dict                                                   | additional key-values to parameterize the chosen function 'fun'.                               | `{}`            |
 
 ## Returns
 

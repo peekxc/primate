@@ -40,12 +40,12 @@ website:
       # - text: Advanced
       - section: Theory
         contents:
-          # - text: Introduction 
-          #   href: theory/intro.qmd
+          - text: Introduction 
+            href: theory/intro.qmd
           - text: Lanczos 
             href: theory/lanczos.qmd
-          - text: SLQ
-            href: theory/slq.qmd
+          # - text: SLQ
+          #   href: theory/slq.qmd
           - text: 
       - section: Advanced
         contents:

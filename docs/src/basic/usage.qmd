@@ -1,8 +1,7 @@
 ---
-title: "Quickstart"
+title: "`primate` usage - quickstart"
 ---
 
-To start using `primate`, 
 
 ```{python}
 #| echo: false
@@ -12,50 +11,4 @@ from bokeh.io import output_notebook
 output_notebook()
 import numpy as np
 np.random.seed(1234)
-```
-
-```{python}
-from primate.random import symmetric
-from primate.trace import hutch
-
-## Random positive definite matrix
-A = symmetric(n=250, pd=True)
-
-## Log-determinant
-logdet_test, info = hutch(A, fun="log", maxiter=100, info=True, plot=True)
-logdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))
-
-print(f"Logdet {logdet_true}")
-print(f"Logdet: {logdet_test}")
-```
-
-We can see that, after about $\approx 20$ samples we can get a decent approximation of the log-determinant. 
-
-```{python}
-import timeit 
-## Based on https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
-from scipy.linalg import toeplitz
-# toeplitz([1,2,3], [1,4,5,6])
-T = toeplitz(c)
-# x = np.array([0,1,2,3])
-T @ c
-
-
-
-
-
-hutch(A, maxiter=20, deg=5, fun="log")
-
-timeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun="log", quad="fttr"), number = 1000)
-timeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)
-
-```
-
-
-```{python}
-from primate.operator import matrix_function
-M = matrix_function(A, fun="log")
-
-
-M.quad(np.ones(M.shape[0]))
 ```

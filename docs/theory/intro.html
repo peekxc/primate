@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate - Introduction to primate</title>
+<title>primate - Introduction to trace estimation with primate</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,6 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
+<link href="../theory/lanczos.html" rel="next">
+<link href="../imate_compare.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -165,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Introduction to <code>primate</code></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/intro.html">Introduction</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -223,14 +225,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lanczos</span></a>
+  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/slq.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SLQ</span></a>
+  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
       </ul>
@@ -292,7 +294,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../reference/trace.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
           <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -348,17 +350,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#trace-estimation" id="toc-trace-estimation" class="nav-link active" data-scroll-target="#trace-estimation">Trace estimation</a></li>
+  <li><a href="#basics-trace-estimation" id="toc-basics-trace-estimation" class="nav-link active" data-scroll-target="#basics-trace-estimation">Basics: Trace estimation</a></li>
   <li><a href="#the-implicit-trace-estimation-problem" id="toc-the-implicit-trace-estimation-problem" class="nav-link" data-scroll-target="#the-implicit-trace-estimation-problem">The implicit trace estimation problem</a></li>
+  <li><a href="#the-statistical-side" id="toc-the-statistical-side" class="nav-link" data-scroll-target="#the-statistical-side">The statistical side</a></li>
+  <li><a href="#matrix-functions" id="toc-matrix-functions" class="nav-link" data-scroll-target="#matrix-functions">Matrix functions</a>
+  <ul class="collapse">
+  <li><a href="#ex-logdet-computation" id="toc-ex-logdet-computation" class="nav-link" data-scroll-target="#ex-logdet-computation">Ex: Logdet computation</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../theory/intro.html">Theory</a></li><li class="breadcrumb-item"><a href="../theory/intro.html">Introduction</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Introduction to <code>primate</code></h1>
+<h1 class="title">Introduction to trace estimation with <code>primate</code></h1>
 </div>
 
 
@@ -375,77 +382,203 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><code>primate</code> contains an extensible implementation of a variety of methods for estimating quantities from matrix functions.</p>
-<p>One such method, often used in trace estimation, is the “stochastic Lanczos quadrature” (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.</p>
-<section id="trace-estimation" class="level2">
-<h2 class="anchored" data-anchor-id="trace-estimation">Trace estimation</h2>
+<p><code>primate</code> contains an extensible implementations of a variety of methods for estimating quantities from matrix functions. One popular application of such estimators is the approximation of certain <a href="https://en.wikipedia.org/wiki/Trace_(linear_algebra)">trace</a> quantities.</p>
+<!-- One such method, often used in trace estimation, is the "stochastic Lanczos quadrature" (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.  -->
+<p>In the examples below, I’ll use a simple (random) positive-definite matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span>.</p>
+<div id="7b39d0f6" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>, pd <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By default, <code>symmetric</code> normalizes <span class="math inline">A</span> such that the eigenvalues are uniformly distributed in the interval <span class="math inline">[0, 1]</span>. For reference, the spectrum of <span class="math inline">A</span> looks as follows:</p>
+<div id="6b1f5c06" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> figure(width<span class="op">=</span><span class="dv">500</span>, height<span class="op">=</span><span class="dv">200</span>, title<span class="op">=</span><span class="st">"Spectrum of A"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p.toolbar_location <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>p.multi_line(np.split(np.repeat(np.linalg.eigvalsh(A), <span class="dv">2</span>), <span class="dv">150</span>), [(<span class="op">-</span><span class="fl">0.10</span>, <span class="fl">0.10</span>)]<span class="op">*</span><span class="dv">150</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>p.y_range <span class="op">=</span> Range1d(<span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>p.yaxis.visible <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>p.title.align <span class="op">=</span> <span class="st">'center'</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+  <div id="f6b0772e-c546-4e79-b22d-54395148da73" data-root-id="p4632" style="display: contents;"></div>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/javascript">
+(function(root) {
+  function embed_document(root) {
+  const docs_json = {"1a142259-81d5-4b7a-9a9e-2b9bfb9cee79":{"version":"3.2.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p4632","attributes":{"width":500,"height":200,"x_range":{"type":"object","name":"DataRange1d","id":"p4633"},"y_range":{"type":"object","name":"Range1d","id":"p4670","attributes":{"start":-0.5,"end":0.5}},"x_scale":{"type":"object","name":"LinearScale","id":"p4642"},"y_scale":{"type":"object","name":"LinearScale","id":"p4643"},"title":{"type":"object","name":"Title","id":"p4635","attributes":{"text":"Spectrum of A","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p4667","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p4661","attributes":{"selected":{"type":"object","name":"Selection","id":"p4662","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p4663"},"data":{"type":"map","entries":[["xs",[{"type":"ndarray","array":{"type":"bytes","data":"ZYpGB04rYT9likYHTithPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Cq0iHHaqlT8KrSIcdqqVPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"cJFAiy7blz9wkUCLLtuXPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"sRF7KqsdnT+xEXsqqx2dPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"xy9SGTTrnz/HL1IZNOufPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"CQhUaUoJoD8JCFRpSgmgPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"z5qhsOKwoj/PmqGw4rCiPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"5Q/UHHzioj/lD9QcfOKiPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"DnRbwQ2IqT8OdFvBDYipPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"O5d++0YvrT87l377Ri+tPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"dzh1EbpIrj93OHURukiuPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"mh37x8SpsD+aHfvHxKmwPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ePH05CpFsj948fTkKkWyPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"essvOpMytD96yy86kzK0Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"7nyTckzUuD/ufJNyTNS4Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"r9rhPLJivD+v2uE8smK8Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"AGsP8ATMvD8Aaw/wBMy8Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"bmzrnzmnvT9ubOufOae9Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Z7KQn0U6vj9nspCfRTq+Pw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"yLmXyFAEwT/IuZfIUATBPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"cKt5RrnxwT9wq3lGufHBPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"t0J9iT/wwj+3Qn2JP/DCPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"qEy3F13Kwz+oTLcXXcrDPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"cHLggFIVxD9wcuCAUhXEPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"rOtpHQ62xD+s62kdDrbEPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"B4I00kF6xT8HgjTSQXrFPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Vvym7v7YxT9W/Kbu/tjFPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"jDGf8dhBxj+MMZ/x2EHGPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"DGkmE+Qgxz8MaSYT5CDHPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"3GoRBUHkxz/cahEFQeTHPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"RzRldbOQyD9HNGV1s5DIPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"5JTmwyP5yD/klObDI/nIPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"wszkIfiWyT/CzOQh+JbJPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"dpv0q/ibyj92m/Sr+JvKPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"tdnJfvx+zD+12cl+/H7MPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"dP+4BSGFzD90/7gFIYXMPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"1nN1Mae5zz/Wc3Uxp7nPPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ochcn6fXzz+hyFyfp9fPPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"E+ZxXLQ70D8T5nFctDvQPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"vdTqeeEp0T+91Op54SnRPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Zayxxg5f0T9lrLHGDl/RPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Q0e6j5E90j9DR7qPkT3SPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"I7oOrnB30j8jug6ucHfSPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"EcEm6kZ90j8RwSbqRn3SPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"2C4idzCk0j/YLiJ3MKTSPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"kWnuvvW41D+Rae6+9bjUPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"YBjaAhT31D9gGNoCFPfUPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ReRWCo171T9F5FYKjXvVPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"9SxNkVMB1z/1LE2RUwHXPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"38baaJBy1z/fxtpokHLXPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"nPIrXJCR1z+c8itckJHXPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"nBKIVVYV2D+cEohVVhXYPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"PbsE9Zd32D89uwT1l3fYPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"m9FvMGRr2T+b0W8wZGvZPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"vHcIwAH02T+8dwjAAfTZPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ekNg1GgP2j96Q2DUaA/aPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"HTxsDeDX2j8dPGwN4NfaPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ZDGoq1R+2z9kMairVH7bPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"S+fsvqB+2z9L5+y+oH7bPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"7IN7SXCx2z/sg3tJcLHbPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"a8ohe6o03D9ryiF7qjTcPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"NIqr8Rj/3D80iqvxGP/cPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"RtHmiHFD3T9G0eaIcUPdPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"fEserDTh3T98Sx6sNOHdPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"1Ql+M4Um3j/VCX4zhSbePw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"MzqLiJFt3j8zOouIkW3ePw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"CG/HIyb+3j8Ib8cjJv7ePw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"dl7iuyVY3z92XuK7JVjfPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"srgQFkRr3z+yuBAWRGvfPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"nkCZ4k6/3z+eQJniTr/fPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"J9RquSJ/4D8n1Gq5In/gPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"n5pHqB+54D+fmkeoH7ngPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"DaTTOhMH4T8NpNM6EwfhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"1eFop7kY4T/V4WinuRjhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"KikiSw4d4T8qKSJLDh3hPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"PA+1Y4Ip4T88D7VjginhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"BdCMy7Aw4T8F0IzLsDDhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"2Lm8qY1V4T/YubypjVXhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"sc/kaPdl4T+xz+Ro92XhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"URPzOgOA4T9RE/M6A4DhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"5AGYpIuJ4T/kAZiki4nhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"2mrMB4fI4T/aaswHh8jhPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"PL/dUF/d4T88v91QX93hPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"hsQk07Ek4j+GxCTTsSTiPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"bj+Z8u1e4j9uP5ny7V7iPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"sb4D1aFf4j+xvgPVoV/iPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"wF5dHuOU4j/AXl0e45TiPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"88/yJqzS4j/zz/ImrNLiPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"m8RZX9BZ4z+bxFlf0FnjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"60PgIoNu4z/rQ+Aig27jPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"RkExpudy4z9GQTGm53LjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"z/AAmTeH4z/P8ACZN4fjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"EPmM8qGQ4z8Q+YzyoZDjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"t5867D274z+3nzrsPbvjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"gixAFUXE4z+CLEAVRcTjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"wYm0fODa4z/BibR84NrjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"itXE7Azo4z+K1cTsDOjjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"wyxi2Jz34z/DLGLYnPfjPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"omFYjPA05D+iYViM8DTkPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"4hkiG32C5D/iGSIbfYLkPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"rDa+qIHW5D+sNr6ogdbkPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"YC8DP8fw5D9gLwM/x/DkPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"F3DO+QU15T8XcM75BTXlPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"oGK8x/Zc5T+gYrzH9lzlPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"H2Gar/ln5T8fYZqv+WflPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"uD0dRn1w5T+4PR1GfXDlPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ug3K9Ea15T+6Dcr0RrXlPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"xz4WVJbT5T/HPhZUltPlPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"J+6lkHkY5j8n7qWQeRjmPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"1x8jEDaL5j/XHyMQNovmPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"srfG67YO5z+yt8brtg7nPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"TACiM20l5z9MAKIzbSXnPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"GW/YFW975z8Zb9gVb3vnPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"rD0EA2iY5z+sPQQDaJjnPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"NT3x2mrD5z81PfHaasPnPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"bM0gnm0X6D9szSCebRfoPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"IQqMlj4Z6D8hCoyWPhnoPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Qq1DpZmo6D9CrUOlmajoPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ZcJtaRDD6D9lwm1pEMPoPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"/If/3izF6D/8h//eLMXoPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"eckvc5fU6D95yS9zl9ToPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ZsXiy5rT6T9mxeLLmtPpPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"jLAGeiBE6j+MsAZ6IETqPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"futJENpv6j9+60kQ2m/qPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"lzz325aJ6j+XPPfblonqPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"FDQ6m6nF6z8UNDqbqcXrPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"a81yvAgS7D9rzXK8CBLsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"bVqpmnQU7D9tWqmadBTsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"UnFuIbsi7D9ScW4huyLsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"G8YIKB1B7D8bxggoHUHsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"DAFqS7pN7D8MAWpLuk3sPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"YKOHGiRq7D9go4caJGrsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"cUsr7f2C7D9xSyvt/YLsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"SsvKMkyI7D9Ky8oyTIjsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"tYotFrKY7D+1ii0WspjsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"1Ae1qP2i7D/UB7Wo/aLsPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"/PeE6qsJ7T/894TqqwntPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"GYZNyCtH7T8Zhk3IK0ftPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Lbci+AJY7T8ttyL4AljtPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"QZsNxe1y7T9Bmw3F7XLtPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"/e+2yhaq7T/977bKFqrtPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"ZHITSDIC7j9kchNIMgLuPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"tsJoyMUE7j+2wmjIxQTuPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"NUV2HYUT7j81RXYdhRPuPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"xxJYLxaJ7j/HElgvFonuPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"l5o5hO5x7z+XmjmE7nHvPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"yduBmbyX7z/J24GZvJfvPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Z3fJtB6e7z9nd8m0Hp7vPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"4u1XxDG67z/i7VfEMbrvPw=="},"shape":[2],"dtype":"float64","order":"little"},{"type":"ndarray","array":{"type":"bytes","data":"Flfk5xzU7z8WV+TnHNTvPw=="},"shape":[2],"dtype":"float64","order":"little"}]],["ys",[[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1],[-0.1,0.1]]]]}}},"view":{"type":"object","name":"CDSView","id":"p4668","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p4669"}}},"glyph":{"type":"object","name":"MultiLine","id":"p4664","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"}}},"nonselection_glyph":{"type":"object","name":"MultiLine","id":"p4665","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"MultiLine","id":"p4666","attributes":{"xs":{"type":"field","field":"xs"},"ys":{"type":"field","field":"ys"},"line_color":{"type":"value","value":"#1f77b4"},"line_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p4641","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p4654"},{"type":"object","name":"WheelZoomTool","id":"p4655"},{"type":"object","name":"BoxZoomTool","id":"p4656","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p4657","attributes":{"syncable":false,"level":"overlay","visible":false,"left_units":"canvas","right_units":"canvas","bottom_units":"canvas","top_units":"canvas","line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5}}}},{"type":"object","name":"SaveTool","id":"p4658"},{"type":"object","name":"ResetTool","id":"p4659"},{"type":"object","name":"HelpTool","id":"p4660"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p4649","attributes":{"visible":false,"ticker":{"type":"object","name":"BasicTicker","id":"p4650","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p4651"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p4652"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p4644","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p4645","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p4646"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p4647"}}}],"center":[{"type":"object","name":"Grid","id":"p4648","attributes":{"axis":{"id":"p4644"}}},{"type":"object","name":"Grid","id":"p4653","attributes":{"dimension":1,"axis":{"id":"p4649"}}}]}}]}};
+  const render_items = [{"docid":"1a142259-81d5-4b7a-9a9e-2b9bfb9cee79","roots":{"p4632":"f6b0772e-c546-4e79-b22d-54395148da73"},"root_ids":["p4632"]}];
+  root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
+  }
+  if (root.Bokeh !== undefined) {
+    embed_document(root);
+  } else {
+    let attempts = 0;
+    const timer = setInterval(function(root) {
+      if (root.Bokeh !== undefined) {
+        clearInterval(timer);
+        embed_document(root);
+      } else {
+        attempts++;
+        if (attempts > 100) {
+          clearInterval(timer);
+          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+        }
+      }
+    }, 10, root)
+  }
+})(window);
+</script>
+</div>
+</div>
+<section id="basics-trace-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="basics-trace-estimation">Basics: Trace estimation</h2>
 <!-- Whether used for spectral sum estimation, quadrature approximation, or many techniques 
  -->
-<p>To illustrate the functionality of <code>primate</code>, we need some kind of matrix and some spectral quantity of interest. To sole the former, let’s start with a simple (random) positive semi-definite matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span>.</p>
-<div id="2d1eea03" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>, psd <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>By default, <code>symmetric</code>normalizes <span class="math inline">A</span> such that the eigenvalues are uniformly distributed in the interval <span class="math inline">[0, 1]</span>.</p>
-<div id="7f0602d7" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.histogram(np.linalg.eigvalsh(A)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Suppose we wanted to compute the trace of <span class="math inline">A</span>. From its definition, we have a variety of means to do it: <span class="math display">\mathrm{tr}(A) \triangleq \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i </span></p>
+<p>where, in the right-most sum, we’re using <span class="math inline">e_i</span> to represent the <span class="math inline">i</span>th <a href="https://en.wikipedia.org/wiki/Indicator_vector">identity vector</a>: <span class="math display"> A_{ii} = e_i^T A e_i, \quad e_i = [0, \dots, 0, \underbrace{1}_{i}, 0, \dots, 0] </span></p>
+<p>Using numpy, we can verify all of these give the exact trace of <span class="math inline">A</span>:<br>
+<!-- 1. Sum the diagonal entries (or use numpy's built-in `.trace()`)
+  2. Sum the eigenvalues
+  3. Sum $\mathrm{e}_i^T A \mathrm{e}_i$ for all $i \in [1, n]$ --></p>
+<div id="9f8d2aa6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>eye <span class="op">=</span> <span class="kw">lambda</span> i: np.ravel(np.eye(<span class="dv">1</span>, <span class="dv">150</span>, k<span class="op">=</span>i))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Direct: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(A.diagonal())<span class="sc">:.8f}</span><span class="ss">"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Eigen:  </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.linalg.eigvalsh(A))<span class="sc">:.8f}</span><span class="ss">"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Matvec: </span><span class="sc">{</span><span class="bu">sum</span>([eye(i) <span class="op">@</span> A <span class="op">@</span> eye(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">150</span>)])<span class="sc">:.8f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>(array([15, 18, 12,  9, 16, 18, 21, 12, 15, 14]), array([0.00209579, 0.10135048, 0.20060517, 0.29985986, 0.39911455,
-       0.49836924, 0.59762393, 0.69687862, 0.79613331, 0.895388  ,
-       0.99464269]))</code></pre>
+<pre><code>Direct: 75.69739746
+Eigen:  75.69739746
+Matvec: 75.69739746</code></pre>
 </div>
 </div>
-<p>Now, the problem to solve. Suppose, for starters, we wanted to compute the trace of <span class="math inline">A</span>: <span class="math display">\mathrm{tr}(A) \triangleq \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i </span></p>
-<p>Obviously, there are many ways to obtain this… here’s three:</p>
-<ol type="1">
-<li>Use the built-in <code>.trace()</code> call</li>
-<li>Sum the diagonal entries directly</li>
-<li>Sum the eigenvalues</li>
-</ol>
-<div id="df781249" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(A.trace()) </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(A.diagonal()))</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(np.<span class="bu">sum</span>(np.linalg.eigvalsh(A)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.69739302999076
-75.69739302999076
-75.69739302999078</code></pre>
-</div>
-</div>
-<p>Yet another way to compute <span class="math inline">\mathrm{tr}(A)</span> exactly is to multiply <span class="math inline">A</span> by a sequence of <span class="math inline">n</span> identity vectors:</p>
-<p><span class="math display">\mathrm{tr}(A) = \sum\limits_{i=1}^n e_i^T A e_i, \quad e_i = [0, \dots, 0, \underset{i}{1}, 0, \dots, 0] </span></p>
-<div id="2da5951e" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> A.shape[<span class="dv">0</span>]</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>trace <span class="op">=</span> <span class="fl">0.0</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(n): </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  v <span class="op">=</span> np.eye(<span class="dv">1</span>, n, k<span class="op">=</span>k).T</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  trace <span class="op">+=</span> np.take(v.T <span class="op">@</span> A <span class="op">@</span> v, <span class="dv">0</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(trace)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.6973930299908</code></pre>
-</div>
-</div>
-<p>Putting aside the fact that each <span class="math inline">v \mapsto Av</span> takes <span class="math inline">O(n^2)</span> here, observe this last approach is pretty inefficient in general as most of the entries of <span class="math inline">v</span> are zero. One idea, accredited first to A. Girard and then studied by M.F. Huchinson, is to use random sign vector <span class="math inline">v \in \{-1, +1\}^{n}</span>.</p>
-<p><span class="math display">\mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i = n_v^{-1} \cdot V^\top A V</span></p>
-<p>Let’s see how this fares using, let’s say, <span class="math inline">\frac{1}{2}</span> the number of <em>matvecs</em>:</p>
-<div id="78c60b42" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>trace_estimate <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(n <span class="op">//</span> <span class="dv">4</span>):</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  v <span class="op">=</span> np.random.choice([<span class="op">-</span><span class="dv">1</span>, <span class="op">+</span><span class="dv">1</span>], size<span class="op">=</span>n)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  trace_estimate <span class="op">+=</span> v <span class="op">@</span> A <span class="op">@</span> v</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(trace_estimate <span class="op">/</span> (n <span class="op">//</span> <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>75.21454150546832</code></pre>
-</div>
-</div>
-<p>Not bad!</p>
+<p>While (1) trivially yields <span class="math inline">\mathrm{tr}(A)</span> in (optimal) <span class="math inline">O(n)</span> time, there exist situations where the diagonal entries of <code>A</code> are not available—particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they yield alternative ways nonetheless of obtaining <span class="math inline">\mathrm{tr}(A)</span>.</p>
+<!-- Intuitively, the "base method" of computing $\mathrm{tr}(A)$ exactly under this problem is to multiply $A$ by a sequence of $n$ identity vectors:
+
+$$\mathrm{tr}(A) =  $$
+
+With code, it might be implemented with something like: 
+
+::: {#908ae6be .cell execution_count=5}
+``` {.python .cell-code}
+n = A.shape[0]
+trace = 0.0 
+for k in range(n): 
+  v = np.eye(1, n, k=k).T
+  trace += np.take(v.T @ A @ v, 0)
+print(trace)
+```
+
+::: {.cell-output .cell-output-stdout}
+```
+75.69739745877132
+```
+:::
+:::
+
+
+-->
 </section>
 <section id="the-implicit-trace-estimation-problem" class="level2">
 <h2 class="anchored" data-anchor-id="the-implicit-trace-estimation-problem">The implicit trace estimation problem</h2>
+<p>The <em>implicit</em> trace estimation problem can be stated as follows:</p>
 <blockquote class="blockquote">
 <p>Given access to a square matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span> via its matrix-vector product operator <span class="math inline">x \mapsto Ax</span>, estimate its trace&nbsp;<span class="math inline">\mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii}</span></p>
 </blockquote>
+<pre><code>
+Putting aside the fact that each $v \mapsto Av$ takes $O(n^2)$ here, observe this last approach is pretty inefficient in general as most of the entries of $v$ are zero. The zero components in `v` still yield inner product computations, despite not contributing to the trace estimate at all. One idea, accredited first to A. Girard and then studied more in-depth by M.F. Huchinson, is to use random sign vector $v \in \{-1, +1\}^{n}$. 
+
+$$\mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i = n_v^{-1} \cdot V^\top A V$$
+
+Let's see how this fares using, let's say, $\frac{1}{4}$ the number of _matvecs_: 
+
+::: {#da46ca80 .cell execution_count=6}
+``` {.python .cell-code}
+trace_estimate = 0.0
+for j in range(n // 4):
+  v = np.random.choice([-1, +1], size=n)
+  trace_estimate += v @ A @ v
+print(trace_estimate / (n // 4))</code></pre>
+<div class="cell-output cell-output-stdout">
+<pre><code>75.21454596302897</code></pre>
+</div>
+<p>:::</p>
+<p>Not bad!</p>
+</section>
+<section id="the-statistical-side" class="level2">
+<h2 class="anchored" data-anchor-id="the-statistical-side">The statistical side</h2>
+<p>This forms an unbiased estimator of <span class="math inline">\mathrm{tr}(A)</span>; to see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions <span class="math display">\mathtt{tr}(A) = \mathtt{tr}(A I) = \mathtt{tr}(A \mathbb{E}[v v^T]) = \mathbb{E}[\mathtt{tr}(Avv^T)] = \mathbb{E}[\mathtt{tr}(v^T A v)] = \mathbb{E}[v^T A v]</span></p>
+</section>
+<section id="matrix-functions" class="level1">
+<h1>Matrix functions</h1>
+<section id="ex-logdet-computation" class="level2">
+<h2 class="anchored" data-anchor-id="ex-logdet-computation">Ex: Logdet computation</h2>
+<p>If built-in, the basic way to approximate the trace of a matrix function is to simply supply the name of the spectral function to be applied. For example, to approximate the log-determinant:</p>
+<div id="fcf4bea1" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">## Random positive definite matrix</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(n<span class="op">=</span><span class="dv">300</span>, pd<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">## Log-determinant</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>logdet_test <span class="op">=</span> hutch(A, fun<span class="op">=</span><span class="st">"log"</span>, maxiter<span class="op">=</span><span class="dv">25</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>logdet_true <span class="op">=</span> np.<span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A)))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet </span><span class="sc">{</span>logdet_true<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet: </span><span class="sc">{</span>logdet_test<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logdet -284.548538425247
+Logdet: -281.5599669856715</code></pre>
+</div>
+</div>
+<p>Even using <span class="math inline">\frac{n}{12}</span> matvecs, we get a decent approximation. But how good is this estimate?</p>
+<p>To get a slightly better idea, you can set <code>verbose=True</code>:</p>
+<div id="2b78c1c3" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>hutch(A, fun<span class="op">=</span><span class="st">"log"</span>, maxiter<span class="op">=</span><span class="dv">25</span>, verbose<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Girard-Hutchinson estimator (fun=log, deg=20, quad=fttr)
+Est: -281.074 +/- 8.80 (95% CI), CV: 2%, Evals: 25 [R]</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="181">
+<pre><code>-281.0744503802661</code></pre>
+</div>
+</div>
+<p>The first line of the statement contains fixed about the estimator:</p>
+<ol type="1">
+<li>The type of estimator (Girard-Hutchinson)</li>
+<li>The spectral function being approximated (log)</li>
+<li>The degree of the polynomial approximation (20)</li>
+<li>The quadrature method used (‘fttr’)</li>
+</ol>
+<p>The second line prints the runtime information about the samples:</p>
+<ol type="1">
+<li>The final trace estimate</li>
+<li>Its <a href="https://en.wikipedia.org/wiki/Margin_of_error">margin of error</a></li>
+<li>The <a href="https://en.wikipedia.org/wiki/Coefficient_of_variation">coefficient of variation</a> (aka the relative std. deviation)</li>
+<li>The number of samples used + their distribution prefix (‘R’ for rademacher)</li>
+</ol>
+<!-- ```{python}
+import timeit 
+## Based on https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
+from scipy.linalg import toeplitz
+# toeplitz([1,2,3], [1,4,5,6])
+T = toeplitz(c)
+# x = np.array([0,1,2,3])
+T @ c
+
+hutch(A, maxiter=20, deg=5, fun="log")
+
+timeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun="log", quad="fttr"), number = 1000)
+timeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)
+
+``` -->
+<!-- ```{python}
+
+
+
+M.quad(np.ones(M.shape[0]))
+``` -->
 <!-- ```{python}
 c = np.reciprocal(np.sqrt(n))
 trace_estimates = np.empty(n)
@@ -474,6 +607,7 @@ print(trace_estimate)
 ``` -->
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1018,6 +1152,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../imate_compare.html" class="pagination-link  aria-label=" comparison="" to="" *imate*"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Comparison to <em>imate</em></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../theory/lanczos.html" class="pagination-link" aria-label="Lanczos">
+        <span class="nav-page-text">Lanczos</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
