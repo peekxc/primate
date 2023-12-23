@@ -1,9 +1,5 @@
 ---
 title: "Introduction to trace estimation with `primate`"
-editor: 
-    rendor-on-save: true
-draft: true
-jupyter: python3
 ---
 
 `primate` contains an extensible implementations of a variety of methods for estimating quantities from matrix functions. One popular application of such estimators is the approximation of certain [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) quantities.
@@ -12,7 +8,7 @@ jupyter: python3
 
 ```{python}
 #| echo: false
-#| output: false
+#| output: true
 from bokeh.plotting import figure, show
 from bokeh.io import output_notebook
 from bokeh.models import Range1d
@@ -31,17 +27,17 @@ A = symmetric(150, pd = True)
 By default, `symmetric` normalizes $A$ such that the eigenvalues are uniformly distributed in the interval $[0, 1]$. For reference, the spectrum of $A$ looks as follows:
 
 ```{python}
-#| echo: true
+#| echo: false
 #| output: true
-p = figure(width=500, height=200, title="Spectrum of A")
+#| fig-align: center
+p = figure(width=700, height=20 0, title="Spectrum of A")
 p.toolbar_location = None
 p.multi_line(np.split(np.repeat(np.linalg.eigvalsh(A), 2), 150), [(-0.10, 0.10)]*150)
-p.y_range = Range1d(-0.5, 0.5)
+p.y_range = Range1d(-0.35, 0.35)
 p.yaxis.visible = False
 p.title.align = 'center'
 show(p)
 ```
-
 
 ## Basics: Trace estimation 
 
@@ -81,6 +77,7 @@ $$\mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n
 Let's see how this fares using, let's say, $\frac{1}{4}$ the number of _matvecs_: 
 
 ```{python}
+n: int = A.shape[0]
 trace_estimate = 0.0
 for j in range(n // 4):
   v = np.random.choice([-1, +1], size=n)
@@ -101,28 +98,25 @@ $$\mathtt{tr}(A) = \mathtt{tr}(A I) = \mathtt{tr}(A \mathbb{E}[v v^T]) = \mathbb
 
 ## Ex: Logdet computation
 
-If built-in, the basic way to approximate the trace of a matrix function is to simply supply the name of the spectral function to be applied. For example, to approximate the log-determinant:
+The basic way to approximate the trace of a matrix function is to simply set `fun` to the name the spectral function. For example, to approximate the log-determinant:
 
 ```{python}
 from primate.trace import hutch
-
-## Random positive definite matrix
-A = symmetric(n=300, pd=True)
 
 ## Log-determinant
 logdet_test = hutch(A, fun="log", maxiter=25)
 logdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))
 
-print(f"Logdet {logdet_true}")
-print(f"Logdet: {logdet_test}")
+print(f"Logdet (exact):  {logdet_true}")
+print(f"Logdet (approx): {logdet_test}")
 ```
 
-Even using $\frac{n}{12}$ matvecs, we get a decent approximation. But how good is this estimate? 
+Even using $n / 6$ matvecs, we get a decent approximation. But how good is this estimate? 
 
 To get a slightly better idea, you can set `verbose=True`:
 
 ```{python}
-hutch(A, fun="log", maxiter=25, verbose=True)
+est = hutch(A, fun="log", maxiter=25, verbose=True)
 ```
 
 The first line of the statement contains fixed about the estimator:
@@ -139,6 +133,9 @@ The second line prints the runtime information about the samples:
 2. The [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (aka the relative std. deviation)
 3. The number of samples used + their distribution prefix ('R' for rademacher)
 
+```{python}
+est = hutch(A, fun="log", maxiter=100, plot=True)
+```
 
 
 <!-- ```{python}

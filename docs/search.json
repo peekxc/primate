@@ -957,5 +957,60 @@
     "title": "primate",
     "section": "",
     "text": "This page gives a walk-through of how to use primate to do implicit trace estimation."
+  },
+  {
+    "objectID": "theory/intro.html",
+    "href": "theory/intro.html",
+    "title": "Introduction to trace estimation with primate",
+    "section": "",
+    "text": "primate contains an extensible implementations of a variety of methods for estimating quantities from matrix functions. One popular application of such estimators is the approximation of certain trace quantities.\nIn the examples below, I’ll use a simple (random) positive-definite matrix A \\in \\mathbb{R}^{n \\times n}.\nfrom primate.random import symmetric\nA = symmetric(150, pd = True)\nBy default, symmetric normalizes A such that the eigenvalues are uniformly distributed in the interval [0, 1]. For reference, the spectrum of A looks as follows:",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#basics-trace-estimation",
+    "href": "theory/intro.html#basics-trace-estimation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Basics: Trace estimation",
+    "text": "Basics: Trace estimation\n\nSuppose we wanted to compute the trace of A. From its definition, we have a variety of means to do it: \\mathrm{tr}(A) \\triangleq \\sum\\limits_{i=1}^n A_{ii} = \\sum\\limits_{i=1}^n \\lambda_i = \\sum\\limits_{i=1}^n e_i^T A e_i \nwhere, in the right-most sum, we’re using e_i to represent the ith identity vector:  A_{ii} = e_i^T A e_i, \\quad e_i = [0, \\dots, 0, \\underbrace{1}_{i}, 0, \\dots, 0] \nUsing numpy, we can verify all of these give the exact trace of A:\n\n\nimport numpy as np\neye = lambda i: np.ravel(np.eye(1, 150, k=i))\nprint(f\"Direct: {np.sum(A.diagonal()):.8f}\")\nprint(f\"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}\")\nprint(f\"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}\")\n\nDirect: 75.69739746\nEigen:  75.69739746\nMatvec: 75.69739746\n\n\nWhile (1) trivially yields \\mathrm{tr}(A) in (optimal) O(n) time, there exist situations where the diagonal entries of A are not available—particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they yield alternative ways nonetheless of obtaining \\mathrm{tr}(A).",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#the-implicit-trace-estimation-problem",
+    "href": "theory/intro.html#the-implicit-trace-estimation-problem",
+    "title": "Introduction to trace estimation with primate",
+    "section": "The implicit trace estimation problem",
+    "text": "The implicit trace estimation problem\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nPutting aside the fact that each v \\mapsto Av takes O(n^2) here, observe this last approach is pretty inefficient in general as most of the entries of v are zero. The zero components in v still yield inner product computations, despite not contributing to the trace estimate at all. One idea, accredited first to A. Girard and then studied more in-depth by M.F. Huchinson, is to use random sign vector v \\in \\{-1, +1\\}^{n}.\n\\mathtt{tr}(A) = \\mathbb{E}[v^T A v] \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i = n_v^{-1} \\cdot V^\\top A V\nLet’s see how this fares using, let’s say, \\frac{1}{4} the number of matvecs:\n\nn: int = A.shape[0]\ntrace_estimate = 0.0\nfor j in range(n // 4):\n  v = np.random.choice([-1, +1], size=n)\n  trace_estimate += v @ A @ v\nprint(trace_estimate / (n // 4))\n\n75.21454596302897\n\n\nNot bad!",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#the-statistical-side",
+    "href": "theory/intro.html#the-statistical-side",
+    "title": "Introduction to trace estimation with primate",
+    "section": "The statistical side",
+    "text": "The statistical side\nThis forms an unbiased estimator of \\mathrm{tr}(A); to see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions \\mathtt{tr}(A) = \\mathtt{tr}(A I) = \\mathtt{tr}(A \\mathbb{E}[v v^T]) = \\mathbb{E}[\\mathtt{tr}(Avv^T)] = \\mathbb{E}[\\mathtt{tr}(v^T A v)] = \\mathbb{E}[v^T A v]",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#ex-logdet-computation",
+    "href": "theory/intro.html#ex-logdet-computation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Ex: Logdet computation",
+    "text": "Ex: Logdet computation\nThe basic way to approximate the trace of a matrix function is to simply set fun to the name the spectral function. For example, to approximate the log-determinant:\n\nfrom primate.trace import hutch\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -148.12677777759933\n\n\nEven using n / 6 matvecs, we get a decent approximation. But how good is this estimate?\nTo get a slightly better idea, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -146.538 +/- 5.51 (95% CI), CV: 2%, Evals: 25 [R]\n\n\nThe first line of the statement contains fixed about the estimator:\n\nThe type of estimator (Girard-Hutchinson)\nThe spectral function being approximated (log)\nThe degree of the polynomial approximation (20)\nThe quadrature method used (‘fttr’)\n\nThe second line prints the runtime information about the samples:\n\nThe final trace estimate\nIts margin of error\nThe coefficient of variation (aka the relative std. deviation)\nThe number of samples used + their distribution prefix (‘R’ for rademacher)\n\n\nest = hutch(A, fun=\"log\", maxiter=100, plot=True)",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
   }
 ]
