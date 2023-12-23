@@ -5,33 +5,45 @@
 #include <pybind11/eigen.h>
 #include <eigen_core.h> // Vector, Array, DenseMatrix
 #include <Eigen/SparseCore> // SparseMatrix, Matrix
+#include <chrono>
 namespace py = pybind11;
 
-// ## TODO: use CRTP to craft a set of template classes, e.g. 
+using us = std::chrono::microseconds;
+using dur_seconds = std::chrono::duration< double >;
+using hr_clock = std::chrono::high_resolution_clock;
+
+// ## TODO: use CRTP to craft a set of template classes
 
 // Storing const should be safe for parallel execution, right?
 template< std::floating_point F >
 struct DenseEigenLinearOperator {
   using value_type = F;
   const DenseMatrix< F > A;  
-  DenseEigenLinearOperator(const DenseMatrix< F > _mat) : A(_mat){}
+  mutable size_t matvec_time; 
+  DenseEigenLinearOperator(const DenseMatrix< F > _mat) : A(_mat), matvec_time(0.0){}
 
   void matvec(const F* inp, F* out) const noexcept {
+    auto ts = hr_clock::now();
     auto input = Eigen::Map< const Vector< F > >(inp, A.cols(), 1); // this should be a no-op
     auto output = Eigen::Map< Vector< F > >(out, A.rows(), 1); // this should be a no-op
     output = A * input; 
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   void rmatvec(const F* inp, F* out) const noexcept {
+    auto ts = hr_clock::now();
     auto input = Eigen::Map< const Vector< F > >(inp, A.rows(), 1); // this should be a no-op
     auto output = Eigen::Map< Vector< F > >(out, A.cols(), 1); // this should be a no-op
     output = A.adjoint() * input; 
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    auto ts = hr_clock::now();
     Eigen::Map< const DenseMatrix< F > > XM(X, A.cols(), k);
     Eigen::Map< DenseMatrix< F > > YM(Y, A.rows(), k);
     YM = A * XM;
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
@@ -48,24 +60,32 @@ template< std::floating_point F >
 struct SparseEigenLinearOperator {
   using value_type = F;
   const Eigen::SparseMatrix< F > A;  
+  mutable size_t matvec_time; 
+
   SparseEigenLinearOperator(const Eigen::SparseMatrix< F > _mat) : A(_mat){}
 
   void matvec(const F* inp, F* out) const noexcept {
+    auto ts = hr_clock::now();
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
     auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
     output = A * input; 
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   void rmatvec(const F* inp, F* out) const noexcept {
+    auto ts = hr_clock::now();
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
     auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
     output = A.adjoint() * input; 
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   void matmat(const F* X, F* Y, const size_t k) const noexcept {
+    auto ts = hr_clock::now();
     Eigen::Map< const DenseMatrix< F > > XM(X, A.cols(), k);
     Eigen::Map< DenseMatrix< F > > YM(Y, A.rows(), k);
     YM = A * XM;
+    matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   auto shape() const noexcept -> std::pair< size_t, size_t > {
@@ -106,27 +126,27 @@ struct SparseEigenAffineOperator {
   }
 };
 
-template< std::floating_point F >
-auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
-  return SparseEigenLinearOperator< F >(*A);
-}
+// template< std::floating_point F >
+// auto eigen_sparse_wrapper(const Eigen::SparseMatrix< F >* A){
+//   return SparseEigenLinearOperator< F >(*A);
+// }
 
-// TODO: Support Adjoint and Affine Operators out of the box
-template< std::floating_point F >
-auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
-  auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
-  B.setIdentity();
-  return SparseEigenAffineOperator< F >(*A, B);
-}
+// // TODO: Support Adjoint and Affine Operators out of the box
+// template< std::floating_point F >
+// auto eigen_sparse_affine_wrapper(const Eigen::SparseMatrix< F >* A){
+//   auto B = Eigen::SparseMatrix< F >(A->rows(), A->cols());
+//   B.setIdentity();
+//   return SparseEigenAffineOperator< F >(*A, B);
+// }
 
-template< std::floating_point F >
-auto eigen_dense_wrapper(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >* A){
-  return DenseEigenLinearOperator< F >(*A);
-}
+// template< std::floating_point F >
+// auto eigen_dense_wrapper(const Eigen::Matrix< F, Eigen::Dynamic, Eigen::Dynamic >* A){
+//   return DenseEigenLinearOperator< F >(*A);
+// }
 
-template< std::floating_point F >
-auto linearoperator_wrapper(const py::object* A){
-  return PyLinearOperator< F >(*A);
-}
+// template< std::floating_point F >
+// auto linearoperator_wrapper(const py::object* A){
+//   return PyLinearOperator< F >(*A);
+// }
 
 #endif 

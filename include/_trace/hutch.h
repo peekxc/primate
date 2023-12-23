@@ -13,7 +13,11 @@
 #include "eigen_core.h"
 #include <Eigen/Eigenvalues> 
 #include <iostream> 
+#include <chrono>
 
+using us = std::chrono::microseconds;
+using dur_seconds = std::chrono::duration< double >;
+using hr_clock = std::chrono::high_resolution_clock;
 
 template < int Iterate = 3 >
 double erf_inv(double x) noexcept {
@@ -52,12 +56,13 @@ template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG, typen
 void monte_carlo_quad(
   const Matrix& A,                              // Any linear operator supporting .matvec() and .shape() methods
   const Lambda& f_cb,                           // Thread-safe callback function with signature f(int i, F sample, F* q)
-  const Lambda2& stop_check, // Function to check for convergence or early-stopping (takes no arguments)
+  const Lambda2& stop_check,                    // Function to check for convergence or early-stopping (takes no arguments)
   const int nv,                                 // Number of sample vectors to generate
   const Distribution dist,                      // Isotropic distribution used to generate random vectors
   RBG& rng,                                     // Random bit generator
   const int num_threads,                        // Number of threads used to parallelize the computation   
-  const int seed                                // Seed for random number generator for determinism
+  const int seed,                               // Seed for random number generator for determinism
+  size_t& wall_time                             // Wall clock time
 ){
   using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
   // using ArrayF = Eigen::Array< F, Dynamic, 1 >;
@@ -78,6 +83,7 @@ void monte_carlo_quad(
   // Monte-Carlo ensemble sampling
   int i;
   volatile bool stop_flag = false; // early-stop flag for convergence checking
+  auto t_start = hr_clock::now();
   #pragma omp parallel shared(A, stop_flag)
   {
     int tid = omp_get_thread_num(); // thread-id 
@@ -106,7 +112,7 @@ void monte_carlo_quad(
         A.matvec(q.data(), y.data()); 
         sample = y.dot(q);
       }
-      
+
       // Run the user-supplied function (parallel section!)
       f_cb(i, sample, q.data());
       
@@ -117,6 +123,8 @@ void monte_carlo_quad(
       }
     } // omp for
   } // omp parallel 
+  auto t_end = hr_clock::now();
+  wall_time = duration_cast< us >(dur_seconds(t_end - t_start)).count();
 }
 
 template< std::floating_point F, LinearOperator Matrix, ThreadSafeRBG RBG >
@@ -126,7 +134,8 @@ auto hutch(
   const F atol, const F rtol, 
   const int num_threads,
   const bool use_CLT, 
-  F* estimates
+  F* estimates, 
+  size_t& wall_time
 ) -> F {  
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   
@@ -136,10 +145,10 @@ auto hutch(
   };
   
   // Type-erased function since the call is cheap
-  // std::function< bool (int) > early_stop; 
+  // std::function< bool (int) > early_stop; // apparently this will cause problems!
   if (atol == 0.0 && rtol == 0.0){
     const auto early_stop = [](int i) -> bool { return false; };
-    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed);
+    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed, wall_time);
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
     F mu_est = est.sum() / nv;  
@@ -172,7 +181,7 @@ auto hutch(
         return margin_of_error <= atol || std::abs(sd_est / mu_est) <= rtol;
       }
     };
-    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed);
+    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed, wall_time);
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
     return mu_est * A.shape().first;
@@ -193,7 +202,7 @@ auto hutch(
       // std::cout << "n: " << n_samples << ", mu: " << mu_est << ", atol: " << std::abs(mu_est - mu_pre) << ", rtol: " << (std::abs(mu_est - mu_pre) / mu_est) << std::endl; 
       return atol_check || rtol_check;
     };
-    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed);
+    monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed, wall_time);
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
     return mu_est * A.shape().first; 

@@ -8,6 +8,7 @@
 #include "spectral_functions.h" // to parameterize the functions
 
 namespace py = pybind11;
+using namespace pybind11::literals; 
 
 // NOTE: all matrices should be cast to Fortran ordering for compatibility with Eigen
 template< typename F >
@@ -26,7 +27,7 @@ void _trace_wrapper(py::module& m){
     const int num_threads, 
     const bool use_clt, 
     const py::kwargs& kwargs
-  ) -> py::tuple {
+  ) -> py::dict {
     if (!kwargs.contains("function")){
       throw std::invalid_argument("No matrix function supplied");
     }
@@ -37,17 +38,23 @@ void _trace_wrapper(py::module& m){
     auto rng = ThreadedRNG64(num_threads_, engine_id, seed);
     auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
     auto mu_est = F(0.0);
+    auto wall_time = size_t(0);
 
     if (matrix_func == "None"){
-      mu_est = hutch< F >(op, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data());
+      mu_est = hutch< F >(op, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data(), wall_time);
     } else {
       if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
       if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
       const auto sf = param_spectral_func< F >(kwargs);
       const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv, static_cast< weight_method >(method));
-      mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data());
+      mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data(), wall_time);
     }
-    return py::make_tuple(mu_est, py::cast(estimates));
+    return py::dict(
+      "estimate"_a=mu_est, 
+      "samples"_a=estimates, 
+      "total_time_us"_a = wall_time, 
+      "matvec_time_us"_a = op.matvec_time
+    );
   });
 }
 

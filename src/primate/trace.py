@@ -19,8 +19,9 @@ def hutch(
 	atol: float = None,
 	rtol: float = None,
 	stop: str = ["confidence", "change"],
+	ncv: int = 2,
 	orth: int = 0,
-	quad: str = "golub_welsch",
+	quad: str = "fttr",
 	confidence: float = 0.95,
 	pdf: str = "rademacher",
 	rng: str = "pcg64",
@@ -29,7 +30,7 @@ def hutch(
 	verbose: bool = False,
 	info: bool = False,
 	plot: bool = False,
-	**kwargs,
+	**kwargs
 ) -> Union[float, tuple]:
 	"""Estimates the trace of a matrix $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
 
@@ -50,27 +51,29 @@ def hutch(
 	maxiter : int, default=10
 	    Maximum number of random vectors to sample for the trace estimate.
 	deg  : int, default=20
-	    Degree of the quadrature approximation.
+	    Degree of the quadrature approximation. Must be at least 1. 
 	atol : float, default=None
-	    Absolute tolerance to signal convergence for early-stopping. See details.
+	    Absolute tolerance to signal convergence for early-stopping. See notes.
 	rtol : float, default=1e-2
-	    Relative tolerance to signal convergence for early-stopping. See details.
+	    Relative tolerance to signal convergence for early-stopping. See notes.
 	stop : str, default="confidence"
 	    Early-stopping criteria to test estimator convergence. See details.
+	ncv : int, default=2
+			Number of Lanczos vectors to allocate. Must be at least 2. 
 	orth: int, default=0
-	    Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
-	quad: { 'golub_welsch', 'fttr' }, default='golub_welsch'
-			Method used to obtain the weights of the Gaussian quadrature.  
+	    Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`. 
+	quad: { 'golub_welsch', 'fttr' }, default='fttr'
+			Method used to obtain the weights of the Gaussian quadrature. See notes. 
 	confidence : float, default=0.95
-	    Confidence level to Only used when `stop` = "confidence".
+	    Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
 	pdf : { 'rademacher', 'normal' }, default="rademacher"
 	    Choice of zero-centered distribution to sample random vectors from.
 	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' }, default="pcg64"
-	    Random number generator to use (PCG64 by default).
+	    Random number generator to use.
 	seed : int, default=-1
 	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
 	num_threads: int, default=0
-	    Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide.
+	    Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.
 	plot : bool, default=False
 	    If true, plots the samples of the trace estimate along with their convergence characteristics.
 	info: bool, default=False
@@ -98,6 +101,9 @@ def hutch(
 	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
 	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
 	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
+	
+	# from collections import namedtuple
+	# HutchParams = namedtuple('HutchParams', ['a', 'b'])
 
 	## Choose the random number engine
 	assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
@@ -110,6 +116,7 @@ def hutch(
 	## Choose the stopping criteria
 	if stop == ["confidence", "change"] or stop == "confidence":
 		use_clt: bool = True
+		stop = "confidence"
 	elif stop == "change":
 		use_clt: bool = False
 	else:
@@ -124,16 +131,17 @@ def hutch(
 	assert quad in ["golub_welsch", "fttr"]
 	quad_id = 0 if quad == "golub_welsch" else 1
 
-	## Argument checking
-	nv = int(maxiter)  # Number of random vectors to generate
-	seed = int(seed)  # Seed should be an integer
-	orth = int(orth)  # Number of additional vectors should be an integer
-	# alg_wall_time = f_dtype.type(0.0)                     # Total time spent by the algorithm
-	deg = max(deg, 2)  # Should be at least two
-	ncv = int(deg + orth)  # Number of Lanczos vectors to keep in memory
-	atol = 0.0 if atol is None else float(atol)  # Early stopping upper bound on confidence interval
-	rtol = 0.0 if rtol is None else float(rtol)  # Early stopper relative standard error bound
-	num_threads = 0 if num_threads < 0 else int(num_threads)
+	## Argument checking + clipping
+	N: int = A.shape[0]
+	nv: int = int(maxiter)  
+	seed: int = int(seed)
+	deg: int = int(np.clip(deg, 1, N))
+	ncv: int = int(np.clip(ncv, 2, min(deg, N)))
+	orth: int = int(min(deg if orth < 0 or orth > deg else orth, ncv - 1))
+	atol: float = 0.0 if atol is None else float(atol)  
+	rtol: float = 0.0 if rtol is None else float(rtol) 
+	num_threads: int = 0 if num_threads < 0 else int(num_threads)
+	assert ncv >= 2 and orth < ncv and ncv <= deg, f"Invalid Lanczos parameters (orth < ncv? {orth < ncv}, ncv >= 2 ? {ncv >= 2}, ncv <= deg? {ncv <= deg})"
 
 	## Adjust tolerance for the quadrature estimates
 	atol /= A.shape[1]
@@ -156,28 +164,49 @@ def hutch(
 	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt)
 
 	## Make the actual call
-	# print(hutch_args)
-	# print(kwargs)
-	trace_estimate, estimates = _trace.hutch(A, *hutch_args, **kwargs)
+	info_dict = _trace.hutch(A, *hutch_args, **kwargs)
 	
-	## Re-scale and determine the estimate
-	# estimates *= A.shape[1]
-	# trace_estimate = np.mean(estimates) # todo: consider winsorizing?
-	
+	## Print the status if requested
+	if verbose: 
+		from scipy.special import erfinv
+		msg = f"Girard-Hutchinson estimator (fun={kwargs['function']}, deg={deg}, quad={quad})\n"
+		valid_samples = info_dict['samples'] != 0
+		n_valid = sum(valid_samples)
+		std_error = np.std(info_dict['samples'][valid_samples], ddof=1) / np.sqrt(n_valid)
+		z = np.sqrt(2.0) * erfinv(confidence)
+		cv = np.abs(std_error / info_dict['estimate'])
+		msg += f"Est: {info_dict['estimate']:.3f} +/- {z * std_error:.2f} ({confidence*100:.0f}% CI), CV: {(cv*100):.0f}%, " 
+		msg += f"Evals: { n_valid } [{pdf[0].upper()}]"
+		if seed != -1: 
+			msg += f" (seed: {seed})"
+		print(msg)
+
 	## If only the point-estimate is required, return it
 	if not info and not plot: 
-		return trace_estimate
-
+		return info_dict["estimate"]
+	
 	## Otherwise build the info
-	info = {"estimate": trace_estimate, "samples": estimates}
 	if plot:
 		from bokeh.plotting import show
 		from .plotting import figure_trace
-		p = figure_trace(estimates)
+		p = figure_trace(info_dict["samples"])
 		show(p)
-		info['figure'] = figure_trace(estimates)
+		info_dict['figure'] = figure_trace(info_dict["samples"])
 	
-	return trace_estimate, info
+	## Build the info dictionary 
+	info_dict["stop"] = stop
+	info_dict["pdf"] = pdf
+	info_dict["rng"] = _engines[engine_id]
+	info_dict["seed"] = seed
+	info_dict["function"] = kwargs["function"]
+	info_dict["lanczos_kwargs"] = dict(orth=orth, ncv=ncv, deg=deg)
+	info_dict["quad"] = quad
+	info_dict["rtol"] = rtol
+	info_dict["atol"] = atol
+	info_dict["num_threads"] = "auto" if num_threads == 0 else num_threads
+	info_dict["maxiter"] = nv
+	info_dict["confidence"] = confidence
+	return info_dict["estimate"], info_dict
 
 def sl_gauss(
 	A: Union[LinearOperator, np.ndarray],

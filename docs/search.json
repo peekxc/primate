@@ -687,7 +687,7 @@
     "href": "advanced/cpp_integration.html",
     "title": "C++ Integration",
     "section": "",
-    "text": "primate’s generic API is enabled through C++20 concepts. Generically, any type T respecting the LinearOperator concept shown below can be passed:\nAn instance A of type T is said to support the LinearOperator concept if it has:\nshape() should yield a pair (n,m) representing the sizes of the output and input vectors, respectively. This corresponds to the number of rows and columns in the matrix setting.",
+    "text": "primate’s generic API is enabled through function templates specialized using C++20 concepts. In other words, a function F requiring concept C will compile with any type T so long as T respects the constraints imposed by C. For example, generically, any type T respecting the LinearOperatorconcept shown below can be passed to the Lanczos method:\nIn english, an instance A of type T is said to support the LinearOperator concept if it has:\nshape() should return a pair (n,m) representing the sizes of the output and input vectors, respectively. Note in the matrix setting this corresponds to the number of rows and columns.",
     "crumbs": [
       "Advanced",
       "Usage from C++"
@@ -950,5 +950,12 @@
       "Basics",
       "Integration"
     ]
+  },
+  {
+    "objectID": "basic/usage.html",
+    "href": "basic/usage.html",
+    "title": "Quickstart",
+    "section": "",
+    "text": "To start using primate,\n\nfrom primate.random import symmetric\nfrom primate.trace import hutch\n\n## Random positive definite matrix\nA = symmetric(n=250, pd=True)\n\n## Log-determinant\nlogdet_test, info = hutch(A, fun=\"log\", maxiter=100, info=True, plot=True)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet {logdet_true}\")\nprint(f\"Logdet: {logdet_test}\")\n\nGenerating targets:   0%|          | 0/5 eta ?                                              Writing build.ninja:   0%|          | 0/41 eta ?                                                \n\n\n\n  \n\n\n\n\n\nLogdet -233.24266127357356\nLogdet: -231.85364699215265\n\n\nWe can see that, after about \\approx 20 samples we can get a decent approximation of the log-determinant.\n\nimport timeit \n\nhutch(A, maxiter=20, deg=5, fun=\"log\")\n\ntimeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun=\"log\"), number = 1000)\ntimeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)\n\n3.5682643959880807\n\n\n\nfrom primate.operator import matrix_function\nM = matrix_function(A, fun=\"log\")\n\n\nM.quad(np.ones(M.shape[0]))\n\n-240.86281453036028"
   }
 ]

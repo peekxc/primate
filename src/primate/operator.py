@@ -2,6 +2,7 @@ import numpy as np
 from typing import Union, Callable
 from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import issparse
+from numpy.typing import ArrayLike
 
 from .special import _builtin_matrix_functions
 import _operators
@@ -41,9 +42,15 @@ def matrix_function(
 
 	Notes: 
 	------
-	The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with the 
-	Golub-Welsch algorithm for computing the `deg`-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi 
-	matrix. The underlying tridiagonal eigen-computation uses implicit symmetric QR steps with Wilkinson shifts.
+	The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with either: 
+		1. The Golub-Welsch algorithm (GW), or 
+		2. The Forward Three Term Recurrence algorithm (FTTR)
+	for computing the `deg`-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi matrix `T`.
+
+	The GW computation uses implicit symmetric QR steps with Wilkinson shift to compute the full eigen-decomposition of `T`, 
+	while the FTTR algorithm uses the explicit expression for orthogonal polynomials to compute only the weights of the 
+	quadrature. The former uses $O(\\mathrm{deg}^2)$ time and space and is highly accurate, while the latter uses 
+	$O(\\mathrm{deg}^2)$ time and $O(1)$ space at the cost of some accuracy. If `deg` is large, the `fttr` method should be preferred. 
 
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
@@ -87,3 +94,21 @@ def matrix_function(
 	module_func += "_MatrixFunction"
 	M = getattr(_operators, module_func)(A, deg, rtol, orth, deg, **kwargs)
 	return M
+
+## From: https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
+class Toeplitz(LinearOperator):
+	def __init__(self, c: ArrayLike, r: ArrayLike = None, dtype = None):
+		self.c = np.array(c)
+		self.r = np.array(c if r is None else r)
+		self._d = np.concatenate((self.c,[0],np.flip(self.r[1:])))
+		self._dfft = np.real(np.fft.fft(self._d))
+		self._z = np.zeros(len(c)*2) # workspace
+		self.shape = (len(c), len(c))
+		self.dtype = np.dtype(np.float64) if dtype is None else dtype
+	
+	def _matvec(self, x: np.ndarray) -> np.ndarray:
+		assert len(x) == len(self.c), f"Invalid shape of input vector 'x'; must have length {len(self.c)}"
+		self._z[:len(x)] = x
+		x_fft = np.fft.fft(self._z)
+		y = np.real(np.fft.ifft(self._dfft * x_fft))
+		return y[:len(x)]

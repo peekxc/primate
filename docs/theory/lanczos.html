@@ -406,6 +406,7 @@ A q_j &amp;= \beta_{j\text{-}1} q_{j\text{-}1} + \alpha_j q_j + \beta_j q_{j+1} 
 K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \mid T^{n-1} e_1 \, ]
 </span></p>
 <p>…this is actually a <em>QR</em> factorization, which is <a href="https://www.math.purdue.edu/~kkloste/cs515fa14/qr-uniqueness.pdf">essentially unique</a>! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely determined</em><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> by <span class="math inline">(A, q_1)</span>.</p>
+<!-- Moreover, so long as $T$ has non-zero subdiagonal entries, its the eigenvalues must be distinct -->
 </section>
 <section id="complexity-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="complexity-analysis">Complexity analysis</h2>

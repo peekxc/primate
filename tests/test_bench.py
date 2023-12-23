@@ -32,7 +32,6 @@ def test_hutch_bench_auto(benchmark):
   benchmark(hutch, A=A, maxiter=1500)
   assert True
 
-
 def test_hutch_mf_bench_auto_gw(benchmark):
   n = 100 
   A = symmetric(n)
@@ -64,3 +63,23 @@ def test_bench_quad_fttr(benchmark):
   a, b = a, np.append([0], b)
   benchmark(_lanczos.quadrature, a, b, n, 1)
   assert True
+
+
+# def test_bench_toeplitz():
+#   import timeit
+#   from primate.operator import Toeplitz
+#   from scipy.linalg import toeplitz
+
+#   a = np.arange(1500)
+#   Td = toeplitz(a)
+#   Tm = Toeplitz(a)
+
+#   x = np.random.uniform(size=len(a))
+#   timeit.timeit(lambda: Td @ x, number = 1000)
+#   timeit.timeit(lambda: Tm @ x, number = 1000)
+  
+#   sys.getsizeof(Td)
+#   getsize(Tm)
+#   72824 / 18000128 
+
+
