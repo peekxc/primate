@@ -18,8 +18,8 @@ elif [ -n "$(command -v apt-get)" ]; then
   sudo apt-get install -y libopenblas-dev
   sudo apt-get install -y python3-dev
   sudo wget https://apt.llvm.org/llvm.sh
-  sudo chmod u+x llvm.sh
-  sudo ./llvm.sh 17
+  sudo chmod u+x llvm.sh 
+  sudo ./llvm.sh 17 all 
 elif [ -n "$(command -v apk)" ]; then 
   cat /etc/*-release
   apk update
