@@ -2,7 +2,7 @@ project(
   'primate', 'cpp',
   version: run_command(['src/primate/__version__.py'], check: true).stdout().strip(),
   license: 'Apache-2.0',
-  meson_version: '>= 1.3.0',
+  meson_version: '>= 1.2.0',
   default_options : [
     'buildtype=debugoptimized', 
     'b_ndebug=if-release',
