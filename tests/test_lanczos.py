@@ -62,6 +62,48 @@ def test_high_degree():
     alpha, beta = lanczos(A, v0=v0, rtol=1e-7, deg=k, orth=0)
     assert np.all(~np.isnan(alpha)) and np.all(~np.isnan(beta))
 
+def test_degree_unbiased():
+  from primate.diagonalize import lanczos
+  from scipy.linalg import eigvalsh_tridiagonal
+  np.random.seed(1234)
+  n = 150
+  A = symmetric(n)
+  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+  
+  ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
+  ew = np.linalg.eigvalsh(A)
+  for k in range(5, 150, 5):
+    v0 = np.random.choice([-1.0, +1.0], size=A.shape[1])
+    alpha, beta = lanczos(A, v0=v0, rtol=1e-7, deg=k, orth=15)
+    assert np.all(~np.isnan(alpha)) and np.all(~np.isnan(beta))
+    rr = eigvalsh_tridiagonal(alpha, beta)
+    assert np.allclose(rr.mean(), ew.mean(), atol=0.30)
+
+def test_toeplitz():
+  from scipy.linalg import toeplitz
+  from primate.diagonalize import lanczos
+  from scipy.linalg import eigvalsh_tridiagonal
+  np.random.seed(1234)
+  n = 150
+  c = np.random.uniform(size=n, low=0, high=1.0)
+  A = toeplitz(c)
+  alpha, beta = np.zeros(n, dtype=np.float32), np.zeros(n, dtype=np.float32)
+  
+  ## In general not guaranteed, but with full re-orthogonalization it's likely (and deterministic w/ fixed seed)
+  ew = np.linalg.eigvalsh(A)
+  for k in range(25):
+    v0 = np.random.choice([-1.0, +1.0], size=A.shape[1])
+    alpha, beta = lanczos(A, v0=v0, rtol=1e-7, deg=150, orth=15)
+    assert np.all(~np.isnan(alpha)) and np.all(~np.isnan(beta))
+    rr = eigvalsh_tridiagonal(alpha, beta)
+    assert np.allclose(rr.mean(), ew.mean(), atol=np.ptp(ew)*0.05)
+
+## TODO: go back and re-test fttr on toeplitz
+# def test_symmetric():
+#   assert np.allclose(ew_sym, np.flip(-ew_sym))
+
+
+
 def test_quadrature():
   from primate.diagonalize import lanczos, _lanczos
   from sanity import lanczos_quadrature
@@ -86,11 +128,51 @@ def test_quadrature_methods():
   assert np.allclose(nw_test1, nw_test2)
 
   from primate.diagonalize import lanczos, _lanczos
+  np.random.seed(1234)
   n = 50 
   A = symmetric(n)
+  v0 = np.random.uniform(size=A.shape[1])
+  a, b = lanczos(A, v0=v0, deg=n)
+  a, b = a, np.append([0], b)
+  quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
+  quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
+  assert np.isclose(quad1, quad2, atol=quad1*0.05)
+
+def test_quadrature_toeplitz():
+  from primate.diagonalize import lanczos, _lanczos
+  from scipy.linalg import toeplitz
+  np.random.seed(1234)
+
+  A = toeplitz(np.arange(1,8)).astype(np.float32)
+  v0 = np.random.uniform(size=A.shape[1])
+  n = A.shape[1]
   a, b = lanczos(A, deg=n)
   a, b = a, np.append([0], b)
   quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
   quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
-  assert np.isclose(quad1, quad2, atol=0.5)
+  assert np.isclose(quad1, quad2, atol=np.abs(quad1)*0.50)
 
+  ## ground truth
+  ew, ev = np.linalg.eigh(A)
+  mu_0 = np.sum(np.abs(ew))
+  mu_0 * np.ravel(ev[0,:])**2
+
+  np.array([orth_poly(ew[0], i, mu_0, a, b)**2 for i in range(n)])
+  _lanczos.quadrature(a, b, n, 0)[:,1]
+
+  # np.linalg.norm([orth_poly(ew[0], i, mu_0, a, b) for i in range(n)])
+  ## 
+  # 
+
+# ## to mimick 
+# arr = np.array([orth_poly(ew[0], i, mu_0, a, b)**2 for i in range(n)])
+
+  n = 50 
+  c = np.random.uniform(size=n, low=0, high=1)
+  A = toeplitz(c)
+  v0 = np.random.uniform(size=A.shape[1])
+  a, b = lanczos(A, deg=n)
+  a, b = a, np.append([0], b)
+  quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
+  quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
+  assert np.isclose(quad1, quad2, atol=quad1*0.50)
