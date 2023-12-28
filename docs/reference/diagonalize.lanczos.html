@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/primate.trace.sl_trace.html" rel="next">
+<link href="../reference/trace.hutch.html" rel="next">
 <link href="../reference/index.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -71,6 +71,22 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -114,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/diagonalize.lanczos.html">Diagonalize</a></li><li class="breadcrumb-item"><a href="../reference/diagonalize.lanczos.html">Lanczos</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/diagonalize.lanczos.html">Lanczos</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -172,14 +188,14 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lanczos</span></a>
+  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/slq.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SLQ</span></a>
+  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
       </ul>
@@ -222,55 +238,39 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
- <span class="menu-text">Diagonalize</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
- <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Trace</span></a>
+  <a href="../reference/trace.hutch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Gauss</span></a>
+  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">XTrace</span></a>
   </div>
 </li>
-      </ul>
-  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/operator.matrix_function.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix Function</span></a>
+  </div>
+</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
@@ -299,10 +299,10 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#primate.diagonalize.lanczos" id="toc-primate.diagonalize.lanczos" class="nav-link active" data-scroll-target="#primate.diagonalize.lanczos">diagonalize.lanczos</a>
   <ul class="collapse">
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
@@ -318,8 +318,12 @@ ul.task-list li input[type="checkbox"] {
 <h1>diagonalize.lanczos</h1>
 <p><code>diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)</code></p>
 <p>Lanczos method for matrix tridiagonalization.</p>
-<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,<br>
-with additional modifications to support varying degrees of re-orthogonalization.</p>
+<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization.</p>
+<section id="notes" class="level2">
+<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<p>The Lanczos method iteratively builds a tridiagonal matrix <code>T</code> of a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the resulting tridiagonal matrix.</p>
+<p>Diagonalizing <code>T</code> via e.g.&nbsp;<code>scipy.linalg.eigh_tridiagonal</code> yields Rayleigh-Ritz approximations of the eigenvalues of <code>A</code>, though note no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
+</section>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
@@ -377,7 +381,7 @@ with additional modifications to support varying degrees of re-orthogonalization
 <tr class="odd">
 <td><code>return_basis</code></td>
 <td>bool</td>
-<td>Whether to return the <code>orth</code> + 2 Lanczos vectors.</td>
+<td>If <code>True</code>, returns the Krylov basis vectors <code>Q</code>.</td>
 <td><code>False</code></td>
 </tr>
 <tr class="even">
@@ -393,8 +397,8 @@ with additional modifications to support varying degrees of re-orthogonalization
 <h2 class="anchored" data-anchor-id="returns">Returns</h2>
 <table class="table">
 <colgroup>
-<col style="width: 88%">
-<col style="width: 12%">
+<col style="width: 3%">
+<col style="width: 96%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -404,12 +408,8 @@ with additional modifications to support varying degrees of re-orthogonalization
 </thead>
 <tbody>
 <tr class="odd">
-<td>A tuple <code>(a,b)</code> parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If <code>return_basis</code> is</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>True, then the tuple <code>(a,b), Q</code> is returned, where <code>Q</code> represents orthogonal basis for the Krylov subspace.</td>
-<td></td>
+<td>tuple</td>
+<td>A tuple <code>(a,b)</code> parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If <code>return_basis=True</code>, the tuple <code>(a,b), Q</code> is returned, where <code>Q</code> represents an orthogonal basis for the degree-<code>deg</code> Krylov subspace.</td>
 </tr>
 </tbody>
 </table>
@@ -417,11 +417,6 @@ with additional modifications to support varying degrees of re-orthogonalization
 <section id="see-also" class="level2">
 <h2 class="anchored" data-anchor-id="see-also">See Also</h2>
 <p>scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.</p>
-</section>
-<section id="notes" class="level2">
-<h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<p>No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase <code>orth</code> and <code>deg</code>. Note the number of matvecs with <code>A</code> scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
-<p>Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization.</p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -982,8 +977,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/primate.trace.sl_trace.html" class="pagination-link" aria-label="SL Trace">
-        <span class="nav-page-text">SL Trace</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/trace.hutch.html" class="pagination-link" aria-label="Hutch">
+        <span class="nav-page-text">Hutch</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -6,7 +6,16 @@ Functions for estimating the trace of matrices and matrix functions.
 
 | | |
 | --- | --- |
-| [trace](trace.qmd#primate.trace) |  |
+| [trace.hutch](trace.hutch.qmd#primate.trace.hutch) | Estimates the trace of a symmetric $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator. |
+| [trace.xtrace](trace.xtrace.qmd#primate.trace.xtrace) |  |
+
+## Operators
+
+Matrix operators
+
+| | |
+| --- | --- |
+| [operator.matrix_function](operator.matrix_function.qmd#primate.operator.matrix_function) | Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`.  |
 
 ## Random
 
@@ -15,7 +24,7 @@ Randomized module
 | | |
 | --- | --- |
 | [random.rademacher](random.rademacher.qmd#primate.random.rademacher) | Generates random vectors from the rademacher distribution. |
-| [random.normal](random.normal.qmd#primate.random.normal) | Generates random vectors from the rademacher distribution. |
+| [random.normal](random.normal.qmd#primate.random.normal) | Generates random vectors from the standard normal distribution. |
 
 ## Diagonalize
 

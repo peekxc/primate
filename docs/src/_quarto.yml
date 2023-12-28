@@ -42,7 +42,7 @@ website:
         contents:
           - text: Introduction 
             href: theory/intro.qmd
-          - text: Lanczos 
+          - text: The Lanczos Method
             href: theory/lanczos.qmd
           # - text: SLQ
           #   href: theory/slq.qmd
@@ -65,16 +65,15 @@ website:
       - section: API Reference 
         href: reference/index.qmd
         contents:
-          - contents: 
-            - href: reference/diagonalize.lanczos.qmd
-              text: Lanczos
-            section: Diagonalize 
-          - contents: 
-            - href: reference/primate.trace.sl_trace.qmd
-              text: SL Trace
-            - href: reference/primate.trace.sl_gauss.qmd
-              text: SL Gauss 
-            section: Trace 
+          - href: reference/diagonalize.lanczos.qmd
+            text: Lanczos
+          - href: reference/trace.hutch.qmd
+            text: Hutch
+          - href: reference/trace.xtrace.qmd
+            text: XTrace
+          - href: reference/operator.matrix_function.qmd
+            text: Matrix Function
+          # - href: reference/primate.trace.sl_gauss.qmd
           - contents:
             - href: reference/random.rademacher.qmd
               text: Rademacher
@@ -95,9 +94,12 @@ quartodoc:
     - title: Trace
       desc: "Functions for estimating the trace of matrices and matrix functions."
       contents:
-        - name: trace 
-          children: separate
-          members: ["hutch", "sl_gauss"]
+        - trace.hutch
+        - trace.xtrace
+    - title: Operators
+      desc: "Matrix operators"
+      contents:
+        - operator.matrix_function
     - title: Random
       desc: "Randomized module"
       contents:

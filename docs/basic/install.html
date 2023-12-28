@@ -206,14 +206,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lanczos</span></a>
+  <a href="../theory/intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/slq.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SLQ</span></a>
+  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
       </ul>
@@ -256,55 +256,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
- <span class="menu-text">Diagonalize</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
- <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Trace</span></a>
+  <a href="../reference/trace.hutch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Gauss</span></a>
+  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">XTrace</span></a>
   </div>
 </li>
-      </ul>
-  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/operator.matrix_function.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix Function</span></a>
+  </div>
+</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
@@ -331,7 +315,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#c-installation" id="toc-c-installation" class="nav-link active" data-scroll-target="#c-installation">C++ Installation</a></li>
+  <li><a href="#platform-support" id="toc-platform-support" class="nav-link active" data-scroll-target="#platform-support">Platform support</a></li>
+  <li><a href="#compiling-from-source" id="toc-compiling-from-source" class="nav-link" data-scroll-target="#compiling-from-source">Compiling from source</a></li>
+  <li><a href="#c-installation" id="toc-c-installation" class="nav-link" data-scroll-target="#c-installation">C++ Installation</a></li>
   </ul>
 </nav>
     </div>
@@ -361,6 +347,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install <span class="op">&lt;</span> primate source directory <span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Currently the package must be built from source via cloning the repository. PYPI support is planned.</p>
 <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
+<section id="platform-support" class="level3">
+<h3 class="anchored" data-anchor-id="platform-support">Platform support</h3>
+<p>Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable <code>primate</code> to be installed on supported architecture / CPython implementations without compilation. The currently supported platforms include:</p>
+<p>If your platform isn’t on this list, feel free to make an issue requesting support for your platform.</p>
+</section>
+<section id="compiling-from-source" class="level3">
+<h3 class="anchored" data-anchor-id="compiling-from-source">Compiling from source</h3>
+<p>To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of <a href="">clang</a>. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.</p>
+</section>
 <section id="c-installation" class="level3">
 <h3 class="anchored" data-anchor-id="c-installation">C++ Installation</h3>
 <p><code>primate</code>’s C++ interface is <a href="https://en.wikipedia.org/wiki/Header-only">header-only</a>, making it easy to compile your own <a href="https://docs.python.org/3/extending/extending.html">extension modules</a>. The simplest way to link these headers is to add <code>primate</code> as a <a href="https://peps.python.org/pep-0631/">dependency</a> to your package and use the <code>get_include()</code> function to find the appropriate directory.</p>

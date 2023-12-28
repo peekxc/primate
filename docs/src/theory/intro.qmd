@@ -2,7 +2,23 @@
 title: "Introduction to trace estimation with `primate`"
 ---
 
-`primate` contains an extensible implementations of a variety of methods for estimating quantities from matrix functions. One popular application of such estimators is the approximation of certain [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) quantities.
+`primate` contains a variety of methods for estimating quantities from _matrix functions_. One popular such quantity is the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of $f(A)$, for some generic $f: [a,b] \to \mathbb{R}$ defined on the spectrum of $A$:
+$$ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}$$
+
+Many quantities of common interest can be expressed in as traces of matrix functions with the right spectral function specialization. A few such specialization include: 
+
+$$
+\begin{align*}
+f &= \mathrm{id} \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A) \\
+f &= f^{-1} \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A^{-1}) \\
+f &= \log \quad &\Longleftrightarrow& \quad  &\mathrm{logdet}(A) \\
+f &= \mathrm{exp} \quad &\Longleftrightarrow& \quad &\mathrm{exp}(A) \\
+f &= \mathrm{sign} \quad &\Longleftrightarrow& \quad &\mathrm{rank}(A)  \\
+&\vdots \quad &\hphantom{\Longleftrightarrow}& \quad & \vdots & 
+\end{align*}
+$$ 
+
+In this introduction, the basics of randomized trace estimation are introduced, with a focus on matrix-free algorithms how the readily extend to estimating the traces of _matrix functions_.
 
 <!-- One such method, often used in trace estimation, is the "stochastic Lanczos quadrature" (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.  -->
 
@@ -17,7 +33,17 @@ import numpy as np
 np.random.seed(1234)
 ```
 
-In the examples below, I'll use a simple (random) positive-definite matrix $A \in \mathbb{R}^{n \times n}$. 
+## Basics: Trace estimation 
+
+<!-- Whether used for spectral sum estimation, quadrature approximation, or many techniques 
+ -->
+Suppose we wanted to compute the trace of some matrix $A$. By the very definition of the trace, we have a variety of means to do it: 
+$$\mathrm{tr}(A) \triangleq \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i $$
+
+where, in the right-most sum, we're using $e_i$ to represent the $i$th [identity vector](https://en.wikipedia.org/wiki/Indicator_vector): 
+$$ A_{ii} = e_i^T A e_i, \quad e_i = [0, \dots, 0, \underbrace{1}_{i}, 0, \dots, 0] $$
+
+Let's see some code. First, we start with a simple (random) positive-definite matrix $A \in \mathbb{R}^{n \times n}$. 
 
 ```{python}
 from primate.random import symmetric
@@ -30,7 +56,7 @@ By default, `symmetric` normalizes $A$ such that the eigenvalues are uniformly d
 #| echo: false
 #| output: true
 #| fig-align: center
-p = figure(width=700, height=20 0, title="Spectrum of A")
+p = figure(width=700, height=200, title="Spectrum of A")
 p.toolbar_location = None
 p.multi_line(np.split(np.repeat(np.linalg.eigvalsh(A), 2), 150), [(-0.10, 0.10)]*150)
 p.y_range = Range1d(-0.35, 0.35)
@@ -39,17 +65,7 @@ p.title.align = 'center'
 show(p)
 ```
 
-## Basics: Trace estimation 
-
-<!-- Whether used for spectral sum estimation, quadrature approximation, or many techniques 
- -->
-Suppose we wanted to compute the trace of $A$. From its definition, we have a variety of means to do it: 
-$$\mathrm{tr}(A) \triangleq \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i $$
-
-where, in the right-most sum, we're using $e_i$ to represent the $i$th [identity vector](https://en.wikipedia.org/wiki/Indicator_vector): 
-$$ A_{ii} = e_i^T A e_i, \quad e_i = [0, \dots, 0, \underbrace{1}_{i}, 0, \dots, 0] $$
-
-Using numpy, we can verify all of these give the exact trace of $A$:  
+Now, using numpy, we can verify all of these trace definitions are indeed equivalent:  
   <!-- 1. Sum the diagonal entries (or use numpy's built-in `.trace()`)
   2. Sum the eigenvalues
   3. Sum $\mathrm{e}_i^T A \mathrm{e}_i$ for all $i \in [1, n]$ -->
@@ -62,7 +78,7 @@ print(f"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}")
 print(f"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}")
 ```
 
-While (1) trivially yields $\mathrm{tr}(A)$ in (optimal) $O(n)$ time, there exist situations where the diagonal entries of `A` are not available---particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they yield alternative ways nonetheless of obtaining $\mathrm{tr}(A)$.
+While (1) trivially yields $\mathrm{tr}(A)$ in (optimal) $O(n)$ time, there exist situations where the diagonal entries of `A` are not available---particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they are nonetheless viable altenrnatives to obtain $\mathrm{tr}(A)$.
 
 ## The implicit trace estimation problem
 
@@ -70,10 +86,76 @@ The _implicit_ trace estimation problem can be stated as follows:
 
 > Given access to a square matrix $A \in \mathbb{R}^{n \times n}$ via its matrix-vector product operator $x \mapsto Ax$, estimate its trace $\mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii}$
 
-Putting aside the fact that each $v \mapsto Av$ takes $O(n^2)$ here, observe this last approach is pretty inefficient in general as most of the entries of $v$ are zero. The zero components in `v` still yield inner product computations, despite not contributing to the trace estimate at all. One idea, accredited first to A. Girard and then studied more in-depth by M.F. Huchinson, is to use random sign vector $v \in \{-1, +1\}^{n}$. 
+Observe that although method (3) fits squarely in this category, its pretty inefficient from a computational standpoint---after all, most of the entries of $e_i$ are zero, thus most inner product computations do not contribute to the trace estimate at all. 
 
-$$\mathtt{tr}(A) = \mathbb{E}[v^T A v] \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i = n_v^{-1} \cdot V^\top A V$$
+One idea, attributed to [A. Girard](https://link.springer.com/article/10.1007/BF01395775), is to replace $e_i$ with random _zero-mean_ vectors, e.g. random sign vectors $v \in \{-1, +1\}^{n}$ or random normal vectors $v \sim \mathcal{N}(\mu=0, \sigma=1)$: 
 
+$$\mathtt{tr}(A) \approx \frac{1}{n_v}\sum\limits_{i=1}^{n_v} v_i^\top A v_i $$
+
+It was shown more formally later by [M.F. Huchinson](https://www.tandfonline.com/doi/abs/10.1080/03610918908812806) that if these random vectors $v \in \mathbb{R}^n$ satisfy $\mathbb{E}[vv^T] = I$ then this approach indeed forms an unbiased estimator of $\mathrm{tr}(A)$. To see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned [isotropy conditions](https://en.wikipedia.org/wiki/Isotropic_position):
+$$\mathtt{tr}(A) = \mathtt{tr}(A I) = \mathtt{tr}(A \mathbb{E}[v v^T]) = \mathbb{E}[\mathtt{tr}(Avv^T)] = \mathbb{E}[\mathtt{tr}(v^T A v)] = \mathbb{E}[v^T A v]$$
+
+Naturally we expect the approximation to gradually improve as more vectors are sampled, converging as $n_v \to \infty$. Let's see if we can check this: we start by collecting a few sample quadratic forms 
+
+```{python}
+def isotropic(n):
+  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]
+estimates = np.array([v @ A @ v for v in isotropic(500)])
+```
+
+Plotting the estimator formed by averaging the first $k$ samples along with it's error, we get the following figures for $k = 50$ and $k = 500$, respectively: 
+```{python}
+#| echo: false
+#| output: true
+#| fig-align: center
+
+from bokeh.models import Legend, Span
+from bokeh.layouts import column, row
+k = 50
+sample_indices = np.arange(len(estimates)) + 1
+estimator = np.cumsum(estimates) / sample_indices
+error = np.abs(A.trace() - estimator)
+
+p = figure(width=350, height=200, title=f"Trace estimates (k = {k})")
+p.scatter(sample_indices[:k], estimates[:k], color="blue", size=3, legend_label="Estimates")
+p.line(sample_indices[:k], estimator[:k], color="red", line_width=2.5, legend_label="Estimator")
+# p.add_layout(Legend(), 'above')
+p.add_layout(Span(location=A.trace(), dimension='width', line_color='black', line_dash='dotted', line_width=1.5))
+
+q = figure(width=350, height=200, title=f"Estimator error (k = {k})")
+q.line(sample_indices[:k], error[:k], color="black")
+
+p2 = figure(width=350, height=200, title=f"Trace estimates (k = {len(estimates)})")
+p2.scatter(sample_indices, estimates, color="blue", size=3, legend_label="Estimates")
+p2.line(sample_indices, estimator, color="red", line_width=2.5, legend_label="Estimator")
+p2.add_layout(Span(location=A.trace(), dimension='width', line_color='black', line_dash='dotted', line_width=1.5))
+
+error = np.abs(A.trace() - estimator)
+q2 = figure(width=350, height=200, title=f"Estimator error (k = {len(estimates)})")
+q2.line(sample_indices, error, color="black")
+
+p.toolbar_location = None
+q.toolbar_location = None
+p2.toolbar_location = None
+q2.toolbar_location = None
+# print(f"Trace estimate: { estimates.mean() }")
+
+for fig in [p,p2]:
+  fig.legend.label_text_font_size = '7pt'
+  fig.legend.label_height = 5
+  fig.legend.glyph_height = 5
+  fig.legend.spacing = 1
+  # p.legend.location = "above"
+  fig.legend.orientation = "horizontal"
+  fig.legend.background_fill_alpha = 0.5
+
+show(row(column(p,q), column(p2,q2)))
+```
+
+Sure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision beyond < 1% becomes increasingly difficult due to the variance of the sample estimates. 
+
+
+<!-- 
 Let's see how this fares using, let's say, $\frac{1}{4}$ the number of _matvecs_: 
 
 ```{python}
@@ -85,15 +167,61 @@ for j in range(n // 4):
 print(trace_estimate / (n // 4))
 ```
 
-Not bad! 
-
-## The statistical side 
-
-
-This forms an unbiased estimator of $\mathrm{tr}(A)$; to see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions
-$$\mathtt{tr}(A) = \mathtt{tr}(A I) = \mathtt{tr}(A \mathbb{E}[v v^T]) = \mathbb{E}[\mathtt{tr}(Avv^T)] = \mathbb{E}[\mathtt{tr}(v^T A v)] = \mathbb{E}[v^T A v]$$
+Not bad! Though it's fairly intuitive, why does this work?  -->
 
 # Matrix functions 
+
+While there are some real-world applications for estimating $\mathrm{tr}(A)$, in many setting the trace of a given matrix is not a very informative quantity. On the other hand, there are innumerable applications that rely on spectral information.
+
+
+```{python}
+# from primate.operator import matrix_function
+
+# a, b = 0.8, 2
+# x = np.random.uniform(low=0, high=10, size=40)
+# eps = np.random.normal(loc=0, scale=1.0, size=40)
+# y = (a * x + b) + eps
+
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# show(p)
+
+# X = np.c_[x,y]
+# from scipy.linalg import lstsq
+# from scipy.optimize import least_squares, leastsq, minimize, minimize_scalar
+# def L(beta: tuple):
+#   b, a = beta
+#   return np.linalg.norm(y - a * x + b)**2
+
+# def L(beta: tuple):
+#   b, a = beta
+#   return (y - (a * x + b))
+
+
+
+# res = minimize_scalar(L, x0=(0,1))
+# b_opt, a_opt = res.x
+# L([a_opt,b_opt])
+
+# res = least_squares(L, x0=(0,1))
+# b_opt, a_opt = res.x
+# f_opt = lambda x: x * a_opt + b_opt 
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
+# show(p)
+
+# ## Normal equations...
+# XI = np.c_[np.ones(X.shape[0]), X]
+
+# c, b_opt, a_opt = (np.linalg.inv((XI.T @ XI)) @ XI.T) @ y
+# f_opt = lambda x: x * a_opt + b_opt 
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
+# show(p)
+
+```
 
 
 ## Ex: Logdet computation
@@ -119,16 +247,9 @@ To get a slightly better idea, you can set `verbose=True`:
 est = hutch(A, fun="log", maxiter=25, verbose=True)
 ```
 
-The first line of the statement contains fixed about the estimator:
+The first line of the statement contains fixed about the estimator, including the type of estimator (`Girard-Hutchinson`), the function applied to the spectrum (`log`), the degree of the Krylov expansion (`20`), and the quadrature method used (`fttr`). 
 
-1. The type of estimator (Girard-Hutchinson)
-2. The spectral function being approximated (log)
-2. The degree of the polynomial approximation (20)
-3. The quadrature method used ('fttr')
-
-The second line prints the runtime information about the samples:
-
-1. The final trace estimate 
+The second line prints the runtime information about the samples, such as the final trace estimate (``)
 2. Its [margin of error](https://en.wikipedia.org/wiki/Margin_of_error) 
 2. The [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (aka the relative std. deviation)
 3. The number of samples used + their distribution prefix ('R' for rademacher)
@@ -137,55 +258,3 @@ The second line prints the runtime information about the samples:
 est = hutch(A, fun="log", maxiter=100, plot=True)
 ```
 
-
-<!-- ```{python}
-import timeit 
-## Based on https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
-from scipy.linalg import toeplitz
-# toeplitz([1,2,3], [1,4,5,6])
-T = toeplitz(c)
-# x = np.array([0,1,2,3])
-T @ c
-
-hutch(A, maxiter=20, deg=5, fun="log")
-
-timeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun="log", quad="fttr"), number = 1000)
-timeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)
-
-``` -->
-
-
-<!-- ```{python}
-
-
-
-M.quad(np.ones(M.shape[0]))
-``` -->
-
-<!-- ```{python}
-c = np.reciprocal(np.sqrt(n))
-trace_estimates = np.empty(n)
-for j in range(n):
-  v = np.random.choice([-1, +1], size=n)
-  trace_estimates[j] = v @ A @ v
-
-
-est_index = np.arange(1, (n*10)+1)
-p = figure(width=200, height=150)
-p.line(est_index, (np.cumsum(trace_estimates) / est_index))
-p.line(est_index, np.repeat(A.trace(), n*10), color='red')
-show(p)
-``` -->
-
-<!-- ```{python}
-from primate.trace import sl_trace
-trace_estimate = sl_trace(A)
-print(trace_estimate)
-``` -->
-<!-- 
-```{python}
-# tr_est = np.mean(estimates)
-# print(f"Error: {abs(tr_est - A.trace()):.5}")
-# print(f"Samples std. deviation: {estimates.std(ddof=1)}")
-# print(f"Estimator standard error: {estimates.std(ddof=1)/np.sqrt(len(estimates))}")
-``` -->

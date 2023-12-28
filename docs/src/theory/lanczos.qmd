@@ -17,8 +17,8 @@ In the case where $A$ is symmetric, the eigen-decomposition is not only guarente
 
 In 1950, Cornelius Lanczos studied an alternative means of decomposition via *tridiagonalization*:
 $$  AQ = Q T \quad \Leftrightarrow \quad Q^T A Q = T $$
-The algorithm by which one produces such a $T$ is now known as the *Lanczos method*.
-Despite its age, the Lanczos method remains the standard algorithm[^1] both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) places it among the **top 10 most influential algorithms of the 20th century**.
+The algorithm by which one produces such a $T$ is known as the *Lanczos method*.
+Despite its age, it remains the standard algorithm[^1] both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the _conjugate gradient_ method, the _theory of orthogonal polynomials_, and _Gaussian quadrature_, it is one of the most important numerical methods of all time---indeed, an [IEEE guest editorial](https://www.computer.org/csdl/magazine/cs/2000/01/c1022/13rRUxBJhBm) places it among the **top 10 most influential algorithms of the 20th century**.
 
 As the Lanczos method lies at the heart of `primate`'s design, this post introduces it, with a focus on its motivating principles and computational details. For its API usage, see the [lanczos](../reference/diagonalize.lanczos.qmd) page.
 

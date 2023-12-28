@@ -71,7 +71,7 @@
     "href": "reference/random.normal.html",
     "title": "random.normal",
     "section": "",
-    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
+    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the standard normal distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32\n\n\n\n\n\n\nnp.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
     "crumbs": [
       "API Reference",
       "Random",
@@ -95,10 +95,9 @@
     "href": "reference/diagonalize.lanczos.html",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method for matrix tridiagonalization.\nThis function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,\nwith additional modifications to support varying degrees of re-orthogonalization.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.\n\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\nNo checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg. Note the number of matvecs with A scales linearly with deg and the number of inner-products scales quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.\n\n\n\n\nPaige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
+    "text": "diagonalize.lanczos(A, v0=None, deg=None, rtol=1e-08, orth=0, sparse_mat=False, return_basis=False, seed=None, dtype=None)\nLanczos method for matrix tridiagonalization.\nThis function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, orth=0 corresponds to no re-orthogonalization, orth &lt; deg corresponds to partial re-orthogonalization, and orth &gt;= deg corresponds to full re-orthogonalization.\n\n\nThe Lanczos method iteratively builds a tridiagonal matrix T of a symmetric A via an orthogonal change-of-basis Q:  Q^T A Q  = T  Unlike other Lanczos implementations (e.g. SciPy’s eigsh), which includes e.g. sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes deg steps of the Lanczos method with the supplied v0 and returns the resulting tridiagonal matrix.\nDiagonalizing T via e.g. scipy.linalg.eigh_tridiagonal yields Rayleigh-Ritz approximations of the eigenvalues of A, though note no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing orth and deg. Supplying either negative values or values larger than deg for orth will result in full re-orthogonalization, though note the number of matvecs scales linearly with deg and the number of inner-products scales quadratically with orth.\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nIf True, returns the Krylov basis vectors Q.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\ntuple\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis=True, the tuple (a,b), Q is returned, where Q represents an orthogonal basis for the degree-deg Krylov subspace.\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\n\nPaige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -107,10 +106,9 @@
     "href": "reference/diagonalize.lanczos.html#parameters",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nWhether to return the orth + 2 Lanczos vectors.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nscipy.sparse.linalg.LinearOperator or ndarray or sparray\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nndarray\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nint\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-8\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nIf True, returns the Krylov basis vectors Q.\nFalse\n\n\ndtype\ndtype\nThe precision dtype to specialize the computation.\nNone",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -304,7 +302,7 @@
     "href": "reference/random.rademacher.html",
     "title": "random.rademacher",
     "section": "",
-    "text": "random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32",
+    "text": "random.rademacher(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32\n\n\n\n\n\n\nnp.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
     "crumbs": [
       "API Reference",
       "Random",
@@ -328,7 +326,7 @@
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace\n\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method for matrix tridiagonalization.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace.hutch\nEstimates the trace of a symmetric A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\ntrace.xtrace\n\n\n\n\n\n\n\nMatrix operators\n\n\n\noperator.matrix_function\nConstructs a LinearOperator approximating the action of the matrix function fun(A).\n\n\n\n\n\n\nRandomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the standard normal distribution.\n\n\n\n\n\n\nDiagonalization methods\n\n\n\ndiagonalize.lanczos\nLanczos method for matrix tridiagonalization.\n\n\n\n\n\n\nMiscellenous functions\n\n\n\nget_include\nReturn the directory that contains the primate’s *.h header files.",
     "crumbs": [
       "API Reference"
     ]
@@ -338,7 +336,7 @@
     "href": "reference/index.html#trace",
     "title": "Function reference",
     "section": "",
-    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace",
+    "text": "Functions for estimating the trace of matrices and matrix functions.\n\n\n\ntrace.hutch\nEstimates the trace of a symmetric A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\ntrace.xtrace",
     "crumbs": [
       "API Reference"
     ]
@@ -348,7 +346,7 @@
     "href": "reference/index.html#random",
     "title": "Function reference",
     "section": "",
-    "text": "Randomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the rademacher distribution.",
+    "text": "Randomized module\n\n\n\nrandom.rademacher\nGenerates random vectors from the rademacher distribution.\n\n\nrandom.normal\nGenerates random vectors from the standard normal distribution.",
     "crumbs": [
       "API Reference"
     ]
@@ -390,14 +388,14 @@
     "href": "reference/trace.html",
     "title": "trace",
     "section": "",
-    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nsl_gauss\nStochastic Gaussian quadrature approximation."
+    "text": "trace\n\n\n\n\n\nName\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nxtrace"
   },
   {
     "objectID": "reference/trace.html#functions",
     "href": "reference/trace.html#functions",
     "title": "trace",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nsl_gauss\nStochastic Gaussian quadrature approximation."
+    "text": "Name\nDescription\n\n\n\n\nhutch\nEstimates the trace of a matrix A or matrix function f(A) via a Girard-Hutchinson estimator.\n\n\nxtrace"
   },
   {
     "objectID": "basic/integration.html",
@@ -415,10 +413,10 @@
     "href": "theory/lanczos.html",
     "title": "The Lanczos method",
     "section": "",
-    "text": "Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations, or even just fitting polynomials to data via least-squares, decomposing linear operators has had significant use in many areas of sciences and engineering.\nCentral to operator theory is the spectral theorem, which provides conditions under which a linear operator A : \\mathbb{R}^n \\to \\mathbb{R}^n can be diagonalized in terms of its eigenvalues and eigenvectors:  A = U \\Lambda U^{-1}\nIn the case where A is symmetric, the eigen-decomposition is not only guarenteed to exist, but its canonical form may be obtained via orthogonal diagonalization. Such matrices are among the most commonly encountered matrices in applications.\nIn 1950, Cornelius Lanczos studied an alternative means of decomposition via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  The algorithm by which one produces such a T is now known as the Lanczos method. Despite its age, the Lanczos method remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, an IEEE guest editorial places it among the top 10 most influential algorithms of the 20th century.\nAs the Lanczos method lies at the heart of primate’s design, this post introduces it, with a focus on its motivating principles and computational details. For its API usage, see the lanczos page.",
+    "text": "Whether for simplifying the representation of complicated systems, characterizing the asymptotic behavior of differential equations, or even just fitting polynomials to data via least-squares, decomposing linear operators has had significant use in many areas of sciences and engineering.\nCentral to operator theory is the spectral theorem, which provides conditions under which a linear operator A : \\mathbb{R}^n \\to \\mathbb{R}^n can be diagonalized in terms of its eigenvalues and eigenvectors:  A = U \\Lambda U^{-1}\nIn the case where A is symmetric, the eigen-decomposition is not only guarenteed to exist, but its canonical form may be obtained via orthogonal diagonalization. Such matrices are among the most commonly encountered matrices in applications.\nIn 1950, Cornelius Lanczos studied an alternative means of decomposition via tridiagonalization:   AQ = Q T \\quad \\Leftrightarrow \\quad Q^T A Q = T  The algorithm by which one produces such a T is known as the Lanczos method. Despite its age, it remains the standard algorithm1 both for computing eigensets and solving linear systems in the large-scale regime. Having intrinsic connections to the conjugate gradient method, the theory of orthogonal polynomials, and Gaussian quadrature, it is one of the most important numerical methods of all time—indeed, an IEEE guest editorial places it among the top 10 most influential algorithms of the 20th century.\nAs the Lanczos method lies at the heart of primate’s design, this post introduces it, with a focus on its motivating principles and computational details. For its API usage, see the lanczos page.",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -429,7 +427,7 @@
     "text": "Lanczos on a bumper sticker\nGiven any non-zero v \\in \\mathbb{R}^n, Lanczos generates a Krylov subspace via successive powers of A:\n\n\\mathcal{K}(A, v) \\triangleq \\{ \\, A^{0} v, A^{1}v, A^{2}v, \\dots, A^{n}v \\, \\}\n\nThese vectors are independent, so orthogonalizing them not only yields an orthonormal basis for \\mathcal{K}(A, v) but also a change-of-basis matrix Q, allowing A to be represented by a new matrix T:\n\n\\begin{align*}\nK &= [\\, v \\mid Av \\mid A^2 v \\mid \\dots \\mid A^{n-1}v \\,] && \\\\\nQ &= [\\, q_1, q_2, \\dots, q \\,] \\gets \\mathrm{qr}(K) &&  \\\\\nT &= Q^T A Q &&\n\\end{align*}\n\nIt turns out that since A is symmetric, T is guaranteed to have a symmetric tridiagonal structure:\n\nT = \\mathrm{tridiag}\\Bigg(\n\\begin{array}{ccccccccc}\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n & \\\\\n\\alpha_1 & & \\alpha_2 & & \\cdot & & \\cdot & & \\alpha_n \\\\\n& \\beta_2 & & \\beta_3 & & \\cdot & & \\beta_n &\n\\end{array}\n\\Bigg)\n\n\n\nSince \\mathrm{range}(Q) = \\mathcal{K}(A, v), the change-of-basis A \\mapsto Q^{-1} A Q is in fact a similarity transform, which are known to be equivalence relations on \\mathcal{S}^n—thus we can obtain \\Lambda by diagonalizing T:\n T = Y \\Lambda Y^T  \nAs T is quite structured, it can be easily diagonalized, thus we have effectively solved the eigenvalue problem. To quote the Lanczos introduction from Parlett, could anything be more simple?",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -534,7 +532,7 @@
     "href": "basic/install.html",
     "title": "Installation",
     "section": "",
-    "text": "primate is a standard PEP-517 package, and thus can be installed via pip:\npip install &lt; primate source directory &gt;\nCurrently the package must be built from source via cloning the repository. PYPI support is planned.\n\n\nC++ Installation\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.",
+    "text": "primate is a standard PEP-517 package, and thus can be installed via pip:\npip install &lt; primate source directory &gt;\nCurrently the package must be built from source via cloning the repository. PYPI support is planned.\n\n\nPlatform support\nPlatform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable primate to be installed on supported architecture / CPython implementations without compilation. The currently supported platforms include:\nIf your platform isn’t on this list, feel free to make an issue requesting support for your platform.\n\n\nCompiling from source\nTo install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of clang. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.\n\n\nC++ Installation\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.",
     "crumbs": [
       "Basics",
       "Installation"
@@ -569,7 +567,7 @@
     "text": "Footnotes\n\n\nA variant of the Lanczos method is actually at the heart scipy.sparse.linalg’s default eigsh solver (which is a port of ARPACK).↩︎\nThe spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M↩︎\nThe spectral decomposition A = U \\Lambda U^T identifies a diagonalizable A with its spectrum \\Lambda(A) up to a change of basis A \\mapsto M^{-1} A M↩︎\nFor general A \\in \\mathbb{R}^{n \\times n}, computing the spectral-decomposition is essentially bounded by the matrix-multiplication time: \\Theta(n^\\omega) time and \\Theta(n^2) space, where \\omega \\approx 2.37\\dots is the matrix multiplication constant. If we exclude the Strassen model for computation, we get effectively a \\Omega(n^3) time and \\Omega(n^2) space bound.↩︎",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -765,10 +763,9 @@
     "href": "reference/diagonalize.lanczos.html#returns",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "Type\nDescription\n\n\n\n\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis is\n\n\n\nTrue, then the tuple (a,b), Q is returned, where Q represents orthogonal basis for the Krylov subspace.",
+    "text": "Type\nDescription\n\n\n\n\ntuple\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If return_basis=True, the tuple (a,b), Q is returned, where Q represents an orthogonal basis for the degree-deg Krylov subspace.",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -780,7 +777,6 @@
     "text": "scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices. operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -789,10 +785,9 @@
     "href": "reference/diagonalize.lanczos.html#notes",
     "title": "diagonalize.lanczos",
     "section": "",
-    "text": "No checking for performed for ghost, converged, or ‘locked’ eigenvalues. To increase the accuracy of the eigenvalue approximation, increase orth and deg. Note the number of matvecs with A scales linearly with deg and the number of inner-products scales quadratically with orth.\nSupplying either negative values or values larger than deg for orth will result in full re-orthogonalization.",
+    "text": "The Lanczos method iteratively builds a tridiagonal matrix T of a symmetric A via an orthogonal change-of-basis Q:  Q^T A Q  = T  Unlike other Lanczos implementations (e.g. SciPy’s eigsh), which includes e.g. sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes deg steps of the Lanczos method with the supplied v0 and returns the resulting tridiagonal matrix.\nDiagonalizing T via e.g. scipy.linalg.eigh_tridiagonal yields Rayleigh-Ritz approximations of the eigenvalues of A, though note no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing orth and deg. Supplying either negative values or values larger than deg for orth will result in full re-orthogonalization, though note the number of matvecs scales linearly with deg and the number of inner-products scales quadratically with orth.",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -804,7 +799,6 @@
     "text": "Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.",
     "crumbs": [
       "API Reference",
-      "Diagonalize",
       "Lanczos"
     ]
   },
@@ -882,7 +876,7 @@
     "text": "The “iteration” part\nLanczos originally referred to his algorithm as the method of minimized iterations, and indeed nowadays it is often called an iterative method. Where’s the iterative component?\nIf you squint hard enough, you can deduce that for every j \\in [1, n): A Q_j = Q_j T_j + \\beta_{j+1} q_{j+1} e_{j}^T Equating the j-th columns on each side of the equation and rearranging yields a three-term recurrence: \n\\begin{align*}\nA q_j &= \\beta_{j\\text{-}1} q_{j\\text{-}1} + \\alpha_j q_j + \\beta_j q_{j+1} \\\\\n\\Leftrightarrow \\beta_{j} \\, q_{j+1} &= A q_j - \\alpha_j \\, q_j - \\beta_{j\\text{-}1} \\, q_{j\\text{-}1}  \n\\end{align*}\n\nThe equation above is a variable-coefficient second-order linear difference equation, and it is known such equations have unique solutions; they are given below: \n\\alpha_j = q_j^T A q_j, \\;\\; \\beta_j = \\lVert r_j \\rVert_2, \\;\\; q_{j+1} = r_j / \\beta_j\n\n\n\\text{where  } r_j = (A - \\alpha_j I)q_j - \\beta_{j\\text{-}1} q_j\n\nIn other words, if (q_{j\\text{-}1}, \\beta_j, q_j) are known, then (\\alpha_j, \\beta_{j+1}, q_{j+1}) are completely determined. In theory, this means we can iteratively generate both Q and T using just a couple vectors at a time—no need to explicitly call to the QR algorithm as shown above. Pretty nifty, eh!",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -893,7 +887,7 @@
     "text": "Complexity analysis\nElegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?\nLet’s start by establishing a baseline on its complexity:\n\nTheorem 1 (Parlett 1994) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nAs its clear from the theorem, if we specialize it such that r = n and \\eta = \\nu = n, then the Lanczos method requires just O(n^2) time and O(n) space to execute. In other words, the Lanczos method drops both the time and space complexity4 of obtaining spectral information by order of magnitude over similar eigen-algorithms that decompose A directly.\nTo see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then carrying out the recurrence clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nNow, if we need to store all of Y or Q explicitly, we clearly need O(n^2) space to do so. However, if we only need the eigen-values \\Lambda(A) (and not their eigen-vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -915,7 +909,7 @@
     "text": "Wait, isn’t T arbitrary?\nUnfortunately—and unlike the spectral decomposition2—there is no canonical choice of T. Indeed, as T is a family with n - 1 degrees of freedom and v \\in \\mathbb{R}^n was chosen arbitrarily, there are infinitely many essentially distinct such decompositions.\nNot all hope is lost though, as it turns out that T is actually fully characterized by v. To see this, notice that since Q is an orthogonal matrix, we have:\n Q Q^T = I_n = [e_1, e_2, \\dots, e_n] \nBy extension, given an initial pair (A, q_1) satisfying \\lVert q_1 \\rVert = 1, the following holds:\n\nK_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \\, e_1 \\mid T e_1 \\mid T^2 e_1 \\mid \\dots \\mid T^{n-1} e_1 \\, ]\n\n…this is actually a QR factorization, which is essentially unique! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix T \\in \\mathbb{R}^{n \\times n} has only positive elements on its first subdiagonal and there exists an orthogonal matrix Q such that Q^T A Q = T, then Q and T are uniquely determined3 by (A, q_1).",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -954,16 +948,16 @@
   {
     "objectID": "basic/usage.html",
     "href": "basic/usage.html",
-    "title": "primate",
+    "title": "primate usage - quickstart",
     "section": "",
-    "text": "This page gives a walk-through of how to use primate to do implicit trace estimation."
+    "text": "Below is a quick introduction to primate. For more introductory material, theor\nTo do trace estimation, use functions in the trace module:\n\nimport primate.trace as TR\nfrom primate.random import symmetric\nA = symmetric(150)  ## random positive-definite matrix \n\nprint(f\"Actual trace: {A.trace():6f}\")        ## Actual trace\nprint(f\"Girard-Hutch: {TR.hutch(A):6f}\")      ## Monte-carlo tyoe estimator\nprint(f\"XTrace:       {TR.xtrace(A):6f}\")     ## Epperly's algorithm\n\nActual trace: 75.697397\nGirard-Hutch: 75.981329\nXTrace:       75.697398\n\n\nFor matrix functions, you can either construct a LinearOperator directly via the matrix_function API, or supply a string to the parameter fun describing the spectral function to apply. For example, one might compute the log-determinant as follows:\n\nfrom primate.operator import matrix_function\nM = matrix_function(A, fun=\"log\")\n\new = np.linalg.eigvalsh(A)\nprint(f\"logdet(A):  {np.sum(np.log(ew)):6f}\")\nprint(f\"GR approx:  {TR.hutch(M):6f}\")\nprint(f\"XTrace:     {TR.xtrace(M):6f}\")\n\n## Equivalently could've used: \n## M = matrix_function(A, fun=np.log)\n\nlogdet(A):  -148.321844\nGR approx:  -147.250366\nXTrace:     -148.315937\n\n\nNote in the above example you can supply to fun either string describing a built-in spectral function or an arbitrary Callable. The former is preferred when possible, as function evaluations will generally be faster and hutch can also be parallelized. Multi-threaded execution of e.g. hutch with arbitrary functions is not currently allowed due to the GIL, though there are options available, see the integration docs for more details.\nFor ‘plain’ operators, XTrace should recover the exact trace (up to roundoff error). For matrix functions f(A), there will be some inherent inaccuracy as the underlying matrix-vector multiplication is approximated with the Lanczos method.\nIn general, the amount of accuracy depends both on the Lanczos parameters and the type of matrix function. Spectral functions that are difficult or impossible to approximate via low-degree polynomials, for example, may suffer more from inaccuracy issues than otherwise. For example, consider the example below that computes that rank:\n\n## Make a rank-deficient operator\new = np.sort(ew)\new[:30] = 0.0\nA = symmetric(150, ew = ew, pd = False)\nM = matrix_function(A, fun=np.sign)\n\nprint(f\"Rank:       {np.linalg.matrix_rank(A)}\")\nprint(f\"GR approx:  {TR.hutch(M)}\")\nprint(f\"XTrace:     {TR.xtrace(M)}\")\n\nRank:       120\nGR approx:  144.8700408935547\nXTrace:     143.97018151807674\n\n\nThis is not so much a fault of hutch or xtrace as much as it is the choice of approximation and Lanczos parameters. The sign function has a discontinuity at 0, is not smooth, and is difficult to approximate with low-degree polynomials. One workaround to handle this issue is relax the sign function with a low-degree “soft-sign” function:  \\mathcal{S}_\\lambda(x) = \\sum\\limits_{i=0}^q \\left( x(1 - x^2)^i \\prod_{j=1}^i \\frac{2j - 1}{2j} \\right)\nVisually, the soft-sign function looks like this:\n\nfrom primate.special import soft_sign, figure_fun\nshow(figure_fun(\"smoothstep\"))\n\n\n  \n\n\n\n\n\nIt’s been shown that there is a low degree polynomial p^\\ast that uniformly approximates \\mathcal{S}_\\lambda up to a small error on the interval [-1,1]. Since matrix_function uses a low degree Krylov subspace to approximate the action v \\mapsto f(A)v, one way to improve the accuracy of rank estimation is to replace \\mathrm{sign} \\mapsto \\mathcal{S}_{\\lambda} for some choice of q \\in \\mathbb{Z}_+ (this function is available in primate under the name soft_sign):\n\nfrom primate.special import soft_sign\nfor q in range(0, 50, 5):\n  M = matrix_function(A, fun=soft_sign(q=q))\n  print(f\"XTrace S(A) for q={q}: {TR.xtrace(M):6f}\")\n\nXTrace S(A) for q=0: 72.776775\nXTrace S(A) for q=5: 109.325087\nXTrace S(A) for q=10: 114.843157\nXTrace S(A) for q=15: 116.952146\nXTrace S(A) for q=20: 118.027760\nXTrace S(A) for q=25: 118.657212\nXTrace S(A) for q=30: 119.055340\nXTrace S(A) for q=35: 119.319911\nXTrace S(A) for q=40: 119.501839\nXTrace S(A) for q=45: 119.630120\n\n\nIf the type of operator A is known to typically have a large spectral gap, another option is to compute the numerical rank by thresholding values above some fixed value \\lambda_{\\text{min}}. This is equivalent to applying the following spectral function:\n S_{\\lambda_{\\text{min}}}(x) =\n\\begin{cases}\n1 & \\text{ if } x \\geq \\lambda_{\\text{min}} \\\\\n0 & \\text{ otherwise }\n\\end{cases}\n\nIn the above example, the optimal cutoff \\lambda_{\\text{min}} is given by the smallest non-zero eigenvalue. Since the trace estimators all stochastic to some degree, we set the cutoff to slightly less than this value:\n\nlambda_min = min(ew[ew != 0.0])\nprint(f\"Smallest non-zero eigenvalue: {lambda_min:.6f}\")\n\nstep = lambda x: 1 if x &gt; (lambda_min * 0.90) else 0\nM = matrix_function(A, fun=step, deg=50)\nprint(f\"XTrace S_t(A) for t={lambda_min*0.90:.4f}: {TR.xtrace(M):6f}\")\n\nSmallest non-zero eigenvalue: 0.191916\nXTrace S_t(A) for t=0.1727: 120.000000\n\n\nIndeed, this works! Of course, here we’ve used the fact that we know the optimal cutoff value, but this can also be estimated with the lanczos method itself.\n\nfrom primate.diagonalize import lanczos\nfrom scipy.linalg import eigvalsh_tridiagonal\na,b = lanczos(A)\nrr = eigvalsh_tridiagonal(a,b) # Rayleigh-Ritz values\ntol = 10 * np.finfo(A.dtype).resolution\nprint(f\"Approx. cutoff: {np.min(rr[rr &gt; tol]):.6f}\")\n\nApprox. cutoff: 0.191916"
   },
   {
     "objectID": "theory/intro.html",
     "href": "theory/intro.html",
     "title": "Introduction to trace estimation with primate",
     "section": "",
-    "text": "primate contains an extensible implementations of a variety of methods for estimating quantities from matrix functions. One popular application of such estimators is the approximation of certain trace quantities.\nIn the examples below, I’ll use a simple (random) positive-definite matrix A \\in \\mathbb{R}^{n \\times n}.\nfrom primate.random import symmetric\nA = symmetric(150, pd = True)\nBy default, symmetric normalizes A such that the eigenvalues are uniformly distributed in the interval [0, 1]. For reference, the spectrum of A looks as follows:",
+    "text": "primate contains a variety of methods for estimating quantities from matrix functions. One popular such quantity is the trace of f(A), for some generic f: [a,b] \\to \\mathbb{R} defined on the spectrum of A:  \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nMany quantities of common interest can be expressed in as traces of matrix functions with the right spectral function specialization. A few such specialization include:\n\\begin{align*}\nf &= \\mathrm{id} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A) \\\\\nf &= f^{-1} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A^{-1}) \\\\\nf &= \\log \\quad &\\Longleftrightarrow& \\quad  &\\mathrm{logdet}(A) \\\\\nf &= \\mathrm{exp} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{exp}(A) \\\\\nf &= \\mathrm{sign} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{rank}(A)  \\\\\n&\\vdots \\quad &\\hphantom{\\Longleftrightarrow}& \\quad & \\vdots &\n\\end{align*}\nIn this introduction, the basics of randomized trace estimation are introduced, with a focus on matrix-free algorithms how the readily extend to estimating the traces of matrix functions.",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -974,7 +968,7 @@
     "href": "theory/intro.html#basics-trace-estimation",
     "title": "Introduction to trace estimation with primate",
     "section": "Basics: Trace estimation",
-    "text": "Basics: Trace estimation\n\nSuppose we wanted to compute the trace of A. From its definition, we have a variety of means to do it: \\mathrm{tr}(A) \\triangleq \\sum\\limits_{i=1}^n A_{ii} = \\sum\\limits_{i=1}^n \\lambda_i = \\sum\\limits_{i=1}^n e_i^T A e_i \nwhere, in the right-most sum, we’re using e_i to represent the ith identity vector:  A_{ii} = e_i^T A e_i, \\quad e_i = [0, \\dots, 0, \\underbrace{1}_{i}, 0, \\dots, 0] \nUsing numpy, we can verify all of these give the exact trace of A:\n\n\nimport numpy as np\neye = lambda i: np.ravel(np.eye(1, 150, k=i))\nprint(f\"Direct: {np.sum(A.diagonal()):.8f}\")\nprint(f\"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}\")\nprint(f\"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}\")\n\nDirect: 75.69739746\nEigen:  75.69739746\nMatvec: 75.69739746\n\n\nWhile (1) trivially yields \\mathrm{tr}(A) in (optimal) O(n) time, there exist situations where the diagonal entries of A are not available—particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they yield alternative ways nonetheless of obtaining \\mathrm{tr}(A).",
+    "text": "Basics: Trace estimation\n\nSuppose we wanted to compute the trace of some matrix A. By the very definition of the trace, we have a variety of means to do it: \\mathrm{tr}(A) \\triangleq \\sum\\limits_{i=1}^n A_{ii} = \\sum\\limits_{i=1}^n \\lambda_i = \\sum\\limits_{i=1}^n e_i^T A e_i \nwhere, in the right-most sum, we’re using e_i to represent the ith identity vector:  A_{ii} = e_i^T A e_i, \\quad e_i = [0, \\dots, 0, \\underbrace{1}_{i}, 0, \\dots, 0] \nLet’s see some code. First, we start with a simple (random) positive-definite matrix A \\in \\mathbb{R}^{n \\times n}.\n\nfrom primate.random import symmetric\nA = symmetric(150, pd = True)\n\nBy default, symmetric normalizes A such that the eigenvalues are uniformly distributed in the interval [0, 1]. For reference, the spectrum of A looks as follows:\n\n\n\n  \n\n\n\n\n\nNow, using numpy, we can verify all of these trace definitions are indeed equivalent:\n\n\nimport numpy as np\neye = lambda i: np.ravel(np.eye(1, 150, k=i))\nprint(f\"Direct: {np.sum(A.diagonal()):.8f}\")\nprint(f\"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}\")\nprint(f\"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}\")\n\nDirect: 75.69739746\nEigen:  75.69739746\nMatvec: 75.69739746\n\n\nWhile (1) trivially yields \\mathrm{tr}(A) in (optimal) O(n) time, there exist situations where the diagonal entries of A are not available—particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they are nonetheless viable altenrnatives to obtain \\mathrm{tr}(A).",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -985,7 +979,7 @@
     "href": "theory/intro.html#the-implicit-trace-estimation-problem",
     "title": "Introduction to trace estimation with primate",
     "section": "The implicit trace estimation problem",
-    "text": "The implicit trace estimation problem\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nPutting aside the fact that each v \\mapsto Av takes O(n^2) here, observe this last approach is pretty inefficient in general as most of the entries of v are zero. The zero components in v still yield inner product computations, despite not contributing to the trace estimate at all. One idea, accredited first to A. Girard and then studied more in-depth by M.F. Huchinson, is to use random sign vector v \\in \\{-1, +1\\}^{n}.\n\\mathtt{tr}(A) = \\mathbb{E}[v^T A v] \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i = n_v^{-1} \\cdot V^\\top A V\nLet’s see how this fares using, let’s say, \\frac{1}{4} the number of matvecs:\n\nn: int = A.shape[0]\ntrace_estimate = 0.0\nfor j in range(n // 4):\n  v = np.random.choice([-1, +1], size=n)\n  trace_estimate += v @ A @ v\nprint(trace_estimate / (n // 4))\n\n75.21454596302897\n\n\nNot bad!",
+    "text": "The implicit trace estimation problem\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nObserve that although method (3) fits squarely in this category, its pretty inefficient from a computational standpoint—after all, most of the entries of e_i are zero, thus most inner product computations do not contribute to the trace estimate at all.\nOne idea, attributed to A. Girard, is to replace e_i with random zero-mean vectors, e.g. random sign vectors v \\in \\{-1, +1\\}^{n} or random normal vectors v \\sim \\mathcal{N}(\\mu=0, \\sigma=1):\n\\mathtt{tr}(A) \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i \nIt was shown more formally later by M.F. Huchinson that if these random vectors v \\in \\mathbb{R}^n satisfy \\mathbb{E}[vv^T] = I then this approach indeed forms an unbiased estimator of \\mathrm{tr}(A). To see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions: \\mathtt{tr}(A) = \\mathtt{tr}(A I) = \\mathtt{tr}(A \\mathbb{E}[v v^T]) = \\mathbb{E}[\\mathtt{tr}(Avv^T)] = \\mathbb{E}[\\mathtt{tr}(v^T A v)] = \\mathbb{E}[v^T A v]\nNaturally we expect the approximation to gradually improve as more vectors are sampled, converging as n_v \\to \\infty. Let’s see if we can check this: we start by collecting a few sample quadratic forms\n\ndef isotropic(n):\n  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]\nestimates = np.array([v @ A @ v for v in isotropic(500)])\n\nPlotting the estimator formed by averaging the first k samples along with it’s error, we get the following figures for k = 50 and k = 500, respectively:\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:32: UserWarning:\n\n\nYou are attempting to set `plot.legend.label_text_font_size` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:33: UserWarning:\n\n\nYou are attempting to set `plot.legend.label_height` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:34: UserWarning:\n\n\nYou are attempting to set `plot.legend.glyph_height` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:35: UserWarning:\n\n\nYou are attempting to set `plot.legend.spacing` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:37: UserWarning:\n\n\nYou are attempting to set `plot.legend.orientation` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:38: UserWarning:\n\n\nYou are attempting to set `plot.legend.background_fill_alpha` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n\n\n\n  \n\n\n\n\n\nSure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision beyond &lt; 1% becomes increasingly difficult due to the variance of the sample estimates.",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -1007,10 +1001,210 @@
     "href": "theory/intro.html#ex-logdet-computation",
     "title": "Introduction to trace estimation with primate",
     "section": "Ex: Logdet computation",
-    "text": "Ex: Logdet computation\nThe basic way to approximate the trace of a matrix function is to simply set fun to the name the spectral function. For example, to approximate the log-determinant:\n\nfrom primate.trace import hutch\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -148.12677777759933\n\n\nEven using n / 6 matvecs, we get a decent approximation. But how good is this estimate?\nTo get a slightly better idea, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -146.538 +/- 5.51 (95% CI), CV: 2%, Evals: 25 [R]\n\n\nThe first line of the statement contains fixed about the estimator:\n\nThe type of estimator (Girard-Hutchinson)\nThe spectral function being approximated (log)\nThe degree of the polynomial approximation (20)\nThe quadrature method used (‘fttr’)\n\nThe second line prints the runtime information about the samples:\n\nThe final trace estimate\nIts margin of error\nThe coefficient of variation (aka the relative std. deviation)\nThe number of samples used + their distribution prefix (‘R’ for rademacher)\n\n\nest = hutch(A, fun=\"log\", maxiter=100, plot=True)",
+    "text": "Ex: Logdet computation\nThe basic way to approximate the trace of a matrix function is to simply set fun to the name the spectral function. For example, to approximate the log-determinant:\n\nfrom primate.trace import hutch\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -150.71530622226584\n\n\nEven using n / 6 matvecs, we get a decent approximation. But how good is this estimate?\nTo get a slightly better idea, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -145.469 +/- 7.37 (95% CI), CV: 3%, Evals: 25 [R]\n\n\nThe first line of the statement contains fixed about the estimator, including the type of estimator (Girard-Hutchinson), the function applied to the spectrum (log), the degree of the Krylov expansion (20), and the quadrature method used (fttr).\nThe second line prints the runtime information about the samples, such as the final trace estimate (``) 2. Its margin of error 2. The coefficient of variation (aka the relative std. deviation) 3. The number of samples used + their distribution prefix (‘R’ for rademacher)\n\nest = hutch(A, fun=\"log\", maxiter=100, plot=True)",
     "crumbs": [
       "Theory",
       "Introduction"
+    ]
+  },
+  {
+    "objectID": "reference/primate.operator.matrix_function.html",
+    "href": "reference/primate.operator.matrix_function.html",
+    "title": "matrix_function",
+    "section": "",
+    "text": "operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)\nConstructs an operator approximating the action v \\mapsto f(A)v\nThis function constructs an operator that uses the Lanczos quadrature method to approximate the action of matrix-vector multiplication with the matrix function f(A) for any choice of fun.\n\n\nA : ndarray, sparray, or LinearOperator real symmetric operator. fun : str or Callable, default=“identity” real-valued function defined on the spectrum of A. deg : int, default=20 Degree of the Krylov expansion. rtol : float, default=1e-8 Relative tolerance to consider two Lanczos vectors are numerically orthogonal. orth: int, default=0 Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. kwargs : dict, optional additional key-values to parameterize the chosen function ‘fun’.\n\n\n\noperator : LinearOperator Operator approximating the action of fun on the spectrum of A\n\n\n\nThe matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with either: 1. The Golub-Welsch algorithm (GW), or 2. The Forward Three Term Recurrence algorithm (FTTR) for computing the deg-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi matrix T.\nThe GW computation uses implicit symmetric QR steps with Wilkinson shift to compute the full eigen-decomposition of T, while the FTTR algorithm uses the explicit expression for orthogonal polynomials to compute only the weights of the quadrature. The former uses O(\\mathrm{deg}^2) time and space and is highly accurate, while the latter uses O(\\mathrm{deg}^2) time and O(1) space at the cost of some accuracy. If deg is large, the fttr method should be preferred."
+  },
+  {
+    "objectID": "reference/primate.operator.matrix_function.html#parameters",
+    "href": "reference/primate.operator.matrix_function.html#parameters",
+    "title": "matrix_function",
+    "section": "",
+    "text": "A : ndarray, sparray, or LinearOperator real symmetric operator. fun : str or Callable, default=“identity” real-valued function defined on the spectrum of A. deg : int, default=20 Degree of the Krylov expansion. rtol : float, default=1e-8 Relative tolerance to consider two Lanczos vectors are numerically orthogonal. orth: int, default=0 Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. kwargs : dict, optional additional key-values to parameterize the chosen function ‘fun’."
+  },
+  {
+    "objectID": "reference/primate.operator.matrix_function.html#returns",
+    "href": "reference/primate.operator.matrix_function.html#returns",
+    "title": "matrix_function",
+    "section": "",
+    "text": "operator : LinearOperator Operator approximating the action of fun on the spectrum of A"
+  },
+  {
+    "objectID": "reference/primate.operator.matrix_function.html#notes",
+    "href": "reference/primate.operator.matrix_function.html#notes",
+    "title": "matrix_function",
+    "section": "",
+    "text": "The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with either: 1. The Golub-Welsch algorithm (GW), or 2. The Forward Three Term Recurrence algorithm (FTTR) for computing the deg-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi matrix T.\nThe GW computation uses implicit symmetric QR steps with Wilkinson shift to compute the full eigen-decomposition of T, while the FTTR algorithm uses the explicit expression for orthogonal polynomials to compute only the weights of the quadrature. The former uses O(\\mathrm{deg}^2) time and space and is highly accurate, while the latter uses O(\\mathrm{deg}^2) time and O(1) space at the cost of some accuracy. If deg is large, the fttr method should be preferred."
+  },
+  {
+    "objectID": "reference/operator.html",
+    "href": "reference/operator.html",
+    "title": "operator",
+    "section": "",
+    "text": "operator\n\n\n\n\n\nName\nDescription\n\n\n\n\nmatrix_function\nConstructs an operator approximating the action v \\mapsto f(A)v"
+  },
+  {
+    "objectID": "reference/operator.html#functions",
+    "href": "reference/operator.html#functions",
+    "title": "operator",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\nmatrix_function\nConstructs an operator approximating the action v \\mapsto f(A)v"
+  },
+  {
+    "objectID": "reference/primate.trace.xtrace.html",
+    "href": "reference/primate.trace.xtrace.html",
+    "title": "xtrace",
+    "section": "",
+    "text": "xtrace\ntrace.xtrace(A, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False)"
+  },
+  {
+    "objectID": "reference/index.html#operators",
+    "href": "reference/index.html#operators",
+    "title": "Function reference",
+    "section": "",
+    "text": "Matrix operators\n\n\n\noperator.matrix_function\nConstructs a LinearOperator approximating the action of the matrix function fun(A).",
+    "crumbs": [
+      "API Reference"
+    ]
+  },
+  {
+    "objectID": "reference/random.normal.html#returns",
+    "href": "reference/random.normal.html#returns",
+    "title": "random.normal",
+    "section": "",
+    "text": "np.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
+    "crumbs": [
+      "API Reference",
+      "Random",
+      "Normal"
+    ]
+  },
+  {
+    "objectID": "reference/random.rademacher.html#returns",
+    "href": "reference/random.rademacher.html#returns",
+    "title": "random.rademacher",
+    "section": "",
+    "text": "np.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
+    "crumbs": [
+      "API Reference",
+      "Random",
+      "Rademacher"
+    ]
+  },
+  {
+    "objectID": "reference/operator.matrix_function.html",
+    "href": "reference/operator.matrix_function.html",
+    "title": "operator.matrix_function",
+    "section": "",
+    "text": "operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)\nConstructs a LinearOperator approximating the action of the matrix function fun(A).\nThis function uses the Lanczos quadrature method to approximate the action of matrix function:  v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T  The resulting operator may be used in conjunction with other trace estimation methods, such as the hutch or xtrace estimators.\nThe weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the quad parameter). For a description of the other parameters, see the Lanczos function.\n\n\n\n\n\n\nNote\n\n\n\nTo compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of stability. If deg is large and accuracy is not a priority, the fttr method is preferred.\n\n\n\n\nA : ndarray, sparray, or LinearOperator real symmetric operator. fun : str or Callable, default=“identity” real-valued function defined on the spectrum of A. deg : int, default=20 Degree of the Krylov expansion. rtol : float, default=1e-8 Relative tolerance to consider two Lanczos vectors are numerically orthogonal. orth: int, default=0 Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. kwargs : dict, optional additional key-values to parameterize the chosen function ‘fun’.\n\n\n\noperator : LinearOperator Operator approximating the action of fun on the spectrum of A",
+    "crumbs": [
+      "API Reference",
+      "Matrix Function"
+    ]
+  },
+  {
+    "objectID": "reference/operator.matrix_function.html#parameters",
+    "href": "reference/operator.matrix_function.html#parameters",
+    "title": "operator.matrix_function",
+    "section": "",
+    "text": "A : ndarray, sparray, or LinearOperator real symmetric operator. fun : str or Callable, default=“identity” real-valued function defined on the spectrum of A. deg : int, default=20 Degree of the Krylov expansion. rtol : float, default=1e-8 Relative tolerance to consider two Lanczos vectors are numerically orthogonal. orth: int, default=0 Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. kwargs : dict, optional additional key-values to parameterize the chosen function ‘fun’.",
+    "crumbs": [
+      "API Reference",
+      "Matrix Function"
+    ]
+  },
+  {
+    "objectID": "reference/operator.matrix_function.html#returns",
+    "href": "reference/operator.matrix_function.html#returns",
+    "title": "operator.matrix_function",
+    "section": "",
+    "text": "operator : LinearOperator Operator approximating the action of fun on the spectrum of A",
+    "crumbs": [
+      "API Reference",
+      "Matrix Function"
+    ]
+  },
+  {
+    "objectID": "reference/operator.matrix_function.html#notes",
+    "href": "reference/operator.matrix_function.html#notes",
+    "title": "operator.matrix_function",
+    "section": "",
+    "text": "The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with either: 1. The Golub-Welsch algorithm (GW), or 2. The Forward Three Term Recurrence algorithm (FTTR) for computing the deg-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi matrix T.\nThe GW computation uses implicit symmetric QR steps with Wilkinson shift to compute the full eigen-decomposition of T, while the FTTR algorithm uses the explicit expression for orthogonal polynomials to compute only the weights of the quadrature. The former uses O(\\mathrm{deg}^2) time and space and is highly accurate, while the latter uses O(\\mathrm{deg}^2) time and O(1) space at the cost of some accuracy. If deg is large, the fttr method should be preferred."
+  },
+  {
+    "objectID": "reference/trace.xtrace.html",
+    "href": "reference/trace.xtrace.html",
+    "title": "trace.xtrace",
+    "section": "",
+    "text": "trace.xtrace\ntrace.xtrace(A, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False)",
+    "crumbs": [
+      "API Reference",
+      "XTrace"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html",
+    "href": "reference/trace.hutch.html",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='fttr', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)\nEstimates the trace of a symmetric A or matrix function f(A) via a Girard-Hutchinson estimator.\nThis function uses up to maxiter random isotropic vectors to estimate of the trace of f(A), where: \\mathrm{tr}(f(A)) = \\mathrm{tr}(U f(\\Lambda) U^T) = \\sum\\limits_{i=1}^n f(\\lambda_i)  The estimator is obtained by averaging quadratic forms v \\mapsto v^T f(A)v, rescaling as necessary. This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. See the online documentation for more details.\n\n\n\n\n\n\nNote\n\n\n\nConvergence behavior is controlled by the stop parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with atol and rtol to upper-bound the error of the approximation. Alternatively, when stop = “change”, the estimator is considered converged when the error between the last two iterates is less than atol (or rtol, respectively), similar to the behavior of scipy.integrate.quadrature.\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n10\n\n\ndeg\nint\nDegree of the quadrature approximation. Must be at least 1.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See notes.\nNone\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See notes.\n1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n\"confidence\"\n\n\nncv\nint\nNumber of Lanczos vectors to allocate. Must be at least 2.\n2\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against. Must be less than ncv.\n0\n\n\nquad\nstr\nMethod used to obtain the weights of the Gaussian quadrature. See notes.\n'fttr'\n\n\nconfidence\nfloat\nConfidence level to consider estimator as converged. Only used when stop = “confidence”.\n0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘mt64’\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Set to &lt;= 0 to let OpenMP decide.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\nFalse\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}\n\n\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\ntyping.Union[float, tuple]\nEstimate the trace of f(A). If ‘info = True’, additional information about the computation is also returned.\n\n\n\n\n\n\nlanczos : the lanczos tridiagonalization algorithm.\n\n\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html#notes",
+    "href": "reference/trace.hutch.html#notes",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "For matrix functions (when fun is not None), the Lanczos method is used to approximate the action of f(A), and this function yields estimates of the quantity: \\mathrm{tr}(f(A)) = \\mathrm{tr}(U f(\\Lambda) U^T) This allows for quick approximating of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. See the online documentation for more details.",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html#parameters",
+    "href": "reference/trace.hutch.html#parameters",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nndarray, sparray, or LinearOperator\nreal symmetric operator.\nrequired\n\n\nfun\nstr or typing.Callable\nreal-valued function defined on the spectrum of A.\n\"identity\"\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n10\n\n\ndeg\nint\nDegree of the quadrature approximation. Must be at least 1.\n20\n\n\natol\nfloat\nAbsolute tolerance to signal convergence for early-stopping. See notes.\nNone\n\n\nrtol\nfloat\nRelative tolerance to signal convergence for early-stopping. See notes.\n1e-2\n\n\nstop\nstr\nEarly-stopping criteria to test estimator convergence. See details.\n\"confidence\"\n\n\nncv\nint\nNumber of Lanczos vectors to allocate. Must be at least 2.\n2\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against. Must be less than ncv.\n0\n\n\nquad\nstr\nMethod used to obtain the weights of the Gaussian quadrature. See notes.\n'fttr'\n\n\nconfidence\nfloat\nConfidence level to consider estimator as converged. Only used when stop = “confidence”.\n0.95\n\n\npdf\n‘rademacher’, ‘normal’\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nrng\n‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘mt64’\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\n-1\n\n\nnum_threads\nint\nNumber of threads to use to parallelize the computation. Set to &lt;= 0 to let OpenMP decide.\n0\n\n\nplot\nbool\nIf true, plots the samples of the trace estimate along with their convergence characteristics.\nFalse\n\n\ninfo\nbool\nIf True, returns a dictionary containing all relevant information about the computation.\nFalse\n\n\nkwargs\ndict\nadditional key-values to parameterize the chosen function ‘fun’.\n{}",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html#returns",
+    "href": "reference/trace.hutch.html#returns",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "Type\nDescription\n\n\n\n\ntyping.Union[float, tuple]\nEstimate the trace of f(A). If ‘info = True’, additional information about the computation is also returned.",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html#see-also",
+    "href": "reference/trace.hutch.html#see-also",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "lanczos : the lanczos tridiagonalization algorithm.",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
+    ]
+  },
+  {
+    "objectID": "reference/trace.hutch.html#reference",
+    "href": "reference/trace.hutch.html#reference",
+    "title": "trace.hutch",
+    "section": "",
+    "text": "Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.",
+    "crumbs": [
+      "API Reference",
+      "Hutch"
     ]
   }
 ]

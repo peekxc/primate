@@ -12,6 +12,17 @@ Currently the package must be built from source via cloning the repository. PYPI
 
 <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
 
+### Platform support
+
+Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable `primate` to be installed on supported architecture / CPython implementations without compilation. The currently supported platforms include: 
+
+
+If your platform isn't on this list, feel free to make an issue requesting support for your platform. 
+
+### Compiling from source
+
+To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](). For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
+
 ### C++ Installation
 
 `primate`'s C++ interface is [header-only](https://en.wikipedia.org/wiki/Header-only), making it easy to compile your own [extension modules](https://docs.python.org/3/extending/extending.html). The simplest way to link these headers is to add `primate` as a [dependency](https://peps.python.org/pep-0631/) to your package and use the `get_include()` function to find the appropriate directory.

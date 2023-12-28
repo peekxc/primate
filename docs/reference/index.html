@@ -71,6 +71,22 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -179,7 +195,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lanczos</span></a>
+ <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
       </ul>
@@ -222,55 +238,39 @@ ul.task-list li input[type="checkbox"] {
           </a> 
       </div>
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
- <span class="menu-text">Diagonalize</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/diagonalize.lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Lanczos</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false">
- <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_trace.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Trace</span></a>
+  <a href="../reference/trace.hutch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/primate.trace.sl_gauss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">SL Gauss</span></a>
+  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">XTrace</span></a>
   </div>
 </li>
-      </ul>
-  </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/operator.matrix_function.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix Function</span></a>
+  </div>
+</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
@@ -300,6 +300,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#function-reference" id="toc-function-reference" class="nav-link active" data-scroll-target="#function-reference">Function reference</a>
   <ul class="collapse">
   <li><a href="#trace" id="toc-trace" class="nav-link" data-scroll-target="#trace">Trace</a></li>
+  <li><a href="#operators" id="toc-operators" class="nav-link" data-scroll-target="#operators">Operators</a></li>
   <li><a href="#random" id="toc-random" class="nav-link" data-scroll-target="#random">Random</a></li>
   <li><a href="#diagonalize" id="toc-diagonalize" class="nav-link" data-scroll-target="#diagonalize">Diagonalize</a></li>
   <li><a href="#misc" id="toc-misc" class="nav-link" data-scroll-target="#misc">Misc</a></li>
@@ -321,8 +322,24 @@ ul.task-list li input[type="checkbox"] {
 <table class="table">
 <tbody>
 <tr class="odd">
-<td><a href="../reference/trace.html#primate.trace">trace</a></td>
+<td><a href="../reference/trace.hutch.html#primate.trace.hutch">trace.hutch</a></td>
+<td>Estimates the trace of a symmetric <span class="math inline">A</span> or matrix function <span class="math inline">f(A)</span> via a Girard-Hutchinson estimator.</td>
+</tr>
+<tr class="even">
+<td><a href="../reference/trace.xtrace.html#primate.trace.xtrace">trace.xtrace</a></td>
 <td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="operators" class="level2">
+<h2 class="anchored" data-anchor-id="operators">Operators</h2>
+<p>Matrix operators</p>
+<table class="table">
+<tbody>
+<tr class="odd">
+<td><a href="../reference/operator.matrix_function.html#primate.operator.matrix_function">operator.matrix_function</a></td>
+<td>Constructs a <code>LinearOperator</code> approximating the action of the matrix function <code>fun(A)</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -338,7 +355,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="even">
 <td><a href="../reference/random.normal.html#primate.random.normal">random.normal</a></td>
-<td>Generates random vectors from the rademacher distribution.</td>
+<td>Generates random vectors from the standard normal distribution.</td>
 </tr>
 </tbody>
 </table>

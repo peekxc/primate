@@ -1,0 +1,77 @@
+---
+title: "Performance"
+---
+
+`primate` provides a variety of efficient algorithms for estimating quantities derived from matrix functions. These algorithms are largely implemented in C++ to minimize overhead, and for some computational problems `primate` can out-perform the standard algorithms for estimating spectral quantities by several orders of magnitude. Nonetheless, there are some performance-related caveats to be aware of. 
+
+The main 
+
+
+To illustrate this, we give an example below using Toeplitz matrices.  
+```{python}
+from scipy.linalg import toeplitz
+from primate.trace import hutch 
+
+c = np.random.uniform(size=100, low=0, high=1)
+T = toeplitz(c)
+
+# np.sum(np.reciprocal(np.linalg.eigvalsh(T)))
+np.sum(np.abs(np.linalg.eigvalsh(T)))
+est, info = hutch(T, fun=np.abs, maxiter=200, pdf='rademacher', rng="mt", deg=20, seed=-1, plot=True)
+
+est, info = hutch(T, fun=np.abs, maxiter=800, pdf='rademacher', rng="mt", quad="golub_welsch", deg=200, seed=-1, plot=True)
+est, info = hutch(C, fun=np.abs, maxiter=800, pdf='rademacher', rng="mt", quad="golub_welsch", deg=200, seed=-1, plot=True)
+
+
+
+np.sum(np.linalg.svd(T)[1])
+
+Z = np.zeros(T.shape)
+C = np.block([[Z, T], [T.T, Z]])
+hutch(C, fun=np.abs, maxiter=200, pdf='rademacher', rng="mt", quad="golub_welsch", deg=200, seed=-1, plot=False)
+
+
+hutch(T, fun=np.abs, maxiter=200, pdf='rademacher', deg=50, seed=-1, plot=False)
+
+p = info['figure']
+
+from primate.trace import xtrace
+from primate.operator import matrix_function
+M = matrix_function(T, "abs")
+xtrace(M)
+
+s = info['samples']
+v = np.random.choice([-1, 1], size=T.shape[0])
+T @ v
+
+s[np.abs(s) <= np.linalg.norm(T)].mean()
+
+
+from primate.diagonalize import lanczos
+from scipy.linalg import eigvalsh_tridiagonal
+a, b = lanczos(T, deg=499, orth=150)
+np.sum(np.abs(eigvalsh_tridiagonal(a,b)))
+
+```
+
+```{python}
+import timeit 
+timeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun="log", quad="fttr"), number = 1000)
+timeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)
+```
+
+
+<!-- ```{python}
+c = np.reciprocal(np.sqrt(n))
+trace_estimates = np.empty(n)
+for j in range(n):
+  v = np.random.choice([-1, +1], size=n)
+  trace_estimates[j] = v @ A @ v
+
+
+est_index = np.arange(1, (n*10)+1)
+p = figure(width=200, height=150)
+p.line(est_index, (np.cumsum(trace_estimates) / est_index))
+p.line(est_index, np.repeat(A.trace(), n*10), color='red')
+show(p)
+``` -->

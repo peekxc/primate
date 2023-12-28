@@ -30,7 +30,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/random.rademacher.html" rel="prev">
+<link href="../reference/trace.xtrace.html" rel="next">
+<link href="../reference/diagonalize.lanczos.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -70,6 +71,22 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -113,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/random.rademacher.html">Random</a></li><li class="breadcrumb-item"><a href="../reference/random.normal.html">Normal</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/trace.hutch.html">Hutch</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -229,7 +246,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/trace.hutch.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/trace.hutch.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Hutch</span></a>
   </div>
 </li>
@@ -247,13 +264,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/random.rademacher.html" class="sidebar-item-text sidebar-link">
@@ -262,7 +279,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/random.normal.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Normal</span></a>
   </div>
 </li>
@@ -280,10 +297,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#primate.random.normal" id="toc-primate.random.normal" class="nav-link active" data-scroll-target="#primate.random.normal">random.normal</a>
+  <li><a href="#primate.trace.hutch" id="toc-primate.trace.hutch" class="nav-link active" data-scroll-target="#primate.trace.hutch">trace.hutch</a>
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns:</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -294,18 +313,32 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="primate.random.normal" class="level1">
-<h1>random.normal</h1>
-<p><code>random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)</code></p>
-<p>Generates random vectors from the standard normal distribution.</p>
+<section id="primate.trace.hutch" class="level1">
+<h1>trace.hutch</h1>
+<p><code>trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='fttr', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)</code></p>
+<p>Estimates the trace of a symmetric <span class="math inline">A</span> or matrix function <span class="math inline">f(A)</span> via a Girard-Hutchinson estimator.</p>
+<p>This function uses up to <code>maxiter</code> random isotropic vectors to estimate of the trace of <span class="math inline">f(A)</span>, where: <span class="math display">\mathrm{tr}(f(A)) = \mathrm{tr}(U f(\Lambda) U^T) = \sum\limits_{i=1}^n f(\lambda_i) </span> The estimator is obtained by averaging quadratic forms <span class="math inline">v \mapsto v^T f(A)v</span>, rescaling as necessary. This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. See the <a href="https://peekxc.github.io/primate/">online documentation</a> for more details.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Convergence behavior is controlled by the <code>stop</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation. Alternatively, when <code>stop</code> = “change”, the estimator is considered converged when the error between the last two iterates is less than <code>atol</code> (or <code>rtol</code>, respectively), similar to the behavior of scipy.integrate.quadrature.</p>
+</div>
+</div>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="table">
 <colgroup>
-<col style="width: 7%">
-<col style="width: 16%">
-<col style="width: 62%">
-<col style="width: 13%">
+<col style="width: 8%">
+<col style="width: 26%">
+<col style="width: 54%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -317,35 +350,146 @@ ul.task-list li input[type="checkbox"] {
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>size</code></td>
-<td>int or tuple</td>
-<td>Output shape to generate.</td>
+<td><code>A</code></td>
+<td>ndarray, sparray, or LinearOperator</td>
+<td>real symmetric operator.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
+<td><code>fun</code></td>
+<td>str or typing.Callable</td>
+<td>real-valued function defined on the spectrum of <code>A</code>.</td>
+<td><code>"identity"</code></td>
+</tr>
+<tr class="odd">
+<td><code>maxiter</code></td>
+<td>int</td>
+<td>Maximum number of random vectors to sample for the trace estimate.</td>
+<td><code>10</code></td>
+</tr>
+<tr class="even">
+<td><code>deg</code></td>
+<td>int</td>
+<td>Degree of the quadrature approximation. Must be at least 1.</td>
+<td><code>20</code></td>
+</tr>
+<tr class="odd">
+<td><code>atol</code></td>
+<td>float</td>
+<td>Absolute tolerance to signal convergence for early-stopping. See notes.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td><code>rtol</code></td>
+<td>float</td>
+<td>Relative tolerance to signal convergence for early-stopping. See notes.</td>
+<td><code>1e-2</code></td>
+</tr>
+<tr class="odd">
+<td><code>stop</code></td>
+<td>str</td>
+<td>Early-stopping criteria to test estimator convergence. See details.</td>
+<td><code>"confidence"</code></td>
+</tr>
+<tr class="even">
+<td><code>ncv</code></td>
+<td>int</td>
+<td>Number of Lanczos vectors to allocate. Must be at least 2.</td>
+<td><code>2</code></td>
+</tr>
+<tr class="odd">
+<td><code>orth</code></td>
+<td>int</td>
+<td>Number of additional Lanczos vectors to orthogonalize against. Must be less than <code>ncv</code>.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>quad</code></td>
+<td>str</td>
+<td>Method used to obtain the weights of the Gaussian quadrature. See notes.</td>
+<td><code>'fttr'</code></td>
+</tr>
+<tr class="odd">
+<td><code>confidence</code></td>
+<td>float</td>
+<td>Confidence level to consider estimator as converged. Only used when <code>stop</code> = “confidence”.</td>
+<td><code>0.95</code></td>
+</tr>
+<tr class="even">
+<td><code>pdf</code></td>
+<td>‘rademacher’, ‘normal’</td>
+<td>Choice of zero-centered distribution to sample random vectors from.</td>
+<td><code>'rademacher'</code></td>
+</tr>
+<tr class="odd">
 <td><code>rng</code></td>
-<td>str = “splitmix64”</td>
+<td>‘splitmix64’, ’xoshiro256**‘, ’pcg64’, ‘mt64’</td>
 <td>Random number generator to use.</td>
 <td><code>'splitmix64'</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>seed</code></td>
-<td>int = -1</td>
-<td>Seed for the generator. Use -1 to for random (non-deterministic) behavior.</td>
+<td>int</td>
+<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
 <td><code>-1</code></td>
 </tr>
+<tr class="odd">
+<td><code>num_threads</code></td>
+<td>int</td>
+<td>Number of threads to use to parallelize the computation. Set to &lt;= 0 to let OpenMP decide.</td>
+<td><code>0</code></td>
+</tr>
 <tr class="even">
-<td><code>dtype</code></td>
-<td>dtype = float32</td>
-<td>Floating point dtype for the output. Must be float32 or float64.</td>
-<td><code>np.float32</code></td>
+<td><code>plot</code></td>
+<td>bool</td>
+<td>If true, plots the samples of the trace estimate along with their convergence characteristics.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td><code>info</code></td>
+<td>bool</td>
+<td>If True, returns a dictionary containing all relevant information about the computation.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td><code>kwargs</code></td>
+<td>dict</td>
+<td>additional key-values to parameterize the chosen function ‘fun’.</td>
+<td><code>{}</code></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="returns" class="level2">
-<h2 class="anchored" data-anchor-id="returns">Returns:</h2>
-<p>np.narray Randomly generated matrix of shape <code>size</code> with entries in { -1, 1 }.</p>
+<h2 class="anchored" data-anchor-id="returns">Returns</h2>
+<table class="table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 78%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>typing.Union[float, tuple]</td>
+<td>Estimate the trace of <span class="math inline">f(A)</span>. If ‘info = True’, additional information about the computation is also returned.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also" class="level2">
+<h2 class="anchored" data-anchor-id="see-also">See Also</h2>
+<p>lanczos : the lanczos tridiagonalization algorithm.</p>
+</section>
+<section id="reference" class="level2">
+<h2 class="anchored" data-anchor-id="reference">Reference</h2>
+<ol type="1">
+<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
+</ol>
 
 
 </section>
@@ -895,11 +1039,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/random.rademacher.html" class="pagination-link  aria-label=" rademacher"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Rademacher</span>
+      <a href="../reference/diagonalize.lanczos.html" class="pagination-link  aria-label=" lanczos"="">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Lanczos</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../reference/trace.xtrace.html" class="pagination-link" aria-label="XTrace">
+        <span class="nav-page-text">XTrace</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
