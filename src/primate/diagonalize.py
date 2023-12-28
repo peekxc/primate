@@ -18,8 +18,23 @@ def lanczos(
 ) -> tuple:
 	"""Lanczos method for matrix tridiagonalization.
 
-	This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,  
-	with additional modifications to support varying degrees of re-orthogonalization. 
+	This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional 
+	modifications to support varying degrees of re-orthogonalization. In particular, `orth=0` corresponds to no re-orthogonalization, 
+	`orth < deg` corresponds to partial re-orthogonalization, and `orth >= deg` corresponds to full re-orthogonalization.
+	
+	Notes
+	-----
+	The Lanczos method iteratively builds a tridiagonal matrix `T` of a symmetric `A` via an orthogonal change-of-basis `Q`:
+	$$ Q^T A Q  = T $$
+	Unlike other Lanczos implementations (e.g. SciPy's `eigsh`), which includes e.g. sophisticated restarting, 
+	deflation, and selective-reorthogonalization steps, this method simply executes `deg` steps of the Lanczos method with 
+	the supplied `v0` and returns the resulting tridiagonal matrix.
+	
+	Diagonalizing `T` via e.g. `scipy.linalg.eigh_tridiagonal` yields Rayleigh-Ritz approximations of the eigenvalues of `A`,
+	though note no checking is performed for 'ghost' or already converged eigenvalues. To increase the accuracy of these eigenvalue 
+	approximation, try increasing `orth` and `deg`. Supplying either negative values or values larger than `deg` for `orth` will 
+	result in full re-orthogonalization, though note the number of matvecs scales linearly with `deg` and the number of inner-products 
+	scales quadratically with `orth`.
 
 	Parameters
 	----------
@@ -36,27 +51,20 @@ def lanczos(
 	sparse_mat : bool, default=False
 	    Whether to output the tridiagonal matrix as a sparse matrix.
 	return_basis : bool, default=False
-	    Whether to return the `orth` + 2 Lanczos vectors.
+	    If `True`, returns the Krylov basis vectors `Q`.
 	dtype : dtype, default=None
 	  	The precision dtype to specialize the computation.
 
 	Returns
 	-------
-	A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If `return_basis` is
-	True, then the tuple `(a,b), Q` is returned, where `Q` represents orthogonal basis for the Krylov subspace.
+	: 
+			A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If `return_basis=True`, 
+			the tuple `(a,b), Q` is returned, where `Q` represents an orthogonal basis for the degree-`deg` Krylov subspace.
 
 	See Also
 	--------
 	scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.
 	operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.
-
-	Notes
-	-----
-	No checking for performed for ghost, converged, or 'locked' eigenvalues. To increase the accuracy of the 
-	eigenvalue approximation, increase `orth` and `deg`. Note the number of matvecs with `A` scales linearly 
-	with `deg` and the number of inner-products scales quadratically with `orth`.
-
-	Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization.
 
 	References
 	----------

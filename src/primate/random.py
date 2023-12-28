@@ -10,6 +10,26 @@ _engine_prefixes = ["sx", "xs", "pcg", "mt"]
 _iso_distributions = ["rademacher", "normal", "sphere", "xtrace"]
 
 def symmetric(n: int, dist: str = "normal", pd: bool = True, ew: np.ndarray = None):
+	"""
+	Generates a random symmetric matrix of size with pre-supplied eigenvalues. 
+	
+	Parameters:
+	----------
+	n : int
+			The size of the matrix.
+	dist : str="normal"
+			Distribution of individual matrix entries. 
+	pd : bool=False
+			Whether to make the generated matrix positive-definite.
+	ew : ndarray=None 
+			Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1].
+	
+	Returns:
+	--------
+		A: ndarray 
+				The generated matrix
+
+	"""
 	N: int = n * (n - 1) // 2
 	if dist == "uniform":
 		A = squareform(np.random.uniform(size=N))
@@ -40,6 +60,11 @@ def rademacher(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1,
 			Seed for the generator. Use -1 to for random (non-deterministic) behavior.
 	dtype : dtype = float32
 			Floating point dtype for the output. Must be float32 or float64.
+	
+	Returns: 
+	--------
+	np.narray 
+			Randomly generated matrix of shape `size` with entries in { -1, 1 }.
 	"""
 	assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
 	assert dtype == np.float32 or dtype == np.float64, "Only 32- or 64-bit floating point numbers are supported."
@@ -51,7 +76,7 @@ def rademacher(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1,
 
 
 def normal(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1, dtype=np.float32):
-	"""Generates random vectors from the rademacher distribution.
+	"""Generates random vectors from the standard normal distribution.
 
 	Parameters
 	----------
@@ -63,6 +88,11 @@ def normal(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1, dty
 			Seed for the generator. Use -1 to for random (non-deterministic) behavior.
 	dtype : dtype = float32
 			Floating point dtype for the output. Must be float32 or float64.
+	
+	Returns: 
+	--------
+	:
+			Randomly generated matrix of shape `size` with entries in { -1, 1 }.
 	"""
 	assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
 	assert dtype == np.float32 or dtype == np.float64, "Only 32- or 64-bit floating point numbers are supported."
@@ -84,6 +114,24 @@ def normal(size: Union[int, tuple], rng: str = "splitmix64", seed: int = -1, dty
 
 
 def isotropic(size: Union[int, tuple], method: str = "rademacher") -> np.ndarray:
+	"""Generates random unit-norm vectors from a specified isotropic distribution.
+
+	Parameters
+	----------
+	size : int or tuple
+			Output shape to generate.
+	method : str = "rademacher"
+			Distribution to sample from. Must be one of { "rademacher", "sphere" }.
+	seed : int = -1
+			Seed for the generator. Use -1 to for random (non-deterministic) behavior.
+	dtype : dtype = float32
+			Floating point dtype for the output. Must be float32 or float64.
+	
+	Returns: 
+	--------
+	np.narray 
+			Randomly generated matrix of shape `size` with entries in { -1, 1 }.
+	"""
 	assert isinstance(method, str) and method in _iso_distributions, f"Invalid distribution '{str(method)}' supplied."
 	n, m = (size, 1) if isinstance(size, Integral) else np.take(size, (0, 1))
 	if method == "rademacher":

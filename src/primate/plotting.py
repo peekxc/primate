@@ -2,7 +2,7 @@ import numpy as np
 from typing import Union
 
 def figure_trace(samples: Union[np.ndarray, dict], real_trace: float = None, **kwargs):
-  """Plots the trace estimates """
+  """Generates figures showing the convergence of sample trace estimates. """
   import bokeh 
   from bokeh.models import Span, Scatter, LinearAxis, Range1d, BoxAnnotation, Legend, Band, ColumnDataSource
   from bokeh.plotting import figure

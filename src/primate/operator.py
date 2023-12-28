@@ -15,42 +15,43 @@ def matrix_function(
 	orth: int = 0,
 	**kwargs,
 ) -> LinearOperator:
-	"""Constructs an operator approximating the action $v \\mapsto f(A)v$
+	"""Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`. 
 
-	This function constructs an operator that uses the Lanczos quadrature method to approximate the action of
-	matrix-vector multiplication with the matrix function $f(A)$ for any choice of `fun`.
+	This function uses the Lanczos quadrature method to approximate the action of matrix function:
+	$$ v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T $$
+	The resulting operator may be used in conjunction with other trace and vector-based estimation methods, 
+	such as the `hutch` or `xtrace` estimators.
 
-	Parameters:
+	The weights of the quadrature may be computed using either the Golub-Welsch (GW) or 
+	Forward Three Term Recurrence algorithms (FTTR) (see the `quad` parameter). For a description 
+	of the other parameters, see the Lanczos function. 
+
+	:::{.callout-note}
+	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
+	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
+	the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
+	If `deg` is large, `fttr` is preferred. 
+	:::
+
+	Parameters
 	-----------
-	  A : ndarray, sparray, or LinearOperator
-	      real symmetric operator.
-	  fun : str or Callable, default="identity"
-	      real-valued function defined on the spectrum of `A`.
-	  deg : int, default=20
-	      Degree of the Krylov expansion.
-	  rtol : float, default=1e-8
-	      Relative tolerance to consider two Lanczos vectors are numerically orthogonal.
-	  orth: int, default=0
-	      Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
-	  kwargs : dict, optional
-	    additional key-values to parameterize the chosen function 'fun'.
+		A : ndarray, sparray, or LinearOperator
+				real symmetric operator.
+		fun : str or Callable, default="identity"
+				real-valued function defined on the spectrum of `A`.
+		deg : int, default=20
+				Degree of the Krylov expansion.
+		rtol : float, default=1e-8
+				Relative tolerance to consider two Lanczos vectors are numerically orthogonal.
+		orth: int, default=0
+				Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
+		kwargs : dict, optional
+			additional key-values to parameterize the chosen function 'fun'.
 
-	Returns:
-	--------
-	  operator : LinearOperator
-	      Operator approximating the action of `fun` on the spectrum of `A`
-
-	Notes: 
-	------
-	The matrix-function approximation is implemented via Lanczos quadrature, which combines the Lanczos method with either: 
-		1. The Golub-Welsch algorithm (GW), or 
-		2. The Forward Three Term Recurrence algorithm (FTTR)
-	for computing the `deg`-point Gaussian quadrature rule of a symmetric tridiagonal / Jacobi matrix `T`.
-
-	The GW computation uses implicit symmetric QR steps with Wilkinson shift to compute the full eigen-decomposition of `T`, 
-	while the FTTR algorithm uses the explicit expression for orthogonal polynomials to compute only the weights of the 
-	quadrature. The former uses $O(\\mathrm{deg}^2)$ time and space and is highly accurate, while the latter uses 
-	$O(\\mathrm{deg}^2)$ time and $O(1)$ space at the cost of some accuracy. If `deg` is large, the `fttr` method should be preferred. 
+	Returns
+	-------
+	: 
+		a `LinearOperator` approximating the action of `fun` on the spectrum of `A`
 
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]

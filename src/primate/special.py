@@ -22,6 +22,36 @@ def soft_sign(x: np.ndarray = None, q: int = 1):
     return sx if len(sx) > 1 else np.take(sx,0)
   return _sign(x) if x is not None else _sign
 
-
+# _builtin_matrix_functions = ["identity", "abs", "sqrt", "log", "inv", "exp", "smoothstep", "numrank", "gaussian"]
+def figure_fun(fun: Union[str, Callable], bounds: tuple = (-1, 1), *args, **kwargs):
+  assert isinstance(fun, str) or isinstance(fun, Callable), "'fun' must be string or callable."
+  from bokeh.plotting import figure
+  dom = np.linspace(bounds[0], bounds[1], 250, endpoint=True)
+  p = figure(width=250, height=250, title=f"fun = {fun}")
+  out = None
+  if isinstance(fun, str):
+    if fun == "identity":
+      out = dom
+    elif fun == "abs":
+      out = np.abs(dom)
+    elif fun == "sqrt":
+      out = np.sqrt(np.abs(dom))
+    elif fun == "log":
+      out = np.log(dom)
+    elif fun == "inv":
+      out = np.reciprocal(dom)
+    elif fun == "exp":
+      out = np.exp(dom)
+    elif fun == "smoothstep":
+      out = soft_sign(dom, *args, **kwargs)
+    elif fun == "rank":
+      out = np.sign(dom)
+    else:
+      raise ValueError(f"Invalid function '{fun}' supplied. Must be one of {str(_builtin_matrix_functions)}")
+  else: 
+    out = fun(dom, *args, **kwargs)
+  p.line(dom, out)
+  return p 
+    
 
 

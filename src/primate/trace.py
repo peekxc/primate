@@ -32,15 +32,20 @@ def hutch(
 	plot: bool = False,
 	**kwargs
 ) -> Union[float, tuple]:
-	"""Estimates the trace of a matrix $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
+	"""Estimates the trace of a symmetric $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
 
-	This function uses up to `maxiter` random isotropic vectors to form an unbiased estimator of the trace of `A`. 
-	The estimator is obtained by averaging quadratic forms of $A$ (or $f(A)$), rescaling as necessary.  
-	
-	Notes
-	-----
-	For matrix functions, the Lanczos method up to degree `deg` is used to approximate the action of $f(A)$. By default, 
+	This function uses up to `maxiter` random isotropic vectors to estimate of the trace of $f(A)$, where:
+	$$\\mathrm{tr}(f(A)) = \\mathrm{tr}(U f(\\Lambda) U^T) = \\sum\\limits_{i=1}^n f(\\lambda_i) $$
+	The estimator is obtained by averaging quadratic forms $v \mapsto v^T f(A)v$, rescaling as necessary.
+	This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. 
+	See the [online documentation](https://peekxc.github.io/primate/) for more details.
 
+	:::{.callout-note}	
+	Convergence behavior is controlled by the `stop` parameter: "confidence" uses the central limit theorem to generate confidence 
+	intervals on the fly, which may be used in conjunction with `atol` and `rtol` to upper-bound the error of the approximation. 
+	Alternatively, when `stop` = "change", the estimator is considered converged when the error between the last two iterates is less than 
+	`atol` (or `rtol`, respectively), similar to the behavior of scipy.integrate.quadrature.
+	:::
 
 	Parameters
 	----------
@@ -68,7 +73,7 @@ def hutch(
 	    Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
 	pdf : { 'rademacher', 'normal' }, default="rademacher"
 	    Choice of zero-centered distribution to sample random vectors from.
-	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' }, default="pcg64"
+	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'mt64' }, default="pcg64"
 	    Random number generator to use.
 	seed : int, default=-1
 	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
@@ -83,19 +88,16 @@ def hutch(
 
 	Returns
 	-------
-	estimate : float
-	    Estimate of the trace of $A$, if `fun = "identity"`, otherwise estimates the trace of $f(A)$.
-	info : dict, optional
-	    If 'info = True', additional information about the computation.
+	:
+			Estimate the trace of $f(A)$. If 'info = True', additional information about the computation is also returned.
 
 	See Also
 	--------
-	lanczos : the lanczos algorithm.
+	lanczos : the lanczos tridiagonalization algorithm.
 
 	Reference
 	---------
-	  [1] Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.
-	  SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
+	1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
