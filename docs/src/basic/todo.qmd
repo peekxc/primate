@@ -1,0 +1,46 @@
+
+```{python}
+# a, b = 0.8, 2
+# x = np.random.uniform(low=0, high=10, size=40)
+# eps = np.random.normal(loc=0, scale=1.0, size=40)
+# y = (a * x + b) + eps
+
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# show(p)
+
+# X = np.c_[x,y]
+# from scipy.linalg import lstsq
+# from scipy.optimize import least_squares, leastsq, minimize, minimize_scalar
+# def L(beta: tuple):
+#   b, a = beta
+#   return np.linalg.norm(y - a * x + b)**2
+
+# def L(beta: tuple):
+#   b, a = beta
+#   return (y - (a * x + b))
+
+
+
+# res = minimize_scalar(L, x0=(0,1))
+# b_opt, a_opt = res.x
+# L([a_opt,b_opt])
+
+# res = least_squares(L, x0=(0,1))
+# b_opt, a_opt = res.x
+# f_opt = lambda x: x * a_opt + b_opt 
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
+# show(p)
+
+# ## Normal equations...
+# XI = np.c_[np.ones(X.shape[0]), X]
+
+# c, b_opt, a_opt = (np.linalg.inv((XI.T @ XI)) @ XI.T) @ y
+# f_opt = lambda x: x * a_opt + b_opt 
+# p = figure(width=350, height=200)
+# p.scatter(x, y)
+# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
+# show(p)
+```

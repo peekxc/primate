@@ -42,11 +42,10 @@ website:
         contents:
           - text: Introduction 
             href: theory/intro.qmd
+          - text: Matrix functions
+            href: theory/matrix_functions.qmd
           - text: The Lanczos Method
             href: theory/lanczos.qmd
-          # - text: SLQ
-          #   href: theory/slq.qmd
-          - text: 
       - section: Advanced
         contents:
           - href: advanced/cpp_integration.qmd

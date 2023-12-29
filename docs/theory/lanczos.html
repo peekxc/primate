@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../advanced/cpp_integration.html" rel="next">
+<link href="../theory/matrix_functions.html" rel="next">
 <link href="../theory/intro.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -198,6 +198,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -300,7 +306,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#lanczos-on-a-bumper-sticker" id="toc-lanczos-on-a-bumper-sticker" class="nav-link active" data-scroll-target="#lanczos-on-a-bumper-sticker">Lanczos on a bumper sticker</a></li>
   <li><a href="#the-iteration-part" id="toc-the-iteration-part" class="nav-link" data-scroll-target="#the-iteration-part">The “iteration” part</a></li>
   <li><a href="#wait-isnt-t-arbitrary" id="toc-wait-isnt-t-arbitrary" class="nav-link" data-scroll-target="#wait-isnt-t-arbitrary">Wait, isn’t <span class="math inline">T</span> arbitrary?</a></li>
-  <li><a href="#complexity-analysis" id="toc-complexity-analysis" class="nav-link" data-scroll-target="#complexity-analysis">Complexity analysis</a></li>
+  <li><a href="#beating-the-complexity-bounds" id="toc-beating-the-complexity-bounds" class="nav-link" data-scroll-target="#beating-the-complexity-bounds">Beating the complexity bounds</a></li>
   </ul>
 </nav>
     </div>
@@ -392,8 +398,8 @@ K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \
 <p>…this is actually a <em>QR</em> factorization, which is <a href="https://www.math.purdue.edu/~kkloste/cs515fa14/qr-uniqueness.pdf">essentially unique</a>! Indeed, the Implicit Q Theorem asserts that if an upper Hessenburg matrix <span class="math inline">T \in \mathbb{R}^{n \times n}</span> has only positive elements on its first subdiagonal and there exists an orthogonal matrix <span class="math inline">Q</span> such that <span class="math inline">Q^T A Q = T</span>, then <span class="math inline">Q</span> and <span class="math inline">T</span> are <em>uniquely determined</em><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> by <span class="math inline">(A, q_1)</span>.</p>
 <!-- Moreover, so long as $T$ has non-zero subdiagonal entries, its the eigenvalues must be distinct -->
 </section>
-<section id="complexity-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="complexity-analysis">Complexity analysis</h2>
+<section id="beating-the-complexity-bounds" class="level2">
+<h2 class="anchored" data-anchor-id="beating-the-complexity-bounds">Beating the complexity bounds</h2>
 <p>Elegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?</p>
 <p>Let’s start by establishing a baseline on its complexity:</p>
 <div id="thm-line" class="theorem" style="background-color: #efefef;">
@@ -402,6 +408,9 @@ K_n(A, q_1) = Q Q^T K_n(A, q_1) = Q[ \, e_1 \mid T e_1 \mid T^2 e_1 \mid \dots \
 <p>As its clear from the theorem, if we specialize it such that <span class="math inline">r = n</span> and <span class="math inline">\eta = \nu = n</span>, then the Lanczos method requires just <span class="math inline">O(n^2)</span> time and <span class="math inline">O(n)</span> space to execute. In other words, the Lanczos method drops <em>both</em> the time and space complexity<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> of obtaining spectral information by <strong>order of magnitude</strong> over similar eigen-algorithms that decompose <span class="math inline">A</span> directly.</p>
 <p>To see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just <span class="math inline">O(n)</span> space. If we assume that <span class="math inline">v \mapsto Av \sim O(n)</span>, then carrying out the recurrence clearly takes at most <span class="math inline">O(n^2)</span> time, since there are most <span class="math inline">n</span> such vectors <span class="math inline">\{q_i\}_{i=1}^n</span> to generate!</p>
 <p>Now, if we need to store all of <span class="math inline">Y</span> or <span class="math inline">Q</span> explicitly, we clearly need <span class="math inline">O(n^2)</span> space to do so. However, if we only need the eigen-<em>values</em> <span class="math inline">\Lambda(A)</span> (and not their eigen-vectors <span class="math inline">U</span>), then we may execute the recurrence keeping at most three vectors <span class="math inline">\{q_{j-1}, q_{j}, q_{j+1}\}</span> in memory at any given time. Since each of these is <span class="math inline">O(n)</span> is size, the claim of <span class="math inline">O(n)</span> space is justified!</p>
+<!-- ## ... but how do I code it up? 
+
+ -->
 <!-- ## Rayleigh-Ritz approximations
 
 Suppose instead of constructing the full $T \in \mathbb{R}^{n \times n}$, we stop at the $j^{\text{th}}$ iteration, where $1 \leq j < n$. 
@@ -1038,8 +1047,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../advanced/cpp_integration.html" class="pagination-link" aria-label="Usage from C++">
-        <span class="nav-page-text">Usage from C++</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../theory/matrix_functions.html" class="pagination-link" aria-label="Matrix functions">
+        <span class="nav-page-text">Matrix functions</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

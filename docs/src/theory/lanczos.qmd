@@ -108,7 +108,7 @@ $$
 
 <!-- Moreover, so long as $T$ has non-zero subdiagonal entries, its the eigenvalues must be distinct -->
 
-## Complexity analysis 
+## Beating the complexity bounds
 
 Elegant and as theoretically founded as the Lanczos method may be, is it efficient in practice? 
 
@@ -127,6 +127,11 @@ As its clear from the theorem, if we specialize it such that $r = n$ and $\eta =
 To see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just $O(n)$ space. If we assume that $v \mapsto Av \sim O(n)$, then carrying out the recurrence clearly takes at most $O(n^2)$ time, since there are most $n$ such vectors $\{q_i\}_{i=1}^n$ to generate! 
 
 Now, if we need to store all of $Y$ or $Q$ explicitly, we clearly need $O(n^2)$ space to do so. However, if we only need the eigen-_values_ $\Lambda(A)$ (and not their eigen-vectors $U$), then we may execute the recurrence keeping at most three vectors $\{q_{j-1}, q_{j}, q_{j+1}\}$ in memory at any given time. Since each of these is $O(n)$ is size, the claim of $O(n)$ space is justified!
+
+<!-- ## ... but how do I code it up? 
+
+{{< include slq_pseudo.qmd >}} -->
+
 
 <!-- ## Rayleigh-Ritz approximations
 

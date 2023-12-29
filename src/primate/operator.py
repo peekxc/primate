@@ -18,9 +18,8 @@ def matrix_function(
 	"""Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`. 
 
 	This function uses the Lanczos quadrature method to approximate the action of matrix function:
-	$$ v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T $$
-	The resulting operator may be used in conjunction with other trace and vector-based estimation methods, 
-	such as the `hutch` or `xtrace` estimators.
+	$$ v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T $$
+	The resulting operator may be used in conjunction with other estimation methods, such as `hutch` or `xtrace`.
 
 	The weights of the quadrature may be computed using either the Golub-Welsch (GW) or 
 	Forward Three Term Recurrence algorithms (FTTR) (see the `quad` parameter). For a description 
@@ -29,7 +28,7 @@ def matrix_function(
 	:::{.callout-note}
 	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
 	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
-	the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
+	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
 	If `deg` is large, `fttr` is preferred. 
 	:::
 

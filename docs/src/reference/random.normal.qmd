@@ -15,5 +15,5 @@ Generates random vectors from the standard normal distribution.
 
 ## Returns: 
 
-np.narray 
+:
                 Randomly generated matrix of shape `size` with entries in { -1, 1 }.

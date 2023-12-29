@@ -71,7 +71,7 @@
     "href": "reference/random.normal.html",
     "title": "random.normal",
     "section": "",
-    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the standard normal distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32\n\n\n\n\n\n\nnp.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
+    "text": "random.normal(size, rng='splitmix64', seed=-1, dtype=np.float32)\nGenerates random vectors from the standard normal distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nint or tuple\nOutput shape to generate.\nrequired\n\n\nrng\nstr = “splitmix64”\nRandom number generator to use.\n'splitmix64'\n\n\nseed\nint = -1\nSeed for the generator. Use -1 to for random (non-deterministic) behavior.\n-1\n\n\ndtype\ndtype = float32\nFloating point dtype for the output. Must be float32 or float64.\nnp.float32\n\n\n\n\n\n\n: Randomly generated matrix of shape size with entries in { -1, 1 }.",
     "crumbs": [
       "API Reference",
       "Random",
@@ -584,12 +584,12 @@
   {
     "objectID": "theory/lanczos.html#pseudocode",
     "href": "theory/lanczos.html#pseudocode",
-    "title": "The Lanczos method",
+    "title": "SLQ Trace guide",
     "section": "Pseudocode",
-    "text": "Pseudocode\nThere are several ways to implement the Lanczos method, some of which are “better” than others. Below is pseudocode equivalent to Paige’s A27 variant, which has been shown to have a variety of attractive properties.\nThere are many extensions that modify the Lanczos method to make it more robust, more computationally efficient, etc., though many of these have non-trivial implications on the space and time complexities.",
+    "text": "Pseudocode\nTo clarify that that means, here’s an abstract presentation of the generic SLQ procedure:\n\n\n\\begin{algorithm} \\caption{Stochastic Lanczos Quadrature} \\begin{algorithmic} \\Input Symmetric operator ($A \\in \\mathbb{R}^{n \\times n}$) \\Require Number of queries ($n_v$), Degree of quadrature ($k$) \\Function{SLQ}{$A$, $n_v$, $k$} \\State $\\Gamma \\gets 0$ \\For{$j = 1, 2, \\dots, n_v$} \\State $v_i \\sim \\mathcal{D}$ where $\\mathcal{D}$ satisfies $\\mathbb{E}(v v^\\top) = I$ \\State $T^{(j)}(\\alpha, \\beta)$ $\\gets$ $\\mathrm{Lanczos}(A,v_j,k+1)$ \\State $[\\Theta, Y] \\gets \\mathrm{eigh\\_tridiag}(T^{(j)}(\\alpha, \\beta))$ \\State $\\tau_i \\gets \\langle e_1, y_i \\rangle$ \\State &lt; Do something with the node/weight pairs $(\\theta_i, \\tau_i^2)$ &gt; \\EndFor \\EndFunction \\end{algorithmic} \\end{algorithm}",
     "crumbs": [
       "Theory",
-      "Lanczos"
+      "The Lanczos Method"
     ]
   },
   {
@@ -882,7 +882,7 @@
   {
     "objectID": "theory/lanczos.html#complexity-analysis",
     "href": "theory/lanczos.html#complexity-analysis",
-    "title": "The Lanczos method",
+    "title": "SLQ Trace guide",
     "section": "Complexity analysis",
     "text": "Complexity analysis\nElegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?\nLet’s start by establishing a baseline on its complexity:\n\nTheorem 1 (Parlett 1994) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nAs its clear from the theorem, if we specialize it such that r = n and \\eta = \\nu = n, then the Lanczos method requires just O(n^2) time and O(n) space to execute. In other words, the Lanczos method drops both the time and space complexity4 of obtaining spectral information by order of magnitude over similar eigen-algorithms that decompose A directly.\nTo see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then carrying out the recurrence clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nNow, if we need to store all of Y or Q explicitly, we clearly need O(n^2) space to do so. However, if we only need the eigen-values \\Lambda(A) (and not their eigen-vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!",
     "crumbs": [
@@ -957,7 +957,7 @@
     "href": "theory/intro.html",
     "title": "Introduction to trace estimation with primate",
     "section": "",
-    "text": "primate contains a variety of methods for estimating quantities from matrix functions. One popular such quantity is the trace of f(A), for some generic f: [a,b] \\to \\mathbb{R} defined on the spectrum of A:  \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nMany quantities of common interest can be expressed in as traces of matrix functions with the right spectral function specialization. A few such specialization include:\n\\begin{align*}\nf &= \\mathrm{id} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A) \\\\\nf &= f^{-1} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A^{-1}) \\\\\nf &= \\log \\quad &\\Longleftrightarrow& \\quad  &\\mathrm{logdet}(A) \\\\\nf &= \\mathrm{exp} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{exp}(A) \\\\\nf &= \\mathrm{sign} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{rank}(A)  \\\\\n&\\vdots \\quad &\\hphantom{\\Longleftrightarrow}& \\quad & \\vdots &\n\\end{align*}\nIn this introduction, the basics of randomized trace estimation are introduced, with a focus on matrix-free algorithms how the readily extend to estimating the traces of matrix functions.",
+    "text": "primate contains a variety of methods for estimating quantities from matrix functions. One popular such quantity is the trace of f(A), for some generic f: [a,b] \\to \\mathbb{R} defined on the spectrum of A:  \\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nMany quantities of common interest can be expressed in as traces of matrix functions with the right choice of f. A few such function specializations include:\n\\begin{align*}\nf &= \\mathrm{id} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A) \\\\\nf &= f^{-1} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{tr}(A^{-1}) \\\\\nf &= \\log \\quad &\\Longleftrightarrow& \\quad  &\\mathrm{logdet}(A) \\\\\nf &= \\mathrm{exp} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{exp}(A) \\\\\nf &= \\mathrm{sign} \\quad &\\Longleftrightarrow& \\quad &\\mathrm{rank}(A)  \\\\\n&\\vdots \\quad &\\hphantom{\\Longleftrightarrow}& \\quad & \\vdots &\n\\end{align*}\nIn this introduction, the basics of randomized trace estimation are introduced, with a focus on how to use matrix-free algorithms estimate traces of matrix functions.",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -979,7 +979,7 @@
     "href": "theory/intro.html#the-implicit-trace-estimation-problem",
     "title": "Introduction to trace estimation with primate",
     "section": "The implicit trace estimation problem",
-    "text": "The implicit trace estimation problem\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nObserve that although method (3) fits squarely in this category, its pretty inefficient from a computational standpoint—after all, most of the entries of e_i are zero, thus most inner product computations do not contribute to the trace estimate at all.\nOne idea, attributed to A. Girard, is to replace e_i with random zero-mean vectors, e.g. random sign vectors v \\in \\{-1, +1\\}^{n} or random normal vectors v \\sim \\mathcal{N}(\\mu=0, \\sigma=1):\n\\mathtt{tr}(A) \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i \nIt was shown more formally later by M.F. Huchinson that if these random vectors v \\in \\mathbb{R}^n satisfy \\mathbb{E}[vv^T] = I then this approach indeed forms an unbiased estimator of \\mathrm{tr}(A). To see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions: \\mathtt{tr}(A) = \\mathtt{tr}(A I) = \\mathtt{tr}(A \\mathbb{E}[v v^T]) = \\mathbb{E}[\\mathtt{tr}(Avv^T)] = \\mathbb{E}[\\mathtt{tr}(v^T A v)] = \\mathbb{E}[v^T A v]\nNaturally we expect the approximation to gradually improve as more vectors are sampled, converging as n_v \\to \\infty. Let’s see if we can check this: we start by collecting a few sample quadratic forms\n\ndef isotropic(n):\n  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]\nestimates = np.array([v @ A @ v for v in isotropic(500)])\n\nPlotting the estimator formed by averaging the first k samples along with it’s error, we get the following figures for k = 50 and k = 500, respectively:\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:32: UserWarning:\n\n\nYou are attempting to set `plot.legend.label_text_font_size` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:33: UserWarning:\n\n\nYou are attempting to set `plot.legend.label_height` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:34: UserWarning:\n\n\nYou are attempting to set `plot.legend.glyph_height` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:35: UserWarning:\n\n\nYou are attempting to set `plot.legend.spacing` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:37: UserWarning:\n\n\nYou are attempting to set `plot.legend.orientation` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n/var/folders/0l/b3dbb2_d2bb4y3wbbfk0wt_80000gn/T/ipykernel_34141/588126951.py:38: UserWarning:\n\n\nYou are attempting to set `plot.legend.background_fill_alpha` on a plot that has zero legends added, this will have no effect.\n\nBefore legend properties can be set, you must add a Legend explicitly, or call a glyph method with a legend parameter set.\n\n\n\n\n\n  \n\n\n\n\n\nSure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision beyond &lt; 1% becomes increasingly difficult due to the variance of the sample estimates.",
+    "text": "The implicit trace estimation problem\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nThough method (3) may be used to solve the implicit trace estimation problem exactly, its pretty inefficient from a computational standpoint—after all, most of the entries of e_i are zero, thus most inner product computations do not contribute to the trace estimate at all.\nOne idea, attributed to A. Girard, is to replace e_i with random zero-mean vectors, e.g. random sign vectors v \\in \\{-1, +1\\}^{n} or random normal vectors v \\sim \\mathcal{N}(\\mu=0, \\sigma=1):\n\\mathtt{tr}(A) \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i \nIt was shown more formally later by M.F. Huchinson that if these random vectors v \\in \\mathbb{R}^n satisfy \\mathbb{E}[vv^T] = I then this approach indeed forms an unbiased estimator of \\mathrm{tr}(A). To see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions: \\mathtt{tr}(A) = \\mathtt{tr}(A I) = \\mathtt{tr}(A \\mathbb{E}[v v^T]) = \\mathbb{E}[\\mathtt{tr}(Avv^T)] = \\mathbb{E}[\\mathtt{tr}(v^T A v)] = \\mathbb{E}[v^T A v]\nNaturally we expect the approximation to gradually improve as more vectors are sampled, converging as n_v \\to \\infty. Let’s see if we can check this: we start by collecting a few sample quadratic forms\n\ndef isotropic(n):\n  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]\nestimates = np.array([v @ A @ v for v in isotropic(500)])\n\nPlotting both the estimator formed by averaging the first k samples along with its absolute error, we get the following figures for k = 50 and k = 500, respectively:\n\n\n\n  \n\n\n\n\n\nSure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision much less than 1% becomes increasingly difficult due to the randomness and variance of the sample estimates.",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -1001,7 +1001,7 @@
     "href": "theory/intro.html#ex-logdet-computation",
     "title": "Introduction to trace estimation with primate",
     "section": "Ex: Logdet computation",
-    "text": "Ex: Logdet computation\nThe basic way to approximate the trace of a matrix function is to simply set fun to the name the spectral function. For example, to approximate the log-determinant:\n\nfrom primate.trace import hutch\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -150.71530622226584\n\n\nEven using n / 6 matvecs, we get a decent approximation. But how good is this estimate?\nTo get a slightly better idea, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -145.469 +/- 7.37 (95% CI), CV: 3%, Evals: 25 [R]\n\n\nThe first line of the statement contains fixed about the estimator, including the type of estimator (Girard-Hutchinson), the function applied to the spectrum (log), the degree of the Krylov expansion (20), and the quadrature method used (fttr).\nThe second line prints the runtime information about the samples, such as the final trace estimate (``) 2. Its margin of error 2. The coefficient of variation (aka the relative std. deviation) 3. The number of samples used + their distribution prefix (‘R’ for rademacher)\n\nest = hutch(A, fun=\"log\", maxiter=100, plot=True)",
+    "text": "Ex: Logdet computation\nThe basic way to approximate the trace of a matrix function is to simply set fun to the name the spectral function. For example, to approximate the log-determinant:\n\nfrom primate.trace import hutch\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -148.3090874345191\n\n\nEven using n / 6 matvecs, we get a decent approximation. But how good is this estimate?\nTo get a slightly better idea, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, seed=5, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -146.830 +/- 5.59 (95% CI), CV: 2%, Evals: 25 [R] (seed: 5)\n\n\nThe first line of the statement contains fixed about the estimator, including the type of estimator (Girard-Hutchinson), the function applied to the spectrum (log), the degree of the Krylov expansion (20), and the quadrature method used (fttr).\nThe second line prints the runtime information about the samples, such as the final trace estimate, its margin of error and coefficient of variation (aka the relative std. deviation), and the number of samples used + their distribution prefix (‘R’ for rademacher).\nAnother way to get an idea of how well the estimator is converging is to pass the plot=True option. Here, we pass the same seed for reproducibility with the above call.\n\nest = hutch(A, fun=\"log\", maxiter=100, seed=5, plot=True)\n\n\n  \n\n\n\n\n\nSimilar information reported by the verbose=True flag is plotted, now cumulatively applied to every sample. The left plot shows the sample point estimates alongside yellow bands denoting the margin of error associated with the 95% confidence interval (CI) at every sample index. The right plot show convergence information, e.g. the running coefficient of variation is shown on the top-right and an upper bound on the absolute error is derived from the CI is shown on the bottom right.\nWhile the margin of error is typically a valid, conservative estimate of estimators error, in some situations these bounds may not be valid as they are based solely on the CLT implications for normally distributed random variables. In particular, there is an inherent amount of error associated with the Lanczos-based quadrature approximations that is not taken into account in the error bound, which may invalidate the corresponding CI’s.",
     "crumbs": [
       "Theory",
       "Introduction"
@@ -1071,7 +1071,7 @@
     "href": "reference/random.normal.html#returns",
     "title": "random.normal",
     "section": "",
-    "text": "np.narray Randomly generated matrix of shape size with entries in { -1, 1 }.",
+    "text": ": Randomly generated matrix of shape size with entries in { -1, 1 }.",
     "crumbs": [
       "API Reference",
       "Random",
@@ -1095,7 +1095,7 @@
     "href": "reference/operator.matrix_function.html",
     "title": "operator.matrix_function",
     "section": "",
-    "text": "operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)\nConstructs a LinearOperator approximating the action of the matrix function fun(A).\nThis function uses the Lanczos quadrature method to approximate the action of matrix function:  v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T  The resulting operator may be used in conjunction with other trace estimation methods, such as the hutch or xtrace estimators.\nThe weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the quad parameter). For a description of the other parameters, see the Lanczos function.\n\n\n\n\n\n\nNote\n\n\n\nTo compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of stability. If deg is large and accuracy is not a priority, the fttr method is preferred.\n\n\n\n\nA : ndarray, sparray, or LinearOperator real symmetric operator. fun : str or Callable, default=“identity” real-valued function defined on the spectrum of A. deg : int, default=20 Degree of the Krylov expansion. rtol : float, default=1e-8 Relative tolerance to consider two Lanczos vectors are numerically orthogonal. orth: int, default=0 Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. kwargs : dict, optional additional key-values to parameterize the chosen function ‘fun’.\n\n\n\noperator : LinearOperator Operator approximating the action of fun on the spectrum of A",
+    "text": "operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)\nConstructs a LinearOperator approximating the action of the matrix function fun(A).\nThis function uses the Lanczos quadrature method to approximate the action of matrix function:  v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T  The resulting operator may be used in conjunction with other trace and vector-based estimation methods, such as hutch or xtrace.\nThe weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the quad parameter). For a description of the other parameters, see the Lanczos function.\n\n\n\n\n\n\nNote\n\n\n\nTo compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of stability. If deg is large, fttr is preferred.\n\n\n\n\n\n\n\n\n\n\n\nType\nDescription\n\n\n\n\nscipy.sparse.linalg.LinearOperator\na LinearOperator approximating the action of fun on the spectrum of A",
     "crumbs": [
       "API Reference",
       "Matrix Function"
@@ -1117,7 +1117,7 @@
     "href": "reference/operator.matrix_function.html#returns",
     "title": "operator.matrix_function",
     "section": "",
-    "text": "operator : LinearOperator Operator approximating the action of fun on the spectrum of A",
+    "text": "Type\nDescription\n\n\n\n\nscipy.sparse.linalg.LinearOperator\na LinearOperator approximating the action of fun on the spectrum of A",
     "crumbs": [
       "API Reference",
       "Matrix Function"
@@ -1205,6 +1205,203 @@
     "crumbs": [
       "API Reference",
       "Hutch"
+    ]
+  },
+  {
+    "objectID": "basic/performance.html",
+    "href": "basic/performance.html",
+    "title": "Performance",
+    "section": "",
+    "text": "primate provides a variety of efficient algorithms for estimating quantities derived from matrix functions. These algorithms are largely implemented in C++ to minimize overhead, and for some computational problems primate can out-perform the standard algorithms for estimating spectral quantities by several orders of magnitude. Nonetheless, there are some performance-related caveats to be aware of.\n\n\n\nfrom scipy.linalg import toeplitz\nfrom primate.trace import hutch \n\nc = np.random.uniform(size=100, low=0, high=1)\nT = toeplitz(c)\n\n# np.sum(np.reciprocal(np.linalg.eigvalsh(T)))\nnp.sum(np.abs(np.linalg.eigvalsh(T)))\nest, info = hutch(T, fun=np.abs, maxiter=200, pdf='rademacher', rng=\"mt\", deg=20, seed=-1, plot=True)\n\nest, info = hutch(T, fun=np.abs, maxiter=800, pdf='rademacher', rng=\"mt\", quad=\"golub_welsch\", deg=200, seed=-1, plot=True)\nest, info = hutch(C, fun=np.abs, maxiter=800, pdf='rademacher', rng=\"mt\", quad=\"golub_welsch\", deg=200, seed=-1, plot=True)\n\n\n\nnp.sum(np.linalg.svd(T)[1])\n\nZ = np.zeros(T.shape)\nC = np.block([[Z, T], [T.T, Z]])\nhutch(C, fun=np.abs, maxiter=200, pdf='rademacher', rng=\"mt\", quad=\"golub_welsch\", deg=200, seed=-1, plot=False)\n\n\nhutch(T, fun=np.abs, maxiter=200, pdf='rademacher', deg=50, seed=-1, plot=False)\n\np = info['figure']\n\nfrom primate.trace import xtrace\nfrom primate.operator import matrix_function\nM = matrix_function(T, \"abs\")\nxtrace(M)\n\ns = info['samples']\nv = np.random.choice([-1, 1], size=T.shape[0])\nT @ v\n\ns[np.abs(s) &lt;= np.linalg.norm(T)].mean()\n\n\nfrom primate.diagonalize import lanczos\nfrom scipy.linalg import eigvalsh_tridiagonal\na, b = lanczos(T, deg=499, orth=150)\nnp.sum(np.abs(eigvalsh_tridiagonal(a,b)))\n\n\nimport timeit \ntimeit.timeit(lambda: hutch(A, maxiter=20, deg=5, fun=\"log\", quad=\"fttr\"), number = 1000)\ntimeit.timeit(lambda: np.sum(np.log(np.linalg.eigvalsh(A))), number = 1000)"
+  },
+  {
+    "objectID": "theory/intro.html#footnotes",
+    "href": "theory/intro.html#footnotes",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nTechnically, we could solve a system of equations via either Gaussian elimination or, when A is rank-deficient, via least squares: (A + \\epsilon I)^{-1}v \\simeq u \\Leftrightarrow \\mathrm{argmin}_{u \\in \\mathbb{R}^n} \\lVert v - (A + \\epsilon I)u \\rVert^2. Then again, this could be just as expensive—if not more so—than just executing the Lanczos iteration!↩︎",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#but-how-do-i-code-it-up",
+    "href": "theory/lanczos.html#but-how-do-i-code-it-up",
+    "title": "SLQ Trace guide",
+    "section": "… but how do I code it up?",
+    "text": "… but how do I code it up?\nTo clarify that that means, here’s an abstract presentation of the generic SLQ procedure:\n\n\n\\begin{algorithm} \\caption{Stochastic Lanczos Quadrature} \\begin{algorithmic} \\Input Symmetric operator ($A \\in \\mathbb{R}^{n \\times n}$) \\Require Number of queries ($n_v$), Degree of quadrature ($k$) \\Function{SLQ}{$A$, $n_v$, $k$} \\State $\\Gamma \\gets 0$ \\For{$j = 1, 2, \\dots, n_v$} \\State $v_i \\sim \\mathcal{D}$ where $\\mathcal{D}$ satisfies $\\mathbb{E}(v v^\\top) = I$ \\State $T^{(j)}(\\alpha, \\beta)$ $\\gets$ $\\mathrm{Lanczos}(A,v_j,k+1)$ \\State $[\\Theta, Y] \\gets \\mathrm{eigh\\_tridiag}(T^{(j)}(\\alpha, \\beta))$ \\State $\\tau_i \\gets \\langle e_1, y_i \\rangle$ \\State &lt; Do something with the node/weight pairs $(\\theta_i, \\tau_i^2)$ &gt; \\EndFor \\EndFunction \\end{algorithmic} \\end{algorithm}",
+    "crumbs": [
+      "Theory",
+      "The Lanczos Method"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#beating-the-bound",
+    "href": "theory/lanczos.html#beating-the-bound",
+    "title": "SLQ Trace guide",
+    "section": "Beating the bound",
+    "text": "Beating the bound\nElegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?\nLet’s start by establishing a baseline on its complexity:\n\nTheorem 1 (Parlett 1994) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nAs its clear from the theorem, if we specialize it such that r = n and \\eta = \\nu = n, then the Lanczos method requires just O(n^2) time and O(n) space to execute. In other words, the Lanczos method drops both the time and space complexity4 of obtaining spectral information by order of magnitude over similar eigen-algorithms that decompose A directly.\nTo see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then carrying out the recurrence clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nNow, if we need to store all of Y or Q explicitly, we clearly need O(n^2) space to do so. However, if we only need the eigen-values \\Lambda(A) (and not their eigen-vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!",
+    "crumbs": [
+      "Theory",
+      "The Lanczos Method"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#basics-trace-computation",
+    "href": "theory/intro.html#basics-trace-computation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Basics: Trace computation",
+    "text": "Basics: Trace computation\n\nSuppose we wanted to compute the trace of some matrix A. By the very definition of the trace, we have a variety of means to do it: \\mathrm{tr}(A) \\triangleq \\sum\\limits_{i=1}^n A_{ii} = \\sum\\limits_{i=1}^n \\lambda_i = \\sum\\limits_{i=1}^n e_i^T A e_i \nwhere, in the right-most sum, we’re using e_i to represent the ith identity vector:  A_{ii} = e_i^T A e_i, \\quad e_i = [0, \\dots, 0, \\underbrace{1}_{i}, 0, \\dots, 0] \nLet’s see some code. First, we start with a simple (random) positive-definite matrix A \\in \\mathbb{R}^{n \\times n}.\n\nfrom primate.random import symmetric\nA = symmetric(150, pd = True)\n\nBy default, symmetric normalizes A such that the eigenvalues are uniformly distributed in the interval [0, 1]. For reference, the spectrum of A looks as follows:\n\n\n\n  \n\n\n\n\n\nNow, using numpy, we can verify all of these trace definitions are indeed equivalent:\n\n\nimport numpy as np\neye = lambda i: np.ravel(np.eye(1, 150, k=i))\nprint(f\"Direct: {np.sum(A.diagonal()):.8f}\")\nprint(f\"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}\")\nprint(f\"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}\")\n\nDirect: 75.69739746\nEigen:  75.69739746\nMatvec: 75.69739746\n\n\nWhile (1) trivially yields \\mathrm{tr}(A) in (optimal) O(n) time, there exist situations where the diagonal entries of A are not available—particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they are nonetheless viable alternatives to obtain \\mathrm{tr}(A).",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#implicit-trace-estimation",
+    "href": "theory/intro.html#implicit-trace-estimation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Implicit trace estimation",
+    "text": "Implicit trace estimation\nThe implicit trace estimation problem can be stated as follows:\n\nGiven access to a square matrix A \\in \\mathbb{R}^{n \\times n} via its matrix-vector product operator x \\mapsto Ax, estimate its trace \\mathrm{tr}(A) = \\sum\\limits_{i=1}^n A_{ii}\n\nNote we no longer assume we have direct access to the diagonal here, leaving us with the Eigen or Matvec methods. The Eigen method is expensive, and though the Matvec method solves the problem exactly, its pretty inefficient from a computational standpoint—most of the entries of e_i are zero, thus most inner product computations do not contribute to the trace estimate at all.\nOne idea, attributed to A. Girard, is to replace e_i with random zero-mean vectors, e.g. random sign vectors v \\in \\{-1, +1\\}^{n} or random normal vectors v \\sim \\mathcal{N}(\\mu=0, \\sigma=1):\n\\mathtt{tr}(A) \\approx \\frac{1}{n_v}\\sum\\limits_{i=1}^{n_v} v_i^\\top A v_i \nIt was shown more formally later by M.F. Huchinson that if these random vectors v \\in \\mathbb{R}^n satisfy \\mathbb{E}[vv^T] = I then this approach indeed forms an unbiased estimator of \\mathrm{tr}(A). To see this, its sufficient to combine the linearity of expectation, the cyclic-property of the trace function, and the aforementioned isotropy conditions: \\mathtt{tr}(A) = \\mathtt{tr}(A I) = \\mathtt{tr}(A \\mathbb{E}[v v^T]) = \\mathbb{E}[\\mathtt{tr}(Avv^T)] = \\mathbb{E}[\\mathtt{tr}(v^T A v)] = \\mathbb{E}[v^T A v]\nNaturally we expect the approximation to gradually improve as more vectors are sampled, converging as n_v \\to \\infty. Let’s see if we can check this: we start by collecting a few sample quadratic forms\n\ndef isotropic(n):\n  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]\nestimates = np.array([v @ A @ v for v in isotropic(500)])\n\nPlotting both the estimator formed by averaging the first k samples along with its absolute error, we get the following figures for k = 50 and k = 500, respectively:\n\n\n\n  \n\n\n\n\n\nSure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision much less than 1% becomes increasingly difficult due to the randomness and variance of the sample estimates.",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/lanczos.html#beating-the-complexity-bounds",
+    "href": "theory/lanczos.html#beating-the-complexity-bounds",
+    "title": "The Lanczos method",
+    "section": "Beating the complexity bounds",
+    "text": "Beating the complexity bounds\nElegant and as theoretically founded as the Lanczos method may be, is it efficient in practice?\nLet’s start by establishing a baseline on its complexity:\n\nTheorem 1 (Parlett 1994) Given a symmetric rank-r matrix A \\in \\mathbb{R}^{n \\times n} whose operator x \\mapsto A x requires O(\\eta) time and O(\\nu) space, the Lanczos method computes \\Lambda(A) in O(\\max\\{\\eta, n\\}\\cdot r) time and O(\\max\\{\\nu, n\\}) space, when computation is done in exact arithmetic\n\nAs its clear from the theorem, if we specialize it such that r = n and \\eta = \\nu = n, then the Lanczos method requires just O(n^2) time and O(n) space to execute. In other words, the Lanczos method drops both the time and space complexity4 of obtaining spectral information by order of magnitude over similar eigen-algorithms that decompose A directly.\nTo see why this is true, note that a symmetric tridiagonal matrix is fully characterized by its diagonal and subdiagonal terms, which requires just O(n) space. If we assume that v \\mapsto Av \\sim O(n), then carrying out the recurrence clearly takes at most O(n^2) time, since there are most n such vectors \\{q_i\\}_{i=1}^n to generate!\nNow, if we need to store all of Y or Q explicitly, we clearly need O(n^2) space to do so. However, if we only need the eigen-values \\Lambda(A) (and not their eigen-vectors U), then we may execute the recurrence keeping at most three vectors \\{q_{j-1}, q_{j}, q_{j+1}\\} in memory at any given time. Since each of these is O(n) is size, the claim of O(n) space is justified!",
+    "crumbs": [
+      "Theory",
+      "The Lanczos Method"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#example-logdet-computation",
+    "href": "theory/intro.html#example-logdet-computation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Example: Logdet computation",
+    "text": "Example: Logdet computation\nPutting all of the theory above together, a simple way to estimate the trace of a matrix function is to average Lanczos quadrature estimates:\n\\mathrm{tr}(f(A)) \\approx \\frac{n}{n_v} \\sum\\limits_{i=1}^{n_v} e_1^T f(T_m) e_1  = \\frac{n}{n_v} \\sum\\limits_{j=1}^{n_v} \\left ( \\sum\\limits_{i=1}^m \\tau_i^{(j)} f(\\theta_i)^{(j)} \\right )\nTo enable this kind of estimator in hutch, simply set the fun argument to either the name of a built-in function or an arbitrary Callable. For example, to approximate the log-determinant:\n\n## Log-determinant\nlogdet_test = hutch(A, fun=\"log\", maxiter=25)\nlogdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))\n\nprint(f\"Logdet (exact):  {logdet_true}\")\nprint(f\"Logdet (approx): {logdet_test}\")\n\nLogdet (exact):  -148.3218440234385\nLogdet (approx): -148.71526016046562\n\n\nHere we see that using n / 6 evaluatons of e_1^T f(T_m) e_1, we get a decent approximation of logdet(A). To get a better idea of the quality of this estimate, you can set verbose=True:\n\nest = hutch(A, fun=\"log\", maxiter=25, seed=5, verbose=True)\n\nGirard-Hutchinson estimator (fun=log, deg=20, quad=fttr)\nEst: -143.207 +/- 5.40 (95% CI), CV: 2%, Evals: 25 [R] (seed: 5)\n\n\nThe first line of the statement contains fixed about the estimator, including the type of estimator (Girard-Hutchinson), the function applied to the spectrum (log), the degree of the Lanczos quadrature approximation (20), and the quadrature method used (fttr).\nThe second line prints the runtime information about the samples, such as the final trace estimate, its margin of error and coefficient of variation (aka the relative std. deviation), and the number of samples used + their distribution prefix (‘R’ for rademacher).\nAnother way to get an idea of how well the estimator is converging is to pass the plot=True option. Here, we pass the same seed for reproducibility with the above call.\n\nest = hutch(A, fun=\"log\", maxiter=100, seed=5, plot=True)\n\n\n  \n\n\n\n\n\nSimilar information as reported by the verbose=True flag is shown cumulatively applied to every sample. The left plot shows the sample point estimates alongside yellow bands denoting the margin of error associated with the 95% confidence interval (CI) at every sample index. The right plot show convergence information, e.g. the running coefficient of variation is shown on the top-right and an upper bound on the absolute error is derived from the CI is shown on the bottom right.\nWhile the margin of error is typically a valid, conservative estimate of estimators error, in some situations these bounds may not be valid as they are based solely on the CLT implications for normally distributed random variables. In particular, there is an inherent amount of error associated with the Lanczos-based quadrature approximations that is not taken into account in the error bound, which may invalidate the corresponding CI’s.",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#implementation",
+    "href": "theory/intro.html#implementation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Implementation",
+    "text": "Implementation\nRather than manually averaging samples, trace estimates can be obtained via the hutch function:\n\nfrom primate.trace import hutch\nprint(f\"Trace estimate: {hutch(A, maxiter=50)}\")\n\nTrace estimate: 76.03071528930039\n\n\nThough its estimation is identical to averaging quadratic forms v^T A v of isotropic vectors as above, hutch comes with a few extra features to simplify its usage. In particular, all v \\mapsto v^T A v evaluations are done in parallel, there are a variety of isotropic distributions and random number generators (RNGs) to choose from, and the estimator may be suppleid various convergence criteria to allow for early-stopping; see the hutch documentation page for more details.",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#estimator-implementation",
+    "href": "theory/intro.html#estimator-implementation",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Estimator Implementation",
+    "text": "Estimator Implementation\nRather than manually averaging samples, trace estimates can be obtained via the hutch function:\n\nfrom primate.trace import hutch\nprint(f\"Trace estimate: {hutch(A, maxiter=50)}\")\n\nTrace estimate: 76.32787158595767\n\n\nThough its estimation is identical to averaging quadratic forms v^T A v of isotropic vectors as above, hutch comes with a few extra features to simplify its usage. In particular, all v \\mapsto v^T A v evaluations are done in parallel, there are a variety of isotropic distributions and random number generators (RNGs) to choose from, and the estimator may be suppleid various convergence criteria to allow for early-stopping; see the hutch documentation page for more details.",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/intro.html#stochastic-lanczos-quadrature",
+    "href": "theory/intro.html#stochastic-lanczos-quadrature",
+    "title": "Introduction to trace estimation with primate",
+    "section": "Stochastic Lanczos Quadrature",
+    "text": "Stochastic Lanczos Quadrature\nWhile there are some real-world applications for estimating \\mathrm{tr}(A), in many setting the trace of a given matrix is not a very informative quantity. On the other hand, as shown in the beginning, there are many situations where we might be interested in estimating the trace of a matrix function f(A). It is natural to consider extending the Hutchinson estimator above with something like:\n \\mathrm{tr}(f(A)) \\approx \\frac{n}{n_v} \\sum\\limits_{i=1}^{n_v} v_i^T f(A) v_i \nOf course, the remaining difficult lies in computing quadratic forms v \\mapsto v^T f(A) v efficiently. The approach taken by Ubaru, Saad, and Seghouane (2017) is to notice that sums of these quantities can transformed into a Riemann-Stieltjes integral:\n v^T f(A) v = v^T U f(\\Lambda) U^T v = \\sum\\limits_{i}^n f(\\lambda_i) \\mu_i^2 = \\int\\limits_{a}^b f(t) \\mu(t)\nwhere scalars \\mu_i \\in \\mathbb{R} constitute a cumulative, piecewise constant function \\mu : \\mathbb{R} \\to \\mathbb{R}_+:\n\n\\mu_i = (U^T v)_i, \\quad \\mu(t) = \\begin{cases}\n0, & \\text{if } t &lt; a = \\lambda_1 \\\\\n\\sum_{j=1}^{i-1} \\mu_j^2, & \\text{if } \\lambda_{i-1} \\leq t &lt; \\lambda_i, i = 2, \\dots, n \\\\\n\\sum_{j=1}^n \\mu_j^2, & \\text{if } b = \\lambda_n \\leq t\n\\end{cases}\n\nAs with any definite integral, one would ideally like to approximate its value via some quadrature rule. An exemplary such approximation is the m-point Gaussian quadrature rule:\n \\int\\limits_{a}^b f(t) \\mu(t) \\approx \\sum\\limits_{k=1}^m \\omega_k f(\\eta_k) \nwith weights \\{\\omega_k\\} and nodes \\{ \\eta_k\\}. On one hand, Gaussian Quadrature (GQ) is just one of many quadrature rules that could be used to approximate v^T A v. On the other hand, GQ is often preferred over other rules due to its exactness on polynomials up to degree 2m - 1.\nOf course, both the weights and nodes of GQ rule are unknown for the integral above. This is in strong contrast to the typical setting, wherein \\omega is assumed uniform or otherwise known ahead-of-time. A surprising and non-trivial fact is that both the weights \\{\\omega_k\\} and nodes \\{ \\eta_k\\} of the m-point GQ above are directly computable the degree m matrix T_m produced by the Lanczos method:\n Q_m^T A Q_m = T_m = Y \\Theta Y^T \\quad \\Leftrightarrow \\quad (\\eta_i, \\omega_i) = (\\theta_i, \\tau_i), \\; \\tau_i = (e_1^T y_i)^2 \nIn other words, the Ritz values \\{\\theta_i\\} of T_m are exactly the nodes of GQ quadrature rule applied to \\mu(t), while the first components of the Ritz vectors \\tau_i (squared) are exactly the weights. For more information about this non-trivial fact, see Golub and Meurant (2009).",
+    "crumbs": [
+      "Theory",
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "theory/slq_pseudo.html",
+    "href": "theory/slq_pseudo.html",
+    "title": "SLQ Trace guide",
+    "section": "",
+    "text": "To clarify that that means, here’s an abstract presentation of the generic SLQ procedure:\n\n\n\\begin{algorithm} \\caption{Stochastic Lanczos Quadrature} \\begin{algorithmic} \\Input Symmetric operator ($A \\in \\mathbb{R}^{n \\times n}$) \\Require Number of queries ($n_v$), Degree of quadrature ($k$) \\Function{SLQ}{$A$, $n_v$, $k$} \\State $\\Gamma \\gets 0$ \\For{$j = 1, 2, \\dots, n_v$} \\State $v_i \\sim \\mathcal{D}$ where $\\mathcal{D}$ satisfies $\\mathbb{E}(v v^\\top) = I$ \\State $T^{(j)}(\\alpha, \\beta)$ $\\gets$ $\\mathrm{Lanczos}(A,v_j,k+1)$ \\State $[\\Theta, Y] \\gets \\mathrm{eigh\\_tridiag}(T^{(j)}(\\alpha, \\beta))$ \\State $\\tau_i \\gets \\langle e_1, y_i \\rangle$ \\State &lt; Do something with the node/weight pairs $(\\theta_i, \\tau_i^2)$ &gt; \\EndFor \\EndFunction \\end{algorithmic} \\end{algorithm}"
+  },
+  {
+    "objectID": "theory/matrix_functions.html",
+    "href": "theory/matrix_functions.html",
+    "title": "Matrix function estimation with primate",
+    "section": "",
+    "text": "In the introduction, the basics of implicit trace estimation were introduced, wherein it shown both in theory and with code using primate how to estimate the trace of matrix functions:\nf(A) = U f(\\Lambda) U^T, \\quad f: [a,b] \\to \\mathbb{R}\nIn particular, the introduction briefly covered how the Lanczos method is intimately connected to Gaussian Quadrature, and how this connection enables fast randomized trace estimation of f(A).\nIn this post, I’ll cover how to approximate the action v \\mapsto f(A)v for any function f with primate with its matrix_function API, and how to compose this functionality with other trace estimators.",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
+    ]
+  },
+  {
+    "objectID": "basic/todo.html",
+    "href": "basic/todo.html",
+    "title": "primate",
+    "section": "",
+    "text": "# a, b = 0.8, 2\n# x = np.random.uniform(low=0, high=10, size=40)\n# eps = np.random.normal(loc=0, scale=1.0, size=40)\n# y = (a * x + b) + eps\n\n# p = figure(width=350, height=200)\n# p.scatter(x, y)\n# show(p)\n\n# X = np.c_[x,y]\n# from scipy.linalg import lstsq\n# from scipy.optimize import least_squares, leastsq, minimize, minimize_scalar\n# def L(beta: tuple):\n#   b, a = beta\n#   return np.linalg.norm(y - a * x + b)**2\n\n# def L(beta: tuple):\n#   b, a = beta\n#   return (y - (a * x + b))\n\n\n\n# res = minimize_scalar(L, x0=(0,1))\n# b_opt, a_opt = res.x\n# L([a_opt,b_opt])\n\n# res = least_squares(L, x0=(0,1))\n# b_opt, a_opt = res.x\n# f_opt = lambda x: x * a_opt + b_opt \n# p = figure(width=350, height=200)\n# p.scatter(x, y)\n# p.line(x=[0, 10], y=[b_opt, f_opt(10)])\n# show(p)\n\n# ## Normal equations...\n# XI = np.c_[np.ones(X.shape[0]), X]\n\n# c, b_opt, a_opt = (np.linalg.inv((XI.T @ XI)) @ XI.T) @ y\n# f_opt = lambda x: x * a_opt + b_opt \n# p = figure(width=350, height=200)\n# p.scatter(x, y)\n# p.line(x=[0, 10], y=[b_opt, f_opt(10)])\n# show(p)"
+  },
+  {
+    "objectID": "theory/matrix_functions.html#establishing-a-baseline",
+    "href": "theory/matrix_functions.html#establishing-a-baseline",
+    "title": "Matrix function estimation with primate",
+    "section": "Establishing a baseline",
+    "text": "Establishing a baseline\nprimate allows the user to construct a LinearOperator directly from an existing matrix-like object A and callable fun through its matrix_function API.\n\nAs a baseline example, consider the action that adds an \\epsilon amount of mass to the diagonal of A:\nv \\mapsto (A + \\epsilon I)v\nFor any fixed \\epsilon, imitating this matrix action can be done in three different ways:\n\nObtain u = Av and then add u \\gets u + \\epsilon \\cdot v\nForm (A + \\epsilon I) and explicitly carry out the multiplication\nMultiply v by f(A) induced by f(\\lambda) = \\lambda + \\epsilon\n\nLets see what the code to accomplish this using (3) looks like:\n\nfrom primate.random import symmetric\nfrom primate.operator import matrix_function\n\n## Random matrix + input vector\nA = symmetric(150, pd = True)\nv = np.random.uniform(size=A.shape[1])\n\n## Ground truth v |-&gt; f(A)v\nLambda, U = np.linalg.eigh(A)\nv_truth = (U @ np.diag(Lambda + 0.10) @ U.T) @ v\n\n## Lanczos approximation\nM = matrix_function(A, fun = lambda x: x + 0.10)\nv_test = np.ravel(M @ v)\n\nvn, vn_approx = np.linalg.norm(v_truth), np.linalg.norm(v_test)\nprint(f\"f(A)v norm:  {vn:.6f}\")\nprint(f\"Approx norm: {vn_approx:.6f}\")\nprint(f\"Max diff:    {np.max(np.abs(v_truth - np.ravel(v_test))):.6e}\")\nprint(f\"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}\")\n\nf(A)v norm:  4.392660\nApprox norm: 4.392660\nMax diff:    5.218048e-15\ncosine sim:  1.000000e+00\n\n\nObserve M matches the ground truth v \\mapsto (A + \\epsilon I)v. In this way, one benefit of using matrix_function is that it allows one to approximate f(A) by thinking only about what is happening at the spectral level (as opposed to the matrix level). Of course, this example is a bit non-convincing as there are simpler ways of achieving the same result as shown by (1) and (2), for example:\n\nnp.allclose(A @ v + 0.10 * v, v_truth)\n\nTrue\n\n\nBaseline established.",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
+    ]
+  },
+  {
+    "objectID": "theory/matrix_functions.html#when-v-mapsto-fav-is-not-known",
+    "href": "theory/matrix_functions.html#when-v-mapsto-fav-is-not-known",
+    "title": "Matrix function estimation with primate",
+    "section": "When v \\mapsto f(A)v is not known",
+    "text": "When v \\mapsto f(A)v is not known\nOn the other hand, there are plenty of situations where one doesn’t have access to these simpler expressions. For example, consider the map:\nv \\mapsto (A + \\epsilon I)^{-1} v\nSuch expressions pop up in a variety of settings, such as in Tikhonov regularization, in Schatten-norm estimation Ubaru, Saad, and Seghouane (2017), in the Cholesky factorization of PSD matrices, and so on. Unlike the previous setting, we cannot readily access v \\mapsto f(A)v unless we explicitly compute the full spectral decomposition of A or the inverse of A, both of which are expensive to obtain.\n\n## Alternative: v_truth = np.linalg.inv((A + 0.10 * np.eye(A.shape[0]))) @ v\nv_truth = (U @ np.diag(np.reciprocal(Lambda + 0.10)) @ U.T) @ v\n\n## Lanczos approximation\nM = matrix_function(A, fun = lambda x: 1.0 / (x + 0.10))\nv_test = np.ravel(M @ v)\n\nvn, vn_approx = np.linalg.norm(v_truth), np.linalg.norm(v_test)\nprint(f\"f(A)v norm:  {vn:.6f}\")\nprint(f\"Approx norm: {vn_approx:.6f}\")\nprint(f\"Max diff:    {np.max(np.abs(v_truth - np.ravel(v_test))):.6e}\")\nprint(f\"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}\")\n\nf(A)v norm:  32.982583\nApprox norm: 32.982583\nMax diff:    1.626085e-05\ncosine sim:  1.000000e+00\n\n\nThere is a larger degree of error compared to the base as evidenced by the \\lVert \\cdot \\rVert_\\infty-normed difference between v_truth and v_test, however this is to be expected, as in general approximating the action v \\mapsto A^{-1} v will always be more difficult that v \\mapsto A v, even if A is well-conditioned.",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
+    ]
+  },
+  {
+    "objectID": "theory/matrix_functions.html#section",
+    "href": "theory/matrix_functions.html#section",
+    "title": "Matrix function estimation with primate",
+    "section": "",
+    "text": "Unfortunately, by its very definition, if A \\in \\mathbb{R}^{n \\times n} then obtaining f(A) \\in \\mathbb{R}^{n \\times n} explicitly can be very expensive. One well-known approach to sidestep this difficulty is to use the degree-k Lanczos expansion to iteratively approximate the action x \\mapsto f(A)x:\n Q^T A Q = T \\quad \\Leftrightarrow \\quad f(A)x \\approx \\lVert x \\rVert \\cdot Q f(T) e_1 \nDespite its rich theory, most results about the Lanczos method only hold in exact arithmetic; historically, practitioners have been hesitant about using the Lanczos method for eigen-estimation application due to its well-known instability with respect to roundoff and cancellation errors. Such errors typically manifest as loss of orthogonality between Lanczos vectors, which can cause a host of issues related to eigen- estimations, such as muddled convergence and spurious Ritz values. While there exist fixes to these issues, such fixes typically involve difficult to implement convergence heuristics or expensive re-orthogonalization techniques.\nOn the other hand, there is mounting empirical evidence (e.g. Ghorbani, Krishnan, and Xiao (2019)) that suggests using the (plain) Lanczos method in randomized setting is often more than sufficient for several eigenvalue-related estimation tasks. In fact, it’s been recently shown[^2] that the using the Lanczos method to approximate the action x \\mapsto f(A)x has the following guarantee:\n\\|f(\\mathbf{A}) \\mathbf{x}-\\mathbf{y}\\| \\leq 2\\|\\mathbf{x}\\| \\cdot \\min _{\\substack{\\text { polynomial } p \\\\ \\text { with degree }&lt;k}}\\left(\\max _{x \\in\\left[\\lambda_{\\min }(\\mathbf{A}), \\lambda_{\\max }(\\mathbf{A})\\right]}|f(x)-p(x)|\\right)\nIn other words, up to a factor of 2, the error \\|f(\\mathbf{A}) \\mathbf{x}-\\mathbf{y}\\| is bounded by the uniform error of the best polynomial approximation to f with degree &lt; k. For general matrix functions, this implies that finite-precision Lanczos essentially matches strongest known exact arithmetic bounds.",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
+    ]
+  },
+  {
+    "objectID": "theory/matrix_functions.html#matrix-function-approximation",
+    "href": "theory/matrix_functions.html#matrix-function-approximation",
+    "title": "Matrix function estimation with primate",
+    "section": "Matrix function approximation",
+    "text": "Matrix function approximation\nIf A \\in \\mathbb{R}^{n \\times n} and n is large, obtaining f(A) \\in \\mathbb{R}^{n \\times n} explicitly can be very expensive. One way to sidestep this difficulty is to approximate v \\mapsto f(A)v using the degree-k Lanczos expansion:\n Q^T A Q = T \\quad \\Leftrightarrow \\quad f(A)v \\approx \\lVert x \\rVert \\cdot Q f(T) e_1 \nIt’s been shown by (Musco, Musco, and Sidford 2018) that this approximation has the following guarantee:\n\\|f(\\mathbf{A}) \\mathbf{x}-\\mathbf{y}\\| \\leq 2\\|\\mathbf{x}\\| \\cdot \\min _{\\substack{\\text { polynomial } p \\\\ \\text { with degree }&lt;k}}\\left(\\max _{x \\in\\left[\\lambda_{\\min }(\\mathbf{A}), \\lambda_{\\max }(\\mathbf{A})\\right]}|f(x)-p(x)|\\right)\nIn other words, up to a factor of 2, the error \\|f(\\mathbf{A}) \\mathbf{x}-\\mathbf{y}\\| is bounded by the uniform error of the best polynomial approximation to f with degree &lt; k. For general matrix functions, this implies that finite-precision Lanczos essentially matches strongest known exact arithmetic bounds.\nThis suggests an idea: can we convert any matrix-like object into a LinearOperator that transparently converts matrix-vector products Av into products with matrix-functions f(A)v?",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
+    ]
+  },
+  {
+    "objectID": "theory/matrix_functions.html#back-to-trace-estimation",
+    "href": "theory/matrix_functions.html#back-to-trace-estimation",
+    "title": "Matrix function estimation with primate",
+    "section": "Back to trace estimation",
+    "text": "Back to trace estimation\nThere are several use-cases wherein one might be interested in the output f(A)v itself—see Musco, Musco, and Sidford (2018) and references within for some examples. One use-case is the extension of existing matvec-dependent implicit trace estimators to matrix-function trace estimators.\n\nfrom primate.trace import hutch, xtrace\nM = matrix_function(A, fun=\"log\")\nprint(f\"Logdet exact:  {np.sum(np.log(np.linalg.eigvalsh(A))):6e}\")\nprint(f\"Logdet Hutch:  {hutch(A, fun='log'):6e}\")\nprint(f\"Logdet XTrace: {xtrace(M):6e}\")\n\nLogdet exact:  -1.483218e+02\nLogdet Hutch:  -1.477567e+02\nLogdet XTrace: -1.483155e+02\n\n\nAs with the hutch estimators applied to matrix functions, note that the action v \\mapto f(A)v is subject to the approximation errors studied by Musco, Musco, and Sidford (2018), making such extensions limited functions that are well-approximated by Lanczos.",
+    "crumbs": [
+      "Theory",
+      "Matrix functions"
     ]
   }
 ]

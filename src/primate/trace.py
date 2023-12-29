@@ -36,7 +36,7 @@ def hutch(
 
 	This function uses up to `maxiter` random isotropic vectors to estimate of the trace of $f(A)$, where:
 	$$\\mathrm{tr}(f(A)) = \\mathrm{tr}(U f(\\Lambda) U^T) = \\sum\\limits_{i=1}^n f(\\lambda_i) $$
-	The estimator is obtained by averaging quadratic forms $v \mapsto v^T f(A)v$, rescaling as necessary.
+	The estimator is obtained by averaging quadratic forms $v \\mapsto v^T f(A)v$, rescaling as necessary.
 	This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. 
 	See the [online documentation](https://peekxc.github.io/primate/) for more details.
 

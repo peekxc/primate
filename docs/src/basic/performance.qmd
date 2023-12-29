@@ -1,13 +1,15 @@
 ---
 title: "Performance"
+execute: 
+  eval: false
 ---
 
 `primate` provides a variety of efficient algorithms for estimating quantities derived from matrix functions. These algorithms are largely implemented in C++ to minimize overhead, and for some computational problems `primate` can out-perform the standard algorithms for estimating spectral quantities by several orders of magnitude. Nonetheless, there are some performance-related caveats to be aware of. 
 
-The main 
+<!-- The main  -->
 
+<!-- To illustrate this, we give an example below using Toeplitz matrices.   -->
 
-To illustrate this, we give an example below using Toeplitz matrices.  
 ```{python}
 from scipy.linalg import toeplitz
 from primate.trace import hutch 

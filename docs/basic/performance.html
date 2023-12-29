@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate</title>
+<title>primate - Performance</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +64,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/operator.matrix_function.html" rel="next">
-<link href="../reference/trace.hutch.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -114,7 +146,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/trace.xtrace.html">XTrace</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Performance</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -182,12 +214,6 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Matrix functions</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -242,7 +268,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">XTrace</span></a>
   </div>
 </li>
@@ -283,26 +309,98 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#primate.trace.xtrace" id="toc-primate.trace.xtrace" class="nav-link active" data-scroll-target="#primate.trace.xtrace">trace.xtrace</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Performance</h1>
+</div>
 
 
 
-<section id="primate.trace.xtrace" class="level1">
-<h1>trace.xtrace</h1>
-<p><code>trace.xtrace(A, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False)</code></p>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-</section>
+</header>
+
+
+<p><code>primate</code> provides a variety of efficient algorithms for estimating quantities derived from matrix functions. These algorithms are largely implemented in C++ to minimize overhead, and for some computational problems <code>primate</code> can out-perform the standard algorithms for estimating spectral quantities by several orders of magnitude. Nonetheless, there are some performance-related caveats to be aware of.</p>
+<!-- The main  -->
+<!-- To illustrate this, we give an example below using Toeplitz matrices.   -->
+<div id="370cac97" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> toeplitz</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.random.uniform(size<span class="op">=</span><span class="dv">100</span>, low<span class="op">=</span><span class="dv">0</span>, high<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>T <span class="op">=</span> toeplitz(c)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># np.sum(np.reciprocal(np.linalg.eigvalsh(T)))</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(np.linalg.eigvalsh(T)))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(T, fun<span class="op">=</span>np.<span class="bu">abs</span>, maxiter<span class="op">=</span><span class="dv">200</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, rng<span class="op">=</span><span class="st">"mt"</span>, deg<span class="op">=</span><span class="dv">20</span>, seed<span class="op">=-</span><span class="dv">1</span>, plot<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(T, fun<span class="op">=</span>np.<span class="bu">abs</span>, maxiter<span class="op">=</span><span class="dv">800</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, rng<span class="op">=</span><span class="st">"mt"</span>, quad<span class="op">=</span><span class="st">"golub_welsch"</span>, deg<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=-</span><span class="dv">1</span>, plot<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(C, fun<span class="op">=</span>np.<span class="bu">abs</span>, maxiter<span class="op">=</span><span class="dv">800</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, rng<span class="op">=</span><span class="st">"mt"</span>, quad<span class="op">=</span><span class="st">"golub_welsch"</span>, deg<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=-</span><span class="dv">1</span>, plot<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">sum</span>(np.linalg.svd(T)[<span class="dv">1</span>])</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>Z <span class="op">=</span> np.zeros(T.shape)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>C <span class="op">=</span> np.block([[Z, T], [T.T, Z]])</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>hutch(C, fun<span class="op">=</span>np.<span class="bu">abs</span>, maxiter<span class="op">=</span><span class="dv">200</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, rng<span class="op">=</span><span class="st">"mt"</span>, quad<span class="op">=</span><span class="st">"golub_welsch"</span>, deg<span class="op">=</span><span class="dv">200</span>, seed<span class="op">=-</span><span class="dv">1</span>, plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>hutch(T, fun<span class="op">=</span>np.<span class="bu">abs</span>, maxiter<span class="op">=</span><span class="dv">200</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, deg<span class="op">=</span><span class="dv">50</span>, seed<span class="op">=-</span><span class="dv">1</span>, plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> info[<span class="st">'figure'</span>]</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> xtrace</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operator <span class="im">import</span> matrix_function</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(T, <span class="st">"abs"</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>xtrace(M)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> info[<span class="st">'samples'</span>]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.random.choice([<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], size<span class="op">=</span>T.shape[<span class="dv">0</span>])</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>T <span class="op">@</span> v</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>s[np.<span class="bu">abs</span>(s) <span class="op">&lt;=</span> np.linalg.norm(T)].mean()</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.diagonalize <span class="im">import</span> lanczos</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> eigvalsh_tridiagonal</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>a, b <span class="op">=</span> lanczos(T, deg<span class="op">=</span><span class="dv">499</span>, orth<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>np.<span class="bu">sum</span>(np.<span class="bu">abs</span>(eigvalsh_tridiagonal(a,b)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="c8032eb8" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> timeit </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>timeit.timeit(<span class="kw">lambda</span>: hutch(A, maxiter<span class="op">=</span><span class="dv">20</span>, deg<span class="op">=</span><span class="dv">5</span>, fun<span class="op">=</span><span class="st">"log"</span>, quad<span class="op">=</span><span class="st">"fttr"</span>), number <span class="op">=</span> <span class="dv">1000</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>timeit.timeit(<span class="kw">lambda</span>: np.<span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A))), number <span class="op">=</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- ```{python}
+c = np.reciprocal(np.sqrt(n))
+trace_estimates = np.empty(n)
+for j in range(n):
+  v = np.random.choice([-1, +1], size=n)
+  trace_estimates[j] = v @ A @ v
+
+
+est_index = np.arange(1, (n*10)+1)
+p = figure(width=200, height=150)
+p.line(est_index, (np.cumsum(trace_estimates) / est_index))
+p.line(est_index, np.repeat(A.trace(), n*10), color='red')
+show(p)
+``` -->
+
+
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -846,18 +944,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../reference/trace.hutch.html" class="pagination-link  aria-label=" hutch"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Hutch</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../reference/operator.matrix_function.html" class="pagination-link" aria-label="Matrix Function">
-        <span class="nav-page-text">Matrix Function</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

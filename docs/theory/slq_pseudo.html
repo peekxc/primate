@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>primate</title>
+<title>primate - SLQ Trace guide</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/operator.matrix_function.html" rel="next">
-<link href="../reference/trace.hutch.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,6 +67,24 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
+MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
 
@@ -114,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/trace.xtrace.html">XTrace</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">SLQ Trace guide</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -242,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/trace.xtrace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">XTrace</span></a>
   </div>
 </li>
@@ -283,26 +299,38 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#primate.trace.xtrace" id="toc-primate.trace.xtrace" class="nav-link active" data-scroll-target="#primate.trace.xtrace">trace.xtrace</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SLQ Trace guide</h1>
+</div>
 
 
 
-<section id="primate.trace.xtrace" class="level1">
-<h1>trace.xtrace</h1>
-<p><code>trace.xtrace(A, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False)</code></p>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
 
 
-</section>
+</header>
+
+
+<p>To clarify that that means, here’s an abstract presentation of the generic SLQ procedure:</p>
+<div id="alg-slq" class="pseudocode-container" data-comment-delimiter="//" data-line-number="true" data-alg-title="Algorithm" data-no-end="true" data-indent-size="1.1em" data-line-number-punc=":" data-pseudocode-index="1">
+<div class="pseudocode">
+\begin{algorithm} \caption{Stochastic Lanczos Quadrature} \begin{algorithmic} \Input Symmetric operator ($A \in \mathbb{R}^{n \times n}$) \Require Number of queries ($n_v$), Degree of quadrature ($k$) \Function{SLQ}{$A$, $n_v$, $k$} \State $\Gamma \gets 0$ \For{$j = 1, 2, \dots, n_v$} \State $v_i \sim \mathcal{D}$ where $\mathcal{D}$ satisfies $\mathbb{E}(v v^\top) = I$ \State $T^{(j)}(\alpha, \beta)$ $\gets$ $\mathrm{Lanczos}(A,v_j,k+1)$ \State $[\Theta, Y] \gets \mathrm{eigh\_tridiag}(T^{(j)}(\alpha, \beta))$ \State $\tau_i \gets \langle e_1, y_i \rangle$ \State &lt; Do something with the node/weight pairs $(\theta_i, \tau_i^2)$ &gt; \EndFor \EndFunction \end{algorithmic} \end{algorithm}
+</div>
+</div>
+
+
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -846,18 +874,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../reference/trace.hutch.html" class="pagination-link  aria-label=" hutch"="">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Hutch</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../reference/operator.matrix_function.html" class="pagination-link" aria-label="Matrix Function">
-        <span class="nav-page-text">Matrix Function</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

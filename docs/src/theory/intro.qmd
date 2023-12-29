@@ -1,11 +1,12 @@
 ---
 title: "Introduction to trace estimation with `primate`"
+bibliography: ../references.bib
 ---
 
 `primate` contains a variety of methods for estimating quantities from _matrix functions_. One popular such quantity is the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of $f(A)$, for some generic $f: [a,b] \to \mathbb{R}$ defined on the spectrum of $A$:
 $$ \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}$$
 
-Many quantities of common interest can be expressed in as traces of matrix functions with the right spectral function specialization. A few such specialization include: 
+Many quantities of common interest can be expressed in as traces of matrix functions with the right choice of $f$. A few such function specializations include: 
 
 $$
 \begin{align*}
@@ -18,7 +19,7 @@ f &= \mathrm{sign} \quad &\Longleftrightarrow& \quad &\mathrm{rank}(A)  \\
 \end{align*}
 $$ 
 
-In this introduction, the basics of randomized trace estimation are introduced, with a focus on matrix-free algorithms how the readily extend to estimating the traces of _matrix functions_.
+In this introduction, the basics of randomized trace estimation are introduced, with a focus on how to use matrix-free algorithms estimate traces of _matrix functions_.
 
 <!-- One such method, often used in trace estimation, is the "stochastic Lanczos quadrature" (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.  -->
 
@@ -33,7 +34,7 @@ import numpy as np
 np.random.seed(1234)
 ```
 
-## Basics: Trace estimation 
+## Basics: Trace computation 
 
 <!-- Whether used for spectral sum estimation, quadrature approximation, or many techniques 
  -->
@@ -78,15 +79,15 @@ print(f"Eigen:  {np.sum(np.linalg.eigvalsh(A)):.8f}")
 print(f"Matvec: {sum([eye(i) @ A @ eye(i) for i in range(150)]):.8f}")
 ```
 
-While (1) trivially yields $\mathrm{tr}(A)$ in (optimal) $O(n)$ time, there exist situations where the diagonal entries of `A` are not available---particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they are nonetheless viable altenrnatives to obtain $\mathrm{tr}(A)$.
+While (1) trivially yields $\mathrm{tr}(A)$ in (optimal) $O(n)$ time, there exist situations where the diagonal entries of `A` are not available---particularly in the large-scale regime. In contrast, though both (2) and (3) are less efficient, they are nonetheless viable alternatives to obtain $\mathrm{tr}(A)$.
 
-## The implicit trace estimation problem
+## _Implicit_ trace estimation
 
 The _implicit_ trace estimation problem can be stated as follows: 
 
 > Given access to a square matrix $A \in \mathbb{R}^{n \times n}$ via its matrix-vector product operator $x \mapsto Ax$, estimate its trace $\mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii}$
 
-Observe that although method (3) fits squarely in this category, its pretty inefficient from a computational standpoint---after all, most of the entries of $e_i$ are zero, thus most inner product computations do not contribute to the trace estimate at all. 
+Note we no longer assume we have direct access to the diagonal here, leaving us with the `Eigen` or `Matvec` methods. The `Eigen` method is expensive, and though the `Matvec` method solves the problem exactly, its pretty inefficient from a computational standpoint---most of the entries of $e_i$ are zero, thus most inner product computations do not contribute to the trace estimate at all. 
 
 One idea, attributed to [A. Girard](https://link.springer.com/article/10.1007/BF01395775), is to replace $e_i$ with random _zero-mean_ vectors, e.g. random sign vectors $v \in \{-1, +1\}^{n}$ or random normal vectors $v \sim \mathcal{N}(\mu=0, \sigma=1)$: 
 
@@ -103,7 +104,7 @@ def isotropic(n):
 estimates = np.array([v @ A @ v for v in isotropic(500)])
 ```
 
-Plotting the estimator formed by averaging the first $k$ samples along with it's error, we get the following figures for $k = 50$ and $k = 500$, respectively: 
+Plotting both the estimator formed by averaging the first $k$ samples along with its absolute error, we get the following figures for $k = 50$ and $k = 500$, respectively: 
 ```{python}
 #| echo: false
 #| output: true
@@ -152,8 +153,18 @@ for fig in [p,p2]:
 show(row(column(p,q), column(p2,q2)))
 ```
 
-Sure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision beyond < 1% becomes increasingly difficult due to the variance of the sample estimates. 
+Sure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision much less than 1% becomes increasingly difficult due to the randomness and variance of the sample estimates. 
 
+## Estimator Implementation
+
+Rather than manually averaging samples, trace estimates can be obtained via the `hutch` function: 
+
+```{python}
+from primate.trace import hutch
+print(f"Trace estimate: {hutch(A, maxiter=50)}")
+```
+
+Though its estimation is identical to averaging quadratic forms $v^T A v$ of isotropic vectors as above, `hutch` comes with a few extra features to simplify its usage. In particular, all $v \mapsto v^T A v$ evaluations are done in parallel, there are a variety of isotropic distributions and random number generators (RNGs) to choose from, and the estimator may be suppleid various convergence criteria to allow for early-stopping; see the [hutch documentation page](../reference/trace.hutch.qmd) for more details.  
 
 <!-- 
 Let's see how this fares using, let's say, $\frac{1}{4}$ the number of _matvecs_: 
@@ -169,68 +180,47 @@ print(trace_estimate / (n // 4))
 
 Not bad! Though it's fairly intuitive, why does this work?  -->
 
-# Matrix functions 
+## Stochastic Lanczos Quadrature
 
-While there are some real-world applications for estimating $\mathrm{tr}(A)$, in many setting the trace of a given matrix is not a very informative quantity. On the other hand, there are innumerable applications that rely on spectral information.
+While there are some real-world applications for estimating $\mathrm{tr}(A)$, in many setting the trace of a given matrix is not a very informative quantity. On the other hand, as shown in the beginning, there are many situations where we might be interested in estimating the trace of a _matrix function_ $f(A)$. It is natural to consider extending the Hutchinson estimator above with something like: 
 
+$$ \mathrm{tr}(f(A)) \approx \frac{n}{n_v} \sum\limits_{i=1}^{n_v} v_i^T f(A) v_i $$
 
-```{python}
-# from primate.operator import matrix_function
+Of course, the remaining difficult lies in computing quadratic forms $v \mapsto v^T f(A) v$ efficiently. The approach taken by @ubaru2017fast is to notice that sums of these quantities can transformed into a _Riemann-Stieltjes integral_:
 
-# a, b = 0.8, 2
-# x = np.random.uniform(low=0, high=10, size=40)
-# eps = np.random.normal(loc=0, scale=1.0, size=40)
-# y = (a * x + b) + eps
+$$ v^T f(A) v = v^T U f(\Lambda) U^T v = \sum\limits_{i}^n f(\lambda_i) \mu_i^2 = \int\limits_{a}^b f(t) \mu(t)$$
 
-# p = figure(width=350, height=200)
-# p.scatter(x, y)
-# show(p)
+where scalars $\mu_i \in \mathbb{R}$ constitute a cumulative, piecewise constant function $\mu : \mathbb{R} \to \mathbb{R}_+$: 
 
-# X = np.c_[x,y]
-# from scipy.linalg import lstsq
-# from scipy.optimize import least_squares, leastsq, minimize, minimize_scalar
-# def L(beta: tuple):
-#   b, a = beta
-#   return np.linalg.norm(y - a * x + b)**2
+$$
+\mu_i = (U^T v)_i, \quad \mu(t) = \begin{cases}
+0, & \text{if } t < a = \lambda_1 \\
+\sum_{j=1}^{i-1} \mu_j^2, & \text{if } \lambda_{i-1} \leq t < \lambda_i, i = 2, \dots, n \\
+\sum_{j=1}^n \mu_j^2, & \text{if } b = \lambda_n \leq t
+\end{cases}
+$$
 
-# def L(beta: tuple):
-#   b, a = beta
-#   return (y - (a * x + b))
+As with any definite integral, one would ideally like to approximate its value via some [quadrature rule](https://en.wikipedia.org/wiki/Numerical_integration#Methods_for_one-dimensional_integrals). An exemplary such approximation is the $m$-point Gaussian quadrature rule: 
 
+$$ \int\limits_{a}^b f(t) \mu(t) \approx \sum\limits_{k=1}^m \omega_k f(\eta_k) $$
 
+with weights $\{\omega_k\}$ and nodes $\{ \eta_k\}$. On one hand, Gaussian Quadrature (GQ) is just one of many quadrature rules that could be used to approximate $v^T A v$. On the other hand, GQ is often preferred over other rules due to its _exactness_ on polynomials up to degree $2m - 1$.
 
-# res = minimize_scalar(L, x0=(0,1))
-# b_opt, a_opt = res.x
-# L([a_opt,b_opt])
+Of course, both the weights and nodes of GQ rule are unknown for the integral above. This is in strong contrast to the typical setting, wherein $\omega$ is assumed uniform or otherwise known ahead-of-time. A surprising and non-trivial fact is that both the weights $\{\omega_k\}$ and nodes $\{ \eta_k\}$ of the $m$-point GQ above are directly computable the degree $m$ matrix $T_m$ produced by the Lanczos method:
 
-# res = least_squares(L, x0=(0,1))
-# b_opt, a_opt = res.x
-# f_opt = lambda x: x * a_opt + b_opt 
-# p = figure(width=350, height=200)
-# p.scatter(x, y)
-# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
-# show(p)
+$$ Q_m^T A Q_m = T_m = Y \Theta Y^T \quad \Leftrightarrow \quad (\eta_i, \omega_i) = (\theta_i, \tau_i), \; \tau_i = (e_1^T y_i)^2 $$
 
-# ## Normal equations...
-# XI = np.c_[np.ones(X.shape[0]), X]
+In other words, the Ritz values $\{\theta_i\}$ of $T_m$ are exactly the nodes of GQ quadrature rule applied to $\mu(t)$, while the first components of the Ritz vectors $\tau_i$ (squared) are exactly the weights. For more information about this non-trivial fact, see @golub2009matrices.
 
-# c, b_opt, a_opt = (np.linalg.inv((XI.T @ XI)) @ XI.T) @ y
-# f_opt = lambda x: x * a_opt + b_opt 
-# p = figure(width=350, height=200)
-# p.scatter(x, y)
-# p.line(x=[0, 10], y=[b_opt, f_opt(10)])
-# show(p)
+## Example: Logdet computation
 
-```
+Putting all of the theory above together, a simple way to estimate the trace of a matrix function is to average Lanczos quadrature estimates:
 
+$$\mathrm{tr}(f(A)) \approx \frac{n}{n_v} \sum\limits_{i=1}^{n_v} e_1^T f(T_m) e_1  = \frac{n}{n_v} \sum\limits_{j=1}^{n_v} \left ( \sum\limits_{i=1}^m \tau_i^{(j)} f(\theta_i)^{(j)} \right )$$
 
-## Ex: Logdet computation
-
-The basic way to approximate the trace of a matrix function is to simply set `fun` to the name the spectral function. For example, to approximate the log-determinant:
+To enable this kind of estimator in `hutch`, simply set the `fun` argument to either the name of a built-in function or an arbitrary Callable. For example, to approximate the log-determinant:
 
 ```{python}
-from primate.trace import hutch
-
 ## Log-determinant
 logdet_test = hutch(A, fun="log", maxiter=25)
 logdet_true = np.sum(np.log(np.linalg.eigvalsh(A)))
@@ -239,22 +229,26 @@ print(f"Logdet (exact):  {logdet_true}")
 print(f"Logdet (approx): {logdet_test}")
 ```
 
-Even using $n / 6$ matvecs, we get a decent approximation. But how good is this estimate? 
-
-To get a slightly better idea, you can set `verbose=True`:
+Here we see that using $n / 6$ evaluatons of $e_1^T f(T_m) e_1$, we get a decent approximation of `logdet(A)`. To get a better idea of the quality of this estimate, you can set `verbose=True`:
 
 ```{python}
-est = hutch(A, fun="log", maxiter=25, verbose=True)
+est = hutch(A, fun="log", maxiter=25, seed=5, verbose=True)
 ```
 
-The first line of the statement contains fixed about the estimator, including the type of estimator (`Girard-Hutchinson`), the function applied to the spectrum (`log`), the degree of the Krylov expansion (`20`), and the quadrature method used (`fttr`). 
+The first line of the statement contains fixed about the estimator, including the type of estimator (`Girard-Hutchinson`), the function applied to the spectrum (`log`), the degree of the Lanczos quadrature approximation (`20`), and the quadrature method used (`fttr`). 
 
-The second line prints the runtime information about the samples, such as the final trace estimate (``)
-2. Its [margin of error](https://en.wikipedia.org/wiki/Margin_of_error) 
-2. The [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (aka the relative std. deviation)
-3. The number of samples used + their distribution prefix ('R' for rademacher)
+The second line prints the runtime information about the samples, such as the final trace estimate, its [margin of error](https://en.wikipedia.org/wiki/Margin_of_error) and [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (aka the relative std. deviation), and the number of samples used + their distribution prefix ('R' for rademacher). 
+
+Another way to get an idea of how well the estimator is converging is to pass the `plot=True` option. Here, we pass the same `seed` for reproducibility with the above call. 
 
 ```{python}
-est = hutch(A, fun="log", maxiter=100, plot=True)
+est = hutch(A, fun="log", maxiter=100, seed=5, plot=True)
 ```
 
+Similar information as reported by the `verbose=True` flag is shown cumulatively applied to every sample. The left plot shows the sample point estimates alongside yellow bands denoting the margin of error associated with the 95% confidence interval (CI) at every sample index. The right plot show convergence information, e.g. the running coefficient of variation is shown on the top-right and an upper bound on the absolute error is derived from the CI is shown on the bottom right. 
+
+While the margin of error is typically a valid, conservative estimate of estimators error, in some situations these bounds may not be valid as they are based solely on the [CLT](https://en.wikipedia.org/wiki/Central_limit_theorem) implications for normally distributed random variables. In particular, there is an inherent amount of error associated with the Lanczos-based quadrature approximations that is not taken into account in the error bound, which may invalidate the corresponding CI's. 
+
+<!-- Moreover, though `primate` provides a variety of "good" random number generators for vector generation, every such generator is inherently imperfect. -->
+
+[^1]: Technically, we could solve a system of equations via either Gaussian elimination or, when $A$ is rank-deficient, via least squares: $(A + \epsilon I)^{-1}v \simeq u \Leftrightarrow \mathrm{argmin}_{u \in \mathbb{R}^n} \lVert v - (A + \epsilon I)u \rVert^2$. Then again, this could  be just as expensive---if not more so---than just executing the Lanczos iteration!
