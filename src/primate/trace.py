@@ -67,7 +67,7 @@ def hutch(
 			Number of Lanczos vectors to allocate. Must be at least 2. 
 	orth: int, default=0
 	    Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`. 
-	quad: { 'golub_welsch', 'fttr' }, default='fttr'
+	quad: { 'golub_welsch', 'fttr' }, default='golub_welsch'
 			Method used to obtain the weights of the Gaussian quadrature. See notes. 
 	confidence : float, default=0.95
 	    Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
@@ -91,10 +91,10 @@ def hutch(
 	:
 			Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
 
-	Notes:
-	------
-	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
-	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
+	Notes
+	-----
+	To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former (GW) uses implicit symmetric QR steps with Wilkinson shifts, 
+	while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
 	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
 	If `deg` is large, `fttr` is preferred. 
 

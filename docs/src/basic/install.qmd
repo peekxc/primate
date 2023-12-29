@@ -14,7 +14,8 @@ Currently the package must be built from source via cloning the repository. PYPI
 
 ### Platform support
 
-Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable `primate` to be installed on supported architecture / CPython implementations without compilation. As of 12/29/23, native `primate` wheels are buitl for the following platforms:
+<!-- Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI.  -->
+For certain platforms, `primate` can be installed from PyPi without compilation. As of 12/29/23, native `primate` wheels are built for the following platforms:
 
 | Platform                          | 3.8 | 3.9 | 3.10 | 3.11 | 3.12 |
 |-----------------------------------|:---:|:---:|:----:|:----:|:----:|
@@ -24,14 +25,16 @@ Platform-specific wheels are currently built with cibuildwheel and uploaded to P
 | **Windows (AMD64) [^2]**          | ✅  | ✅  | ✅   | ✅   | ✅   |
 
 Wheels are currently built with [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/).
-Currently no support is offered for PyPy, 32-bit runtimes, or [unsupported versions of CPython](https://devguide.python.org/versions/#supported-versions). If your platform isn't on this list, feel free to make an issue requesting support. 
+Currently no support is offered for [PyPy](https://www.pypy.org/), 32-bit systems, or [unsupported versions of CPython](https://devguide.python.org/versions/#supported-versions). 
 
-[^1]: Single-thread execution only; ARM-based OSX runners come stocked with Apple's clang, which doesn't natively ship with `libomp.dylib`, though this [may be fixable](https://mac.r-project.org/openmp/). Feel free to file an PR if you can get this working.  
+If your platform isn't on this table but you would like it to be supported, feel free to [make an issue](https://github.com/peekxc/primate). 
+
+[^1]: Single-thread execution only; ARM-based OSX runners compile with Apple's clang, which doesn't natively ship with `libomp.dylib`, though this [may be fixable](https://mac.r-project.org/openmp/). Feel free to file an PR if you can get this working.  
 [^2]: Single-thread execution only; `primate` depends on OpenMP 4.5+, which isn't supported on any Windows compiler I'm aware of. 
 
 ### Compiling from source
 
-To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](https://clang.llvm.org/). For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
+To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](https://clang.llvm.org/), preferably version 15.0 or higher. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
 
 ### C++ Installation
 

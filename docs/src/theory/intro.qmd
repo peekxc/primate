@@ -19,7 +19,7 @@ f &= \mathrm{sign} \quad &\Longleftrightarrow& \quad &\mathrm{rank}(A)  \\
 \end{align*}
 $$ 
 
-In this introduction, the basics of randomized trace estimation are introduced, with a focus on how to use matrix-free algorithms estimate traces of _matrix functions_.
+In this introduction, the basics of randomized trace estimation are introduced, with a focus on how to use matrix-free algorithms to estimate traces of _matrix functions_.
 
 <!-- One such method, often used in trace estimation, is the "stochastic Lanczos quadrature" (SLQ) method. Unfortunately, SLQ refer not to one but a host of methods in the literature; though each is typically related, they are often used in different contexts.  -->
 
@@ -180,13 +180,13 @@ print(trace_estimate / (n // 4))
 
 Not bad! Though it's fairly intuitive, why does this work?  -->
 
-## Stochastic Lanczos Quadrature
+## Extending to matrix functions
 
 While there are some real-world applications for estimating $\mathrm{tr}(A)$, in many setting the trace of a given matrix is not a very informative quantity. On the other hand, as shown in the beginning, there are many situations where we might be interested in estimating the trace of a _matrix function_ $f(A)$. It is natural to consider extending the Hutchinson estimator above with something like: 
 
 $$ \mathrm{tr}(f(A)) \approx \frac{n}{n_v} \sum\limits_{i=1}^{n_v} v_i^T f(A) v_i $$
 
-Of course, the remaining difficult lies in computing quadratic forms $v \mapsto v^T f(A) v$ efficiently. The approach taken by @ubaru2017fast is to notice that sums of these quantities can transformed into a _Riemann-Stieltjes integral_:
+Of course, the remaining difficulty lies in computing quadratic forms $v \mapsto v^T f(A) v$ efficiently. The approach taken by @ubaru2017fast is to notice that sums of these quantities can transformed into a _Riemann-Stieltjes integral_:
 
 $$ v^T f(A) v = v^T U f(\Lambda) U^T v = \sum\limits_{i}^n f(\lambda_i) \mu_i^2 = \int\limits_{a}^b f(t) \mu(t)$$
 
@@ -200,25 +200,43 @@ $$
 \end{cases}
 $$
 
-As with any definite integral, one would ideally like to approximate its value via some [quadrature rule](https://en.wikipedia.org/wiki/Numerical_integration#Methods_for_one-dimensional_integrals). An exemplary such approximation is the $m$-point Gaussian quadrature rule: 
+As with any definite integral, one would ideally like to approximate its value with a [quadrature rule](https://en.wikipedia.org/wiki/Numerical_integration#Methods_for_one-dimensional_integrals). An exemplary such approximation is the $m$-point Gaussian quadrature rule: 
 
 $$ \int\limits_{a}^b f(t) \mu(t) \approx \sum\limits_{k=1}^m \omega_k f(\eta_k) $$
 
 with weights $\{\omega_k\}$ and nodes $\{ \eta_k\}$. On one hand, Gaussian Quadrature (GQ) is just one of many quadrature rules that could be used to approximate $v^T A v$. On the other hand, GQ is often preferred over other rules due to its _exactness_ on polynomials up to degree $2m - 1$.
 
-Of course, both the weights and nodes of GQ rule are unknown for the integral above. This is in strong contrast to the typical setting, wherein $\omega$ is assumed uniform or otherwise known ahead-of-time. A surprising and non-trivial fact is that both the weights $\{\omega_k\}$ and nodes $\{ \eta_k\}$ of the $m$-point GQ above are directly computable the degree $m$ matrix $T_m$ produced by the Lanczos method:
+Of course, both the weights and nodes of GQ rule are unknown for the integral above. This contrasts the typical quadrature setting, wherein $\omega$ is assumed uniform or is otherwise known ahead-of-time. 
+
+A surprising and powerful fact is that both the weights $\{\omega_k\}$ and nodes $\{ \eta_k\}$ of the $m$-point GQ above are directly computable the degree $m$ matrix $T_m$ produced by the _Lanczos method_:
 
 $$ Q_m^T A Q_m = T_m = Y \Theta Y^T \quad \Leftrightarrow \quad (\eta_i, \omega_i) = (\theta_i, \tau_i), \; \tau_i = (e_1^T y_i)^2 $$
 
 In other words, the Ritz values $\{\theta_i\}$ of $T_m$ are exactly the nodes of GQ quadrature rule applied to $\mu(t)$, while the first components of the Ritz vectors $\tau_i$ (squared) are exactly the weights. For more information about this non-trivial fact, see @golub2009matrices.
 
-## Example: Logdet computation
+## Stochastic Lanczos Quadrature
 
-Putting all of the theory above together, a simple way to estimate the trace of a matrix function is to average Lanczos quadrature estimates:
+By using Lanczos quadrature estimates, the theory above enables the Hutchinson estimator to extend to be used as an estimator for the trace of a matrix function:
 
 $$\mathrm{tr}(f(A)) \approx \frac{n}{n_v} \sum\limits_{i=1}^{n_v} e_1^T f(T_m) e_1  = \frac{n}{n_v} \sum\limits_{j=1}^{n_v} \left ( \sum\limits_{i=1}^m \tau_i^{(j)} f(\theta_i)^{(j)} \right )$$
 
-To enable this kind of estimator in `hutch`, simply set the `fun` argument to either the name of a built-in function or an arbitrary Callable. For example, to approximate the log-determinant:
+Under relatively mild assumptions, if the function of interest $f: [a,b] \to \mathbb{R}$ is analytic on $[\lambda_{\text{min}}, \lambda_{\text{max}}]$, then for constants $\epsilon, \eta \in (0, 1)$ the output $\Gamma$ of the Hutchinson estimator satisfies: 
+
+$$
+\mathrm{Pr}\Bigg[ \lvert \mathrm{tr}(f(A)) - \Gamma \rvert \leq \epsilon \lvert \mathrm{tr}(f(A)) \rvert \Bigg] \geq 1 - \eta 
+$$
+
+...if the number of sample vectors $n_v$ satisfies $n_v \geq (24/\epsilon^2) \log(2/\eta)$ and the degree of the Lanczos expansion is sufficiently large. 
+In other words, we can achieve an arbitrary $(1 \pm \epsilon)$-approximation of $\mathrm{tr}(f(A))$ with success probability $\eta$ using 
+on the order of $\sim O(\epsilon^{-2} \log(\eta^{-1}))$ evaluations of $e_1^T f(T_m) e_1$. This probablistic guarantee is most useful when $\epsilon$ is not too small, i.e. only a relatively coarse approximation of $\mathrm{tr}(f(A))$ is needed.
+
+## Example: Logdet computation
+
+Back to the computation, let's see how the above theory translate to code with `primate`. 
+
+To parameterize a Girard-Hutchinson estimator for use with matrix-functions, it suffices to simply set the `fun` argument in `hutch` to either the name of a built-in function or an arbitrary `Callable`. 
+
+For example, to approximate the log-determinant of `A`:
 
 ```{python}
 ## Log-determinant
@@ -229,17 +247,17 @@ print(f"Logdet (exact):  {logdet_true}")
 print(f"Logdet (approx): {logdet_test}")
 ```
 
-Here we see that using $n / 6$ evaluatons of $e_1^T f(T_m) e_1$, we get a decent approximation of `logdet(A)`. To get a better idea of the quality of this estimate, you can set `verbose=True`:
+Here we see that using only $n / 6$ evaluations of $e_1^T f(T_m) e_1$, we get a decent approximation of `logdet(A)`. To get a better idea of the quality of the estimator, set `verbose=True`:
 
 ```{python}
 est = hutch(A, fun="log", maxiter=25, seed=5, verbose=True)
 ```
 
-The first line of the statement contains fixed about the estimator, including the type of estimator (`Girard-Hutchinson`), the function applied to the spectrum (`log`), the degree of the Lanczos quadrature approximation (`20`), and the quadrature method used (`fttr`). 
+The first line of the statement contains fixed information about the estimator, including the type of estimator (`Girard-Hutchinson`), the function applied to the spectrum (`log`), the degree of the Lanczos quadrature approximation (`20`), and the quadrature method used (`golub_welsch`). 
 
-The second line prints the runtime information about the samples, such as the final trace estimate, its [margin of error](https://en.wikipedia.org/wiki/Margin_of_error) and [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (aka the relative std. deviation), and the number of samples used + their distribution prefix ('R' for rademacher). 
+The second line prints the runtime information about the samples, such as the final trace estimate, its [margin of error](https://en.wikipedia.org/wiki/Margin_of_error) and [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation) (a.k.a relative std. deviation), the number of samples vectors $n_v$, and the isotropic distribution of choice ('R' for rademacher). 
 
-Another way to get an idea of how well the estimator is converging is to pass the `plot=True` option. Here, we pass the same `seed` for reproducibility with the above call. 
+Another way to get an idea of summarize the convergence behavior of the estimator is to pass the `plot=True` option. Here, we pass the same `seed` for reproducibility with the above call. 
 
 ```{python}
 est = hutch(A, fun="log", maxiter=100, seed=5, plot=True)

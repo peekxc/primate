@@ -125,5 +125,5 @@ print(f"Logdet Hutch:  {hutch(A, fun='log'):6e}")
 print(f"Logdet XTrace: {xtrace(M):6e}")
 ```
 
-As with the hutch estimators applied to matrix functions, note that the action $v \mapto f(A)v$ is subject to the approximation errors studied by @musco2018stability, making such extensions limited functions that are well-approximated by Lanczos.   
+As with the hutch estimators applied to matrix functions, note that the action $v \mapsto f(A)v$ is subject to the approximation errors studied by @musco2018stability, making such extensions limited to functions that are well-approximated by the Lanczos method.   
 

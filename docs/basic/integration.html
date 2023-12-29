@@ -337,8 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#python-usage" id="toc-python-usage" class="nav-link active" data-scroll-target="#python-usage">Python usage</a></li>
-  <li><a href="#c-usage" id="toc-c-usage" class="nav-link" data-scroll-target="#c-usage">C++ usage</a></li>
+  <li><a href="#c-usage" id="toc-c-usage" class="nav-link active" data-scroll-target="#c-usage">C++ usage</a></li>
   </ul>
 </nav>
     </div>
@@ -364,8 +363,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="python-usage" class="level2">
-<h2 class="anchored" data-anchor-id="python-usage">Python usage</h2>
 <p><code>primate</code> supports a variety of matrix-types of the box, including numpy <code>ndarray</code>’s, compressed <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> (a lá SciPy), and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperators</a>—the latter enables the use of <em>matrix free</em> operators.</p>
 <p>Outside of the natively types above, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method in <code>primate</code> are:</p>
 <ol type="1">
@@ -402,7 +399,6 @@ np.allclose(
 ) 
 ## True
 ``` -->
-</section>
 <section id="c-usage" class="level2">
 <h2 class="anchored" data-anchor-id="c-usage">C++ usage</h2>
 <p>Similarly, to get started calling any matrix-free function provided by <code>primate</code> on the C++ side, such <code>hutch</code> or <code>lanczos</code>, simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>

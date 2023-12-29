@@ -2,8 +2,6 @@
 title: "Integration"
 ---
 
-## Python usage
-
 `primate` supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), and [LinearOperators](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html)---the latter enables the use of _matrix free_ operators.
 
 Outside of the natively types above, the basic requirements for any operator `A` to be used with e.g. the `Lanczos` method in `primate` are: 
