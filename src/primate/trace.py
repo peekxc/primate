@@ -21,7 +21,7 @@ def hutch(
 	stop: str = ["confidence", "change"],
 	ncv: int = 2,
 	orth: int = 0,
-	quad: str = "fttr",
+	quad: str = "golub_welsch",
 	confidence: float = 0.95,
 	pdf: str = "rademacher",
 	rng: str = "pcg64",
@@ -89,7 +89,14 @@ def hutch(
 	Returns
 	-------
 	:
-			Estimate the trace of $f(A)$. If 'info = True', additional information about the computation is also returned.
+			Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
+
+	Notes:
+	------
+	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
+	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
+	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
+	If `deg` is large, `fttr` is preferred. 
 
 	See Also
 	--------
@@ -98,6 +105,7 @@ def hutch(
 	Reference
 	---------
 	1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
+	2. Hutchinson, Michael F. "A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines." Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.
 	"""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"

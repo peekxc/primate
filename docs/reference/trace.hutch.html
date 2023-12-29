@@ -194,6 +194,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Lanczos Method</span></a>
   </div>
@@ -301,6 +307,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes:</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
   </ul></li>
@@ -315,7 +322,7 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="primate.trace.hutch" class="level1">
 <h1>trace.hutch</h1>
-<p><code>trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='fttr', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)</code></p>
+<p><code>trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='golub_welsch', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)</code></p>
 <p>Estimates the trace of a symmetric <span class="math inline">A</span> or matrix function <span class="math inline">f(A)</span> via a Girard-Hutchinson estimator.</p>
 <p>This function uses up to <code>maxiter</code> random isotropic vectors to estimate of the trace of <span class="math inline">f(A)</span>, where: <span class="math display">\mathrm{tr}(f(A)) = \mathrm{tr}(U f(\Lambda) U^T) = \sum\limits_{i=1}^n f(\lambda_i) </span> The estimator is obtained by averaging quadratic forms <span class="math inline">v \mapsto v^T f(A)v</span>, rescaling as necessary. This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. See the <a href="https://peekxc.github.io/primate/">online documentation</a> for more details.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -338,7 +345,7 @@ Note
 <col style="width: 8%">
 <col style="width: 26%">
 <col style="width: 54%">
-<col style="width: 9%">
+<col style="width: 10%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -407,7 +414,7 @@ Note
 <td><code>quad</code></td>
 <td>str</td>
 <td>Method used to obtain the weights of the Gaussian quadrature. See notes.</td>
-<td><code>'fttr'</code></td>
+<td><code>'golub_welsch'</code></td>
 </tr>
 <tr class="odd">
 <td><code>confidence</code></td>
@@ -476,10 +483,14 @@ Note
 <tbody>
 <tr class="odd">
 <td>typing.Union[float, tuple]</td>
-<td>Estimate the trace of <span class="math inline">f(A)</span>. If ‘info = True’, additional information about the computation is also returned.</td>
+<td>Estimate the trace of <span class="math inline">f(A)</span>. If <code>info = True</code>, additional information about the computation is also returned.</td>
 </tr>
 </tbody>
 </table>
+</section>
+<section id="notes" class="level2">
+<h2 class="anchored" data-anchor-id="notes">Notes:</h2>
+<p>To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require <span class="math inline">O(\mathrm{deg}^2)</span> time to execute, the former requires <span class="math inline">O(\mathrm{deg}^2)</span> space but is highly accurate, while the latter uses only <span class="math inline">O(1)</span> space at the cost of stability. If <code>deg</code> is large, <code>fttr</code> is preferred.</p>
 </section>
 <section id="see-also" class="level2">
 <h2 class="anchored" data-anchor-id="see-also">See Also</h2>
@@ -489,6 +500,7 @@ Note
 <h2 class="anchored" data-anchor-id="reference">Reference</h2>
 <ol type="1">
 <li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
+<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
 </ol>
 
 

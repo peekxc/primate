@@ -1,6 +1,6 @@
 # trace.hutch { #primate.trace.hutch }
 
-`trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='fttr', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)`
+`trace.hutch(A, fun=None, maxiter=200, deg=20, atol=None, rtol=None, stop=['confidence', 'change'], ncv=2, orth=0, quad='golub_welsch', confidence=0.95, pdf='rademacher', rng='pcg64', seed=-1, num_threads=0, verbose=False, info=False, plot=False, **kwargs)`
 
 Estimates the trace of a symmetric $A$ or matrix function $f(A)$ via a Girard-Hutchinson estimator.
 
@@ -19,32 +19,41 @@ Alternatively, when `stop` = "change", the estimator is considered converged whe
 
 ## Parameters
 
-| Name          | Type                                          | Description                                                                                    | Default         |
-|---------------|-----------------------------------------------|------------------------------------------------------------------------------------------------|-----------------|
-| `A`           | ndarray, sparray, or LinearOperator           | real symmetric operator.                                                                       | _required_      |
-| `fun`         | str or typing.Callable                        | real-valued function defined on the spectrum of `A`.                                           | `"identity"`    |
-| `maxiter`     | int                                           | Maximum number of random vectors to sample for the trace estimate.                             | `10`            |
-| `deg`         | int                                           | Degree of the quadrature approximation. Must be at least 1.                                    | `20`            |
-| `atol`        | float                                         | Absolute tolerance to signal convergence for early-stopping. See notes.                        | `None`          |
-| `rtol`        | float                                         | Relative tolerance to signal convergence for early-stopping. See notes.                        | `1e-2`          |
-| `stop`        | str                                           | Early-stopping criteria to test estimator convergence. See details.                            | `"confidence"`  |
-| `ncv`         | int                                           | Number of Lanczos vectors to allocate. Must be at least 2.                                     | `2`             |
-| `orth`        | int                                           | Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`.        | `0`             |
-| `quad`        | str                                           | Method used to obtain the weights of the Gaussian quadrature. See notes.                       | `'fttr'`        |
-| `confidence`  | float                                         | Confidence level to consider estimator as converged. Only used when `stop` = "confidence".     | `0.95`          |
-| `pdf`         | 'rademacher', 'normal'                        | Choice of zero-centered distribution to sample random vectors from.                            | ` 'rademacher'` |
-| `rng`         | 'splitmix64', 'xoshiro256**', 'pcg64', 'mt64' | Random number generator to use.                                                                | ` 'splitmix64'` |
-| `seed`        | int                                           | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.              | `-1`            |
-| `num_threads` | int                                           | Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.     | `0`             |
-| `plot`        | bool                                          | If true, plots the samples of the trace estimate along with their convergence characteristics. | `False`         |
-| `info`        | bool                                          | If True, returns a dictionary containing all relevant information about the computation.       | `False`         |
-| `kwargs`      | dict                                          | additional key-values to parameterize the chosen function 'fun'.                               | `{}`            |
+| Name          | Type                                          | Description                                                                                    | Default          |
+|---------------|-----------------------------------------------|------------------------------------------------------------------------------------------------|------------------|
+| `A`           | ndarray, sparray, or LinearOperator           | real symmetric operator.                                                                       | _required_       |
+| `fun`         | str or typing.Callable                        | real-valued function defined on the spectrum of `A`.                                           | `"identity"`     |
+| `maxiter`     | int                                           | Maximum number of random vectors to sample for the trace estimate.                             | `10`             |
+| `deg`         | int                                           | Degree of the quadrature approximation. Must be at least 1.                                    | `20`             |
+| `atol`        | float                                         | Absolute tolerance to signal convergence for early-stopping. See notes.                        | `None`           |
+| `rtol`        | float                                         | Relative tolerance to signal convergence for early-stopping. See notes.                        | `1e-2`           |
+| `stop`        | str                                           | Early-stopping criteria to test estimator convergence. See details.                            | `"confidence"`   |
+| `ncv`         | int                                           | Number of Lanczos vectors to allocate. Must be at least 2.                                     | `2`              |
+| `orth`        | int                                           | Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`.        | `0`              |
+| `quad`        | str                                           | Method used to obtain the weights of the Gaussian quadrature. See notes.                       | `'golub_welsch'` |
+| `confidence`  | float                                         | Confidence level to consider estimator as converged. Only used when `stop` = "confidence".     | `0.95`           |
+| `pdf`         | 'rademacher', 'normal'                        | Choice of zero-centered distribution to sample random vectors from.                            | ` 'rademacher'`  |
+| `rng`         | 'splitmix64', 'xoshiro256**', 'pcg64', 'mt64' | Random number generator to use.                                                                | ` 'splitmix64'`  |
+| `seed`        | int                                           | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.              | `-1`             |
+| `num_threads` | int                                           | Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.     | `0`              |
+| `plot`        | bool                                          | If true, plots the samples of the trace estimate along with their convergence characteristics. | `False`          |
+| `info`        | bool                                          | If True, returns a dictionary containing all relevant information about the computation.       | `False`          |
+| `kwargs`      | dict                                          | additional key-values to parameterize the chosen function 'fun'.                               | `{}`             |
 
 ## Returns
 
 | Type                         | Description                                                                                                    |
 |------------------------------|----------------------------------------------------------------------------------------------------------------|
-| typing.Union\[float, tuple\] | Estimate the trace of $f(A)$. If 'info = True', additional information about the computation is also returned. |
+| typing.Union\[float, tuple\] | Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned. |
+
+## Notes:
+
+To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
+while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\mathrm{deg}^2)$ time to execute, 
+the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
+If `deg` is large, `fttr` is preferred. 
+
+
 
 ## See Also
 
@@ -55,3 +64,4 @@ lanczos : the lanczos tridiagonalization algorithm.
 ## Reference
 
 1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
+2. Hutchinson, Michael F. "A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines." Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.

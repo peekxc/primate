@@ -14,14 +14,24 @@ Currently the package must be built from source via cloning the repository. PYPI
 
 ### Platform support
 
-Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable `primate` to be installed on supported architecture / CPython implementations without compilation. The currently supported platforms include: 
+Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable `primate` to be installed on supported architecture / CPython implementations without compilation. As of 12/29/23, native `primate` wheels are buitl for the following platforms:
 
+| Platform                          | 3.8 | 3.9 | 3.10 | 3.11 | 3.12 |
+|-----------------------------------|:---:|:---:|:----:|:----:|:----:|
+| **Linux (manylinux x86_64)**      | ✅  | ✅  | ✅   | ✅   | ✅   |
+| **MacOS (x86_64)**                | ✅  | ✅  | ✅   | ✅   | ✅   |
+| **MacOS ARM (arm64) [^1]**        | ✅  | ✅  | ✅   | ✅   | ✅   |
+| **Windows (AMD64) [^2]**          | ✅  | ✅  | ✅   | ✅   | ✅   |
 
-If your platform isn't on this list, feel free to make an issue requesting support for your platform. 
+Wheels are currently built with [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/).
+Currently no support is offered for PyPy, 32-bit runtimes, or [unsupported versions of CPython](https://devguide.python.org/versions/#supported-versions). If your platform isn't on this list, feel free to make an issue requesting support. 
+
+[^1]: Single-thread execution only; ARM-based OSX runners come stocked with Apple's clang, which doesn't natively ship with `libomp.dylib`, though this [may be fixable](https://mac.r-project.org/openmp/). Feel free to file an PR if you can get this working.  
+[^2]: Single-thread execution only; `primate` depends on OpenMP 4.5+, which isn't supported on any Windows compiler I'm aware of. 
 
 ### Compiling from source
 
-To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](). For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
+To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](https://clang.llvm.org/). For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
 
 ### C++ Installation
 

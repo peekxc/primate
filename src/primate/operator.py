@@ -17,7 +17,7 @@ def matrix_function(
 ) -> LinearOperator:
 	"""Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`. 
 
-	This function uses the Lanczos quadrature method to approximate the action of matrix function:
+	This function uses the Lanczos method to approximate the action of matrix function:
 	$$ v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T $$
 	The resulting operator may be used in conjunction with other estimation methods, such as `hutch` or `xtrace`.
 
@@ -33,18 +33,18 @@ def matrix_function(
 	:::
 
 	Parameters
-	-----------
-		A : ndarray, sparray, or LinearOperator
-				real symmetric operator.
-		fun : str or Callable, default="identity"
-				real-valued function defined on the spectrum of `A`.
-		deg : int, default=20
-				Degree of the Krylov expansion.
-		rtol : float, default=1e-8
-				Relative tolerance to consider two Lanczos vectors are numerically orthogonal.
-		orth: int, default=0
-				Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
-		kwargs : dict, optional
+	----------
+	A : LinearOperator or ndarray or sparray
+			real symmetric operator.
+	fun : str or Callable, default="identity"
+			real-valued function defined on the spectrum of `A`.
+	deg : int, default=20
+			Degree of the Krylov expansion.
+	rtol : float, default=1e-8
+			Relative tolerance to consider two Lanczos vectors are numerically orthogonal.
+	orth: int, default=0
+			Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
+	kwargs : dict, optional
 			additional key-values to parameterize the chosen function 'fun'.
 
 	Returns

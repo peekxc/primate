@@ -194,14 +194,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">The Lanczos Method</span></a>
+  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Matrix functions</span></a>
+  <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">The Lanczos Method</span></a>
   </div>
 </li>
       </ul>
@@ -305,6 +305,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#primate.operator.matrix_function" id="toc-primate.operator.matrix_function" class="nav-link active" data-scroll-target="#primate.operator.matrix_function">operator.matrix_function</a>
   <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   </ul></li>
   </ul>
@@ -320,7 +321,7 @@ ul.task-list li input[type="checkbox"] {
 <h1>operator.matrix_function</h1>
 <p><code>operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)</code></p>
 <p>Constructs a <code>LinearOperator</code> approximating the action of the matrix function <code>fun(A)</code>.</p>
-<p>This function uses the Lanczos quadrature method to approximate the action of matrix function: <span class="math display"> v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T </span> The resulting operator may be used in conjunction with other trace and vector-based estimation methods, such as <code>hutch</code> or <code>xtrace</code>.</p>
+<p>This function uses the Lanczos method to approximate the action of matrix function: <span class="math display"> v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T </span> The resulting operator may be used in conjunction with other estimation methods, such as <code>hutch</code> or <code>xtrace</code>.</p>
 <p>The weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the <code>quad</code> parameter). For a description of the other parameters, see the Lanczos function.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -335,6 +336,63 @@ Note
 <p>To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require <span class="math inline">O(\mathrm{deg}^2)</span> time to execute, the former requires <span class="math inline">O(\mathrm{deg}^2)</span> space but is highly accurate, while the latter uses only <span class="math inline">O(1)</span> space at the cost of stability. If <code>deg</code> is large, <code>fttr</code> is preferred.</p>
 </div>
 </div>
+<section id="parameters" class="level2">
+<h2 class="anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 32%">
+<col style="width: 53%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>A</code></td>
+<td>scipy.sparse.linalg.LinearOperator or ndarray or sparray</td>
+<td>real symmetric operator.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td><code>fun</code></td>
+<td>str or typing.Callable</td>
+<td>real-valued function defined on the spectrum of <code>A</code>.</td>
+<td><code>"identity"</code></td>
+</tr>
+<tr class="odd">
+<td><code>deg</code></td>
+<td>int</td>
+<td>Degree of the Krylov expansion.</td>
+<td><code>20</code></td>
+</tr>
+<tr class="even">
+<td><code>rtol</code></td>
+<td>float</td>
+<td>Relative tolerance to consider two Lanczos vectors are numerically orthogonal.</td>
+<td><code>1e-8</code></td>
+</tr>
+<tr class="odd">
+<td><code>orth</code></td>
+<td>int</td>
+<td>Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td><code>kwargs</code></td>
+<td>dict</td>
+<td>additional key-values to parameterize the chosen function ‘fun’.</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="returns" class="level2">
 <h2 class="anchored" data-anchor-id="returns">Returns</h2>
 <table class="table">

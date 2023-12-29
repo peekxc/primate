@@ -4,10 +4,9 @@
 
 Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`. 
 
-This function uses the Lanczos quadrature method to approximate the action of matrix function:
+This function uses the Lanczos method to approximate the action of matrix function:
 $$ v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T $$
-The resulting operator may be used in conjunction with other trace and vector-based estimation methods, 
-such as `hutch` or `xtrace`.
+The resulting operator may be used in conjunction with other estimation methods, such as `hutch` or `xtrace`.
 
 The weights of the quadrature may be computed using either the Golub-Welsch (GW) or 
 Forward Three Term Recurrence algorithms (FTTR) (see the `quad` parameter). For a description 
@@ -19,6 +18,17 @@ while the FTTR algorithm uses the explicit expression for orthogonal polynomials
 the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
 If `deg` is large, `fttr` is preferred. 
 :::
+
+## Parameters
+
+| Name     | Type                                                     | Description                                                                                   | Default      |
+|----------|----------------------------------------------------------|-----------------------------------------------------------------------------------------------|--------------|
+| `A`      | scipy.sparse.linalg.LinearOperator or ndarray or sparray | real symmetric operator.                                                                      | _required_   |
+| `fun`    | str or typing.Callable                                   | real-valued function defined on the spectrum of `A`.                                          | `"identity"` |
+| `deg`    | int                                                      | Degree of the Krylov expansion.                                                               | `20`         |
+| `rtol`   | float                                                    | Relative tolerance to consider two Lanczos vectors are numerically orthogonal.                | `1e-8`       |
+| `orth`   | int                                                      | Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis. | `0`          |
+| `kwargs` | dict                                                     | additional key-values to parameterize the chosen function 'fun'.                              | `{}`         |
 
 ## Returns
 

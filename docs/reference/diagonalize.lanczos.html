@@ -194,6 +194,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Lanczos Method</span></a>
   </div>
@@ -321,8 +327,8 @@ ul.task-list li input[type="checkbox"] {
 <p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization.</p>
 <section id="notes" class="level2">
 <h2 class="anchored" data-anchor-id="notes">Notes</h2>
-<p>The Lanczos method iteratively builds a tridiagonal matrix <code>T</code> of a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the resulting tridiagonal matrix.</p>
-<p>Diagonalizing <code>T</code> via e.g.&nbsp;<code>scipy.linalg.eigh_tridiagonal</code> yields Rayleigh-Ritz approximations of the eigenvalues of <code>A</code>, though note no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
+<p>The Lanczos method builds a tridiagonal <code>T</code> from a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the resulting tridiagonal matrix <code>T</code>.</p>
+<p>Rayleigh-Ritz approximations of the eigenvalues of <code>A</code> can be further obtained by diagonalizing <code>T</code> via any symmetric tridiagonal eigenvalue solver, <code>scipy.linalg.eigh_tridiagonal</code> though note unlike <code>eigsh</code> no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
 </section>
 <section id="parameters" class="level2">
 <h2 class="anchored" data-anchor-id="parameters">Parameters</h2>

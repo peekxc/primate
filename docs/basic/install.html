@@ -212,6 +212,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../theory/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../theory/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">The Lanczos Method</span></a>
   </div>
@@ -349,12 +355,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- https://stackoverflow.com/questions/122906s39/quantifiable-metrics-benchmarks-on-the-usage-of-header-only-c-libraries/13593041#13593041 -->
 <section id="platform-support" class="level3">
 <h3 class="anchored" data-anchor-id="platform-support">Platform support</h3>
-<p>Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable <code>primate</code> to be installed on supported architecture / CPython implementations without compilation. The currently supported platforms include:</p>
-<p>If your platform isn’t on this list, feel free to make an issue requesting support for your platform.</p>
+<p>Platform-specific wheels are currently built with cibuildwheel and uploaded to PyPI. These enable <code>primate</code> to be installed on supported architecture / CPython implementations without compilation. As of 12/29/23, native <code>primate</code> wheels are buitl for the following platforms:</p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Platform</th>
+<th style="text-align: center;">3.8</th>
+<th style="text-align: center;">3.9</th>
+<th style="text-align: center;">3.10</th>
+<th style="text-align: center;">3.11</th>
+<th style="text-align: center;">3.12</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Linux (manylinux x86_64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="even">
+<td><strong>MacOS (x86_64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="odd">
+<td><strong>MacOS ARM (arm64) <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="even">
+<td><strong>Windows (AMD64) <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<p>Wheels are currently built with <a href="https://cibuildwheel.readthedocs.io/en/stable/">cibuildwheel</a>. Currently no support is offered for PyPy, 32-bit runtimes, or <a href="https://devguide.python.org/versions/#supported-versions">unsupported versions of CPython</a>. If your platform isn’t on this list, feel free to make an issue requesting support.</p>
 </section>
 <section id="compiling-from-source" class="level3">
 <h3 class="anchored" data-anchor-id="compiling-from-source">Compiling from source</h3>
-<p>To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of <a href="">clang</a>. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.</p>
+<p>To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of <a href="https://clang.llvm.org/">clang</a>. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.</p>
 </section>
 <section id="c-installation" class="level3">
 <h3 class="anchored" data-anchor-id="c-installation">C++ Installation</h3>
@@ -389,7 +441,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Single-thread execution only; ARM-based OSX runners come stocked with Apple’s clang, which doesn’t natively ship with <code>libomp.dylib</code>, though this <a href="https://mac.r-project.org/openmp/">may be fixable</a>. Feel free to file an PR if you can get this working.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Single-thread execution only; <code>primate</code> depends on OpenMP 4.5+, which isn’t supported on any Windows compiler I’m aware of.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
