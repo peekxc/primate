@@ -389,7 +389,7 @@ div.csl-indent {
 </header>
 
 
-<div id="23351b68" class="cell" data-execution_count="1">
+<div id="034ec308" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <script type="application/javascript">
 (function(root) {
@@ -700,7 +700,7 @@ On the other hand, there is mounting empirical evidence (e.g. @ghorbani2019inves
 <li>Multiply <span class="math inline">v</span> by <span class="math inline">f(A)</span> induced by <span class="math inline">f(\lambda) = \lambda + \epsilon</span></li>
 </ol>
 <p>Lets see what the code to accomplish this using (3) looks like:</p>
-<div id="daee58fb" class="cell" data-execution_count="2">
+<div id="c2b8b58e" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operator <span class="im">import</span> matrix_function</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -729,7 +729,7 @@ cosine sim:  1.000000e+00</code></pre>
 </div>
 </div>
 <p>Observe <span class="math inline">M</span> matches the ground truth <span class="math inline">v \mapsto (A + \epsilon I)v</span>. In this way, one benefit of using <code>matrix_function</code> is that it allows one to approximate <span class="math inline">f(A)</span> by thinking only about what is happening at the spectral level (as opposed to the matrix level). Of course, this example is a bit non-convincing as there are simpler ways of achieving the same result as shown by (1) and (2), for example:</p>
-<div id="2695492a" class="cell" data-execution_count="3">
+<div id="7247b947" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.allclose(A <span class="op">@</span> v <span class="op">+</span> <span class="fl">0.10</span> <span class="op">*</span> v, v_truth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>True</code></pre>
@@ -742,7 +742,7 @@ cosine sim:  1.000000e+00</code></pre>
 <p>On the other hand, there are plenty of situations where one <em>doesn’t have access to these simpler expressions</em>. For example, consider the map:</p>
 <p><span class="math display">v \mapsto (A + \epsilon I)^{-1} v</span></p>
 <p>Such expressions pop up in a variety of settings, such as in <a href="https://en.wikipedia.org/wiki/Ridge_regression">Tikhonov regularization</a>, in Schatten-norm estimation <span class="citation" data-cites="ubaru2017fast">Ubaru, Saad, and Seghouane (<a href="#ref-ubaru2017fast" role="doc-biblioref">2017</a>)</span>, in the <a href="https://scikit-sparse.readthedocs.io/en/latest/cholmod.html#sksparse.cholmod.Factor.cholesky_AAt_inplace">Cholesky factorization of PSD matrices</a>, and so on. Unlike the previous setting, we cannot readily access <span class="math inline">v \mapsto f(A)v</span> unless we explicitly compute the full spectral decomposition of <span class="math inline">A</span> or the inverse of <span class="math inline">A</span>, both of which are expensive to obtain.</p>
-<div id="0b49dd3b" class="cell" data-execution_count="4">
+<div id="57fe428e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Alternative: v_truth = np.linalg.inv((A + 0.10 * np.eye(A.shape[0]))) @ v</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>v_truth <span class="op">=</span> (U <span class="op">@</span> np.diag(np.reciprocal(Lambda <span class="op">+</span> <span class="fl">0.10</span>)) <span class="op">@</span> U.T) <span class="op">@</span> v</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -767,7 +767,7 @@ cosine sim:  1.000000e+00</code></pre>
 <section id="back-to-trace-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="back-to-trace-estimation">Back to trace estimation</h2>
 <p>There are several use-cases wherein one might be interested in the output <span class="math inline">f(A)v</span> itself—see <span class="citation" data-cites="musco2018stability">Musco, Musco, and Sidford (<a href="#ref-musco2018stability" role="doc-biblioref">2018</a>)</span> and references within for some examples. One use-case is the extension of existing <code>matvec</code>-dependent implicit trace estimators to matrix-function trace estimators.</p>
-<div id="8df3ec5b" class="cell" data-execution_count="5">
+<div id="f45b556c" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch, xtrace</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet exact:  </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A)))<span class="sc">:6e}</span><span class="ss">"</span>)</span>
@@ -775,7 +775,7 @@ cosine sim:  1.000000e+00</code></pre>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet XTrace: </span><span class="sc">{</span>xtrace(M)<span class="sc">:6e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Logdet exact:  -1.483218e+02
-Logdet Hutch:  -1.521959e+02
+Logdet Hutch:  -1.478062e+02
 Logdet XTrace: -1.483155e+02</code></pre>
 </div>
 </div>
