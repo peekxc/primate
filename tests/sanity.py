@@ -76,20 +76,20 @@ def approx_matvec(A, v: np.ndarray, k: int = None, f: Callable = None):
   y = np.linalg.norm(v) * (Q @ V @ (V[0,:] * rw))
   return y
 
-def orthogonal_polynomial_value(x, k, theta, gamma):
-  # Initialize the polynomials p_{-1} and p_0
-  p_minus1 = 0
-  p_0 = 1.0 / np.sqrt(1)  # Since k_0 = 1 / sqrt(mu_0) and mu_0 = 1
+# def orthogonal_polynomial_value(x, k, theta, gamma):
+#   # Initialize the polynomials p_{-1} and p_0
+#   p_minus1 = 0
+#   p_0 = 1.0 / np.sqrt(1)  # Since k_0 = 1 / sqrt(mu_0) and mu_0 = 1
 
-  # Use recurrence relation to compute p_k for k > 0
-  p_k = 0.0
-  for ell in range(1, k + 1):
-    p_k = ((x - theta[ell - 1]) * p_0 - gamma[ell - 1] * p_minus1) / gamma[ell]
+#   # Use recurrence relation to compute p_k for k > 0
+#   p_k = 0.0
+#   for ell in range(1, k + 1):
+#     p_k = ((x - theta[ell - 1]) * p_0 - gamma[ell - 1] * p_minus1) / gamma[ell]
 
-    # Update values for next iteration
-    p_minus1 = p_0
-    p_0 = p_k
-  return p_k
+#     # Update values for next iteration
+#     p_minus1 = p_0
+#     p_0 = p_k
+#   return p_k
 
 # from scipy.sparse import spdiags
 # alpha = np.array([1,1,1])
@@ -123,22 +123,22 @@ def orthogonal_polynomial_value(x, k, theta, gamma):
 # b = np.append(0, beta[:-1])
 # mu_0 = np.sum(np.abs(ew))
 
-# def orth_poly(x: float, i: int, mu: float, a: np.ndarray, b: np.ndarray):
-#   # print(f"x: {x:.2f}, i: {i})")
-#   z = 0
-#   if i < 0: 
-#     z = 0
-#   elif i == 0: 
-#     z = 1 / np.sqrt(mu)
-#   elif i == 1: 
-#     z = (x - a[0]) * (1 / np.sqrt(mu)) / b[1]
-#   elif i < len(a): 
-#     z = (x - a[i-1]) * orth_poly(x, i - 1, mu, a, b) 
-#     z -= b[i-1] * orth_poly(x, i - 2, mu, a, b) 
-#     z /= b[i]
-#   else:
-#     z = 0
-#   return z
+def orth_poly(x: float, i: int, mu: float, a: np.ndarray, b: np.ndarray):
+  # print(f"x: {x:.2f}, i: {i})")
+  z = 0
+  if i < 0: 
+    z = 0
+  elif i == 0: 
+    z = 1 / np.sqrt(mu)
+  elif i == 1: 
+    z = (x - a[0]) * (1 / np.sqrt(mu)) / b[1]
+  elif i < len(a): 
+    z = (x - a[i-1]) * orth_poly(x, i - 1, mu, a, b) 
+    z -= b[i-1] * orth_poly(x, i - 2, mu, a, b) 
+    z /= b[i]
+  else:
+    z = 0
+  return z
 
 # mu_0 * np.ravel(ev[0,:])**2
 

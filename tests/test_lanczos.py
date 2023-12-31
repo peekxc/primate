@@ -119,6 +119,83 @@ def test_quadrature():
   assert np.allclose(nw_true[0], nw_test[:,0], atol=1e-6)
   assert np.allclose(nw_true[1], nw_test[:,1], atol=1e-6)
 
+def test_fttr_basic():
+  from scipy.sparse import spdiags
+  alpha = np.array([1,1,1])
+  beta = np.array([1,1,0])
+  T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=3, n=3).todense()
+  ew, ev = np.linalg.eigh(T)
+
+  a = alpha 
+  b = np.append(0, beta[:-1])
+  mu_0 = np.sum(np.abs(ew))
+  p0 = lambda x: 1 / np.sqrt(mu_0)
+  p1 = lambda x: (x - a[0])*p0(x) / b[1]
+  p2 = lambda x: ((x - a[1])*p1(x) - b[1] * p0(x)) / b[2]
+  p = lambda x: np.array([p0(x), p1(x), p2(x)])
+  weights_fttr = np.reciprocal([np.sum(p(lam) ** 2) for lam in ew])
+
+  ## Forward three-term recurrence relation (fttr)
+  assert np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
+
+def test_fttr_2():
+  from sanity import orth_poly
+  from scipy.sparse import spdiags
+  from primate.diagonalize import lanczos, _lanczos
+  np.random.seed(1234)
+  from scipy.linalg import toeplitz
+  n = 5
+  alpha = np.random.uniform(size=n, low=0, high=1)
+  beta = np.append(np.random.uniform(size=n-1, low=0, high=1), 0)
+  T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=n, n=n).todense()
+  ew, ev = np.linalg.eigh(T)
+
+  ## Deduced as the FTTR algorothm from Theorem 1 of "Computing Gaussian quadrature rules with high relative accuracy"
+  a = alpha 
+  b = np.append(0, beta[:-1]) # first must be zero
+  mu_0 = np.sum(np.abs(ew))
+  p = lambda x: np.array([orth_poly(x, i, mu_0, a, b) for i in range(n)])
+  
+  weights_fttr = np.reciprocal([np.sum(p(lam) ** 2) for lam in ew])
+  assert np.allclose(weights_fttr, mu_0 * np.ravel(ev[0,:])**2)
+
+def test_fttr3():
+  from scipy.linalg import toeplitz
+  from scipy.sparse import spdiags
+  from primate.diagonalize import lanczos, _lanczos
+  np.random.seed(1234)
+  n = 8
+  A = toeplitz([0,1,2,3,4,5,6,7]).astype(np.float64) # symmetric(n)
+  v0 = np.random.uniform(size=A.shape[1])
+  alpha, beta = lanczos(A, v0=v0, deg=n, orth=n-1)
+  a, b = alpha, np.append([0], beta)
+  T = spdiags(data=[np.roll(b,-1), a, b], diags=(-1, 0, +1), m=n, n=n).todense()
+  # T = np.array([[4, 3, 0], [3, 1, 1], [0, 1, -1]])
+  ew, ev = np.linalg.eigh(T)
+  a, b = np.diag(T, 0), np.append([0], np.diag(T, 1))
+  mu_0 = np.sum(np.abs(ew))
+
+  # echo = lambda i, x, a1, z1, b1, z0, b2: print(f"{i}: (({x} - {a1}) * {z1} - {b1} * {z0}) / {b2}")
+  # def p(x, mu_0, a, b, verbose: bool = True):
+  #   z0 = 1 / np.sqrt(mu_0)
+  #   z1 = (x - a[0]) * z0 / b[1]
+  #   if verbose:
+  #     echo(1, x, a[0], z0, b[1], 0, 0)
+  #   z = [z0,z1]
+  #   for i in range(2, len(a)):
+  #     zi = ((x - a[i-1]) * z[i-1] - b[i-1] * z[i-2]) / b[i]
+  #     z += [zi]
+  #     if verbose: 
+  #       echo(i, x, a[i-1], z[i-1], b[i-1], z[i-2], b[i])
+  #   return np.array(z)
+
+  from primate.ortho import _orthogonalize
+  fttr_weights_base = _orthogonalize.fttr(ew, a, b)
+  fttr_weights_run = _lanczos.quadrature(a,b,len(a),1)[:,1]
+  fttr_weights_true = np.ravel(ev[0,:])**2
+  assert np.allclose(fttr_weights_base, fttr_weights_run)
+  assert np.allclose(fttr_weights_base, fttr_weights_true)
+
 def test_quadrature_methods():
   from primate.diagonalize import _lanczos
   n = 3
@@ -137,6 +214,7 @@ def test_quadrature_methods():
   quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
   quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
   assert np.isclose(quad1, quad2, atol=quad1*0.05)
+
 
 # def test_quadrature_toeplitz():
 #   from primate.diagonalize import lanczos, _lanczos

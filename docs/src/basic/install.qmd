@@ -2,16 +2,16 @@
 title: "Installation"
 ---
 
-`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package, and thus can be installed via `pip`: 
+`primate` is a standard [PEP-517](https://peps.python.org/pep-0517/) package that can be installed via `pip`: 
 
 ```python
 python -m pip install scikit-primate  
 ```
 
-Assuming your platform is natively supported, no compilation is needed; see [platform support](#platform-support) for details. 
+Assuming your platform is supported, no compilation is needed---see [platform support](#platform-support) for details. 
 
 :::{.callout-note}
-Like many packages registered on PyPI, the distribution name "`scikit-primate`" differs from the importable package name "`primate`" (also see [#3471](https://github.com/pypi/support/issues/3471)). Once installed, all exported package modules are available through the `primate` module. 
+Like many packages registered on PyPI, the _distribution_ "`scikit-primate`" differs from the importable _package_ "`primate`" (also see [#3471](https://github.com/pypi/support/issues/3471)). Additionally, `primate` does not rely on organizational prefixes that some [scikits](https://projects.scipy.org/scikits.html) use (e.g. `scikit-learn` -> `sklearn`). 
 :::
 
 <!-- Currently the package must be built from source via cloning the repository. PYPI support is planned.  -->
@@ -40,7 +40,7 @@ If your platform isn't on this table but you would like it to be supported, feel
 
 ### Compiling from source
 
-To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of [clang](https://clang.llvm.org/), preferably version 15.0 or higher. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.
+A C++20 compiler is required to install the package from its source distribution. Current builds all compile with some variant of [clang](https://clang.llvm.org/) (version 15.0+). For platform- and compiler-specific settings, consult the [build scripts](https://github.com/peekxc/primate/blob/main/meson.build) and [CI configuration files](https://github.com/peekxc/primate/tree/main/.github/workflows).
 
 ### C++ Installation
 

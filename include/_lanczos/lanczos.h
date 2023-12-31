@@ -49,7 +49,7 @@ void lanczos_recurrence(
   const F rtol,               // Tolerance of residual error for early-stopping the iteration.
   const int orth,             // Number of *additional* vectors to orthogonalize against 
   F* alpha,                   // Output diagonal elements of T of size A.shape[1]+1
-  F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1
+  F* beta,                    // Output subdiagonal elements of T of size A.shape[1]+1; should be 0; 
   F* V,                       // Output matrix for Lanczos vectors (column-major)
   const size_t ncv            // Number of Lanczos vectors pre-allocated (must be at least 2)
 ){
@@ -69,7 +69,8 @@ void lanczos_recurrence(
   // Setup for first iteration
   std::array< int, 3 > pos = { int(ncv) - 1, 0, 1 };          // Indices for the recurrence
   Q.col(pos[0]) = static_cast< VectorF >(VectorF::Zero(n));   // Ensure previous is 0
-  Q.col(0) = v.normalized();                                  // load normalized v0 into Q  
+  Q.col(0) = v.normalized();                                  // Load unit-norm v as q0
+  beta[0] = 0.0;                                              // Ensure beta_0 is 0
 
   for (int j = 0; j < deg; ++j) {
 
@@ -118,8 +119,8 @@ auto lanczos_quadrature(
   const weight_method method = golub_welsch  // The method of computing the weights 
 ) -> void {
   using VectorF = Eigen::Array< F, Dynamic, 1>;
-
-  // Use Eigen to obtain eigenvalues + eigenvectors of tridiagonal
+  assert(beta[0] == 0.0);
+  
   Eigen::Map< const VectorF > a(alpha, k);        // diagonal elements
   Eigen::Map< const VectorF > b(beta+1, k-1);     // subdiagonal elements (offset by 1!)
 
@@ -138,14 +139,9 @@ auto lanczos_quadrature(
     solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::EigenvaluesOnly);
     auto theta = static_cast< VectorF >(solver.eigenvalues()); // Rayleigh-Ritz values == nodes
     std::copy(theta.begin(), theta.end(), nodes);
-    
+
     // Compute weights via FTTR
-    const F mu_0 = theta.abs().sum();
-    const F mu_rec_sqrt = 1.0 / std::sqrt(mu_0);
-    auto tbl = std::vector< F >(k, 0.0);
-    for (int i = 0; i < k; ++i){
-      weights[i] = orth_poly_weight(theta[i], mu_rec_sqrt, alpha, beta, tbl.data(), k) / mu_0;
-    }
+    FTTR_weights(theta.data(), alpha, beta, k, weights);
   }
 };
 

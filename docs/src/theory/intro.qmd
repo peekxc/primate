@@ -10,11 +10,11 @@ Many quantities of common interest can be expressed in as traces of matrix funct
 
 $$
 \begin{align*}
-f &= \mathrm{id} \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A) \\
-f &= f^{-1} \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A^{-1}) \\
-f &= \log \quad &\Longleftrightarrow& \quad  &\mathrm{logdet}(A) \\
-f &= \mathrm{exp} \quad &\Longleftrightarrow& \quad &\mathrm{exp}(A) \\
-f &= \mathrm{sign} \quad &\Longleftrightarrow& \quad &\mathrm{rank}(A)  \\
+f(\lambda) &= \lambda \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A) \\
+f(\lambda) &= \lambda^{-1} \quad &\Longleftrightarrow& \quad &\mathrm{tr}(A^{-1}) \\
+f(\lambda) &= \log(\lambda) \quad &\Longleftrightarrow& \quad  &\mathrm{logdet}(A) \\
+f(\lambda) &= \mathrm{exp}(\lambda) \quad &\Longleftrightarrow& \quad &\mathrm{exp}(A) \\
+f(\lambda) &= \mathrm{sign}(\lambda) \quad &\Longleftrightarrow& \quad &\mathrm{rank}(A)  \\
 &\vdots \quad &\hphantom{\Longleftrightarrow}& \quad & \vdots & 
 \end{align*}
 $$ 
