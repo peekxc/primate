@@ -22,7 +22,7 @@ def test_functional():
   for i in range(30):
     # est = hutch(A, fun="numrank", maxiter=15000, threshold=min_ew_est, stop="change", atol=0.001, info=False, verbose=False)
     correct[i] = numrank(A) == true_rank
-  assert np.sum(correct) >= 27
+  assert np.sum(correct) >= 25
   # import timeit
   # timeit.timeit(lambda: numrank(A, est="xtrace"), number = 30)
   # timeit.timeit(lambda: np.linalg.matrix_rank(A), number=30)

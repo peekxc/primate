@@ -4,7 +4,7 @@ title: "Integration"
 
 `primate` supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), and [LinearOperators](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html).
 
-More generally, the basic requirements for any operator `A` to be used with e.g. the `Lanczos` method are: 
+The basic requirements for any operator `A` to be used with e.g. the `Lanczos` method are: 
 
 1. A method `A.matvec(input: ndarray) -> ndarray` implementing $v \mapsto Av$
 2. An attribute `A.shape -> tuple[int, int]` giving the output/input dimensions of $A$
