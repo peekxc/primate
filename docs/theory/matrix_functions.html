@@ -361,7 +361,7 @@ div.csl-indent {
    
   <ul>
   <li><a href="#matrix-function-approximation" id="toc-matrix-function-approximation" class="nav-link active" data-scroll-target="#matrix-function-approximation">Matrix function approximation</a></li>
-  <li><a href="#establishing-a-baseline" id="toc-establishing-a-baseline" class="nav-link" data-scroll-target="#establishing-a-baseline">Establishing a baseline</a></li>
+  <li><a href="#modifying-operators" id="toc-modifying-operators" class="nav-link" data-scroll-target="#modifying-operators">Modifying operators</a></li>
   <li><a href="#when-v-mapsto-fav-is-not-known" id="toc-when-v-mapsto-fav-is-not-known" class="nav-link" data-scroll-target="#when-v-mapsto-fav-is-not-known">When <span class="math inline">v \mapsto f(A)v</span> is not known</a></li>
   <li><a href="#back-to-trace-estimation" id="toc-back-to-trace-estimation" class="nav-link" data-scroll-target="#back-to-trace-estimation">Back to trace estimation</a></li>
   </ul>
@@ -389,7 +389,7 @@ div.csl-indent {
 </header>
 
 
-<div id="c6ce9edd" class="cell" data-execution_count="1">
+<div id="bf1284ad" class="cell" data-execution_count="1">
 <div class="cell-output cell-output-display">
 <script type="application/javascript">
 (function(root) {
@@ -679,17 +679,17 @@ function(Bokeh) {
 <h2 class="anchored" data-anchor-id="matrix-function-approximation">Matrix function approximation</h2>
 <p>If <span class="math inline">A \in \mathbb{R}^{n \times n}</span> and <span class="math inline">n</span> is large, obtaining <span class="math inline">f(A) \in \mathbb{R}^{n \times n}</span> explicitly can be very expensive. One way to sidestep this difficulty is to approximate <span class="math inline">v \mapsto f(A)v</span> using the degree-<span class="math inline">k</span> <em>Lanczos</em> expansion:</p>
 <p><span class="math display"> Q^T A Q = T \quad \Leftrightarrow \quad f(A)v \approx \lVert x \rVert \cdot Q f(T) e_1 </span></p>
-<p>It’s been shown by <span class="citation" data-cites="musco2018stability">(<a href="#ref-musco2018stability" role="doc-biblioref">Musco, Musco, and Sidford 2018</a>)</span> that this approximation has the following guarantee:</p>
+<p>It’s been shown by <span class="citation" data-cites="musco2018stability">(<a href="#ref-musco2018stability" role="doc-biblioref">Musco, Musco, and Sidford 2018</a>)</span> this approximation has the following guarantee:</p>
 <p><span class="math display">\|f(\mathbf{A}) \mathbf{x}-\mathbf{y}\| \leq 2\|\mathbf{x}\| \cdot \min _{\substack{\text { polynomial } p \\ \text { with degree }&lt;k}}\left(\max _{x \in\left[\lambda_{\min }(\mathbf{A}), \lambda_{\max }(\mathbf{A})\right]}|f(x)-p(x)|\right)</span></p>
 <p>In other words, up to a factor of 2, the error <span class="math inline">\|f(\mathbf{A}) \mathbf{x}-\mathbf{y}\|</span> is bounded by the uniform error of the best polynomial approximation to <span class="math inline">f</span> with degree <span class="math inline">&lt; k</span>. For general matrix functions, this implies that finite-precision Lanczos essentially matches strongest known exact arithmetic bounds.</p>
-<p>This suggests an idea: can we convert any matrix-like object into a <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> that transparently converts matrix-vector products <span class="math inline">Av</span> into products with matrix-functions <span class="math inline">f(A)v</span>?</p>
 <!-- Despite its rich theory, most results about the Lanczos method only hold in _exact arithmetic_; historically, practitioners have been hesitant about using the Lanczos method for eigen-estimation application due to its well-known instability with respect to roundoff and cancellation errors. Such errors typically manifest as loss of orthogonality between Lanczos vectors, which can cause a host of issues related to eigen- estimations, such as muddled convergence and spurious Ritz values. While there exist fixes to these issues, such fixes typically involve difficult to implement convergence heuristics or expensive re-orthogonalization techniques. 
 
 On the other hand, there is mounting empirical evidence (e.g. @ghorbani2019investigation) that suggests using the (plain) Lanczos method in randomized setting is often more than sufficient for several eigenvalue-related estimation tasks. In fact,  -->
 </section>
-<section id="establishing-a-baseline" class="level2">
-<h2 class="anchored" data-anchor-id="establishing-a-baseline">Establishing a baseline</h2>
-<p><code>primate</code> allows the user to construct a <code>LinearOperator</code> directly from an existing matrix-like object <code>A</code> and callable <code>fun</code> through its <code>matrix_function</code> API.</p>
+<section id="modifying-operators" class="level2">
+<h2 class="anchored" data-anchor-id="modifying-operators">Modifying operators</h2>
+<p>The above approximation result suggests an idea: can we modify the existing matrix-free algorithms that rely <code>matvec</code> functionality <span class="math inline">v \mapsto Av</span> to work matrix functions <span class="math inline">v \mapsto f(A)v</span>?</p>
+<p>This is precisely what <code>primate</code> enables with its <code>matrix_function</code> API: given a existing matrix-like object <code>A</code> and callable <code>fun</code> provided by the user, <code>matrix_function</code> constructs a <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a> that transparently converts matrix-vector products <span class="math inline">Av</span> into products <span class="math inline">f(A)v</span>.</p>
 <!-- A basic though somewhat uninteresting example of a function to apply is to simply the identity function on $f(A) = A$: -->
 <p>As a baseline example, consider the action that adds an <span class="math inline">\epsilon</span> amount of mass to the diagonal of <span class="math inline">A</span>:</p>
 <p><span class="math display">v \mapsto (A + \epsilon I)v</span></p>
@@ -700,7 +700,7 @@ On the other hand, there is mounting empirical evidence (e.g. @ghorbani2019inves
 <li>Multiply <span class="math inline">v</span> by <span class="math inline">f(A)</span> induced by <span class="math inline">f(\lambda) = \lambda + \epsilon</span></li>
 </ol>
 <p>Lets see what the code to accomplish this using (3) looks like:</p>
-<div id="e15c81ca" class="cell" data-execution_count="2">
+<div id="ea2f3263" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operator <span class="im">import</span> matrix_function</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -728,8 +728,8 @@ Max diff:    5.218048e-15
 cosine sim:  1.000000e+00</code></pre>
 </div>
 </div>
-<p>Observe <span class="math inline">M</span> matches the ground truth <span class="math inline">v \mapsto (A + \epsilon I)v</span>. In this way, one benefit of using <code>matrix_function</code> is that it allows one to approximate <span class="math inline">f(A)</span> by thinking only about what is happening at the spectral level (as opposed to the matrix level). Of course, this example is a bit non-convincing as there are simpler ways of achieving the same result as shown by (1) and (2), for example:</p>
-<div id="c9b1fe33" class="cell" data-execution_count="3">
+<p>Observe <span class="math inline">M</span> matches the ground truth <span class="math inline">v \mapsto (A + \epsilon I)v</span>. In this way, one benefit of using <code>matrix_function</code> is that it allows one to approximate <span class="math inline">f(A)</span> by thinking only about what is happening at the spectral level (as opposed to the matrix level). We can check the result is identical to approach (1) and (2) above:</p>
+<div id="69a517fc" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.allclose(A <span class="op">@</span> v <span class="op">+</span> <span class="fl">0.10</span> <span class="op">*</span> v, v_truth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>True</code></pre>
@@ -739,10 +739,12 @@ cosine sim:  1.000000e+00</code></pre>
 </section>
 <section id="when-v-mapsto-fav-is-not-known" class="level2">
 <h2 class="anchored" data-anchor-id="when-v-mapsto-fav-is-not-known">When <span class="math inline">v \mapsto f(A)v</span> is not known</h2>
-<p>On the other hand, there are plenty of situations where one <em>doesn’t have access to these simpler expressions</em>. For example, consider the map:</p>
+<p>On the other hand, there are many situations where the explicit expression of the matrix polynomial corresponding to <span class="math inline">f</span> is analytically intractable, too computationally expensive to obtain, or simply unknown. For example, consider the map:</p>
 <p><span class="math display">v \mapsto (A + \epsilon I)^{-1} v</span></p>
-<p>Such expressions pop up in a variety of settings, such as in <a href="https://en.wikipedia.org/wiki/Ridge_regression">Tikhonov regularization</a>, in Schatten-norm estimation <span class="citation" data-cites="ubaru2017fast">Ubaru, Saad, and Seghouane (<a href="#ref-ubaru2017fast" role="doc-biblioref">2017</a>)</span>, in the <a href="https://scikit-sparse.readthedocs.io/en/latest/cholmod.html#sksparse.cholmod.Factor.cholesky_AAt_inplace">Cholesky factorization of PSD matrices</a>, and so on. Unlike the previous setting, we cannot readily access <span class="math inline">v \mapsto f(A)v</span> unless we explicitly compute the full spectral decomposition of <span class="math inline">A</span> or the inverse of <span class="math inline">A</span>, both of which are expensive to obtain.</p>
-<div id="f5597c77" class="cell" data-execution_count="4">
+<p>Such expressions pop up in a variety of settings, such as in <a href="https://en.wikipedia.org/wiki/Ridge_regression">Tikhonov regularization</a>, in Schatten-norm estimation <span class="citation" data-cites="ubaru2017fast">(<a href="#ref-ubaru2017fast" role="doc-biblioref">Ubaru, Saad, and Seghouane 2017</a>)</span>, in the <a href="https://scikit-sparse.readthedocs.io/en/latest/cholmod.html#sksparse.cholmod.Factor.cholesky_AAt_inplace">Cholesky factorization of PSD matrices</a>, and so on.</p>
+<p>Note that unlike the previous setting, we cannot readily access <span class="math inline">v \mapsto f(A)v</span> unless we explicitly compute the full spectral decomposition of <span class="math inline">A</span> or the inverse of <span class="math inline">A</span>, both of which are expensive to obtain. Alternatively, observe that for <span class="math inline">A \succeq 0</span>, we have: <span class="math display"> \lambda \in \Lambda(\, A \, )  \; \Leftrightarrow \; (\lambda+\epsilon)^{-1} \in \Lambda(\, (A + \epsilon I)^{-1} \,)</span></p>
+<p>Thus, obtaining an operator approximating <span class="math inline">v \mapsto (A + \epsilon I)^{-1}v</span> requires just a trivial modification of the code above:</p>
+<div id="0cc27af4" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Alternative: v_truth = np.linalg.inv((A + 0.10 * np.eye(A.shape[0]))) @ v</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>v_truth <span class="op">=</span> (U <span class="op">@</span> np.diag(np.reciprocal(Lambda <span class="op">+</span> <span class="fl">0.10</span>)) <span class="op">@</span> U.T) <span class="op">@</span> v</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -766,8 +768,8 @@ cosine sim:  1.000000e+00</code></pre>
 </section>
 <section id="back-to-trace-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="back-to-trace-estimation">Back to trace estimation</h2>
-<p>There are several use-cases wherein one might be interested in the output <span class="math inline">f(A)v</span> itself—see <span class="citation" data-cites="musco2018stability">Musco, Musco, and Sidford (<a href="#ref-musco2018stability" role="doc-biblioref">2018</a>)</span> and references within for some examples. One use-case is the extension of existing <code>matvec</code>-dependent implicit trace estimators to matrix-function trace estimators.</p>
-<div id="b91efb35" class="cell" data-execution_count="5">
+<p>There are several use-cases wherein one might be interested in the output <span class="math inline">f(A)v</span> itself, e.g.&nbsp;principal component regression or spectral clustering. Another use case is implicit <em>matrix function</em> trace estimation.</p>
+<div id="c39f98a4" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch, xtrace</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet exact:  </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A)))<span class="sc">:6e}</span><span class="ss">"</span>)</span>
@@ -775,11 +777,11 @@ cosine sim:  1.000000e+00</code></pre>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Logdet XTrace: </span><span class="sc">{</span>xtrace(M)<span class="sc">:6e}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Logdet exact:  -1.483218e+02
-Logdet Hutch:  -1.495564e+02
+Logdet Hutch:  -1.525118e+02
 Logdet XTrace: -1.483155e+02</code></pre>
 </div>
 </div>
-<p>As with the hutch estimators applied to matrix functions, note that the action <span class="math inline">v \mapsto f(A)v</span> is subject to the approximation errors studied by <span class="citation" data-cites="musco2018stability">Musco, Musco, and Sidford (<a href="#ref-musco2018stability" role="doc-biblioref">2018</a>)</span>, making such extensions limited to functions that are well-approximated by the Lanczos method.</p>
+<p>As with the hutch estimators applied to matrix functions, note that the action <span class="math inline">v \mapsto f(A)v</span> is subject to the approximation errors mentioned above, making such extensions limited to functions that are well-approximated by the Lanczos method.</p>
 
 
 

@@ -18,14 +18,12 @@ def test_xtrace_trace():
   assert np.isclose(A.trace(), xtrace(A), atol=1e-5)
 
 def test_xtrace_mf():
-  from primate.operator import matrix_function
   np.random.seed(1234)
   n = 100
   A = random.symmetric(n, pd = True)
   ew, ev = np.linalg.eigh(A)
   for fun_name, fun in zip(["identity", "log", "inv", "exp"], [lambda x: x, np.log, np.reciprocal, np.exp]):
-    M = matrix_function(A, fun_name)
-    trace_test = xtrace(M)
+    trace_test = xtrace(A, fun=fun)
     trace_true = (ev @ np.diag(fun(ew)) @ ev.T).trace()
     assert np.isclose(trace_test, trace_true, atol=abs(0.001*trace_true))
 

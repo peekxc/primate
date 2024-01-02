@@ -30,8 +30,9 @@ def test_functional():
   # print(f"Sum >= t:      {sum(ew >= min_ew_est*0.95)}")
   # print(f"Actual rank:   {np.linalg.matrix_rank(A)}")
 
-# def test_rank_time():
-#   from primate.operator import Toeplitz
-#   ind = np.arange(100)
-#   T = Toeplitz(ind)
-#   assert numrank(T) == 100
+def test_rank_time():
+  from primate.operator import Toeplitz
+  from primate.functional import numrank
+  ind = np.arange(100)
+  T = Toeplitz(ind)
+  assert numrank(T) == 100

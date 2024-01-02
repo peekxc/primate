@@ -16,13 +16,13 @@ np.random.seed(1234)
 
 To do trace estimation, use functions in the `trace` module: 
 ```{python}
-import primate.trace as TR
+from primate.trace import hutch, xtrace
 from primate.random import symmetric
 A = symmetric(150)  ## random positive-definite matrix 
 
 print(f"Actual trace: {A.trace():6f}")        ## Actual trace
-print(f"Girard-Hutch: {TR.hutch(A):6f}")      ## Monte-carlo tyoe estimator
-print(f"XTrace:       {TR.xtrace(A):6f}")     ## Epperly's algorithm
+print(f"Girard-Hutch: {hutch(A):6f}")      ## Monte-carlo tyoe estimator
+print(f"XTrace:       {xtrace(A):6f}")     ## Epperly's algorithm
 ```
 
 For matrix functions, you can either construct a `LinearOperator` directly via the `matrix_function` API, or supply a string to the parameter `fun` describing the spectral function to apply. For example, one might compute the log-determinant as follows:
@@ -33,8 +33,8 @@ M = matrix_function(A, fun="log")
 
 ew = np.linalg.eigvalsh(A)
 print(f"logdet(A):  {np.sum(np.log(ew)):6f}")
-print(f"GR approx:  {TR.hutch(M):6f}")
-print(f"XTrace:     {TR.xtrace(M):6f}")
+print(f"GR approx:  {hutch(M):6f}")
+print(f"XTrace:     {xtrace(M):6f}")
 
 ## Equivalently could've used: 
 ## M = matrix_function(A, fun=np.log)
@@ -44,75 +44,13 @@ Note in the above example you can supply to `fun` either string describing a bui
 
 For 'plain' operators, `XTrace` should recover the exact trace (up to roundoff error). For matrix functions $f(A)$, there will be some inherent inaccuracy as the underlying matrix-vector multiplication is approximated with the Lanczos method. 
 
-
-
-
-
-
-
-
-In general, the amount of accuracy depends both on the Lanczos parameters and the type of matrix function. Spectral functions that are difficult or impossible to approximate via low-degree polynomials, for example, may suffer more from inaccuracy issues than otherwise. For example, consider the example below that computes that rank:
-
 ```{python}
-## Make a rank-deficient operator
-ew = np.sort(ew)
+from primate.functional import numrank
+ew = np.sort(np.random.uniform(size=150, low=0, high=1))
 ew[:30] = 0.0
 A = symmetric(150, ew = ew, pd = False)
-M = matrix_function(A, fun=np.sign)
 
-print(f"Rank:       {np.linalg.matrix_rank(A)}")
-print(f"GR approx:  {TR.hutch(M)}")
-print(f"XTrace:     {TR.xtrace(M)}")
+print(f"numrank(A): {np.linalg.matrix_rank(A)}")
+print(f"GR approx:  {numrank(A, est='hutch')}")
+print(f"XTrace:     {numrank(A, est='xtrace')}")
 ```
-
-This is not so much a fault of `hutch` or `xtrace` as much as it is the choice of approximation and Lanczos parameters. The `sign` function has a discontinuity at 0, is not smooth, and is difficult to approximate with low-degree polynomials. 
-One workaround to handle this issue is relax the sign function with a low-degree "soft-sign" function: 
-$$ \mathcal{S}_\lambda(x) = \sum\limits_{i=0}^q \left( x(1 - x^2)^i \prod_{j=1}^i \frac{2j - 1}{2j} \right)$$
-
-Visually, the soft-sign function looks like this: 
-```{python}
-from primate.special import soft_sign, figure_fun
-show(figure_fun("smoothstep"))
-```
-
-It's been shown that there is a low degree polynomial $p^\ast$ that uniformly approximates $\mathcal{S}_\lambda$ up to a small error on the interval $[-1,1]$. Since `matrix_function` uses a low degree Krylov subspace to approximate the action $v \mapsto f(A)v$, one way to improve the accuracy of rank estimation is to replace $\mathrm{sign} \mapsto \mathcal{S}_{\lambda}$ for some choice of $q \in \mathbb{Z}_+$ (this function is available in `primate` under the name `soft_sign`):
-
-```{python}
-from primate.special import soft_sign
-for q in range(0, 50, 5):
-  M = matrix_function(A, fun=soft_sign(q=q))
-  print(f"XTrace S(A) for q={q}: {TR.xtrace(M):6f}")
-```
-
-If the type of operator `A` is known to typically have a large [spectral gap](), another option is to compute the _numerical rank_ by thresholding values above some fixed value $\lambda_{\text{min}}$. This is equivalent to applying the following spectral function:
-
-$$ S_{\lambda_{\text{min}}}(x) = 
-\begin{cases} 
-1 & \text{ if } x \geq \lambda_{\text{min}} \\
-0 & \text{ otherwise }
-\end{cases}
-$$
-
-In the above example, the optimal cutoff $\lambda_{\text{min}}$ is given by the smallest non-zero eigenvalue. Since the trace estimators all stochastic to some degree, we set the cutoff to slightly less than this value: 
-
-```{python}
-lambda_min = min(ew[ew != 0.0])
-print(f"Smallest non-zero eigenvalue: {lambda_min:.6f}")
-
-step = lambda x: 1 if x > (lambda_min * 0.90) else 0
-M = matrix_function(A, fun=step, deg=50)
-print(f"XTrace S_t(A) for t={lambda_min*0.90:.4f}: {TR.xtrace(M):6f}")
-```
-
-Indeed, this works! Of course, here we've used the fact that we know the optimal cutoff value, but this can also be estimated with the `lanczos` method itself. 
-
-```{python}
-from primate.diagonalize import lanczos
-from scipy.linalg import eigvalsh_tridiagonal
-a,b = lanczos(A)
-rr = eigvalsh_tridiagonal(a,b) # Rayleigh-Ritz values
-tol = 10 * np.finfo(A.dtype).resolution
-print(f"Approx. cutoff: {np.min(rr[rr > tol]):.6f}")
-
-```
-

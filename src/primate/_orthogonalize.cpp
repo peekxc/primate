@@ -75,7 +75,7 @@ template< std::floating_point F >
 void _orthogonalize(py::module &m){
   m.def("mgs", &modified_gram_schmidt< F >);
   m.def("orth_vector", &orth_vector< F >);
-  m.def("fttr", &fttr< F >);
+  // m.def("fttr", &fttr< F >);
 }
 
 PYBIND11_MODULE(_orthogonalize, m) {

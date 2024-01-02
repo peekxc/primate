@@ -1,4 +1,4 @@
 # trace.xtrace { #primate.trace.xtrace }
 
-`trace.xtrace(A, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False)`
+`trace.xtrace(A, fun=None, nv='auto', pdf='sphere', atol=0.1, rtol=1e-06, cond_tol=100000000.0, verbose=0, info=False, **kwargs)`
 

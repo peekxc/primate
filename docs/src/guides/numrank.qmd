@@ -1,0 +1,184 @@
+---
+title: "Guide - numerical rank"
+---
+
+```{python}
+#| echo: false
+#| output: false
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+output_notebook()
+import numpy as np
+np.random.seed(1234)
+```
+
+```{python}
+from primate.trace import xtrace, hutch
+from primate.random import symmetric
+A = symmetric(150)  ## random positive-definite matrix 
+```
+
+## Computing the rank of a matrix
+
+In general, the accuracy of the action $v \mapsto f(A)v$ as approximated by `matrix_function` depends both on the parameters of the underlying Lanczos computation and properties of $f$ itself. Spectral functions that are either difficult or impossible to approximate via low-degree polynomials, for example, may suffer more from inaccuracy issues. For example, consider the following matrix function equivalence:
+$$ f(\lambda) = \mathrm{sign}(\lambda) \Leftrightarrow \mathrm{tr}(f(A)) = \mathrm{rank}(A)$$
+
+While true in theory, blind-application of the $\mathrm{sign}$ function to the spectrum of $A$ computationally does not yield a good rank estimator. 
+
+```{python}
+## Make a rank-deficient operator
+ew = np.sort(ew)
+ew[:30] = 0.0
+A = symmetric(150, ew = ew, pd = False)
+M = matrix_function(A, fun=np.sign)
+
+print(f"Rank:       {np.linalg.matrix_rank(A)}")
+print(f"GR approx:  {hutch(M)}")
+print(f"XTrace:     {xtrace(M)}")
+```
+
+This is not so much a fault of `hutch` or `xtrace` as much as it is the choice of approximation and Lanczos parameters. The `sign` function has a discontinuity at 0, is not smooth, and is difficult to approximate with low-degree polynomials.
+
+One workaround to handle this issue is relax the sign function with a "soft-sign" function: 
+$$ \mathcal{S}_\lambda(x) = \sum\limits_{i=0}^q \left( x(1 - x^2)^i \prod_{j=1}^i \frac{2j - 1}{2j} \right)$$
+
+Visually, the soft-sign function looks like this: 
+```{python}
+from primate.special import figure_fun
+show(figure_fun("softsign"))
+```
+
+It's been shown that there is a low degree polynomial $p^\ast$ that uniformly approximates $\mathcal{S}_\lambda$ up to a small error on the interval $[-1,1]$. Since `matrix_function` uses a low degree Krylov subspace to approximate the action $v \mapsto f(A)v$, replacing $\mathrm{sign} \mapsto \mathcal{S}_{\lambda}$ for some choice of $q \in \mathbb{Z}_+$ (this function is available in `primate` under the name `soft_sign`):
+
+```{python}
+from primate.special import softsign
+for q in range(0, 50, 5):
+  M = matrix_function(A, fun=softsign(q=q))
+  print(f"XTrace S(A) for q={q}: {xtrace(M):6f}")
+```
+
+As you can see, `XTrace`'s results gradually improves towards the true rank. Thus, as a rule, relaxing discontinuous spectral functions with low-degree approximations can improve the quality of the estimation. 
+
+## Computing the numerical rank
+
+While we do get within rounding range using the `softsign` function above, the error of the final estimate is still relatively large. In general, rank-deficient matrices are practically non-existent: the set of full-rank matrices is _dense_ in $\mathbb{R}^{n \times n}$. Instead, most practitioners are interested in estimating the _numerical rank_, defined here as the smallest rank of the matrix which is $\epsilon$-close to $A$: 
+$$\mathrm{numrank}(A) \triangleq \mathrm{min} \{ \, \mathrm{rank}(A) : X \in \mathbb{R}^{n \times n}, \lVert X - A \rVert_2 \leq \epsilon \, \}$$
+
+It can be shown that if the numerical rank of an operator $A$ is $r$, then $\lambda_{r} > \epsilon \geq \lambda_{r + 1}$. Thus, to estimate the numerical rank, its sufficient to simply threshold the `sign` function values above some fixed value $\lambda_{\text{min}}$:
+$$ S_{\lambda_{\text{min}}}(x) = 
+\begin{cases} 
+1 & \text{ if } x \geq \lambda_{\text{min}} \\
+0 & \text{ otherwise }
+\end{cases}
+$$
+
+The remaining task is to choose $\epsilon$. For a generic $n \times m$ operator $A$, NumPy uses the following formula, which accounts for accounting for the numerical errors of the corresponding SVD computation of `matrix_rank`: 
+
+$$ \sigma_{\text{max}} * max(M, N) * \mathrm{eps} $$
+
+where $\mathrm{eps}$ is the machine epsilon and $\sigma_{\text{max}}$ is the largest singular value of $A$. Sure enough, this actually works well computationally: 
+
+```{python}
+ew = np.linalg.eigvalsh(A)
+tol = np.max(ew) * A.shape[0] * np.finfo(A.dtype).eps
+M = matrix_function(A, fun=lambda x: 1.0 if x > tol else 0.0)
+print(f"XTrace numrank(A): {xtrace(M):6f}")
+```
+
+However, notice we are still using a discontinuous function---essentially the sign function offset from the origin. In fact, the notion of numerical rank is only useful if there well-defined gap between $\lambda_r$ and $\lambda_{r + 1}$---in practice, we don't know this value, and it is overly expensive to compute all of the eigenvalues to use the approach above. 
+
+One solution, which starts by viewing the translated `sign` function above as _step_ function, is to relax the thresholding operation with a _smooth step_ function.
+
+```{python}
+show(figure_fun("smoothstep", bounds = (-0.05, 1.05)))
+```
+
+This is similar to the `softsign` function in that it can be easily approximated by a lower-degree polynomial, but it is easier to compute and parameterize. 
+
+In theory, replacing the thresholding function should reduce the error of the matrix function approximation. Let's test this: for the given operator $A$, I'll form the matrix function $f(A) \in \mathbb{R}^{n \times n}$ explicitly and then construct an approximation for a smoothstep function at varying smoothness levels, which is determined by the parameter `b`. 
+
+```{python}
+ew, ev = np.linalg.eigh(A)
+approx_errors = []
+for b in np.geomspace(tol, 1e-8, 50):
+  s = smoothstep(a=0, b=b)
+  M = matrix_function(A, fun = s)
+  MF = (ev @ np.diag(s(ew)) @ ev.T)
+  error = np.zeros(30)
+  for i in range(30):
+    v = np.random.uniform(size=A.shape[0], low=-1, high=+1)
+    v_truth, v_test = np.ravel(MF @ v), np.ravel(M @ v)
+    vn, vn_approx = np.linalg.norm(v_truth), np.linalg.norm(v_test)
+    max_diff = np.max(np.abs(v_truth - np.ravel(v_test)))
+    error[i] = max_diff
+  approx_errors.append(error.mean())
+
+p = figure(width=500, height=200, x_axis_type="log", title="MF Approximation error")
+p.line(np.geomspace(tol, 1e-8, 50), approx_errors)
+p.scatter(np.geomspace(tol, 1e-8, 50), approx_errors)
+show(p)
+```
+
+Sure enough, the error of the approximation decreases monotonically as we relax the step function further and further. On the other hand, we don't want to relax too much, as this will yield a biased estimator of the rank: the largest value of $\epsilon$ we can safely choose is the given by the smallest positive eigenvalue of $A$, as all eigenvalues equal to or larger than this are mapped to $1$. Accounting for round-off error, if we choose $\epsilon$ to be slightly lower than this, we should in theory be able to recover the numerical rank to a higher accuracy than before: 
+
+```{python}
+tol = lambda_max * A.shape[0] * np.finfo(A.dtype).eps
+lambda_max = max(ew)
+lambda_min = min(ew[ew > tol])
+print(f"Smallest / largest non-zero eigenvalue: {lambda_min:.6f} / {lambda_max:.6f}")
+
+ss = smoothstep(a = tol, b = 0.90*lambda_min)
+M = matrix_function(A, fun=ss)
+print(f"XTrace S_t(A) for t={lambda_min*0.90:.4f}: {xtrace(M):8f}")
+```
+
+Indeed, this works! Of course, here we've used the fact that we know the optimal cutoff values $\lambda_{\mathrm{min}}$ and $\lambda_{\mathrm{min}}$. Then again, these can also be quickly estimated with the `lanczos` method itself. 
+
+```{python}
+from primate.diagonalize import lanczos
+from scipy.linalg import eigvalsh_tridiagonal
+a,b = lanczos(A)
+rr = eigvalsh_tridiagonal(a,b) # Rayleigh-Ritz values
+print(f"Max eigenvalue: {lambda_max:.6f}, max Ritz value: {np.max(rr):.6f}, Error: {abs(np.max(rr) - lambda_max):.6f}")
+print(f"Min eigenvalue: {lambda_min:.6f}, min Ritz value: {min(rr[rr > tol]):.6f}, Error: {abs(min(rr[rr > tol]) - lambda_min):.6f}")
+```
+
+## Packaging it all up 
+
+This is effectively what `numrank` does. 
+
+
+
+<!-- ```{python}
+ew, ev = np.linalg.eigh(A)
+approx_errors = []
+pts = np.geomspace(0.10*np.min(ew[ ew > tol]), np.max(ew) / 2, 50)
+for b in pts:
+  s = smoothstep(a=0, b=b)
+  M = matrix_function(A, fun = s)
+  MF = (ev @ np.diag(s(ew)) @ ev.T)
+  error = np.zeros(30)
+  for i in range(30):
+    v = np.random.uniform(size=A.shape[0], low=-1, high=+1)
+    v_truth, v_test = np.ravel(MF @ v), np.ravel(M @ v)
+    vn, vn_approx = np.linalg.norm(v_truth), np.linalg.norm(v_test)
+    max_diff = np.max(np.abs(v_truth - np.ravel(v_test)))
+    error[i] = max_diff
+  approx_errors.append(error.mean())
+
+p = figure(width=500, height=200, x_axis_type="log", title="MF Approximation error")
+p.line(pts, approx_errors)
+p.scatter(pts, approx_errors)
+show(p)
+``` -->
+
+<!-- If the type of operator `A` is known to typically have a large [spectral gap](https://en.wikipedia.org/wiki/Spectral_gap), the interval range in which we can choose $\epsilon$ and expect to recover the rank is . -->
+ <!-- Since the trace estimators all stochastic to some degree, we set the cutoff to slightly less than this value:  -->
+<!-- # from primate.special import smoothstep
+# from primate.operator import matrix_function
+# v = np.random.uniform(size=A.shape[0], low=-1, high=+1)
+# ew, ev = np.linalg.eigh(A)
+  # print(f"f(A)v norm:  {vn:.6f}")
+  # print(f"Approx norm: {vn_approx:.6f}")
+  # print(f"Max diff:    {np.max(np.abs(v_truth - np.ravel(v_test))):.6e}")
+  # print(f"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}") -->

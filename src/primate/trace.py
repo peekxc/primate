@@ -8,6 +8,7 @@ from numbers import Real
 ## Package imports
 from .random import _engine_prefixes, _engines, isotropic
 from .special import _builtin_matrix_functions
+from .operator import matrix_function
 import _lanczos
 import _trace
 
@@ -339,24 +340,37 @@ def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method:
 
 def xtrace(
 	A: Union[LinearOperator, np.ndarray], 
+	fun: Union[str, Callable] = None,
 	nv: Union[str, int] = "auto", 
 	pdf: str = "sphere",
 	atol: float = 0.1, 
 	rtol: float = 1e-6, 
 	cond_tol: float = 1e8,
 	verbose: int = 0,
-	info: bool = False
+	info: bool = False, 
+	**kwargs
 ):
 	assert atol >= 0.0 and rtol >= 0.0, "Error tolerances must be positive"
 	assert cond_tol >= 0.0, "Condition number must be non-negative"
 	nv = int(nv) if isinstance(nv, Integral) else int(np.ceil(np.sqrt(A.shape[0])))
 	n = A.shape[0]
+
+	## Transparently convert A to matrix function 
+	if isinstance(fun, str):
+		assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+		A = matrix_function(A, fun=fun)
+	elif isinstance(fun, Callable):
+		A = matrix_function(A, fun=fun)
+	elif fun is not None:
+		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
+
+	## Setup outputs. TODO: these should really be resizable arrays
 	Y, Om, Z = np.zeros(shape=(n, 0)), np.zeros(shape=(n, 0)), np.zeros(shape=(n, 0))
 	t, err = np.inf if (rtol != 0) else 0, np.inf
 	it = 0
 	cond_numb_bound = np.inf
 	while Y.shape[1] < A.shape[1]:  # err >= (error_atol + error_rtol * abs(t)):
-		## Determine number of new vectors to sample
+		## Determine number of new sample vectors to generate
 		ns = max(nv,2) if it == 0 else nv 
 		ns = min(A.shape[1] - Y.shape[1], ns)
 		
@@ -378,7 +392,7 @@ def xtrace(
 	
 	if info: 
 		info = {"estimate": t, "samples": t_samples, "error": err }
-		return info 
+		return t, info 
 	return t
 
 

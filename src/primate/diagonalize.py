@@ -4,7 +4,6 @@ from scipy.sparse import spdiags
 from scipy.sparse.linalg import LinearOperator
 import _lanczos
 
-
 def lanczos(
 	A: LinearOperator,
 	v0: Optional[np.ndarray] = None,

@@ -189,12 +189,11 @@ def test_fttr3():
   #       echo(i, x, a[i-1], z[i-1], b[i-1], z[i-2], b[i])
   #   return np.array(z)
 
-  from primate.ortho import _orthogonalize
-  fttr_weights_base = _orthogonalize.fttr(ew, a, b)
+  # from primate.ortho import _orthogonalize
+  # fttr_weights_base = _orthogonalize.fttr(ew, a, b)
   fttr_weights_run = _lanczos.quadrature(a,b,len(a),1)[:,1]
   fttr_weights_true = np.ravel(ev[0,:])**2
-  assert np.allclose(fttr_weights_base, fttr_weights_run)
-  assert np.allclose(fttr_weights_base, fttr_weights_true)
+  assert np.allclose(fttr_weights_run, fttr_weights_true)
 
 def test_quadrature_methods():
   from primate.diagonalize import _lanczos
