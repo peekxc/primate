@@ -113,5 +113,6 @@ a,b = lanczos(A)
 rr = eigvalsh_tridiagonal(a,b) # Rayleigh-Ritz values
 tol = 10 * np.finfo(A.dtype).resolution
 print(f"Approx. cutoff: {np.min(rr[rr > tol]):.6f}")
+
 ```
 

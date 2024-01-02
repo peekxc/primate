@@ -26,6 +26,7 @@ python_sources = [
   'operator.py', 
   'stats.py',
   'special.py',
+  'functional.py',
   '__init__.py'
 ]
 

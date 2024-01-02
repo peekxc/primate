@@ -46,10 +46,10 @@ Alternatively, when `stop` = "change", the estimator is considered converged whe
 |------------------------------|----------------------------------------------------------------------------------------------------------------|
 | typing.Union\[float, tuple\] | Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned. |
 
-## Notes:
+## Notes
 
-To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
-while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\mathrm{deg}^2)$ time to execute, 
+To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former (GW) uses implicit symmetric QR steps with Wilkinson shifts, 
+while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require $O(\mathrm{deg}^2)$ time to execute, 
 the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
 If `deg` is large, `fttr` is preferred. 
 

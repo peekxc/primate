@@ -324,7 +324,7 @@ MathJax = {
 
 
 <p>To clarify that that means, here’s an abstract presentation of the generic SLQ procedure:</p>
-<div id="alg-slq" class="pseudocode-container" data-alg-title="Algorithm" data-line-number="true" data-comment-delimiter="//" data-indent-size="1.1em" data-pseudocode-index="1" data-no-end="true" data-line-number-punc=":">
+<div id="alg-slq" class="pseudocode-container" data-no-end="true" data-pseudocode-index="1" data-indent-size="1.1em" data-comment-delimiter="//" data-alg-title="Algorithm" data-line-number="true" data-line-number-punc=":">
 <div class="pseudocode">
 \begin{algorithm} \caption{Stochastic Lanczos Quadrature} \begin{algorithmic} \Input Symmetric operator ($A \in \mathbb{R}^{n \times n}$) \Require Number of queries ($n_v$), Degree of quadrature ($k$) \Function{SLQ}{$A$, $n_v$, $k$} \State $\Gamma \gets 0$ \For{$j = 1, 2, \dots, n_v$} \State $v_i \sim \mathcal{D}$ where $\mathcal{D}$ satisfies $\mathbb{E}(v v^\top) = I$ \State $T^{(j)}(\alpha, \beta)$ $\gets$ $\mathrm{Lanczos}(A,v_j,k+1)$ \State $[\Theta, Y] \gets \mathrm{eigh\_tridiag}(T^{(j)}(\alpha, \beta))$ \State $\tau_i \gets \langle e_1, y_i \rangle$ \State &lt; Do something with the node/weight pairs $(\theta_i, \tau_i^2)$ &gt; \EndFor \EndFunction \end{algorithmic} \end{algorithm}
 </div>

@@ -307,7 +307,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes:</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
   <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
   </ul></li>
@@ -489,8 +489,8 @@ Note
 </table>
 </section>
 <section id="notes" class="level2">
-<h2 class="anchored" data-anchor-id="notes">Notes:</h2>
-<p>To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require <span class="math inline">O(\mathrm{deg}^2)</span> time to execute, the former requires <span class="math inline">O(\mathrm{deg}^2)</span> space but is highly accurate, while the latter uses only <span class="math inline">O(1)</span> space at the cost of stability. If <code>deg</code> is large, <code>fttr</code> is preferred.</p>
+<h2 class="anchored" data-anchor-id="notes">Notes</h2>
+<p>To compute the weights of the quadrature, <code>quad</code> can be set to either ‘golub_welsch’ or ‘fttr’. The former (GW) uses implicit symmetric QR steps with Wilkinson shifts, while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require <span class="math inline">O(\mathrm{deg}^2)</span> time to execute, the former requires <span class="math inline">O(\mathrm{deg}^2)</span> space but is highly accurate, while the latter uses only <span class="math inline">O(1)</span> space at the cost of stability. If <code>deg</code> is large, <code>fttr</code> is preferred.</p>
 </section>
 <section id="see-also" class="level2">
 <h2 class="anchored" data-anchor-id="see-also">See Also</h2>

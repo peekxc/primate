@@ -363,15 +363,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><code>primate</code> supports a variety of matrix-types of the box, including numpy <code>ndarray</code>’s, compressed <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> (a lá SciPy), and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperators</a>—the latter enables the use of <em>matrix free</em> operators.</p>
-<p>Outside of the natively types above, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method in <code>primate</code> are:</p>
+<p><code>primate</code> supports a variety of matrix-types of the box, including numpy <code>ndarray</code>’s, compressed <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> (a lá SciPy), and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperators</a>.</p>
+<p>More generally, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method are:</p>
 <ol type="1">
 <li>A method <code>A.matvec(input: ndarray) -&gt; ndarray</code> implementing <span class="math inline">v \mapsto Av</span></li>
 <li>An attribute <code>A.shape -&gt; tuple[int, int]</code> giving the output/input dimensions of <span class="math inline">A</span></li>
 </ol>
 <!-- Note that in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, so existing matrix implementations like [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)'s and [sparray](https://docs.scipy.org/doc/scipy/reference/sparse.html#sparse-array-classes)'s natively support the interface. -->
 <!-- Using [PyLops](adthedocs.io/en/stable/index.html) terminology, any self-adjoint operator supporting _forward model_ of matrix-vector multiplication is compatible with most of `primate`'s API.  -->
-<p>Here’s an example of a simple operator representing a Diagonal matrix, which inherits a <code>.matvec()</code> method by following the subclassing rules of <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPy’s LinearOperator</a>:</p>
+<p>Here’s an example of a simple operator representing a Diagonal matrix:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy.typing <span class="im">import</span> ArrayLike</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse.linalg <span class="im">import</span> LinearOperator </span>
@@ -387,21 +387,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> _matvec(<span class="va">self</span>, x: ArrayLike) <span class="op">-&gt;</span> np.ndarray:</span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> <span class="va">self</span>.diag <span class="op">*</span> np.ravel(x)</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out.reshape(x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<!-- Sure enough, you 
-
-```python
-from scipy.sparse.linalg import eigsh
-
-D = DiagonalOp(np.arange(10))
-np.allclose(
-  eigsh(DiagonalOp(v), k = 9, return_eigenvectors=False),
-  np.arange(1, 10)
-) 
-## True
-``` -->
+<p>Note that by following the subclassing rules of <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPy’s LinearOperator</a>, this class inherits a <code>.matvec()</code> method and thus satisfies the constraints above.</p>
 <section id="c-usage" class="level2">
 <h2 class="anchored" data-anchor-id="c-usage">C++ usage</h2>
-<p>Similarly, to get started calling any matrix-free function provided by <code>primate</code> on the C++ side, such <code>hutch</code> or <code>lanczos</code>, simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>
+<p>Similarly, to call any C++ function, such <code>hutch</code> or <code>lanczos</code>, simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  </span>
@@ -414,7 +403,7 @@ np.allclose(
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">void</span> shape<span class="op">()</span> <span class="at">const</span> <span class="op">{</span> <span class="cf">return</span> <span class="bu">std::</span>make_pair<span class="op">(</span>nrow<span class="op">,</span> ncol<span class="op">);</span> <span class="op">}</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>It’s up to you to ensure <code>shape()</code> yields the correct size; <code>primate</code> will supply vectors to <code>input</code> of size <code>.shape().second</code> (number of columns) and guarantees the pointer to the <code>output</code> will be at least <code>shape().first</code> (number of rows), no more.</p>
-<p>To read more about how semantics extend to the C++ side as well via <em>C++20 concepts</em>—see the <a href="../advanced/cpp_integration.html">C++ integration guide</a>. If you’re using pybind11 and you want to extend <code>primate</code>’s Python API to work natively with linear operator implemented in C++, see the <a href="../advanced/pybind11_integration.html">pybind11 integration guide</a>.</p>
+<p>To read more about how semantics extend to the C++ side via <em>C++20 concepts</em>, see the <a href="../advanced/cpp_integration.html">C++ integration guide</a>. If you’re using pybind11 and you want to extend <code>primate</code>’s Python API to work natively with linear operator implemented in C++, see the <a href="../advanced/pybind11_integration.html">pybind11 integration guide</a>.</p>
 
 
 </section>

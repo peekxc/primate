@@ -349,9 +349,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p><code>primate</code> is a standard <a href="https://peps.python.org/pep-0517/">PEP-517</a> package, and thus can be installed via <code>pip</code>:</p>
+<p><code>primate</code> is a standard <a href="https://peps.python.org/pep-0517/">PEP-517</a> package that can be installed via <code>pip</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>python <span class="op">-</span>m pip install scikit<span class="op">-</span>primate  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Assuming your platform is natively supported, no compilation is needed; see <a href="#platform-support">platform support</a> for details.</p>
+<p>Assuming your platform is supported, no compilation is needed—see <a href="#platform-support">platform support</a> for details.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -362,7 +362,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Like many packages registered on PyPI, the distribution name “<code>scikit-primate</code>” differs from the importable package name “<code>primate</code>” (also see <a href="https://github.com/pypi/support/issues/3471">#3471</a>). Once installed, all exported package modules are available through the <code>primate</code> module.</p>
+<p>Like many packages registered on PyPI, the <em>distribution</em> “<code>scikit-primate</code>” differs from the importable <em>package</em> “<code>primate</code>” (also see <a href="https://github.com/pypi/support/issues/3471">#3471</a>). Additionally, <code>primate</code> does not rely on organizational prefixes that some <a href="https://projects.scipy.org/scikits.html">scikits</a> use (e.g.&nbsp;<code>scikit-learn</code> -&gt; <code>sklearn</code>).</p>
 </div>
 </div>
 <!-- Currently the package must be built from source via cloning the repository. PYPI support is planned.  -->
@@ -422,7 +422,7 @@ Note
 </section>
 <section id="compiling-from-source" class="level3">
 <h3 class="anchored" data-anchor-id="compiling-from-source">Compiling from source</h3>
-<p>To install the package from its source distribution, a C++20 compiler is required; the current builds are all built with some variant of <a href="https://clang.llvm.org/">clang</a>, preferably version 15.0 or higher. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.</p>
+<p>A C++20 compiler is required to install the package from its source distribution. Current builds all compile with some variant of <a href="https://clang.llvm.org/">clang</a> (version 15.0+). For platform- and compiler-specific settings, consult the <a href="https://github.com/peekxc/primate/blob/main/meson.build">build scripts</a> and <a href="https://github.com/peekxc/primate/tree/main/.github/workflows">CI configuration files</a>.</p>
 </section>
 <section id="c-installation" class="level3">
 <h3 class="anchored" data-anchor-id="c-installation">C++ Installation</h3>
