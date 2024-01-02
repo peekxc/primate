@@ -166,8 +166,9 @@ def hutch(
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
 		kwargs["function"] = "generic"
-		assert isinstance(fun(0.0), Real), "Spectral function must return a real-valued number"
+		assert isinstance(fun(1.0), Real), "Spectral function must return a real-valued number"
 		kwargs["matrix_func"] = fun
+		num_threads = 1
 	else:
 		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
 
@@ -220,7 +221,7 @@ def hutch(
 	return info_dict["estimate"], info_dict
 
 
-# TODO: implemented hutch++
+# TODO: implement hutch++
 # def hutchpp():
 
 def sl_gauss(

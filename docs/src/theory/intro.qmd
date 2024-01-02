@@ -99,9 +99,9 @@ $$\mathtt{tr}(A) = \mathtt{tr}(A I) = \mathtt{tr}(A \mathbb{E}[v v^T]) = \mathbb
 Naturally we expect the approximation to gradually improve as more vectors are sampled, converging as $n_v \to \infty$. Let's see if we can check this: we start by collecting a few sample quadratic forms 
 
 ```{python}
-def isotropic(n):
-  yield from [np.random.choice([-1,+1], size=A.shape[1]) for i in range(n)]
-estimates = np.array([v @ A @ v for v in isotropic(500)])
+from primate.random import rademacher
+gen_isotropic = lambda n: (rademacher(A.shape[0]) for _ in range(n))
+estimates = np.array([v @ A @ v for v in gen_isotropic(500)])
 ```
 
 Plotting both the estimator formed by averaging the first $k$ samples along with its absolute error, we get the following figures for $k = 50$ and $k = 500$, respectively: 
@@ -155,7 +155,7 @@ show(row(column(p,q), column(p2,q2)))
 
 Sure enough, the estimator quickly gets within an error rate of about 1-5% away from the actual trace, getting generally closer as more samples are collected. On the other hand, improvement is not gaurenteed, and securing additional precision much less than 1% becomes increasingly difficult due to the randomness and variance of the sample estimates. 
 
-## Estimator Implementation
+## Maximizing configurability
 
 Rather than manually averaging samples, trace estimates can be obtained via the `hutch` function: 
 
@@ -164,21 +164,42 @@ from primate.trace import hutch
 print(f"Trace estimate: {hutch(A, maxiter=50)}")
 ```
 
-Though its estimation is identical to averaging quadratic forms $v^T A v$ of isotropic vectors as above, `hutch` comes with a few extra features to simplify its usage. In particular, all $v \mapsto v^T A v$ evaluations are done in parallel, there are a variety of isotropic distributions and random number generators (RNGs) to choose from, and the estimator may be suppleid various convergence criteria to allow for early-stopping; see the [hutch documentation page](../reference/trace.hutch.qmd) for more details.  
+Though its estimation is identical to averaging quadratic forms $v^T A v$ of isotropic vectors as above, `hutch` comes with a few extra features to simplify its usage. 
 
-<!-- 
-Let's see how this fares using, let's say, $\frac{1}{4}$ the number of _matvecs_: 
+For example, to stop the estimator once it reaches an absolute tolerence, supply a residual value to `atol`: 
 
 ```{python}
-n: int = A.shape[0]
-trace_estimate = 0.0
-for j in range(n // 4):
-  v = np.random.choice([-1, +1], size=n)
-  trace_estimate += v @ A @ v
-print(trace_estimate / (n // 4))
+## Stops the estimator if margin of error <= 0.15
+print(f"Trace est: {hutch(A, atol=0.15, maxiter=1000)}")
 ```
 
-Not bad! Though it's fairly intuitive, why does this work?  -->
+The default early-stopping rule uses the CLT to bound the error of the estimator. A simpler early-stopping method can also be used, which is similar to the [quadrature](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quadrature.html) method: 
+
+```python
+## Stops the estimator when pair of iterates change <= 0.05
+hutch(A, atol=0.05, stop='change', maxiter=1000)
+```
+
+By default, all $v \mapsto v^T A v$ evaluations are done in parallel, which can be controlled `num_threads`: 
+
+```python
+hutch(A, num_threads=8) ## ~8x times faster on native 8-core machine
+```
+
+Moreover, a variety of isotropic distributions and random number generators (RNGs) are available to choose from, each of which can be seeded with positive integers seeds for determinism. 
+```python
+## Samples from the normal distribution N(0, 1) using the SplitMix64 generator 
+hutch(A, pdf="normal", rng="splitmix64", seed=1234)
+```
+
+You can also parameterize the underlying function approximation parameters. 
+```python
+hutch(A, deg = 40)      ## Degree-40 Krylov expansion 
+hutch(A, orth = 5)      ## Re-orthogonalize against 5 add. Lanczos vectors
+hutch(A, quad="fttr")   ## Use three-term recurrence for quad. approx 
+```
+
+See the [hutch documentation page](../reference/trace.hutch.qmd) for more details on the hyper-parameters. More details about the convergence checking options are also given below.   
 
 ## Extending to matrix functions
 

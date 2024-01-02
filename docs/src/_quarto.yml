@@ -50,10 +50,10 @@ website:
         contents:
           - href: advanced/cpp_integration.qmd
             text: Usage from C++
-          - href: advanced/pybind11_integration.qmd
-            text: Integrating with pybind11
-          - href: advanced/slq_param.qmd
-            text: Parameterizing SLQ 
+          # - href: advanced/pybind11_integration.qmd
+          #   text: Integrating with pybind11
+          # - href: advanced/slq_param.qmd
+          #   text: Parameterizing SLQ 
       # - section: User Guide 
       #   contents: 
       #     - href: guide/lanczos.qmd 

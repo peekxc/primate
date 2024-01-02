@@ -53,7 +53,7 @@ void generate_normal(const unsigned long n, RBG& bit_generator, const int thread
 	arr_norm = 0.0; 
 	// #pragma omp simd reduction(+:arr_norm)
 	for (unsigned long i = 0; i < n; ++i){
-		arr_norm += std::abs(array[i]);
+		arr_norm += std::pow(array[i], 2);
 	}
 	arr_norm = std::sqrt(arr_norm);
 }

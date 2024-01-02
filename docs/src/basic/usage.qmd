@@ -20,7 +20,7 @@ from primate.trace import hutch, xtrace
 from primate.random import symmetric
 A = symmetric(150)  ## random positive-definite matrix 
 
-print(f"Actual trace: {A.trace():6f}")        ## Actual trace
+print(f"Actual trace: {A.trace():6f}")     ## Actual trace
 print(f"Girard-Hutch: {hutch(A):6f}")      ## Monte-carlo tyoe estimator
 print(f"XTrace:       {xtrace(A):6f}")     ## Epperly's algorithm
 ```
@@ -29,20 +29,20 @@ For matrix functions, you can either construct a `LinearOperator` directly via t
 
 ```{python}
 from primate.operator import matrix_function
-M = matrix_function(A, fun="log")
+M = matrix_function(A, fun="log") 
+## Alternative: M = matrix_function(A, fun=np.log)
 
 ew = np.linalg.eigvalsh(A)
 print(f"logdet(A):  {np.sum(np.log(ew)):6f}")
 print(f"GR approx:  {hutch(M):6f}")
 print(f"XTrace:     {xtrace(M):6f}")
-
-## Equivalently could've used: 
-## M = matrix_function(A, fun=np.log)
 ```
 
-Note in the above example you can supply to `fun` either string describing a built-in spectral function or an arbitrary `Callable`. The former is preferred when possible, as function evaluations will generally be faster and `hutch` can also be parallelized. Multi-threaded execution of e.g. `hutch` with arbitrary functions is not currently allowed due to the GIL, though there are options available, see [the integration docs](../advanced/cpp_integration.qmd) for more details. 
+Note in the above example you can supply to `fun` either string describing a built-in spectral function or an arbitrary `Callable`. The former is preferred when possible, as function evaluations will generally be faster and `hutch` can also be parallelized. Multi-threaded execution of e.g. `hutch` with arbitrary functions is not currently allowed due to the GIL, though there are options available for getting around this---see [the integration docs](../advanced/cpp_integration.qmd) for more details. 
 
-For 'plain' operators, `XTrace` should recover the exact trace (up to roundoff error). For matrix functions $f(A)$, there will be some inherent inaccuracy as the underlying matrix-vector multiplication is approximated with the Lanczos method. 
+<!-- For 'plain' operators (i.e. `fun = None`), `XTrace` should recover the exact trace (up to very small roundoff error). However, for matrix functions $f(A)$, there will be some inherent inaccuracy as the underlying matrix-vector multiplication is only approximate.  -->
+
+Some function specializations 
 
 ```{python}
 from primate.functional import numrank

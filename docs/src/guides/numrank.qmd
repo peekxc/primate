@@ -7,7 +7,7 @@ title: "Guide - numerical rank"
 #| output: false
 from bokeh.plotting import figure, show
 from bokeh.io import output_notebook
-output_notebook()
+output_notebook(hide_banner=True)
 import numpy as np
 np.random.seed(1234)
 ```
@@ -26,8 +26,9 @@ $$ f(\lambda) = \mathrm{sign}(\lambda) \Leftrightarrow \mathrm{tr}(f(A)) = \math
 While true in theory, blind-application of the $\mathrm{sign}$ function to the spectrum of $A$ computationally does not yield a good rank estimator. 
 
 ```{python}
+from primate.operator import matrix_function
 ## Make a rank-deficient operator
-ew = np.sort(ew)
+ew = np.sort(np.random.uniform(size=A.shape[0], low=0, high=1))
 ew[:30] = 0.0
 A = symmetric(150, ew = ew, pd = False)
 M = matrix_function(A, fun=np.sign)
@@ -98,6 +99,7 @@ This is similar to the `softsign` function in that it can be easily approximated
 In theory, replacing the thresholding function should reduce the error of the matrix function approximation. Let's test this: for the given operator $A$, I'll form the matrix function $f(A) \in \mathbb{R}^{n \times n}$ explicitly and then construct an approximation for a smoothstep function at varying smoothness levels, which is determined by the parameter `b`. 
 
 ```{python}
+from primate.special import smoothstep
 ew, ev = np.linalg.eigh(A)
 approx_errors = []
 for b in np.geomspace(tol, 1e-8, 50):
@@ -122,9 +124,10 @@ show(p)
 Sure enough, the error of the approximation decreases monotonically as we relax the step function further and further. On the other hand, we don't want to relax too much, as this will yield a biased estimator of the rank: the largest value of $\epsilon$ we can safely choose is the given by the smallest positive eigenvalue of $A$, as all eigenvalues equal to or larger than this are mapped to $1$. Accounting for round-off error, if we choose $\epsilon$ to be slightly lower than this, we should in theory be able to recover the numerical rank to a higher accuracy than before: 
 
 ```{python}
-tol = lambda_max * A.shape[0] * np.finfo(A.dtype).eps
-lambda_max = max(ew)
+tol = max(ew) * A.shape[0] * np.finfo(A.dtype).eps
 lambda_min = min(ew[ew > tol])
+lambda_max = max(ew)
+
 print(f"Smallest / largest non-zero eigenvalue: {lambda_min:.6f} / {lambda_max:.6f}")
 
 ss = smoothstep(a = tol, b = 0.90*lambda_min)
@@ -145,8 +148,33 @@ print(f"Min eigenvalue: {lambda_min:.6f}, min Ritz value: {min(rr[rr > tol]):.6f
 
 ## Packaging it all up 
 
-This is effectively what `numrank` does. 
+```{python}
+from primate.functional import numrank
+numrank(A, est="hutch")
+```
 
+`numrank` 
+Rather than designing your own  does. 
+`primate` contains a variety of 
+
+## Polynomial trace approximation 
+
+```{python}
+
+# B = A / np.max(np.linalg.eigvalsh(A))
+# (3 * (B @ B) - 2 * (B @ B @ B)).trace()
+# (6 * np.linalg.matrix_power(A, 5) - 15 * np.linalg.matrix_power(A, 4) + 10 * np.linalg.matrix_power(A, 3)).trace()
+
+# coeffs = [924, -6006, 16380, -24024, 20020, -9009, 1716]
+# powers = [13, 12, 11, 10, 9, 8, 7]
+# sum([(c*np.linalg.matrix_power(A, p)).trace() for c,p in zip(coeffs, powers)])
+
+# B = 
+
+
+# ss = l
+
+```
 
 
 <!-- ```{python}
@@ -182,3 +210,4 @@ show(p)
   # print(f"Approx norm: {vn_approx:.6f}")
   # print(f"Max diff:    {np.max(np.abs(v_truth - np.ravel(v_test))):.6e}")
   # print(f"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}") -->
+
