@@ -83,7 +83,7 @@ void monte_carlo_quad(
   // Monte-Carlo ensemble sampling
   int i;
   volatile bool stop_flag = false; // early-stop flag for convergence checking
-  auto t_start = hr_clock::now();
+  const auto t_start = hr_clock::now();
   #pragma omp parallel shared(A, stop_flag)
   {
     int tid = omp_get_thread_num(); // thread-id 
@@ -123,7 +123,7 @@ void monte_carlo_quad(
       }
     } // omp for
   } // omp parallel 
-  auto t_end = hr_clock::now();
+  const auto t_end = hr_clock::now();
   wall_time = duration_cast< us >(dur_seconds(t_end - t_start)).count();
 }
 

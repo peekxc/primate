@@ -62,7 +62,7 @@ struct SparseEigenLinearOperator {
   const Eigen::SparseMatrix< F > A;  
   mutable size_t matvec_time; 
 
-  SparseEigenLinearOperator(const Eigen::SparseMatrix< F > _mat) : A(_mat){}
+  SparseEigenLinearOperator(const Eigen::SparseMatrix< F > _mat) : A(_mat), matvec_time(0.0){}
 
   void matvec(const F* inp, F* out) const noexcept {
     auto ts = hr_clock::now();

@@ -19,7 +19,7 @@ struct PyLinearOperator {
   const py::object _op; 
   mutable size_t matvec_time; 
   
-  PyLinearOperator(const py::object op) : _op(op) {
+  PyLinearOperator(const py::object op) : _op(op), matvec_time(0.0) {
     if (!py::hasattr(op, "matvec")) { throw std::invalid_argument("Supplied object is missing 'matvec' attribute."); }
     if (!py::hasattr(op, "shape")) { throw std::invalid_argument("Supplied object is missing 'shape' attribute."); }
     // if (!op.has_attr("dtype")) { throw std::invalid_argument("Supplied object is missing 'dtype' attribute."); }
