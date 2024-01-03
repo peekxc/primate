@@ -11,17 +11,22 @@ from .diagonalize import lanczos
 def numrank(
   A: Union[LinearOperator, np.ndarray],
 	est: str = "hutch",
+  eps: Union[float, str] = "auto",
 	**kwargs
 ):
   ## Use lanczos to get basic estimation of smallest positive eigenvalue
+  # if eps == "auto":
   a,b = lanczos(A, deg=A.shape[0])
   rr = np.sort(eigvalsh_tridiagonal(a,b))
   EPS = np.finfo(A.dtype).eps
+  tol = np.max(rr) * A.shape[0] * EPS # NumPy default tolerance 
+  gap = np.min(rr[rr > tol])
+  # else: 
+
   # rr_mag = np.maximum(np.abs(rr[:-1]), EPS)
   # max_rel_ind = np.argmax(np.diff(rr) / rr_mag) + 1
   # tol = rr[max_rel_ind]
-  tol = np.max(rr) * A.shape[0] * EPS # NumPy default tolerance 
-  gap = np.min(rr[rr > tol])
+
   # assert min_ew_est > 10 * EPS, f"Estimated smallest positive eigenvalue is too small: {min_ew_est}"
 
   ## Estimate numerical rank by w/ Hutch
