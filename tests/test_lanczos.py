@@ -214,6 +214,56 @@ def test_quadrature_methods():
   quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
   assert np.isclose(quad1, quad2, atol=quad1*0.05)
 
+def test_tridiagonal():
+  from primate.diagonalize import lanczos
+  np.random.seed(1234)
+  n = 100
+  A_sparse = csc_array(symmetric(n))
+  v0 = np.random.uniform(size=n)
+  M = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=5, sparse_mat=True).todense()
+  a, b = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=5, sparse_mat=False)
+  assert np.allclose(np.diag(M), a)
+  assert np.allclose(np.diag(M, 1), b)
+
+  # ## Gerschgorin disk check
+  # radius = np.append([0], np.abs(b) + np.roll(np.abs(b), -1))
+  # radius[0] = np.abs(b[0])
+  # radius[-1] = np.abs(b[-1])
+  # assert np.allclose((M - np.diag(a)).sum(axis=0), radius)
+  # np.max(a + radius)
+  # np.max(np.linalg.eigh(A_sparse.todense())[0])
+
+
+## Testing Parlett's bounds on the spectral gap 
+def test_rayleigh_approx():
+  from primate.diagonalize import lanczos
+  from scipy.linalg import eigh_tridiagonal
+  from scipy.sparse.linalg import eigsh
+  from primate.random import symmetric
+
+  lb_works = []
+  lb_error = []
+  for i in range(50):
+    ew_true = np.random.uniform(size=150, low=0.0, high=5.0)
+    ew_true[ew_true <= .40] = 0.0
+    A = symmetric(150, ew=ew_true, pd=False)
+    a,b = lanczos(A, deg = 20)
+    rr, rv = eigh_tridiagonal(a,b)
+    tol = max(rr) * A.shape[0]  * np.finfo(A.dtype).eps
+    rr = np.abs(rr)
+    min_id = np.flatnonzero(rr >= tol)[np.argmin(rr[rr >= tol])]
+    coeff = min([b[min_id-1], b[min_id], b[min_id+1]])
+    ew_lb = rr[min_id] - coeff * np.abs(rv[-1,min_id])
+    min_ew = min(ew_true[ew_true > tol])
+    lb_works.append((rr[min_id] - 2*(coeff * np.abs(rv[-1,min_id]))) < min_ew)
+    # print(f"LB Error, error est: {abs(min_ew - ew_lb):.5f}, {coeff * np.abs(rv[-1,min_id]):.5f}")
+  assert np.sum(lb_works) > 45
+  # ## Confirmed it does not work, unles algebraically smallest includes negative
+  # min_rr - rv[:,min_id][-1] <= np.min(np.abs(ew_true))
+
+
+
+  # eigsh(A, k=1, sigma = max(rr), which = 'SM', maxiter = 15, tol = 0.001, return_eigenvectors=False)
 
 # def test_quadrature_toeplitz():
 #   from primate.diagonalize import lanczos, _lanczos
@@ -239,12 +289,12 @@ def test_quadrature_methods():
 # ## to mimick 
 # arr = np.array([orth_poly(ew[0], i, mu_0, a, b)**2 for i in range(n)])
 
-  # n = 50 
-  # c = np.random.uniform(size=n, low=0, high=1)
-  # A = toeplitz(c)
-  # v0 = np.random.uniform(size=A.shape[1])
-  # a, b = lanczos(A, deg=n)
-  # a, b = a, np.append([0], b)
-  # quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
-  # quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
-  # assert np.isclose(quad1, quad2, atol=quad1*0.50)
+# n = 50 
+# c = np.random.uniform(size=n, low=0, high=1)
+# A = toeplitz(c)
+# v0 = np.random.uniform(size=A.shape[1])
+# a, b = lanczos(A, deg=n)
+# a, b = a, np.append([0], b)
+# quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
+# quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
+# assert np.isclose(quad1, quad2, atol=quad1*0.50)

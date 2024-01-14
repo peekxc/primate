@@ -103,7 +103,7 @@ def lanczos(
 
 	## Format the output(s)
 	if sparse_mat:
-		T = spdiags(data=[beta, alpha, np.roll(beta, 1)], diags=(-1, 0, +1), m=deg, n=deg)
+		T = spdiags(data=[np.roll(beta, -1), alpha, beta], diags=(-1, 0, +1), m=deg, n=deg)
 		return T if not return_basis else (T, Q)
 	else:
 		a, b = alpha[:deg], beta[1:deg]

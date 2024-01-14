@@ -134,6 +134,8 @@ auto hutch(
   const F atol, const F rtol, 
   const int num_threads,
   const bool use_CLT, 
+  const F* t_scores, 
+  const F z, 
   F* estimates, 
   size_t& wall_time
 ) -> F {  
@@ -160,8 +162,8 @@ auto hutch(
     F mu_est = 0.0, vr_est = 0.0; 
     F mu_pre = 0.0, vr_pre = 0.0; 
     int n_samples = 0; // number of estimates computed
-    const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
-    const auto early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n_samples, z, atol, rtol](int i) -> bool {
+    // const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
+    const auto early_stop = [&estimates, &mu_est, &vr_est, &mu_pre, &vr_pre, &n_samples, &t_scores, z, atol, rtol](int i) -> bool {
       if (std::isnan(estimates[i])){ return false; }
       ++n_samples; 
       const F denom = (1.0 / F(n_samples));
@@ -175,7 +177,8 @@ auto hutch(
         return false; 
       } else {
         const auto sd_est = std::sqrt(vr_est);
-        const auto margin_of_error = z * sd_est / std::sqrt(F(n_samples)); // todo: remove sqrt's 
+        const auto score = n_samples < 30 ? t_scores[n_samples] : z;
+        const auto margin_of_error = score * sd_est / std::sqrt(F(n_samples)); // todo: remove sqrt's 
         // std::cout << "n: " << n << ", mu: " << mu_est << ", ci: [" << mu_est - margin_of_error << ", " << mu_est + margin_of_error << "]";
         // std::cout << "margin/atol: " << margin_of_error << ", " << atol << "\n";
         return margin_of_error <= atol || std::abs(sd_est / mu_est) <= rtol;

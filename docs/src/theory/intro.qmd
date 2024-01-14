@@ -281,7 +281,7 @@ The second line prints the runtime information about the samples, such as the fi
 Another way to get an idea of summarize the convergence behavior of the estimator is to pass the `plot=True` option. Here, we pass the same `seed` for reproducibility with the above call. 
 
 ```{python}
-est = hutch(A, fun="log", maxiter=100, seed=5, plot=True)
+est = hutch(A, fun="numrank", maxiter=150, seed=8, plot=True)
 ```
 
 Similar information as reported by the `verbose=True` flag is shown cumulatively applied to every sample. The left plot shows the sample point estimates alongside yellow bands denoting the margin of error associated with the 95% confidence interval (CI) at every sample index. The right plot show convergence information, e.g. the running coefficient of variation is shown on the top-right and an upper bound on the absolute error is derived from the CI is shown on the bottom right. 

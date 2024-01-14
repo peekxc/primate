@@ -352,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p><code>primate</code> supports a variety of matrix-types of the box, including numpy <code>ndarray</code>’s, compressed <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> (a lá SciPy), and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperators</a>.</p>
-<p>More generally, the basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method are:</p>
+<p>The basic requirements for any operator <code>A</code> to be used with e.g.&nbsp;the <code>Lanczos</code> method are:</p>
 <ol type="1">
 <li>A method <code>A.matvec(input: ndarray) -&gt; ndarray</code> implementing <span class="math inline">v \mapsto Av</span></li>
 <li>An attribute <code>A.shape -&gt; tuple[int, int]</code> giving the output/input dimensions of <span class="math inline">A</span></li>

@@ -27,12 +27,25 @@ def test_functional():
   # timeit.timeit(lambda: numrank(A, est="xtrace"), number = 30)
   # timeit.timeit(lambda: np.linalg.matrix_rank(A), number=30)
   # print(f"Intended rank: {np.sum(u != 0.0)}")
-  # print(f"Sum >= t:      {sum(ew >= min_ew_est*0.95)}")
   # print(f"Actual rank:   {np.linalg.matrix_rank(A)}")
 
-def test_rank_time():
+def test_rank_toeplitz():
   from primate.operator import Toeplitz
   from primate.functional import numrank
   ind = np.arange(100)
   T = Toeplitz(ind)
-  assert numrank(T) == 100
+  assert numrank(T, psd=False) == 100
+
+
+# ## Profiling 
+# import line_profiler
+# prof = line_profiler.LineProfiler()
+# prof.add_function(numrank)
+# prof.enable_by_count()
+# numrank(A)
+# prof.print_stats(output_unit=0.001)
+
+# from primate.trace import hutch
+# import timeit
+# timeit.timeit(lambda: hutch(T, maxiter=100*10, fun="numrank", threshold=1e-8, atol=0.01, info=True, stop="change"), number = 10)
+# timeit.timeit(lambda: numrank(T), number=10)

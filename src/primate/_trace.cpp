@@ -26,6 +26,8 @@ void _trace_wrapper(py::module& m){
     const F atol, const F rtol, 
     const int num_threads, 
     const bool use_clt, 
+    const py_array< F >& t_scores, 
+    const F z, 
     const py::kwargs& kwargs
   ) -> py::dict {
     if (!kwargs.contains("function")){
@@ -40,14 +42,16 @@ void _trace_wrapper(py::module& m){
     auto mu_est = F(0.0);
     auto wall_time = size_t(0);
 
+    // t.ppf(0.975, df=np.arange(30)+1)
+    // const auto z = std::sqrt(2.0) * erf_inv< 3 >(double(0.95));
     if (matrix_func == "None"){
-      mu_est = hutch< F >(op, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data(), wall_time);
+      mu_est = hutch< F >(op, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, t_scores.data(), z, estimates.data(), wall_time);
     } else {
       if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
       if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
       const auto sf = param_spectral_func< F >(kwargs);
       const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv, static_cast< weight_method >(method));
-      mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, estimates.data(), wall_time);
+      mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, t_scores.data(), z, estimates.data(), wall_time);
     }
     return py::dict(
       "estimate"_a=mu_est, 

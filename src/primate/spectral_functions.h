@@ -36,10 +36,13 @@ auto param_spectral_func(const py::kwargs& kwargs) -> std::function< F(F) >{
     } else if (matrix_func == "smoothstep"){
       F a = kwargs_map.contains("a") ? kwargs_map["a"].cast< F >() : 0.0;
       F b = kwargs_map.contains("b") ? kwargs_map["b"].cast< F >() : 1.0;
+      // const bool pos_only = kwargs_map.contains("pos") ? kwargs_map["pos"].cast< bool >() : false;
       const F d = (b-a);
       f = [a, d](F eigenvalue) -> F { 
-        return std::min(std::max((eigenvalue-a)/d, F(0.0)), F(1.0)); 
-      }; 
+        F y = std::clamp(std::abs(F((eigenvalue-a)/d)), F(0.0), F(1.0));
+        y = 3.0 * std::pow(y, 2) - 2.0 * std::pow(y, 3);
+        return y;
+      };
     } else if (matrix_func == "gaussian"){
       F mu = kwargs_map.contains("mu") ? kwargs_map["mu"].cast< F >() : 0.0;
       F sigma = kwargs_map.contains("sigma") ? kwargs_map["sigma"].cast< F >() : 1.0;

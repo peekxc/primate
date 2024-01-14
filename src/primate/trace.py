@@ -3,6 +3,8 @@ from numbers import Integral
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 from scipy.linalg import solve_triangular
+from scipy.stats import t
+from scipy.special import erfinv
 from numbers import Real
 
 ## Package imports
@@ -11,6 +13,11 @@ from .special import _builtin_matrix_functions
 from .operator import matrix_function
 import _lanczos
 import _trace
+
+_default_tvals = t.ppf((0.95 + 1.0) / 2.0, df=np.arange(30)+1)
+
+# from collections import namedtuple
+# HutchParams = namedtuple('HutchParams', ['a', 'b'])
 
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
@@ -113,8 +120,10 @@ def hutch(
 	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
 	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
 	
-	# from collections import namedtuple
-	# HutchParams = namedtuple('HutchParams', ['a', 'b'])
+	## Catch degenerate cases 
+	assert hasattr(A, "shape"), "Operator 'A' must have a valid 'shape' attribute!"
+	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
+		return 0
 
 	## Choose the random number engine
 	assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
@@ -173,14 +182,16 @@ def hutch(
 		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
 
 	## Collect the arguments processed so far
-	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt)
+	assert 0 < confidence and confidence < 1, "Confidence must be in (0, 1)"
+	t_values = _default_tvals if confidence == 0.95 else t.ppf((confidence + 1.0) / 2.0, df=np.arange(30)+1)
+	z = np.sqrt(2) * erfinv(confidence)
+	hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt, t_values, z)
 
 	## Make the actual call
 	info_dict = _trace.hutch(A, *hutch_args, **kwargs)
 	
 	## Print the status if requested
 	if verbose: 
-		from scipy.special import erfinv
 		msg = f"Girard-Hutchinson estimator (fun={kwargs['function']}, deg={deg}, quad={quad})\n"
 		valid_samples = info_dict['samples'] != 0
 		n_valid = sum(valid_samples)
