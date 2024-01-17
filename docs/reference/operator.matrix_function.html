@@ -309,8 +309,9 @@ ul.task-list li input[type="checkbox"] {
 <h1>operator.matrix_function</h1>
 <p><code>operator.matrix_function(A, fun='identity', deg=20, rtol=None, orth=0, **kwargs)</code></p>
 <p>Constructs a <code>LinearOperator</code> approximating the action of the matrix function <code>fun(A)</code>.</p>
-<p>This function uses the Lanczos method to approximate the action of matrix function: <span class="math display"> v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T </span> The resulting operator may be used in conjunction with other estimation methods, such as <code>hutch</code> or <code>xtrace</code>.</p>
-<p>The weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the <code>quad</code> parameter). For a description of the other parameters, see the Lanczos function.</p>
+<p>This function uses the Lanczos method to approximate the action of matrix function: <span class="math display"> v \mapsto f(A)v, \quad f(A) = U f(\lambda) U^T </span> The resulting operator may be used in conjunction with other methods, such as <code>hutch</code> or <code>xtrace</code>.</p>
+<p>The resulting operator also supports fast evaluation of <span class="math inline">f(A)</span>’s quadratic form: <span class="math display"> v \mapsto v^T f(A) v </span> The weights of the quadrature may be computed using either the Golub-Welsch (GW) or Forward Three Term Recurrence algorithms (FTTR) (see the <code>method</code> parameter).</p>
+<p>For a description of all other parameters, see the Lanczos function.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">

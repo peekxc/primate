@@ -9,7 +9,7 @@ from .trace import hutch, xtrace
 from .operator import matrix_function
 from .diagonalize import lanczos
 
-## Since Python has no support for sized generators 
+## Since Python has no support for inline creation of sized generators 
 class RelativeErrorBound():
   def __init__(self, n: int):
     self.base_num = 2.575 * np.log(n)
@@ -33,11 +33,21 @@ def numrank(
   
   Parameters
   ----------
-
+  A : LinearOperator or sparray or ndarray 
+      The operator or matrix to estimate the numerical rank of. 
   est : str 
       The trace estimator to use.  
   gap : str or float 
+      Lower bound on the magnitude of the smallest non-zero eigenvalue, or the 'spectral gap'. 
+  gap_rtol : float 
+      Relative 
+  psd : bool 
+      Whether `A` is a assumed positive semi-definite. 
 
+  Returns
+  -------
+  : 
+      Stochastic estimate of the numerical rank. 
   """
   ## Use lanczos to get basic estimation of largest and smallest positive eigenvalues
   ## Relative error bounds based on: the Largest Eigenvalue by the Power and Lanczos Algorithms with a Random Starts
@@ -54,7 +64,7 @@ def numrank(
     else: 
       ## This does binary search like searchsorted but uses O(1) memory
       re_bnd = RelativeErrorBound(n)
-      deg_bound = max(bisect.bisect_left(re_bnd, -0.01) + 1, deg)
+      deg_bound = max(bisect.bisect_left(re_bnd, -0.001) + 1, deg)
     
     ## Use PSD-specific theory to estimate spectral gap 
     a,b = lanczos(A, deg=deg_bound)

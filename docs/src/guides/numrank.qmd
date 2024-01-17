@@ -154,8 +154,7 @@ numrank(A, est="hutch")
 ```
 
 `numrank` 
-Rather than designing your own  does. 
-`primate` contains a variety of 
+<!-- Rather than designing your own  does. `primate` contains a variety of  -->
 
 ## Polynomial trace approximation 
 
