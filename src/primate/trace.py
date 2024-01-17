@@ -1,4 +1,4 @@
-from typing import Union, Callable
+from typing import Union, Callable, Any
 from numbers import Integral
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
@@ -13,11 +13,36 @@ from .special import _builtin_matrix_functions
 from .operator import matrix_function
 import _lanczos
 import _trace
+import _orthogonalize
 
 _default_tvals = t.ppf((0.95 + 1.0) / 2.0, df=np.arange(30)+1)
 
 # from collections import namedtuple
 # HutchParams = namedtuple('HutchParams', ['a', 'b'])
+
+def _operator_checks(A: Any) -> None:
+	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
+	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
+	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
+	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
+	assert hasattr(A, "shape"), "Operator 'A' must have a valid 'shape' attribute!"
+
+def _estimator_msg(info) -> str:
+	msg = f"{info['estimator']} estimator"
+	msg += f" (fun={info.get('function', None)}"
+	if info.get('lanczos_kwargs', None) is not None:
+		msg += f", deg={info['lanczos_kwargs'].get('deg', 20)}"
+	if info.get('quad', None) is not None:
+		msg += f", quad={info['quad']}"
+	msg += ")\n"
+	msg += f"Est: {info['estimate']:.3f}"
+	if 'margin_of_error' in info:
+		moe, conf, cv = (info[k] for k in ['margin_of_error', 'confidence', 'coeff_var'])
+		msg += f" +/- {moe:.3f} ({conf*100:.0f}% CI | {(cv*100):.0f}% CV)" 
+	msg += f", (#S:{ info['n_samples'] } | #MV:{ info['n_matvecs']}) [{info['pdf'][0].upper()}]"
+	if info.get('seed', -1) != -1: 
+		msg += f" (seed: {info['seed']})"
+	return msg 
 
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
@@ -51,7 +76,7 @@ def hutch(
 	:::{.callout-note}	
 	Convergence behavior is controlled by the `stop` parameter: "confidence" uses the central limit theorem to generate confidence 
 	intervals on the fly, which may be used in conjunction with `atol` and `rtol` to upper-bound the error of the approximation. 
-	Alternatively, when `stop` = "change", the estimator is considered converged when the error between the last two iterates is less than 
+	Alternatively, when `stop` = 'change', the estimator is considered converged when the error between the last two iterates is less than 
 	`atol` (or `rtol`, respectively), similar to the behavior of scipy.integrate.quadrature.
 	:::
 
@@ -101,10 +126,11 @@ def hutch(
 
 	Notes
 	-----
-	To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former (GW) uses implicit symmetric QR steps with Wilkinson shifts, 
-	while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
-	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
-	If `deg` is large, `fttr` is preferred. 
+	To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former uses implicit symmetric QR 
+	steps with Wilkinson shifts, while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require 
+	$O(\\mathrm{deg}^2)$ time to execute, the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses 
+	only $O(1)$ space at the cost of stability. If `deg` is large, `fttr` is preferred is performance, though pilot testing should be 
+	done to ensure that instability does not cause bias in the approximation. 
 
 	See Also
 	--------
@@ -115,13 +141,10 @@ def hutch(
 	1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
 	2. Hutchinson, Michael F. "A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines." Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.
 	"""
-	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
-	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
-	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
-	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
-	
+	## Quick + basic input validation checks
+	_operator_checks(A)
+
 	## Catch degenerate cases 
-	assert hasattr(A, "shape"), "Operator 'A' must have a valid 'shape' attribute!"
 	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
 		return 0
 
@@ -190,33 +213,19 @@ def hutch(
 	## Make the actual call
 	info_dict = _trace.hutch(A, *hutch_args, **kwargs)
 	
-	## Print the status if requested
-	if verbose: 
-		msg = f"Girard-Hutchinson estimator (fun={kwargs['function']}, deg={deg}, quad={quad})\n"
-		valid_samples = info_dict['samples'] != 0
-		n_valid = sum(valid_samples)
-		std_error = np.std(info_dict['samples'][valid_samples], ddof=1) / np.sqrt(n_valid)
-		z = np.sqrt(2.0) * erfinv(confidence)
-		cv = np.abs(std_error / info_dict['estimate'])
-		msg += f"Est: {info_dict['estimate']:.3f} +/- {z * std_error:.2f} ({confidence*100:.0f}% CI), CV: {(cv*100):.0f}%, " 
-		msg += f"Evals: { n_valid } [{pdf[0].upper()}]"
-		if seed != -1: 
-			msg += f" (seed: {seed})"
-		print(msg)
-
-	## If only the point-estimate is required, return it
-	if not info and not plot: 
+	## Return as early as possible if no additional info requested for speed 
+	if not verbose and not info and not plot:
 		return info_dict["estimate"]
-	
-	## Otherwise build the info
-	if plot:
-		from bokeh.plotting import show
-		from .plotting import figure_trace
-		p = figure_trace(info_dict["samples"])
-		show(p)
-		info_dict['figure'] = figure_trace(info_dict["samples"])
-	
-	## Build the info dictionary 
+
+	## Post-process info dict 
+	info_dict['estimator'] = "Girard-Hutchinson"
+	info_dict['valid'] = info_dict['samples'] != 0
+	info_dict['n_samples'] = np.sum(info_dict['valid'])
+	info_dict['n_matvecs'] = info_dict['n_samples'] * deg
+	info_dict['std_error'] = np.std(info_dict['samples'][info_dict['valid']], ddof=1) / np.sqrt(info_dict['n_samples'])
+	info_dict['coeff_var'] = np.abs(info_dict['std_error'] / info_dict['estimate'])
+	info_dict['margin_of_error'] = (t_values[info_dict['n_samples']] if info_dict['n_samples'] < 30 else z) * info_dict['std_error']
+	info_dict['confidence'] = confidence
 	info_dict["stop"] = stop
 	info_dict["pdf"] = pdf
 	info_dict["rng"] = _engines[engine_id]
@@ -228,94 +237,95 @@ def hutch(
 	info_dict["atol"] = atol
 	info_dict["num_threads"] = "auto" if num_threads == 0 else num_threads
 	info_dict["maxiter"] = nv
-	info_dict["confidence"] = confidence
-	return info_dict["estimate"], info_dict
+
+	## Print the status if requested
+	if verbose: 
+		print(_estimator_msg(info_dict))
+
+	## Plot samples if requested
+	if plot:
+		from bokeh.plotting import show
+		from .plotting import figure_trace
+		p = figure_trace(info_dict["samples"])
+		show(p)
+		info_dict['figure'] = figure_trace(info_dict["samples"])
+
+	## Final return 
+	return (info_dict["estimate"], info_dict) if info else info_dict["estimate"]
 
 
-# TODO: implement hutch++
-# def hutchpp():
-
-def sl_gauss(
+def hutchpp(
 	A: Union[LinearOperator, np.ndarray],
-	n: int = 150,
-	deg: int = 20,
-	pdf: str = "rademacher",
-	rng: str = "pcg",
-	seed: int = -1,
-	orth: int = 0,
-	num_threads: int = 0,
-) -> np.ndarray:
-	"""Stochastic Gaussian quadrature approximation.
+	fun: Union[str, Callable] = None, 
+	b: int = "auto",
+	maxiter: int = 200, 
+	mode: str = 'reduced', 
+	**kwargs
+) -> Union[float, dict]:
+	_operator_checks(A)
 
-	Computes a set of sample nodes and weights for the degree-k orthogonal polynomial approximating the 
-	cumulative spectral measure of `A`. This function can be used to approximate the spectral density of `A`, 
-	or to approximate the spectral sum of any function applied to the spectrum of `A`.
+	## Catch degenerate cases 
+	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
+		return 0
 
-	Parameters
-	----------
-	A : ndarray, sparray, or LinearOperator
-	    real symmetric operator.
-	n : int, default=150
-	    Number of random vectors to sample for the quadrature estimate.
-	deg  : int, default=20
-	    Degree of the quadrature approximation.
-	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'lcg64', 'mt64' }, default="pcg64"
-	    Random number generator to use (PCG64 by default).
-	seed : int, default=-1
-	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
-	pdf : { 'rademacher', 'normal' }, default="rademacher"
-	    Choice of zero-centered distribution to sample random vectors from.
-	orth: int, default=0
-		Number of additional Lanczos vectors to orthogonalize against when building the Krylov basis.
-	num_threads: int, default=0
-	    Number of threads to use to parallelize the computation. Setting `num_threads` < 1 to let OpenMP decide.
-
-	Returns
-	-------
-	trace_estimate : float
-	    Estimate of the trace of the matrix function $f(A)$.
-	info : dict, optional
-	    If 'info = True', additional information about the computation.
-
-	"""
-	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
-	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
-	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
-	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
-
-	## Choose the random number engine
-	assert rng in _engine_prefixes or rng in _engines, f"Invalid pseudo random number engine supplied '{str(rng)}'"
-	engine_id = _engine_prefixes.index(rng) if rng in _engine_prefixes else _engines.index(rng)
-
-	## Choose the distribution to sample random vectors from
-	assert pdf in ["rademacher", "normal"], f"Invalid distribution '{pdf}'; Must be one of 'rademacher' or 'normal'."
-	distr_id = ["rademacher", "normal"].index(pdf)
-
-	## Get the dtype; infer it if it's not available
+	## Setup constants 
+	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
+	N: int = A.shape[0]
+	b = (N // 3) if b == "auto" else b
+	m = (N // 3) if maxiter == "auto" else maxiter
+	assert m % 3 == 0, "Number of sample vectors 'm' must be divisible by 3."
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
-	assert (
-		f_dtype.type == np.float32 or f_dtype.type == np.float64
-	), "Only 32- or 64-bit floating point numbers are supported."
+	info_dict = {}
 
-	## Extract the machine precision for the given floating point type
-	lanczos_rtol = np.finfo(f_dtype).eps  # if lanczos_rtol is None else f_dtype.type(lanczos_rtol)
+	## Raw isotropic random vectors 
+	# W = np.random.choice([-1.0, +1.0], size=(N, M)).astype(f_dtype)
+	# W1, W2 = W[:,:(m // 3)], W[:,(m // 3):]
+	WB = np.random.choice([-1.0, +1.0], size=(N, b)).astype(f_dtype)
 
-	## Argument checking
-	m = A.shape[1]  # Dimension of the space
-	nv = int(n)  # Number of random vectors to generate
-	seed = int(seed)  # Seed should be an integer
-	deg = max(deg, 2)  # Must be at least 2
-	orth = m - 1 if orth < 0 else min(m - 1, orth)  # Number of additional vectors should be an integer
-	ncv = max(int(deg + orth), m)  # Number of Lanczos vectors to keep in memory
-	num_threads = int(num_threads)  # should be integer; if <= 0 will trigger max threads on C++ side
+	## Sketch Y - use numpy for now, but consider parallelizing MGS later
+	Q = np.linalg.qr(A @ WB)[0]
+	# Y = np.array(A @ W2, order='F')
+	# assert Y.flags['F_CONTIGUOUS'] and Y.flags['OWNDATA'] and Y.flags['WRITEABLE']
+	# _orthogonalize.mgs(Y, 0)
+	# Q = Y # Q is mostly orthonormal
 
-	## Collect the arguments processed so far
-	sl_quad_args = (nv, distr_id, engine_id, seed, deg, lanczos_rtol, orth, ncv, num_threads)
+	## Estimate trace of the low-rank approx. / sketch
+	bulk_tr = 0.0
+	if mode == 'full': 
+		bulk_tr = (Q.T @ (A @ Q)).trace()
+	else:
+		bulk_tr = np.sum(_trace.quad_sum(A, Q))
 
-	## Make the actual call
-	quad_nw = _lanczos.stochastic_quadrature(A, *sl_quad_args)
-	return quad_nw
+	## Estimate trace of the residual 
+	residual_tr = 0.0
+	if mode == 'full': 
+		WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
+		G = WM - Q @ (Q.T @ WM)
+		residual_tr += (1 / m) * (G.T @ (A @ G)).trace()
+	else:
+		from primate.operator import OrthComplement
+		PC = OrthComplement(A, Q) # evaluates (I - Q^T Q)A(I - Q^T Q)
+		kwargs['maxiter'] = kwargs.get('maxiter', m)
+		if not info and not verbose:
+			residual_tr = hutch(PC, **kwargs)
+			return bulk_tr + residual_tr
+		else: 
+			kwargs['info'] = True
+			kwargs['verbose'] = False
+			residual_tr, ID = hutch(PC, **kwargs)
+			info_dict.update(ID)
+		
+	## Modify the info dict
+	info_dict['estimate'] = bulk_tr + residual_tr
+	info_dict['estimator'] = 'Hutch++'
+	info_dict['n_matvecs'] = 2*b + info_dict['n_samples'] 
+	info_dict['n_samples'] = b + info_dict['n_samples']
+	info_dict['pdf'] = 'rademacher'	
 
+	## Print as needed 
+	if verbose:
+		print(_estimator_msg(info_dict))
+	return info_dict['estimate'] if not info else (info_dict['estimate'], info_dict)
 
 def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method: str):
 	"""Helper for xtrace function"""

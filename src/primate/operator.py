@@ -115,3 +115,19 @@ class Toeplitz(LinearOperator):
 		x_fft = np.fft.fft(self._z)
 		y = np.real(np.fft.ifft(self._dfft * x_fft))
 		return y[:len(x)]
+
+
+## For use with e.g. Hutch++ 
+class OrthComplement(LinearOperator):
+	def __init__(self, A: Union[LinearOperator, np.ndarray], Q: np.ndarray):
+		self.A = A 
+		self.Q = Q 
+		self.shape = A.shape
+		self.dtype = self.Q.dtype
+	
+	def _deflate(self, w: np.ndarray) -> np.ndarray:
+		return w - self.Q @ (self.Q.T @ w)
+
+	def _matvec(self, x: np.ndarray) -> np.ndarray:
+		y = self._deflate(x)
+		return self._deflate(self.A @ y)
