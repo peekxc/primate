@@ -44,11 +44,15 @@ test-requires = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"] # coverage
 test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
 build-verbosity = 1
 skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
-manylinux-x86_64-image = "manylinux_2_28" # prefer the newer one
+# manylinux-x86_64-image = "manylinux_2_28" # prefer the newer one
+manylinux-x86_64-image = "manylinux2014"
+
 
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/tools/cibw_linux.sh {project}"
-environment = { CC="clang", CXX="clang++" }
+environment = { CC="gcc", CXX="g++" } # for manylinux2014
+# environment = { CC="clang", CXX="clang++" } # for manylinux_2_28
+
 # before-build = ["ulimit -n 4096", "yum install -y clang", "yum install -y openblas"]
 
 [tool.cibuildwheel.macos]
