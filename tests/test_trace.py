@@ -195,12 +195,20 @@ def test_quad_sum():
 	assert np.allclose(test_quads, true_quads)
 	assert np.isclose(np.sum(test_quads), np.sum(true_quads))
 
-# def test_hutch_pp():
-# 	from primate.trace import hutchpp
-# 	np.random.seed(1234)
-# 	n = 100
-# 	A = symmetric(n)
-# 	hutchpp(A, mode="reduced", verbose=True)
+def test_hutch_pp():
+	from primate.trace import hutchpp
+	np.random.seed(1234)
+	n = 100
+	A = symmetric(n)
+	test_trace = hutchpp(A, mode="reduced", seed=1)
+	true_trace = A.trace()
+	assert np.isclose(test_trace, true_trace, atol=1.0)
+	test_trace = hutchpp(A, mode="full", seed=1)
+	assert np.isclose(test_trace, true_trace, atol=1.0)
+
+	# import timeit
+	# timeit.timeit(lambda: hutchpp(A, mode="full"), number=1000)
+	# timeit.timeit(lambda: hutchpp(A, mode="reduced"), number=1000)
 
 	# ## Raw isotropic random vectors 
 	# m = 20 * 3

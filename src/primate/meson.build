@@ -27,6 +27,7 @@ python_sources = [
   'stats.py',
   'special.py',
   'functional.py',
+  'quadrature.py',
   '__init__.py'
 ]
 

@@ -10,7 +10,7 @@ from numbers import Real
 ## Package imports
 from .random import _engine_prefixes, _engines, isotropic
 from .special import _builtin_matrix_functions
-from .operator import matrix_function
+from .operator import matrix_function, OrthComplement
 import _lanczos
 import _trace
 import _orthogonalize
@@ -262,6 +262,8 @@ def hutchpp(
 	mode: str = 'reduced', 
 	**kwargs
 ) -> Union[float, dict]:
+	"""Hutch++ estimator. 
+	"""
 	_operator_checks(A)
 
 	## Catch degenerate cases 
@@ -271,18 +273,14 @@ def hutchpp(
 	## Setup constants 
 	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
 	N: int = A.shape[0]
-	b = (N // 3) if b == "auto" else b
-	m = (N // 3) if maxiter == "auto" else maxiter
-	assert m % 3 == 0, "Number of sample vectors 'm' must be divisible by 3."
+	b = (N // 3) if b == "auto" else b							# main samples
+	m = (N // 3) if maxiter == "auto" else maxiter 	# residual samples 
+	# assert m % 3 == 0, "Number of sample vectors 'm' must be divisible by 3."
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
 	info_dict = {}
 
-	## Raw isotropic random vectors 
-	# W = np.random.choice([-1.0, +1.0], size=(N, M)).astype(f_dtype)
-	# W1, W2 = W[:,:(m // 3)], W[:,(m // 3):]
+	## Sketch Y / Q - use numpy for now, but consider parallelizing MGS later
 	WB = np.random.choice([-1.0, +1.0], size=(N, b)).astype(f_dtype)
-
-	## Sketch Y - use numpy for now, but consider parallelizing MGS later
 	Q = np.linalg.qr(A @ WB)[0]
 	# Y = np.array(A @ W2, order='F')
 	# assert Y.flags['F_CONTIGUOUS'] and Y.flags['OWNDATA'] and Y.flags['WRITEABLE']
@@ -299,11 +297,14 @@ def hutchpp(
 	## Estimate trace of the residual 
 	residual_tr = 0.0
 	if mode == 'full': 
+		## Full mode == form the full (m x m) matrix and take the diagonal 
+		## Note memory efficient, but is vectorized, so suitable for relatively small m
 		WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
 		G = WM - Q @ (Q.T @ WM)
 		residual_tr += (1 / m) * (G.T @ (A @ G)).trace()
 	else:
-		from primate.operator import OrthComplement
+		## reduced mode == Switch to plain Hutch estimator on orthogonal complement projector
+		## Low memory footprint but might be 5x slower or worse on small inputs
 		PC = OrthComplement(A, Q) # evaluates (I - Q^T Q)A(I - Q^T Q)
 		kwargs['maxiter'] = kwargs.get('maxiter', m)
 		if not info and not verbose:
@@ -318,8 +319,8 @@ def hutchpp(
 	## Modify the info dict
 	info_dict['estimate'] = bulk_tr + residual_tr
 	info_dict['estimator'] = 'Hutch++'
-	info_dict['n_matvecs'] = 2*b + info_dict['n_samples'] 
-	info_dict['n_samples'] = b + info_dict['n_samples']
+	info_dict['n_matvecs'] = 2*b + info_dict.get('n_samples', m)
+	info_dict['n_samples'] = b + info_dict.get('n_samples', m)
 	info_dict['pdf'] = 'rademacher'	
 
 	## Print as needed 

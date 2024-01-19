@@ -1,10 +1,12 @@
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
+# image: quay.io/pypa/manylinux_2_24_x86_64 # debian 
 
 linux_task:
   container:
-    image: quay.io/pypa/manylinux_2_28_x86_64
+    # image: quay.io/pypa/manylinux_2_28_x86_64
+    image: quay.io/pypa/manylinux2014_x86_64
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
     CC: clang 
