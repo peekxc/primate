@@ -14,10 +14,12 @@ using namespace pybind11::literals;
 template< typename F >
 using py_array = py::array_t< F, py::array::f_style | py::array::forcecast >;
 
+
 // Template function for generating module definitions for a given Operator / precision 
 template< bool multithreaded, std::floating_point F, class Matrix, LinearOperator Wrapper >
 void _trace_wrapper(py::module& m){
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
+  using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
 
   m.def("hutch", [](
     const Matrix& A, 
@@ -59,6 +61,21 @@ void _trace_wrapper(py::module& m){
       "total_time_us"_a = wall_time, 
       "matvec_time_us"_a = op.matvec_time
     );
+  });
+
+  // Computes the trace of Q.T @ (A @ Q) including the inner terms q_i^T A q_i 
+  m.def("quad_sum", [](const Matrix& A, DenseMatrix< F > Q) -> py_array< F > {
+    const auto op = Wrapper(A);
+    F quad_sum = 0.0; 
+    const size_t N = static_cast< size_t >(Q.cols());
+    auto estimates = static_cast< ArrayF >(ArrayF::Zero(N));
+    auto y = static_cast< VectorF >(VectorF::Zero(Q.rows()));
+    for (size_t j = 0; j < N; ++j){
+      op.matvec(Q.col(j).data(), y.data());
+      estimates[j] = Q.col(j).adjoint().dot(y);
+      quad_sum += estimates[j];
+    }
+    return py::cast(estimates);
   });
 }
 

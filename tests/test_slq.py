@@ -15,7 +15,7 @@ def test_stochastic_quadrature():
   from primate.diagonalize import _lanczos
   assert hasattr(_lanczos, "stochastic_quadrature"), "Module compile failed"
   
-  from primate.trace import sl_gauss
+  from primate.quadrature import sl_gauss
   np.random.seed(1234)
   n, nv, lanczos_deg = 30, 250, 20
   A = csc_array(symmetric(30), dtype=np.float32)

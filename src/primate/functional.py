@@ -10,6 +10,7 @@ from .operator import matrix_function
 from .diagonalize import lanczos
 
 ## Since Python has no support for inline creation of sized generators 
+## Based on "Estimating the Largest Eigenvalue by the Power and Lanczos Algorithms with a Random Start"
 class RelativeErrorBound():
   def __init__(self, n: int):
     self.base_num = 2.575 * np.log(n)
