@@ -1,17 +1,20 @@
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
-# image: quay.io/pypa/manylinux_2_24_x86_64 # debian 
-
+# quay.io/pypa/manylinux2014_x86_64  # CentOS 7  (use GCC 10)
+# quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
+# quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
 linux_task:
   container:
     # image: quay.io/pypa/manylinux_2_28_x86_64
     image: quay.io/pypa/manylinux2014_x86_64
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
-    CC: clang 
-    CXX: clang++
-    PATH: ${PATH}:/opt/python/cp310-cp310/bin
+    # CC: clang 
+    # CXX: clang++
+    CC: gcc 
+    CXX: g++
+    PATH: /opt/python/cp310-cp310/bin:${PATH}
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
