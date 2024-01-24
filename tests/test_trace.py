@@ -46,6 +46,17 @@ def test_trace_basic():
 	assert tr_test1 == tr_test2, "Builds not reproducible!"
 	assert np.isclose(tr_test1, tr_true, atol=tr_true*0.05)
 
+def test_trace_identity():
+	from primate.trace import hutch
+	np.random.seed(1234)
+	n = 10 
+	A = np.eye(n)
+	from primate.operator import matrix_function
+	M = matrix_function(A, fun=lambda x: x)
+	assert np.isclose(hutch(M), 10)
+
+	hutch(A, fun="identity", info=True)
+
 def test_trace_pdfs():
 	from primate.trace import hutch
 	np.random.seed(1234)

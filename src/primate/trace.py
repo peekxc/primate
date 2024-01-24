@@ -257,7 +257,7 @@ def hutch(
 def hutchpp(
 	A: Union[LinearOperator, np.ndarray],
 	fun: Union[str, Callable] = None, 
-	b: int = "auto",
+	nb: int = "auto",
 	maxiter: int = 200, 
 	mode: str = 'reduced', 
 	**kwargs
@@ -281,14 +281,14 @@ def hutchpp(
 	## Setup constants 
 	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
 	N: int = A.shape[0]
-	b = (N // 3) if b == "auto" else b							# main samples
+	nb = (N // 3) if nb == "auto" else nb							# main samples
 	m = (N // 3) if maxiter == "auto" else maxiter 	# residual samples 
 	# assert m % 3 == 0, "Number of sample vectors 'm' must be divisible by 3."
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
 	info_dict = {}
 
 	## Sketch Y / Q - use numpy for now, but consider parallelizing MGS later
-	WB = np.random.choice([-1.0, +1.0], size=(N, b)).astype(f_dtype)
+	WB = np.random.choice([-1.0, +1.0], size=(N, nb)).astype(f_dtype)
 	Q = np.linalg.qr(A @ WB)[0]
 	# Y = np.array(A @ W2, order='F')
 	# assert Y.flags['F_CONTIGUOUS'] and Y.flags['OWNDATA'] and Y.flags['WRITEABLE']
@@ -327,8 +327,8 @@ def hutchpp(
 	## Modify the info dict
 	info_dict['estimate'] = bulk_tr + residual_tr
 	info_dict['estimator'] = 'Hutch++'
-	info_dict['n_matvecs'] = 2*b + info_dict.get('n_samples', m)
-	info_dict['n_samples'] = b + info_dict.get('n_samples', m)
+	info_dict['n_matvecs'] = 2*nb + info_dict.get('n_samples', m)
+	info_dict['n_samples'] = nb + info_dict.get('n_samples', m)
 	info_dict['pdf'] = 'rademacher'	
 
 	## Print as needed 

@@ -22,6 +22,19 @@ class RelativeErrorBound():
   def __getitem__(self, i: int):
     return -self.base_num / i**2
 
+def estimate_spectral_radius(A: Union[LinearOperator, np.ndarray], rtol: float = 0.01):
+  EPS = np.finfo(A.dtype).eps
+  n = A.shape[0]
+  if n < 150:
+    rel_error_bound = 2.575 * np.log(A.shape[0]) / np.arange(4, n)**2
+    deg_bound = max(np.searchsorted(-rel_error_bound, -rtol) + 5, 4)
+    return deg_bound
+  else: 
+    ## This does binary search like searchsorted but uses O(1) memory
+    re_bnd = RelativeErrorBound(n)
+    deg_bound = max(bisect.bisect_left(re_bnd, -rtol) + 1, 4)
+    return deg_bound
+
 def numrank(
   A: Union[LinearOperator, np.ndarray],
 	est: str = "hutch",
@@ -50,6 +63,9 @@ def numrank(
   : 
       Stochastic estimate of the numerical rank. 
   """
+  assert hasattr(A, "shape"), "Must be properly shaped operator" 
+  if np.prod(A.shape) == 0:
+    return 0
   ## Use lanczos to get basic estimation of largest and smallest positive eigenvalues
   ## Relative error bounds based on: the Largest Eigenvalue by the Power and Lanczos Algorithms with a Random Starts
   ## Spectral gap bounds based on sec. 13.2 of "The Symmetric Eigenvalue Problem" by Paige and the by 
