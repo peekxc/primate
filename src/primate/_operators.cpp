@@ -195,7 +195,6 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
       }
     })
     .def_property("transform", [](const OP_t& M){
-      [](const OP_t& M){
         return py::cpp_function(M.f);
       }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
         if (py::isinstance< py::str >(fun)) {
@@ -209,14 +208,14 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
           const auto *result = f.template target< fn_type >();
           if (!result) {
             // std::cout << "Failed to convert to function ptr! Falling back to pyfunc" << std::endl;
-            M.transform = [fun](F x) -> void { fun(x); return; };
+            M.transform = [fun](F* x) -> void { fun(x); return; };
           } else {
             // std::cout << "Native cpp function detected!" << std::endl;
             M.transform = f; 
           }
         }
       }
-    })
+    )
     ; 
 }
 

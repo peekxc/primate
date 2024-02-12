@@ -262,7 +262,7 @@ struct MatrixFunction {
     // const F v_scale = v_map.norm(); 
         
     // Apply configured transform to the input vector
-    transform(v_copy);
+    transform(v_copy.data());
     const F v_scale = v_copy.norm(); 
     v_copy.normalize();
 
