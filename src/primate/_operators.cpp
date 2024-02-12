@@ -199,8 +199,7 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
       }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
         if (py::isinstance< py::str >(fun)) {
           // kwargs["Q"] = fun; 
-          // M.f = param_spectral_func< F >(kwargs);
-
+          M.transform = param_vector_func< F >(M.shape().second, kwargs);
         } else {
           // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
           std::function< void(F*) > f = py::cast< std::function< void(F*) > >(fun);
