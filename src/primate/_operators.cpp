@@ -194,6 +194,29 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
         throw std::invalid_argument("Invalid method supplied. Must be one of 'golub_welsch' or 'fttr'.");
       }
     })
+    .def_property("transform", [](const OP_t& M){
+      [](const OP_t& M){
+        return py::cpp_function(M.f);
+      }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
+        if (py::isinstance< py::str >(fun)) {
+          // kwargs["Q"] = fun; 
+          // M.f = param_spectral_func< F >(kwargs);
+
+        } else {
+          // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
+          std::function< void(F*) > f = py::cast< std::function< void(F*) > >(fun);
+          using fn_type = void(*)(F*);
+          const auto *result = f.template target< fn_type >();
+          if (!result) {
+            // std::cout << "Failed to convert to function ptr! Falling back to pyfunc" << std::endl;
+            M.transform = [fun](F x) -> void { fun(x); return; };
+          } else {
+            // std::cout << "Native cpp function detected!" << std::endl;
+            M.transform = f; 
+          }
+        }
+      }
+    })
     ; 
 }
 

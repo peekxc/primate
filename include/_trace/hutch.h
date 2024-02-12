@@ -107,6 +107,7 @@ void monte_carlo_quad(
       F sample = 0.0;  
       if constexpr (QuadOperator< Matrix >){
         sample = M.quad(q.data()); // x^T A x
+        std::cout << "quad output: " << sample << std::endl;
       } else {
         auto y = static_cast< VectorF >(VectorF::Zero(n));
         A.matvec(q.data(), y.data()); 
@@ -153,6 +154,7 @@ auto hutch(
     monte_carlo_quad< F >(A, save_sample, early_stop, nv, static_cast< Distribution >(dist), rbg, num_threads, seed, wall_time);
     Eigen::Map< ArrayF > est(estimates, nv);
     est *= A.shape().first;
+    std::cout << "est sum: " << est.sum() << ", nv: " << nv << std::endl; 
     F mu_est = est.sum() / nv;  
     return mu_est;
   } else if (use_CLT){

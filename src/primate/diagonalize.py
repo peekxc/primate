@@ -83,7 +83,7 @@ def lanczos(
 
 	## Determine number of projections + lanczos vectors
 	orth: int = deg if orth < 0 or orth > deg else orth
-	ncv: int = np.clip(orth, 2, deg) if not (return_basis) else n
+	ncv: int = np.clip(orth, 2, deg) if not (return_basis) else deg
 
 	## Generate the starting vector if none is specified
 	if v0 is None:

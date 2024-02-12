@@ -20,7 +20,7 @@ template< bool multithreaded, std::floating_point F, class Matrix, LinearOperato
 void _trace_wrapper(py::module& m){
   using ArrayF = Eigen::Array< F, Dynamic, 1 >;
   using VectorF = Eigen::Matrix< F, Dynamic, 1 >;
-
+  
   m.def("hutch", [](
     const Matrix& A, 
     const int nv, const int dist, const int engine_id, const int seed,

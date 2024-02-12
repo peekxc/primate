@@ -166,6 +166,7 @@ struct MatrixFunction {
   F rtol; 
   int orth;
   weight_method wgt_method; 
+  std::function< void(F*) > transform;
 
   MatrixFunction(const Matrix& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv, weight_method _method = golub_welsch) 
   : op(A), f(fun), 
@@ -181,6 +182,7 @@ struct MatrixFunction {
     nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
     weights = static_cast< ArrayF >(ArrayF::Zero(deg));
     solver = EigenSolver(deg);
+    transform = [](F* v){ return; };
   };
 
   MatrixFunction(Matrix&& A, const std::function< F(F) > fun, int lanczos_degree, F lanczos_rtol, int _orth, int _ncv, weight_method _method = golub_welsch) 
@@ -196,11 +198,14 @@ struct MatrixFunction {
     nodes = static_cast< ArrayF >(ArrayF::Zero(deg));
     weights = static_cast< ArrayF >(ArrayF::Zero(deg));
     solver = EigenSolver(deg);
+    transform = [](F* v){ return; };
   };
  
   // Approximates v |-> f(A)v via a limited degree Lanczos iteration
   void matvec(const F* v, F* y) const noexcept {
     // if (op == nullptr){ return; }
+    // Apply configured transform to the input vector
+    transform(y);
 
     // By default, Q is not allocated in constructor, as quad may used less memory
     // For all calls after the first matvec(), Eigen promises this is a no-op
@@ -253,8 +258,12 @@ struct MatrixFunction {
 
     // Save copy of v + its norm 
     Eigen::Map< const VectorF > v_map(v, op.shape().second);
-    const F v_scale = v_map.norm(); 
     VectorF v_copy = v_map; // save copy; needs to be norm-1 for Lanczos + quad to work
+    // const F v_scale = v_map.norm(); 
+        
+    // Apply configured transform to the input vector
+    transform(v_copy);
+    const F v_scale = v_copy.norm(); 
     v_copy.normalize();
 
     // Execute lanczos method + Golub-Welsch algorithm

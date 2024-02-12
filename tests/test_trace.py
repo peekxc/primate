@@ -54,8 +54,7 @@ def test_trace_identity():
 	from primate.operator import matrix_function
 	M = matrix_function(A, fun=lambda x: x)
 	assert np.isclose(hutch(M), 10)
-
-	hutch(A, fun="identity", info=True)
+	hutch(A, fun="identity", info=True, maxiter=10, quad="fttr")
 
 def test_trace_pdfs():
 	from primate.trace import hutch
