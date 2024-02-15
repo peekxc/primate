@@ -121,6 +121,15 @@ auto py_quad(const Matrix& A, const py_array< F >& x) -> F {
 //     ; 
 // }
 
+template< std::floating_point F > 
+auto deflate_transform(const DenseMatrix< F >& Q) -> std::function< void(F*, const size_t)>{
+  const auto deflate = [Q](F* x, const size_t n){
+    Eigen::Map< Vector< F > > x_vec(x, n);
+    Vector< F > x_copy = x_vec; // save copy
+    x_vec = x_vec - Q * (Q.adjoint() * x_copy);
+  };
+  return deflate;
+}
 
 template< std::floating_point F, class Matrix, LinearOperator Wrapper >
 // requires std::invocable< Wrapper, const Matrix* >
@@ -132,11 +141,13 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
   using OP_t = MatrixFunction< F, Wrapper >;
   py::class_< OP_t >(m, cls_name)
     .def(py::init([](const Matrix& A, const int deg, const F rtol, const int orth, const int ncv, const py::kwargs& kwargs) {
-      const auto sf = param_spectral_func< F >(kwargs);
+      // const auto sf = param_spectral_func< F >(kwargs);
+      const Wrapper* op = new Wrapper(A); // todo: add custom destructor to delete this
+      bool is_native = true; 
+      const auto sf = param_vector_func< F >(kwargs, is_native);
       // const auto op = Wrapper(*A); // we want a new instance here!
       // std::cout << op.shape().first << ", ";
-      const Wrapper* op = new Wrapper(A); // todo: add custom destructor to delete this
-      return std::make_unique< OP_t >(OP_t(*op, sf, deg, rtol, orth, ncv));
+      return std::make_unique< OP_t >(OP_t(*op, sf, deg, rtol, orth, ncv, is_native));
     }))
     .def_property_readonly("shape", &OP_t::shape)
     .def_property_readonly("dtype", [](const OP_t& M) -> py::dtype {
@@ -144,29 +155,20 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
       return dtype; 
     })
     .def_property("fun", [](const OP_t& M){
-      return py::cpp_function(M.f);
+      return py::cpp_function([&M](py::array_t< F >& x){
+        M.f(x.mutable_data(), x.size());
+        return x; 
+      });
     }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
       if (py::isinstance< py::str >(fun)) {
         kwargs["function"] = fun; 
-        M.f = param_spectral_func< F >(kwargs);
+        M.f = param_vector_func< F >(kwargs, M.native_f);
       } else {
-        // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
-        std::function< F(F) > f = py::cast< std::function< F(F) > >(fun);
-        using fn_type = F(*)(F);
-        const auto *result = f.template target< fn_type >();
-        if (!result) {
-          // std::cout << "Failed to convert to function ptr! Falling back to pyfunc" << std::endl;
-          M.f = [fun](F x) -> F { return fun(x).template cast< F >(); };
-        } else {
-          // std::cout << "Native cpp function detected!" << std::endl;
-          M.f = f; 
-        }
-        // if (py::isinstance< py::function >(fun)){
-        // std::cout << "Python function detected!" << std::endl;
-        // M.f = [fun](F x) -> F { return fun(x).template cast< F >(); };
-        // } else {
-        //   throw std::invalid_argument("Invalid argument type; must be string or Callable");
-        // }
+        // Try to deduce scalar-valued input/output vs vector-valued
+        const py::function g = fun.cast< const py::function >();
+        auto ov = deduce_vector_func< F >(g, M.native_f);
+        if (ov){ M.f = *ov; return; }
+        throw std::invalid_argument("Invalid function type; matrix function must be vector-valued.");
       }
     })
     .def_readonly("deg", &OP_t::deg)
@@ -183,6 +185,7 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
     .def_property_readonly("_alpha", [](const OP_t& M){ return py::cast(M.alpha); })
     .def_property_readonly("_beta", [](const OP_t& M){ return py::cast(M.beta); })
     .def_property_readonly("krylov_basis", [](const OP_t& M){ return py::cast(M.Q); })
+    .def_property_readonly("native_fun", [](const OP_t& M) -> bool { return M.native_f; })
     .def_property("method", [](const OP_t& M){
       return M.wgt_method == golub_welsch ? "golub_welsch" : "fttr";
     }, [](OP_t& M, std::string method){
@@ -194,31 +197,52 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
         throw std::invalid_argument("Invalid method supplied. Must be one of 'golub_welsch' or 'fttr'.");
       }
     })
-    .def_property("transform", [](const OP_t& M){
-        return py::cpp_function(M.f);
-      }, [](OP_t& M, const py::object fun, py::kwargs& kwargs){
-        if (py::isinstance< py::str >(fun)) {
-          // kwargs["Q"] = fun; 
-          M.transform = param_vector_func< F >(M.shape().second, kwargs);
-        } else {
-          // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
-          std::function< void(F*) > f = py::cast< std::function< void(F*) > >(fun);
-          using fn_type = void(*)(F*);
-          const auto *result = f.template target< fn_type >();
-          if (!result) {
-            // std::cout << "Failed to convert to function ptr! Falling back to pyfunc" << std::endl;
-            M.transform = [fun](F* x) -> void { fun(x); return; };
-          } else {
-            // std::cout << "Native cpp function detected!" << std::endl;
-            M.transform = f; 
-          }
-        }
+    .def_property_readonly("transform", [](const OP_t& M){ 
+      // return py::cpp_function(M.transform); 
+      return py::cpp_function([&M](py::array_t< F >& x){
+        M.transform(x.mutable_data(), x.size());
+        return x; 
+      });
+    })
+    // .def("_set_transform", [](OP_t& M, const py::object fun, py::kwargs& kwargs){
+    //   if (py::isinstance< py::str >(fun)) {
+    //     // kwargs["Q"] = fun; 
+    //     M.transform = param_vector_func< F >(kwargs, M.native_f);
+    //   } else if (py::isinstance< py::function >(fun)){
+    //     // See also: https://github.com/pybind/pybind11/blob/master/tests/test_callbacks.cpp
+    //     const py::function g = fun.cast< const py::function >();
+    //     auto of = deduce_vector_func< F >(g, M.native_f);
+    //     if (of){
+    //       M.transform = std::move(*of);
+    //     }
+    //     throw std::invalid_argument("Failed to deduce transform function.");
+    //   } else {
+    //     throw std::invalid_argument("Invalid transform function specified. Must be Callable or string.");
+    //   }
+    // })
+    .def("deflate", [](OP_t& M, const DenseMatrix< F >& Q){
+      M.transform = deflate_transform(Q);
+    })
+    .def("quad_sum", [](const OP_t& M, const DenseMatrix< F >& W) -> py::tuple {
+      F quad_sum = 0.0; 
+      const size_t N = static_cast< size_t >(W.cols());
+      auto estimates = static_cast< Array< F > >(Array< F >::Zero(N));
+      auto y = static_cast< Vector< F > >(Vector< F >::Zero(W.rows()));
+
+      // TODO: make parallel
+      for (size_t j = 0; j < N; ++j){
+        M.matvec(W.col(j).data(), y.data());
+        estimates[j] = W.col(j).adjoint().dot(y);
+        quad_sum += estimates[j];
       }
-    )
+      return py::make_tuple(quad_sum, py::cast(estimates));
+    })
     ; 
 }
 
-float native_exp(float x) { return std::exp(x); }
+void native_exp(float* x, const size_t n) { 
+  std::for_each_n(x, n, [](auto& ew){ ew = std::exp(ew); });
+}
 
 PYBIND11_MODULE(_operators, m) {
   m.doc() = "operators module";

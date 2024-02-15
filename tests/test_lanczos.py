@@ -260,10 +260,31 @@ def test_rayleigh_approx():
   assert np.sum(lb_works) > 45
   # ## Confirmed it does not work, unles algebraically smallest includes negative
   # min_rr - rv[:,min_id][-1] <= np.min(np.abs(ew_true))
-
-
-
   # eigsh(A, k=1, sigma = max(rr), which = 'SM', maxiter = 15, tol = 0.001, return_eigenvectors=False)
+
+def test_rank_deficient():
+  from primate.diagonalize import lanczos
+  from primate.random import symmetric
+  from scipy.linalg import eigh_tridiagonal
+  ew = np.random.uniform(size=30, low=0.0, high=1.0)
+  ew[:20] = 0.0
+  A = symmetric(30, ew=ew)
+  a,b = lanczos(A, deg=30, orth=10)
+  assert np.all(~np.isnan(a)) and np.all(~np.isnan(b))
+  rw, rv = eigh_tridiagonal(a,b)
+  assert np.all(~np.isnan(rw)) and np.all(~np.isnan(np.ravel(rv)))
+
+# def test_diagonal():
+#   from primate.diagonalize import lanczos
+#   from primate.random import symmetric
+#   ew = np.random.uniform(size=30, low=0.0, high=1.0)
+#   ew[:20] = 0.0
+#   a,b = lanczos(np.diag(ew), deg=30)
+#   rw, rv = eigh_tridiagonal(a,b)
+
+#   from primate.trace import hutch
+#   hutch(np.eye(10))
+  
 
 # def test_quadrature_toeplitz():
 #   from primate.diagonalize import lanczos, _lanczos

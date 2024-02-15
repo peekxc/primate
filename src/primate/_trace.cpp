@@ -37,7 +37,8 @@ void _trace_wrapper(py::module& m){
     }
     const auto op = Wrapper(A);
     const auto matrix_func = kwargs["function"].template cast< std::string >(); 
-    const auto num_threads_ = multithreaded ? num_threads : 1; 
+    const auto num_threads_ = get_num_threads(multithreaded ? num_threads : 1); 
+    // std::cout << "Number of threads: " << num_threads_ << std::endl;
 
     auto rng = ThreadedRNG64(num_threads_, engine_id, seed);
     auto estimates = static_cast< ArrayF >(ArrayF::Zero(nv));
@@ -51,31 +52,33 @@ void _trace_wrapper(py::module& m){
     } else {
       if (ncv < 2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2."); }
       if (ncv < orth+2){ throw std::invalid_argument("Invalid number of lanczos vectors supplied; must be >= 2+orth."); }
-      const auto sf = param_spectral_func< F >(kwargs);
-      const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv, static_cast< weight_method >(method));
+      bool is_native = true; 
+      const auto sf = param_vector_func< F >(kwargs, is_native);
+      const auto M = MatrixFunction(op, sf, lanczos_degree, lanczos_rtol, orth, ncv, is_native, static_cast< weight_method >(method));
       mu_est = hutch< F >(M, rng, nv, dist, engine_id, seed, atol, rtol, num_threads_, use_clt, t_scores.data(), z, estimates.data(), wall_time);
     }
     return py::dict(
       "estimate"_a=mu_est, 
       "samples"_a=estimates, 
       "total_time_us"_a = wall_time, 
-      "matvec_time_us"_a = op.matvec_time
+      "matvec_time_us"_a = op.matvec_time / num_threads_
     );
   });
 
   // Computes the trace of Q.T @ (A @ Q) including the inner terms q_i^T A q_i 
-  m.def("quad_sum", [](const Matrix& A, DenseMatrix< F > Q) -> py_array< F > {
+  m.def("quad_sum", [](const Matrix& A, DenseMatrix< F > Q) -> py::tuple {
     const auto op = Wrapper(A);
     F quad_sum = 0.0; 
     const size_t N = static_cast< size_t >(Q.cols());
     auto estimates = static_cast< ArrayF >(ArrayF::Zero(N));
     auto y = static_cast< VectorF >(VectorF::Zero(Q.rows()));
+    
     for (size_t j = 0; j < N; ++j){
       op.matvec(Q.col(j).data(), y.data());
       estimates[j] = Q.col(j).adjoint().dot(y);
       quad_sum += estimates[j];
     }
-    return py::cast(estimates);
+    return py::make_tuple(quad_sum, py::cast(estimates));
   });
 }
 
@@ -93,6 +96,11 @@ PYBIND11_MODULE(_trace, m) {
   // Note we cannot multi-thread arbitrary calls to Python due to the GIL
   _trace_wrapper< false, float, py::object, PyLinearOperator< float > >(m);
   _trace_wrapper< false, double, py::object, PyLinearOperator< double > >(m);
+
+  // Wrapping MatrixFunctions natively extends all trace functionality
+  // _trace_wrapper< true, float, DenseMatrix< float >, MatrixFunction< float, DenseEigenLinearOperator< float > > >(m);
+  // _trace_wrapper< false, double, py::object, PyLinearOperator< double > >(m);
+
   // // LinearOperator exports
   // _trace_wrapper< false, float, py::object >(m, linearoperator_wrapper< float >);
   // _trace_wrapper< false, double, py::object >(m, linearoperator_wrapper< double >);

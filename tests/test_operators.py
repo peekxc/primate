@@ -26,6 +26,28 @@ def test_vector_approx():
   y_test = approx_matvec(A_sparse, v0, deg)
   assert np.allclose(y_true, y_test, atol=1e-5)
 
+def test_mf_fun():
+  from primate.operator import matrix_function
+  np.random.seed(1234)
+  n = 10 
+  A = np.eye(n)
+  M = matrix_function(A, fun=lambda x: x)
+  x, y = np.arange(10)+1, np.arange(10)+1
+  assert np.allclose(M.fun(x), y)
+  M = matrix_function(A, fun=np.exp)
+  assert np.allclose(M.fun(x), np.exp(y))
+  M = matrix_function(A, fun="exp")
+  assert np.allclose(M.fun(x), np.exp(y))
+  # from math import exp
+  # M = matrix_function(A, fun=exp)
+  # M.fun([0,1,2,3])
+  # M.fun(list(np.arange(M.shape[0])))
+  # M.fun(range(10))
+  # M.fun(np.array([0]*10))
+  # M.fun(np.arange(M.shape[0]))
+
+
+
 def test_mf_basic():
   from primate.operator import _operators
   np.random.seed(1234)
@@ -100,7 +122,7 @@ def test_mf_api():
   v0 = np.random.normal(size=n)
   assert np.max(np.abs(M.matvec(v0) - A_sparse @ v0)) <= 1e-5, "MF matvec doesn't match identity"
   assert M.dtype == np.float32, "dtype mismatch"
-  assert M.fun(0) == 0.0
+  assert np.allclose(M.fun(np.zeros(10)), np.zeros(10))
   assert M.shape == (10, 10)
 
 def test_mf_pyfun():
@@ -109,18 +131,28 @@ def test_mf_pyfun():
   np.random.seed(1234)
   n = 10
   A = symmetric(n, pd = True).astype(np.float32)
-  M = matrix_function(A, fun="log")
-  assert M.fun(1.0) == 0.0
+  M = matrix_function(A, fun="log") 
+  assert np.allclose(M.fun(np.repeat(1.0, 10)), np.zeros(10))
+  assert M.native_fun
   M = matrix_function(A, fun=lambda x: np.log(x))
   assert M.fun(1.0) == 0.0 
+  assert not(M.native_fun)
   M.fun = "exp"
-  assert np.isclose(M.fun(1.0), np.exp(1.0))
+  assert np.isclose(M.fun(np.ones(1)), np.exp(1.0))
+  assert M.native_fun
   M.fun = lambda x: x
-  assert M.fun(1.0) == 1.0
+  assert M.fun(np.ones(1)) == 1.0
+  assert not(M.native_fun)
   M.fun = np.exp
-  assert np.isclose(M.fun(1.0), np.exp(1.0))
+  assert np.isclose(M.fun(np.ones(1)), np.exp(1.0))
+  assert not(M.native_fun)
+  assert not(matrix_function(A, fun=np.log).native_fun)
+
+  ## **New** : infer stateless native C ptrs! 
   M.fun = _operators.exp
-  assert np.isclose(M.fun(1.0), np.exp(1.0))
+  assert M.native_fun, "failed to infer native function!"
+
+  # assert np.isclose(M.fun(np.ones(1)), np.exp(1.0))
   
   ## TODO: figure out kwargs, add ability for raw function ptrs in trace interface!
   # M.fun = (M, "exp", dict(t=1))
@@ -139,6 +171,23 @@ def test_mf_eigen():
   ew_test = eigsh(M)[0]
   assert np.allclose(ew_true, ew_test, atol=1e-5), f"eigenvalues mismatch error = {np.max(np.abs(ew_true - ew_test)):0.5f}/ operator doesn't register as respecting LO interface"
 
+def test_mf_deflate():
+  from primate.operator import matrix_function
+  np.random.seed(1234)
+  n = 10
+  A = csc_array(symmetric(n, pd = True), dtype=np.float32)
+  M = matrix_function(A, fun=np.exp)
+  Q = np.linalg.qr(np.random.normal(size=(10, 5)))[0]
+  r = np.random.normal(size=10)
+  assert np.allclose(r, M.transform(r))
+  x = M.matvec(r)
+  M.deflate(Q)
+  assert ~np.allclose(r, M.transform(r)), "No deflation happening"
+  assert np.allclose(M.transform(r), r - Q @ (Q.T @ r)), "Deflation step failed"
+  z = M.matvec(r)
+  assert not(np.allclose(x, z))
+  
+  
 def test_mf_matmat():
   from primate.operator import matrix_function
   np.random.seed(1234)
@@ -201,6 +250,18 @@ def test_mf_quad_method():
     assert M.method == "fttr"
     ft_quad = M.quad(v)
     assert np.isclose(ft_quad, gh_quad, atol=abs(0.01*gh_quad))
+
+# def test_mf_transform():
+#   from primate.operator import matrix_function
+#   from primate.random import rademacher
+#   np.random.seed(1234)
+#   n = 100
+#   A = symmetric(n, pd = True).astype(np.float32)
+#   M = matrix_function(A, fun="identity")
+  
+#   x = np.array([0.1, 0.2])
+#   M.transform(x.data)
+
 
 
 # class CustomOperator:

@@ -1,3 +1,4 @@
+import os
 from typing import Union, Callable, Any
 from numbers import Integral
 import numpy as np
@@ -183,7 +184,8 @@ def hutch(
 	orth: int = int(min(deg if orth < 0 or orth > deg else orth, ncv - 1))
 	atol: float = 0.0 if atol is None else float(atol)  
 	rtol: float = 0.0 if rtol is None else float(rtol) 
-	num_threads: int = 0 if num_threads < 0 else int(num_threads)
+	## *should* be safe to pass <= 0 on C++ side, but for redundancy we use os.cpu_count()
+	num_threads: int = os.cpu_count() if num_threads < 0 else int(num_threads) 
 	assert ncv >= 2 and orth < ncv and ncv <= deg, f"Invalid Lanczos parameters (orth < ncv? {orth < ncv}, ncv >= 2 ? {ncv >= 2}, ncv <= deg? {ncv <= deg})"
 
 	## Adjust tolerance for the quadrature estimates
@@ -264,26 +266,19 @@ def hutchpp(
 ) -> Union[float, dict]:
 	"""Hutch++ estimator. 
 	"""
+	## Catch degenerate cases 
 	_operator_checks(A)
 	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
-		## Catch degenerate cases 
 		return 0
 
-	## If fun is specified, transparently convert A to matrix function 
-	if isinstance(fun, str):
-		assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
-		A = matrix_function(A, fun=fun)
-	elif isinstance(fun, Callable):
-		A = matrix_function(A, fun=fun)
-	elif fun is not None:
-		raise ValueError(f"Invalid matrix function type '{type(fun)}'")
+	## Convert to a matrix function, if not already 
+	A = matrix_function(A, fun=fun)
 
 	## Setup constants 
 	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
 	N: int = A.shape[0]
-	nb = (N // 3) if nb == "auto" else nb							# main samples
-	m = (N // 3) if maxiter == "auto" else maxiter 	# residual samples 
-	# assert m % 3 == 0, "Number of sample vectors 'm' must be divisible by 3."
+	nb = (N // 3) if nb == "auto" else nb							# number of samples to dedicate to deflation
+	m = (N // 3) if maxiter == "auto" else maxiter 	  # residual samples; default rule uses Hutch++ result
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
 	info_dict = {}
 
@@ -296,38 +291,45 @@ def hutchpp(
 	# Q = Y # Q is mostly orthonormal
 
 	## Estimate trace of the low-rank approx. / sketch
-	bulk_tr = 0.0
+	tr_defl = 0.0
 	if mode == 'full': 
-		bulk_tr = (Q.T @ (A @ Q)).trace()
+		defl_ests = (Q.T @ (A @ Q)).diagonal()
+		tr_defl = np.sum(defl_ests)
 	else:
-		bulk_tr = np.sum(_trace.quad_sum(A, Q))
+		tr_defl, defl_ests = A.quad_sum(Q)
 
-	## Estimate trace of the residual 
-	residual_tr = 0.0
-	if mode == 'full': 
-		## Full mode == form the full (m x m) matrix and take the diagonal 
-		## Note memory efficient, but is vectorized, so suitable for relatively small m
-		WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
-		G = WM - Q @ (Q.T @ WM)
-		residual_tr += (1 / m) * (G.T @ (A @ G)).trace()
-	else:
-		## reduced mode == Switch to plain Hutch estimator on orthogonal complement projector
-		## Low memory footprint but might be 5x slower or worse on small inputs
-		PC = OrthComplement(A, Q) # evaluates (I - Q^T Q)A(I - Q^T Q)
-		kwargs['maxiter'] = kwargs.get('maxiter', m)
-		if not info and not verbose:
-			residual_tr = hutch(PC, **kwargs)
-			return bulk_tr + residual_tr
-		else: 
-			kwargs['info'] = True
-			kwargs['verbose'] = False
-			residual_tr, ID = hutch(PC, **kwargs)
-			info_dict.update(ID)
+	## Estimate trace of the residual via Girard-Hutchinson on the 
+	## complement of the deflated subspaces, (I - Q @ Q.T)y
+	A.deflate(Q)
+	kwargs['info'] = True
+	kwargs['verbose'] = False
+	tr_resi, info_dict = hutch(A, **kwargs)
+
+	# if mode == 'full': 
+	# 	## Full mode == form the full (m x m) matrix and take the diagonal 
+	# 	## Note memory efficient, but is vectorized, so suitable for relatively small m
+	# 	WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
+	# 	G = WM - Q @ (Q.T @ WM)
+	# 	residual_tr += (1 / m) * (G.T @ (A @ G)).trace()
+	# else:
+	# 	## reduced mode == Switch to plain Hutch estimator on orthogonal complement projector
+	# 	## Low memory footprint but might be 5x slower or worse on small inputs
+	# 	PC = OrthComplement(A, Q) # evaluates (I - Q^T Q)A(I - Q^T Q)
+	# 	kwargs['maxiter'] = kwargs.get('maxiter', m)
+	# 	if not info and not verbose:
+	# 		residual_tr = hutch(PC, **kwargs)
+	# 		return bulk_tr + residual_tr
+	# 	else: 
+	# 		kwargs['info'] = True
+	# 		kwargs['verbose'] = False
+	# 		residual_tr, ID = hutch(PC, **kwargs)
+	# 		info_dict.update(ID)
 		
 	## Modify the info dict
-	info_dict['estimate'] = bulk_tr + residual_tr
+	deg = 1 if fun is None else A.deg
+	info_dict['estimate'] = tr_defl + tr_resi
 	info_dict['estimator'] = 'Hutch++'
-	info_dict['n_matvecs'] = 2*nb + info_dict.get('n_samples', m)
+	info_dict['n_matvecs'] = 2*nb*deg + info_dict.get('n_samples', m)*deg
 	info_dict['n_samples'] = nb + info_dict.get('n_samples', m)
 	info_dict['pdf'] = 'rademacher'	
 

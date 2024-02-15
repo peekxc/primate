@@ -89,15 +89,17 @@ incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; 
 # incdir_imate = run_command(py, ['-c', 'import os; os.chdir(".."); import imate; print(imate.__path__[0])'], check : true).stdout().strip()
 # incdir_nanobind = run_command(py, ['-c', 'import os; os.chdir(".."); import nanobind; print(nanobind.include_dir())'], check : true).stdout().strip()
 incdir_pybind11 = run_command(py, ['-c', 'import os; os.chdir(".."); import pybind11; print(pybind11.get_include())'], check : true).stdout().strip()
+incdir_combin = run_command(py, ['-c', 'import os; os.chdir(".."); import combin; print(combin.get_include())'], check : true).stdout().strip()
 
 ## Header includes
 inc_numpy = include_directories(incdir_numpy)
 inc_pybind11 = include_directories(incdir_pybind11)
+inc_combin = include_directories(incdir_combin)
 # inc_nanobind = include_directories(incdir_nanobind) # nanobind.include_dir()
 inc_eigen = include_directories('extern' / 'eigen')
 # inc_eigen = include_directories(incdir_eigen)
 # inc_imate = include_directories(incdir_imate)
-inc_pkg = include_directories('include')
+# inc_pkg = include_directories('include')
 
 ## Add dependencies, if they are available
 dependency_map = {}
@@ -306,7 +308,6 @@ endif
 
 ## Compile the package directory
 subdir('src' / 'primate')
-
 
 # py.install_sources(
 #   'src/simplextree/__init__.py',

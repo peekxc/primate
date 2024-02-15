@@ -81,7 +81,7 @@ def numrank(
     else: 
       ## This does binary search like searchsorted but uses O(1) memory
       re_bnd = RelativeErrorBound(n)
-      deg_bound = max(bisect.bisect_left(re_bnd, -0.001) + 1, deg)
+      deg_bound = bisect.bisect_left(re_bnd, -0.001) + 1 # , deg)
     
     ## Use PSD-specific theory to estimate spectral gap 
     a,b = lanczos(A, deg=deg_bound)
