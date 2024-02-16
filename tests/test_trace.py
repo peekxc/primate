@@ -196,11 +196,11 @@ def test_quad_sum():
 	n = 100
 	A = symmetric(n)
 	Q = np.linalg.qr(A)[0]
-	test_quads = _trace.quad_sum(A, Q)
+	_, test_quads = _trace.quad_sum(A, Q)
 	true_quads = (Q.T @ (A @ Q)).diagonal()
 	assert np.allclose(test_quads, true_quads)
 	assert np.isclose(np.sum(test_quads), np.sum(true_quads))
-	test_quads = _trace.quad_sum(A, Q[:,:10])
+	_, test_quads = _trace.quad_sum(A, Q[:,:10])
 	true_quads = (Q[:,:10].T @ (A @ Q[:,:10])).diagonal()
 	assert np.allclose(test_quads, true_quads)
 	assert np.isclose(np.sum(test_quads), np.sum(true_quads))
@@ -216,6 +216,8 @@ def test_hutch_pp():
 	test_trace = hutchpp(A, mode="full", seed=1)
 	assert np.isclose(test_trace, true_trace, atol=1.0)
 
+	tr_true = np.sum(np.exp(np.linalg.eigh(A)[0]))
+	hutchpp(A, fun=np.exp, nb=100, mode="reduced", seed=1)
 	# import timeit
 	# timeit.timeit(lambda: hutchpp(A, mode="full"), number=1000)
 	# timeit.timeit(lambda: hutchpp(A, mode="reduced"), number=1000)

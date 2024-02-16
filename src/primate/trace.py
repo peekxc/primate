@@ -272,7 +272,7 @@ def hutchpp(
 		return 0
 
 	## Convert to a matrix function, if not already 
-	A = matrix_function(A, fun=fun)
+	A = matrix_function(A, fun=fun, **kwargs) if fun is not None else A
 
 	## Setup constants 
 	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
@@ -280,7 +280,7 @@ def hutchpp(
 	nb = (N // 3) if nb == "auto" else nb							# number of samples to dedicate to deflation
 	m = (N // 3) if maxiter == "auto" else maxiter 	  # residual samples; default rule uses Hutch++ result
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
-	info_dict = {}
+	info_dict = { }
 
 	## Sketch Y / Q - use numpy for now, but consider parallelizing MGS later
 	WB = np.random.choice([-1.0, +1.0], size=(N, nb)).astype(f_dtype)
@@ -296,14 +296,22 @@ def hutchpp(
 		defl_ests = (Q.T @ (A @ Q)).diagonal()
 		tr_defl = np.sum(defl_ests)
 	else:
-		tr_defl, defl_ests = A.quad_sum(Q)
+		tr_defl, defl_ests = _trace.quad_sum(A, Q) if fun is None else A.quad_sum(Q)
 
 	## Estimate trace of the residual via Girard-Hutchinson on the 
 	## complement of the deflated subspaces, (I - Q @ Q.T)y
-	A.deflate(Q)
-	kwargs['info'] = True
-	kwargs['verbose'] = False
-	tr_resi, info_dict = hutch(A, **kwargs)
+	if fun is None or mode == 'full':
+		## Full mode == form the full (m x m) matrix and take the diagonal 
+		## Note memory efficient, but is potentially vectorized, so suitable for relatively small m
+		WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
+		G = WM - Q @ (Q.T @ WM)
+		tr_resi = (1 / m) * (G.T @ (A @ G)).trace()
+	else: 
+		A.deflate(Q)
+		kwargs['info'] = True
+		kwargs['verbose'] = False
+		tr_resi, ID = hutch(A, maxiter=maxiter, **kwargs)
+		info_dict.update(ID)
 
 	# if mode == 'full': 
 	# 	## Full mode == form the full (m x m) matrix and take the diagonal 
