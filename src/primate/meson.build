@@ -11,7 +11,7 @@ foreach ext: extensions
   py.extension_module(
     ext,
     ext + '.cpp',
-    include_directories: [inc_pkg, inc_numpy, inc_eigen, inc_pybind11, inc_combin], # inc_pybind11, inc_nanobind
+    include_directories: [inc_pkg, inc_numpy, inc_eigen, inc_pybind11], # inc_pybind11, inc_nanobind
     dependencies: deps,
     install: true, 
     cpp_args: _cpp_args

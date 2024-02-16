@@ -1,6 +1,6 @@
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy'] # 'pythran-openblas'  "cmake". nanobind
+requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy', 'combin'] # 'pythran-openblas'  "cmake". nanobind
 
 [project]
 name = "scikit-primate"
@@ -19,7 +19,8 @@ requires-python = ">=3.8"
 dependencies = [
   "numpy", 
   "scipy",
-	"more_itertools"
+	"more_itertools", 
+	"combin"
 ]
 license = {file = "LICENSE"}
 include = [
