@@ -71,8 +71,6 @@ def hutch(
 	This function uses up to `maxiter` random isotropic vectors to estimate of the trace of $f(A)$, where:
 	$$\\mathrm{tr}(f(A)) = \\mathrm{tr}(U f(\\Lambda) U^T) = \\sum\\limits_{i=1}^n f(\\lambda_i) $$
 	The estimator is obtained by averaging quadratic forms $v \\mapsto v^T f(A)v$, rescaling as necessary.
-	This estimator may be used to quickly approximate of a variety of quantities, such as the trace inverse, the log-determinant, the numerical rank, etc. 
-	See the [online documentation](https://peekxc.github.io/primate/) for more details.
 
 	:::{.callout-note}	
 	Convergence behavior is controlled by the `stop` parameter: "confidence" uses the central limit theorem to generate confidence 
@@ -128,10 +126,10 @@ def hutch(
 	Notes
 	-----
 	To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former uses implicit symmetric QR 
-	steps with Wilkinson shifts, while the latter (FTTR) uses the explicit expression for orthogonal polynomials. While both require 
+	steps with Wilkinson shifts, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. While both require 
 	$O(\\mathrm{deg}^2)$ time to execute, the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses 
 	only $O(1)$ space at the cost of stability. If `deg` is large, `fttr` is preferred is performance, though pilot testing should be 
-	done to ensure that instability does not cause bias in the approximation. 
+	done to ensure that instability does not cause a large bias in the approximation. 
 
 	See Also
 	--------
@@ -260,11 +258,12 @@ def hutchpp(
 	A: Union[LinearOperator, np.ndarray],
 	fun: Union[str, Callable] = None, 
 	nb: int = "auto",
-	maxiter: int = 200, 
+	maxiter: Union[str, int] = "auto", 
 	mode: str = 'reduced', 
 	**kwargs
 ) -> Union[float, dict]:
 	"""Hutch++ estimator. 
+	
 	"""
 	## Catch degenerate cases 
 	_operator_checks(A)
@@ -277,68 +276,50 @@ def hutchpp(
 	## Setup constants 
 	verbose, info = kwargs.get('verbose', False), kwargs.get('info', False)
 	N: int = A.shape[0]
-	nb = (N // 3) if nb == "auto" else nb							# number of samples to dedicate to deflation
-	m = (N // 3) if maxiter == "auto" else maxiter 	  # residual samples; default rule uses Hutch++ result
+	nb = (N // 3) if nb == "auto" else nb													 # number of samples to dedicate to deflation
+	maxiter: int = (N // 3) if maxiter == "auto" else int(maxiter) # residual samples; default rule uses Hutch++ result
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
 	info_dict = { }
 
 	## Sketch Y / Q - use numpy for now, but consider parallelizing MGS later
 	WB = np.random.choice([-1.0, +1.0], size=(N, nb)).astype(f_dtype)
-	Q = np.linalg.qr(A @ WB)[0]
+	Q = np.linalg.qr(A @ WB, mode='reduced')[0]
 	# Y = np.array(A @ W2, order='F')
 	# assert Y.flags['F_CONTIGUOUS'] and Y.flags['OWNDATA'] and Y.flags['WRITEABLE']
 	# _orthogonalize.mgs(Y, 0)
 	# Q = Y # Q is mostly orthonormal
 
-	## Estimate trace of the low-rank approx. / sketch
+	## Estimate trace of the low-rank sketch
 	tr_defl = 0.0
 	if mode == 'full': 
-		defl_ests = (Q.T @ (A @ Q)).diagonal()
+		## Full mode may not be space efficient, but is potentially vectorized, so suitable for relatively small output dimen.
+		## https://stackoverflow.com/questions/18541851/calculate-vt-a-v-for-a-matrix-of-vectors-v
+		defl_ests = np.einsum('...i,...i->...', A @ Q, Q)
 		tr_defl = np.sum(defl_ests)
 	else:
+		## Uses at most O(n) memory, but potentially slower 
 		tr_defl, defl_ests = _trace.quad_sum(A, Q) if fun is None else A.quad_sum(Q)
 
-	## Estimate trace of the residual via Girard-Hutchinson on the 
-	## complement of the deflated subspaces, (I - Q @ Q.T)y
+	## Estimate trace of the residual via Girard-Hutchinson on the complement of the deflated subspaces
 	if fun is None or mode == 'full':
-		## Full mode == form the full (m x m) matrix and take the diagonal 
-		## Note memory efficient, but is potentially vectorized, so suitable for relatively small m
-		WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
-		G = WM - Q @ (Q.T @ WM)
-		tr_resi = (1 / m) * (G.T @ (A @ G)).trace()
+		G = np.random.choice([-1.0, +1.0], size=(N, maxiter)).astype(f_dtype)
+		G -= Q @ (Q.T @ G)
+		defl_ests = np.einsum('...i,...i->...', A @ G, G)
+		tr_resi = (1 / maxiter) * np.sum(defl_ests)
+		#tr_resi = (1 / m) * (G.T @ (A @ G)).trace()
 	else: 
 		A.deflate(Q)
 		kwargs['info'] = True
 		kwargs['verbose'] = False
 		tr_resi, ID = hutch(A, maxiter=maxiter, **kwargs)
 		info_dict.update(ID)
-
-	# if mode == 'full': 
-	# 	## Full mode == form the full (m x m) matrix and take the diagonal 
-	# 	## Note memory efficient, but is vectorized, so suitable for relatively small m
-	# 	WM = np.random.choice([-1.0, +1.0], size=(N, m)).astype(f_dtype)
-	# 	G = WM - Q @ (Q.T @ WM)
-	# 	residual_tr += (1 / m) * (G.T @ (A @ G)).trace()
-	# else:
-	# 	## reduced mode == Switch to plain Hutch estimator on orthogonal complement projector
-	# 	## Low memory footprint but might be 5x slower or worse on small inputs
-	# 	PC = OrthComplement(A, Q) # evaluates (I - Q^T Q)A(I - Q^T Q)
-	# 	kwargs['maxiter'] = kwargs.get('maxiter', m)
-	# 	if not info and not verbose:
-	# 		residual_tr = hutch(PC, **kwargs)
-	# 		return bulk_tr + residual_tr
-	# 	else: 
-	# 		kwargs['info'] = True
-	# 		kwargs['verbose'] = False
-	# 		residual_tr, ID = hutch(PC, **kwargs)
-	# 		info_dict.update(ID)
 		
 	## Modify the info dict
 	deg = 1 if fun is None else A.deg
 	info_dict['estimate'] = tr_defl + tr_resi
 	info_dict['estimator'] = 'Hutch++'
-	info_dict['n_matvecs'] = 2*nb*deg + info_dict.get('n_samples', m)*deg
-	info_dict['n_samples'] = nb + info_dict.get('n_samples', m)
+	info_dict['n_matvecs'] = 2*nb*deg + info_dict.get('n_samples', maxiter)*deg
+	info_dict['n_samples'] = nb + info_dict.get('n_samples', maxiter)
 	info_dict['pdf'] = 'rademacher'	
 
 	## Print as needed 

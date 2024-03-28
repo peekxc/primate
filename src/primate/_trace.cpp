@@ -14,7 +14,6 @@ using namespace pybind11::literals;
 template< typename F >
 using py_array = py::array_t< F, py::array::f_style | py::array::forcecast >;
 
-
 // Template function for generating module definitions for a given Operator / precision 
 template< bool multithreaded, std::floating_point F, class Matrix, LinearOperator Wrapper >
 void _trace_wrapper(py::module& m){
@@ -90,8 +89,8 @@ PYBIND11_MODULE(_trace, m) {
   _trace_wrapper< true, float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m);
   _trace_wrapper< true, double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m);
   
-  _trace_wrapper< true, float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m);
-  _trace_wrapper< true, double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double > >(m);
+  _trace_wrapper< true, float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float, false > >(m);
+  _trace_wrapper< true, double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double, false > >(m);
   
   // Note we cannot multi-thread arbitrary calls to Python due to the GIL
   _trace_wrapper< false, float, py::object, PyLinearOperator< float > >(m);

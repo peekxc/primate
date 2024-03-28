@@ -48,7 +48,6 @@ skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit
 # manylinux-x86_64-image = "manylinux_2_28" # prefer the newer one
 manylinux-x86_64-image = "manylinux2014"
 
-
 [tool.cibuildwheel.linux]
 before-build = "bash {project}/tools/cibw_linux.sh {project}"
 environment = { CC="gcc", CXX="g++" } # for manylinux2014

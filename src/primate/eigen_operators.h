@@ -56,7 +56,7 @@ struct DenseEigenLinearOperator {
 };
 
 // TODO: store only lower/upper part for symmetric? http://www.eigen.tuxfamily.org/dox/group__TutorialSparse.html
-template< std::floating_point F >
+template< std::floating_point F, bool gram >
 struct SparseEigenLinearOperator {
   using value_type = F;
   const Eigen::SparseMatrix< F > A;  
@@ -67,16 +67,27 @@ struct SparseEigenLinearOperator {
   void matvec(const F* inp, F* out) const noexcept {
     auto ts = hr_clock::now();
     auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
-    output = A * input; 
+    if constexpr(gram){
+      auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+      output = A.adjoint() * (A * input); 
+    } else {
+      auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.rows(), 1); // this should be a no-op
+      output = A * input; 
+    }
     matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 
   void rmatvec(const F* inp, F* out) const noexcept {
     auto ts = hr_clock::now();
-    auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
-    auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
-    output = A.adjoint() * input; 
+    if constexpr(gram){
+      auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.cols(), 1); // this should be a no-op
+      auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+      output = A.adjoint() * (A * input); 
+    } else {
+      auto input = Eigen::Map< const Eigen::Matrix< F, Eigen::Dynamic, 1 > >(inp, A.rows(), 1); // this should be a no-op
+      auto output = Eigen::Map< Eigen::Matrix< F, Eigen::Dynamic, 1 > >(out, A.cols(), 1); // this should be a no-op
+      output = A.adjoint() * input; 
+    }
     matvec_time += duration_cast< us >(dur_seconds(hr_clock::now() - ts)).count();
   }
 

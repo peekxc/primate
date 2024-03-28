@@ -21,7 +21,7 @@ jobs:
         - [ubuntu-latest, manylinux, x86_64]
         - [macos-latest, macosx, x86_64]
         - [macos-latest, macosx, arm64]
-        - [windows-2019, win, AMD64] 
+        - [windows-2019, win, amd64] 
         # os: [windows-latest]
         # cibw_arch: ["AMD64"]
         # cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]

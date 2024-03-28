@@ -223,6 +223,9 @@ void _matrix_function_wrapper(py::module& m, std::string prefix){
     .def("deflate", [](OP_t& M, const DenseMatrix< F >& Q){
       M.transform = deflate_transform(Q);
     })
+    .def("reset_transform", [](OP_t& M, const DenseMatrix< F >& Q){
+      M.transform = [](F* v, const size_t N){ return; };
+    })
     .def("quad_sum", [](const OP_t& M, const DenseMatrix< F >& W) -> py::tuple {
       F quad_sum = 0.0; 
       const size_t N = static_cast< size_t >(W.cols());
@@ -249,8 +252,11 @@ PYBIND11_MODULE(_operators, m) {
   _matrix_function_wrapper< float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m, "DenseF");
   _matrix_function_wrapper< double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m, "DenseD");
 
-  _matrix_function_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m, "SparseF");
-  _matrix_function_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double > >(m, "SparseD");
+  _matrix_function_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float, false > >(m, "SparseF");
+  _matrix_function_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double, false > >(m, "SparseD");
+  
+  _matrix_function_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float, true > >(m, "SparseFG");
+  _matrix_function_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double, true > >(m, "SparseDG");
   
   _matrix_function_wrapper< float, py::object, PyLinearOperator< float > >(m, "GenericF");
   _matrix_function_wrapper< double, py::object, PyLinearOperator< double > >(m, "GenericD");

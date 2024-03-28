@@ -20,6 +20,13 @@ def test_basic():
   (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=n-1, return_basis = True)
   assert np.abs(max(eigh_tridiagonal(a,b, eigvals_only=True)) - max(eigsh(A_sparse)[0])) < 1e-4
 
+  from primate.diagonalize import _lanczos
+  true_ew = eigh_tridiagonal(a,b, eigvals_only=True)
+  test_rw = _lanczos.ritz_values(a, np.append(0,b), n)
+  assert np.allclose(np.sort(test_rw), np.sort(true_ew))
+
+  # py_array< double > a, py_array< double > b, const int k, const int method = 0) -> py_array< double > {
+
 def test_matvec():
   from primate.diagonalize import lanczos
   np.random.seed(1234)

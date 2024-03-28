@@ -39,7 +39,7 @@ def numrank(
   A: Union[LinearOperator, np.ndarray],
 	est: str = "hutch",
   gap: Union[float, str] = "auto",
-  gap_rtol: float = 0.01, 
+  gap_rtol: float = 0.001, 
   psd: bool = True,
 	**kwargs
 ):
@@ -77,11 +77,11 @@ def numrank(
     n = A.shape[0]
     if n < 150:
       rel_error_bound = 2.575 * np.log(A.shape[0]) / np.arange(4, n)**2
-      deg_bound = max(np.searchsorted(-rel_error_bound, -0.01) + 5, deg)
+      deg_bound = max(np.searchsorted(-rel_error_bound, -gap_rtol) + 5, deg)
     else: 
       ## This does binary search like searchsorted but uses O(1) memory
       re_bnd = RelativeErrorBound(n)
-      deg_bound = bisect.bisect_left(re_bnd, -0.001) + 1 # , deg)
+      deg_bound = bisect.bisect_left(re_bnd, -gap_rtol) + 1 # , deg)
     
     ## Use PSD-specific theory to estimate spectral gap 
     a,b = lanczos(A, deg=deg_bound)

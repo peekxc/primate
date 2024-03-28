@@ -1,10 +1,17 @@
 import numpy as np 
+from numbers import Number
+from scipy.sparse import csc_array
 from primate.random import symmetric
 from primate.trace import hutch, hutchpp
 
 def test_hutchpp():
-  # A = symmetric(10)
-  # hutchpp(A, fun="None")
+  A = symmetric(10)
+  assert isinstance(hutchpp(A), Number)
+  assert np.isclose(A.trace(), hutchpp(A), 0.50)
+  assert isinstance(hutchpp(A, mode='full'), Number)
+  assert isinstance(hutchpp(csc_array(A)), Number)
+  assert isinstance(hutchpp(csc_array(A), mode='full'), Number)
+  assert isinstance(hutchpp(csc_array(A), mode='full', fun="exp"), Number)
   assert True
 
 def hutchpp_tests():
@@ -117,6 +124,36 @@ def ada_krylov_aware_trace():
 
   pass 
   
+
+def test_dinara():
+  from primate.random import symmetric
+
+  A = symmetric(10, pd=True)
+  ew = np.sort(np.linalg.eigh(A)[0])
+  sw = np.sort(np.linalg.svd(A)[1])
+
+  print(f"Eigenvalues of A: {ew}")
+  print(f"Singular values of A: {sw}")
+  assert np.allclose(sw, ew)
+
+  ## Compute spectral decomposition of A, permute in descending order of eigenvalues
+  S, Q = np.linalg.eigh(A)
+  Q = Q[:,np.argsort(-S)]
+  S = S[np.argsort(-S)]
+
+  ## Compute singular value decomposition of A (already in descending order of singular values)
+  U, Sigma, Vt = np.linalg.svd(A)
+
+  ## if SVD == eigh, then this must be true
+  assert np.allclose(U, Vt.T)
+
+  ## Let's check the distortion of the best rank-k approximation using eigen or SVD
+  kth_approx_eigh = lambda k: Q[:,np.arange(k)] @ np.diag(S[np.arange(k)]) @ Q[:,np.arange(k)].T
+  kth_approx_svdh = lambda k: U[:,np.arange(k)] @ np.diag(Sigma[np.arange(k)]) @ Vt[np.arange(k),:]
+
+  distortion_eigh = np.array([np.linalg.norm(A - kth_approx_eigh(k)) for k in range(10)])
+  distortion_svdh = np.array([np.linalg.norm(A - kth_approx_svdh(k)) for k in range(10)])
+  assert np.allclose(distortion_eigh, distortion_svdh)
 
 # class ComplementProjector(LinearOperator):
 #   def __init__(Q):

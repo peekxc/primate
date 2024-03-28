@@ -110,8 +110,8 @@ PYBIND11_MODULE(_lanczos, m) {
   _lanczos_wrapper< float, DenseMatrix< float >, DenseEigenLinearOperator< float > >(m);
   _lanczos_wrapper< double, DenseMatrix< double >, DenseEigenLinearOperator< double > >(m);
 
-  _lanczos_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float > >(m);
-  _lanczos_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double > >(m);
+  _lanczos_wrapper< float, Eigen::SparseMatrix< float >, SparseEigenLinearOperator< float, false > >(m);
+  _lanczos_wrapper< double, Eigen::SparseMatrix< double >, SparseEigenLinearOperator< double, false > >(m);
   
   _lanczos_wrapper< float, py::object, PyLinearOperator< float > >(m);
   _lanczos_wrapper< double, py::object, PyLinearOperator< double > >(m);
@@ -123,7 +123,23 @@ PYBIND11_MODULE(_lanczos, m) {
     lanczos_quadrature(a.data(), b.data(), k, solver, output.col(0).data(), output.col(1).data(), wm);
     return py::cast(output); 
   });
+
+  m.def("ritz_values", [](py_array< double > alpha, py_array< double > beta, const int k) -> py_array< double > { 
+    using VectorF = Eigen::Array< double, Dynamic, 1>;
+    assert(beta[0] == 0.0);
+    const double* alpha_ptr = alpha.data();
+    const double* beta_ptr = beta.data();
+    Eigen::Map< const VectorF > a(alpha_ptr, k);        // diagonal elements
+    Eigen::Map< const VectorF > b(beta_ptr+1, k-1);     // subdiagonal elements (offset by 1!)
+    auto solver = Eigen::SelfAdjointEigenSolver< DenseMatrix< double > >(k);
+    solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::EigenvaluesOnly);
+    auto theta = static_cast< VectorF >(solver.eigenvalues()); // Rayleigh-Ritz values == nodes
+    auto ritz_values = py_array< double >(theta.size(), theta.data());
+    return ritz_values;
+  });
+
 };
+
 
 
 

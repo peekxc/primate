@@ -6,9 +6,11 @@ All notable changes to this project will be documented in this file. This projec
 - Removed ability to specify scalar-valued matrix functions 
 - Added ability to specify vector-valued matrix functions (strictly more general!)
 - Added transform() function to MatrixFunction class to allow preprocessing of vector inputs (e.g. for deflation)
-- Fixed issue related to NaN's being generated from traces of diagonal matrices 
+<!-- - Fixed issue related to NaN's being generated from traces of diagonal matrices  -->
 - Fixed crashing bug related to auto-detection of number of threads to launch when <= 0
 - Preliminary (undocumented) support added for native matrix functions, paving the way for other FFI bindings, e.g. Numba or Cython
+- Updated CI linux wheel to manylinux2014 for improved compatibility for other systems
+- Revamped Hutch++ implementation
 
 ## v0.3.6
 - Updated hutch to correctly account for different confidence levels when use_CLT=True 

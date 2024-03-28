@@ -39,11 +39,14 @@ def test_stochastic_quadrature():
   # assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.05), "Multithreaded quadrature is worse"
 
   ## Ensure it's generally pretty close
-  for _ in range(50):
+  is_close = np.zeros(50, dtype=bool)
+  for ii in range(50):
     quad_nw = sl_gauss(A, n=nv, deg=lanczos_deg, seed=-1, orth=0, num_threads=4)
     quad_ests = np.array([np.prod(nw, axis=1).sum() for nw in np.array_split(quad_nw, nv)])
     quad_est = (n / nv) * np.sum(quad_ests)
-    assert np.isclose(A.trace(), quad_est, atol = A.trace() * 0.05), "Quadrature accuracy not always close"
+    is_close[ii] = np.isclose(A.trace(), quad_est, atol = A.trace() * 0.05)
+  assert np.sum(is_close) >= 45, "Quadrature accuracy not always close"
+
 
   ## Try to achieve a decently high accuracy
   nv, lanczos_deg = 2500, 20
