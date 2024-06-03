@@ -177,14 +177,14 @@ def hutch(
 	N: int = A.shape[0]
 	nv: int = int(maxiter)  
 	seed: int = int(seed)
-	deg: int = int(np.clip(deg, 1, N))
-	ncv: int = int(np.clip(ncv, 2, min(deg, N)))
-	orth: int = int(min(deg if orth < 0 or orth > deg else orth, ncv - 1))
+	deg: int = N if deg < 0 else int(np.clip(deg, 1, N)) # 1 <= deg <= N
+	ncv: int = int(np.clip(ncv, 2, min(deg, N)))				 # 2 <= ncv <= deg
+	orth: int = int(max(0, np.clip(orth, 0, ncv - 2))) # orth <= (deg - 2)
 	atol: float = 0.0 if atol is None else float(atol)  
 	rtol: float = 0.0 if rtol is None else float(rtol) 
 	## *should* be safe to pass <= 0 on C++ side, but for redundancy we use os.cpu_count()
 	num_threads: int = os.cpu_count() if num_threads < 0 else int(num_threads) 
-	assert ncv >= 2 and orth < ncv and ncv <= deg, f"Invalid Lanczos parameters (orth < ncv? {orth < ncv}, ncv >= 2 ? {ncv >= 2}, ncv <= deg? {ncv <= deg})"
+	assert ncv >= 2 and ncv >= (orth+2) and ncv <= deg, f"Invalid Lanczos parameters ncv={ncv}, orth={orth}, deg={deg}; (orth < ncv? {orth < ncv}, ncv >= 2 ? {ncv >= 2}, ncv <= deg? {ncv <= deg})"
 
 	## Adjust tolerance for the quadrature estimates
 	atol /= A.shape[1]

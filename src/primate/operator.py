@@ -131,3 +131,53 @@ class OrthComplement(LinearOperator):
 	def _matvec(self, x: np.ndarray) -> np.ndarray:
 		y = self._deflate(x)
 		return self._deflate(self.A @ y)
+
+class ShiftedOp(LinearOperator):
+	"""Shifted Operator implementing shifted matrix-vector multiplication of the form (A - \\sigma) x."""
+	def __init__(self, A, sigma = 0.0):
+		self.A = A
+		self.dtype = A.dtype 
+		self.shape = A.shape
+		self.sigma = sigma
+
+	def _matvec(self, x: np.ndarray) -> np.ndarray:
+		x = x[:,np.newaxis] if x.ndim == 1 else x
+		return self.A @ x - self.sigma * x
+
+	# def _adjoint(self):
+	# 	return ShiftedOp(self.A.T, self.sigma)
+
+ITERATIVE_SOLVERS = ["bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr"]
+
+class ShiftedInvOp(LinearOperator):
+	"""Generic Linear Operator for iterative"""
+	def __init__(self, A: LinearOperator, sigma: float = 0.0, solver: str = "cg", **kwargs):
+		import scipy.sparse.linalg as sp_linalg
+		# assert isinstance(A_shift, ShiftedOp)
+		assert solver in ITERATIVE_SOLVERS, f"Solver must be one of: {str(ITERATIVE_SOLVERS)}"
+		self.A_shift = ShiftedOp(A, sigma)
+		self.dtype = self.A_shift.dtype 
+		self.shape = self.A_shift.shape
+		self.solver = getattr(sp_linalg, solver)
+		assert isinstance(self.solver, Callable), f"Unknown solver '{str(solver)}'"
+		self.params = kwargs
+		self.num_matvecs = 0
+
+	@property
+	def sigma(self):
+		return self.A_shift.sigma
+
+	@sigma.setter
+	def sigma(self, value: float):
+		self.A_shift.sigma = value
+
+	def _matvec(self, x, **kwargs):
+		self.num_matvecs += 1
+		params = self.params | kwargs
+		return self.solver(self.A_shift, x, **params)[0]
+
+	def _adjoint(self):
+		op = ShiftedInvOp(self.A_shift.T, self.sigma)
+		op.params = self.params.copy()
+		op.solver = self.solver.copy()
+		return op

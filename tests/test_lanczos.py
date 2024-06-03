@@ -24,8 +24,8 @@ def test_basic():
   true_ew = eigh_tridiagonal(a,b, eigvals_only=True)
   test_rw = _lanczos.ritz_values(a, np.append(0,b), n)
   assert np.allclose(np.sort(test_rw), np.sort(true_ew))
-
-  # py_array< double > a, py_array< double > b, const int k, const int method = 0) -> py_array< double > {
+# from primate.functional import estimate_spectral_gap
+# estimate_spectral_gap(A)
 
 def test_matvec():
   from primate.diagonalize import lanczos
@@ -326,3 +326,31 @@ def test_rank_deficient():
 # quad1 = np.sum(_lanczos.quadrature(a, b, n, 0).prod(axis=1))
 # quad2 = np.sum(_lanczos.quadrature(a, b, n, 1).prod(axis=1))
 # assert np.isclose(quad1, quad2, atol=quad1*0.50)
+
+def test_orthogonalization():
+  from primate.diagonalize import lanczos
+  np.random.seed(1234)
+  n = 100
+  A_sparse = csc_array(symmetric(n))
+  v0 = np.random.uniform(size=n)
+  from scipy.linalg import eigh_tridiagonal
+  ew_true = np.linalg.eigh(A_sparse.todense())[0]
+
+  rr_errors = {}
+  for i in range(30):
+    rr_errors[i] = []
+    v0 = np.random.uniform(size=n)
+    for j in range(0, n):
+      (a,b) = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=j, return_basis = False)
+      ew_test = eigh_tridiagonal(a,b,eigvals_only=True)
+      rr_errors[i].append(np.linalg.norm(np.sort(ew_test) - np.sort(ew_true)))
+
+  ## Up to 5, results are identical, then through about 35 the error increases on average 
+  ## only to really start descending around 50; past ~90, error is near machine precision
+  from bokeh.plotting import figure, show 
+  from bokeh.io import output_notebook
+  output_notebook()
+  p = figure(width=350, height=250)
+  for i in range(30):
+    p.line(np.arange(len(rr_errors[i])), rr_errors[i])
+  show(p)

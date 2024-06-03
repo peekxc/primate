@@ -7,7 +7,7 @@ import bisect
 
 from .trace import hutch, xtrace
 from .operator import matrix_function
-from .diagonalize import lanczos
+from .diagonalize import lanczos, _lanczos
 
 ## Since Python has no support for inline creation of sized generators 
 ## Based on "Estimating the Largest Eigenvalue by the Power and Lanczos Algorithms with a Random Start"
@@ -22,18 +22,42 @@ class RelativeErrorBound():
   def __getitem__(self, i: int):
     return -self.base_num / i**2
 
-def estimate_spectral_radius(A: Union[LinearOperator, np.ndarray], rtol: float = 0.01):
+def estimate_spectral_radius(A: Union[LinearOperator, np.ndarray], rtol: float = 0.01, full_output: bool = False):
+  """Estimates the spectral radius and the best guess threshold for indicating rank deficiency using the Lanczos method."""
+  assert len(A.shape) == 2 and len(np.unique(A.shape)) == 1, "A must be square"
   EPS = np.finfo(A.dtype).eps
   n = A.shape[0]
+  deg_bound = n
   if n < 150:
-    rel_error_bound = 2.575 * np.log(A.shape[0]) / np.arange(4, n)**2
+    rel_error_bound = 2.575 * np.log(n) / np.arange(4, n)**2
     deg_bound = max(np.searchsorted(-rel_error_bound, -rtol) + 5, 4)
-    return deg_bound
   else: 
     ## This does binary search like searchsorted but uses O(1) memory
     re_bnd = RelativeErrorBound(n)
     deg_bound = max(bisect.bisect_left(re_bnd, -rtol) + 1, 4)
-    return deg_bound
+  k: int = min(deg_bound, n-1)
+  v0 = np.random.uniform(size=n)
+  v0 /= np.linalg.norm(v0)
+  (a,b) = lanczos(A, v0=v0, orth=k-1, return_basis=False)
+  rw = _lanczos.ritz_values(a, np.append(0.0,b), k)
+  if not full_output:
+    return np.max(rw)
+  else: 
+    sr = np.max(rw)  # spectral radius estimate
+    tol = sr * n * EPS  # NumPy default tolerance 
+    rw_diffs = np.abs(np.diff(rw)/np.where(rw[1:] <= 0, 1.0, rw[1:]))
+    # np.argmax(np.diff(x) / np.where(x[1:] <= 0, 1.0, x[1:])) + 1
+    rw[np.argmax(rw_diffs)+1]
+    if full_output:
+      out = {
+        "gap" : np.min(rw),
+        "tolerance" : tol, 
+        "ritz_values" : rw, 
+        "deg_bound" : deg_bound, 
+        "rtol" : rtol, 
+        "spectral_radius" : sr
+      }
+    return out
 
 def numrank(
   A: Union[LinearOperator, np.ndarray],
@@ -87,6 +111,7 @@ def numrank(
     a,b = lanczos(A, deg=deg_bound)
     if psd:  
       if gap == "auto":   
+        # from scipy.linalg import eigh_tridiagonal
         rr, rv = eigh_tridiagonal(a,b)
         tol = np.max(rr) * A.shape[0] * EPS # NumPy default tolerance 
         min_id = np.flatnonzero(rr >= tol)[np.argmin(rr[rr >= tol])] # [0,n]
@@ -120,4 +145,6 @@ def numrank(
     default_kwargs.update(kwargs)
     M = matrix_function(A, **default_kwargs)
     est = xtrace(M)
+  else: 
+    raise ValueError(f"Invalid estimator '{est}' provided.")
   return int(np.round(est)) if isinstance(est, Number) else est

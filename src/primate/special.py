@@ -25,7 +25,7 @@ def softsign(x: np.ndarray = None, q: int = 1):
 def smoothstep(x: np.ndarray = None, a: float = 0.0, b: float = 1.0) -> np.ndarray:
   """Smoothstep function.
   
-  This function computs a continuous version of the standard 'step' function by 
+  This function computes a continuous version of the standard 'step' function by 
   cubic Hermite interpolation "sigmoid-like" curve between 0 and 1 on the domain [a,b].
 
   The smoothstep function is often used in computer graphics and in shader programming, 
