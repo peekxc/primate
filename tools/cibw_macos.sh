@@ -3,8 +3,12 @@
 rm -rf /usr/local/bin/2to3/*
 brew install --force libomp llvm openblas
 
+export LDDFLAGS="$LDFLAGS -L/opt/homebrew/opt/libomp"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH"
+
 export CC=/usr/local/opt/llvm/bin/clang
 export CXX=/usr/local/opt/llvm/bin/clang++
+export PREFIX=
 export CPPFLAGS="$CPPFLAGS -Xpreprocessor -fopenmp"
 export CFLAGS="$CFLAGS -Wno-implicit-function-declaration -I$PREFIX/include"
 export CXXFLAGS="$CXXFLAGS -I$PREFIX/include"
