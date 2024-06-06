@@ -16,6 +16,10 @@ export LDFLAGS="$LDFLAGS -Wl,-rpath,$PREFIX/lib -L$PREFIX/lib -lomp"
 export LDFLAGS="$LDFLAGS -Wl,-S -Wl,-rpath,$PREFIX/lib -L$PREFIX/lib -lomp"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
+# Add OpenMP LD FLags
+export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/libomp/lib"
+export CXXFLAGS="$CXXFLAGS -I/opt/homebrew/opt/libomp/include"
+
 if [[ $(uname -m) == "arm64" && "$CIBW_BUILD" == "cp38-macosx_arm64" ]]; then
   # Enables native building and testing for macosx arm on Python 3.8. For details see:
   # https://cibuildwheel.readthedocs.io/en/stable/faq/#macos-building-cpython-38-wheels-on-arm64
