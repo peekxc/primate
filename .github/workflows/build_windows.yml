@@ -48,7 +48,7 @@ jobs:
     ## NOTE: this installs clang, clang-cl, lld, etc
     - name: Install Clang with OpenMP support using Chocolatey
       run: |
-        choco install -y llvm --params "clang;compiler=clang" --version 17.0.0
+        choco install -y llvm --params "clang;compiler=clang" --version 18.1.0
         $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
         clang --version
     # - name: Install OpenBLAS using Chocolatey
