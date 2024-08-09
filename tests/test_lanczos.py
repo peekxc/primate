@@ -14,7 +14,7 @@ sys.path.insert(0, rel_dir + '/tests')
 def test_basic():
   from primate.diagonalize import lanczos
   np.random.seed(1234)
-  n = 10
+  n = 100
   A_sparse = csc_array(symmetric(n))
   v0 = np.random.uniform(size=n)
   (a,b), Q = lanczos(A_sparse, v0=v0, rtol=1e-8, orth=n-1, return_basis = True)
@@ -24,6 +24,7 @@ def test_basic():
   true_ew = eigh_tridiagonal(a,b, eigvals_only=True)
   test_rw = _lanczos.ritz_values(a, np.append(0,b), n)
   assert np.allclose(np.sort(test_rw), np.sort(true_ew))
+
 # from primate.functional import estimate_spectral_gap
 # estimate_spectral_gap(A)
 

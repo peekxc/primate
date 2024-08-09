@@ -82,41 +82,41 @@ def hutch(
 	Parameters
 	----------
 	A : ndarray, sparray, or LinearOperator
-	    real symmetric operator.
+			real symmetric operator.
 	fun : str or Callable, default="identity"
-	    real-valued function defined on the spectrum of `A`.
+			real-valued function defined on the spectrum of `A`.
 	maxiter : int, default=10
-	    Maximum number of random vectors to sample for the trace estimate.
+			Maximum number of random vectors to sample for the trace estimate.
 	deg  : int, default=20
-	    Degree of the quadrature approximation. Must be at least 1. 
+			Degree of the quadrature approximation. Must be at least 1. 
 	atol : float, default=None
-	    Absolute tolerance to signal convergence for early-stopping. See notes.
+			Absolute tolerance to signal convergence for early-stopping. See notes.
 	rtol : float, default=1e-2
-	    Relative tolerance to signal convergence for early-stopping. See notes.
+			Relative tolerance to signal convergence for early-stopping. See notes.
 	stop : str, default="confidence"
-	    Early-stopping criteria to test estimator convergence. See details.
+			Early-stopping criteria to test estimator convergence. See details.
 	ncv : int, default=2
 			Number of Lanczos vectors to allocate. Must be at least 2. 
 	orth: int, default=0
-	    Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`. 
+			Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`. 
 	quad: { 'golub_welsch', 'fttr' }, default='golub_welsch'
 			Method used to obtain the weights of the Gaussian quadrature. See notes. 
 	confidence : float, default=0.95
-	    Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
+			Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
 	pdf : { 'rademacher', 'normal' }, default="rademacher"
-	    Choice of zero-centered distribution to sample random vectors from.
+			Choice of zero-centered distribution to sample random vectors from.
 	rng : { 'splitmix64', 'xoshiro256**', 'pcg64', 'mt64' }, default="pcg64"
-	    Random number generator to use.
+			Random number generator to use.
 	seed : int, default=-1
-	    Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
+			Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
 	num_threads: int, default=0
-	    Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.
+			Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.
 	plot : bool, default=False
-	    If true, plots the samples of the trace estimate along with their convergence characteristics.
+			If true, plots the samples of the trace estimate along with their convergence characteristics.
 	info: bool, default=False
-	    If True, returns a dictionary containing all relevant information about the computation.
+			If True, returns a dictionary containing all relevant information about the computation.
 	kwargs : dict, optional
-	    additional key-values to parameterize the chosen function 'fun'.
+			additional key-values to parameterize the chosen function 'fun'.
 
 	Returns
 	-------
@@ -316,6 +316,7 @@ def hutchpp(
 		
 	## Modify the info dict
 	deg = 1 if fun is None else A.deg
+	print(f"Deflation: {tr_defl}, Residual: {tr_resi}")
 	info_dict['estimate'] = tr_defl + tr_resi
 	info_dict['estimator'] = 'Hutch++'
 	info_dict['n_matvecs'] = 2*nb*deg + info_dict.get('n_samples', maxiter)*deg
@@ -339,11 +340,11 @@ def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, method:
 
 	## Handle the scale
 	if not method == 'sphere':
-	  scale = np.ones(m)[:,np.newaxis] # this is a column vector
+		scale = np.ones(m)[:,np.newaxis] # this is a column vector
 	else:
-	  col_norm = lambda X: np.linalg.norm(X, axis=0)
-	  c = n - m + 1
-	  scale = c / (n - (col_norm(W_proj)[:,np.newaxis])**2 + (diag_prod(S,W_proj) * col_norm(S)[:,np.newaxis])**2)
+		col_norm = lambda X: np.linalg.norm(X, axis=0)
+		c = n - m + 1
+		scale = c / (n - (col_norm(W_proj)[:,np.newaxis])**2 + (diag_prod(S,W_proj) * col_norm(S)[:,np.newaxis])**2)
 
 	## Intermediate quantities
 	H = Q.T @ Z

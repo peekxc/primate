@@ -139,15 +139,30 @@ class ShiftedOp(LinearOperator):
 		self.dtype = A.dtype 
 		self.shape = A.shape
 		self.sigma = sigma
+		self.num_matvecs = 0
+		self.num_adjoint = 0
 
 	def _matvec(self, x: np.ndarray) -> np.ndarray:
 		x = x[:,np.newaxis] if x.ndim == 1 else x
+		self.num_matvecs += 1
 		return self.A @ x - self.sigma * x
+
+	def _rmatvec(self, x: np.ndarray) -> np.ndarray: 
+		x = x[:,np.newaxis] if x.ndim == 1 else x
+		self.num_matvecs += 1
+		self.num_adjoint += 1
+		return self.A.T @ x - self.sigma * x
+
+	def _matmat(self, X: np.ndarray) -> np.ndarray:
+		X = X[:,np.newaxis] if X.ndim == 1 else X
+		self.num_matvecs += X.shape[1]
+		return self.A @ X - self.sigma * X
+
 
 	# def _adjoint(self):
 	# 	return ShiftedOp(self.A.T, self.sigma)
 
-ITERATIVE_SOLVERS = ["bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr"]
+ITERATIVE_SOLVERS = ["bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr", "lsqr", "lsmr"]
 
 class ShiftedInvOp(LinearOperator):
 	"""Generic Linear Operator for iterative"""
@@ -156,12 +171,14 @@ class ShiftedInvOp(LinearOperator):
 		# assert isinstance(A_shift, ShiftedOp)
 		assert solver in ITERATIVE_SOLVERS, f"Solver must be one of: {str(ITERATIVE_SOLVERS)}"
 		self.A_shift = ShiftedOp(A, sigma)
+		self.A_shift_T = ShiftedOp(A.T, sigma)
 		self.dtype = self.A_shift.dtype 
 		self.shape = self.A_shift.shape
 		self.solver = getattr(sp_linalg, solver)
 		assert isinstance(self.solver, Callable), f"Unknown solver '{str(solver)}'"
 		self.params = kwargs
 		self.num_matvecs = 0
+		self.num_adjoint = 0
 
 	@property
 	def sigma(self):
@@ -170,14 +187,22 @@ class ShiftedInvOp(LinearOperator):
 	@sigma.setter
 	def sigma(self, value: float):
 		self.A_shift.sigma = value
+		self.A_shift_T.sigma = value
 
 	def _matvec(self, x, **kwargs):
 		self.num_matvecs += 1
 		params = self.params | kwargs
 		return self.solver(self.A_shift, x, **params)[0]
 
-	def _adjoint(self):
-		op = ShiftedInvOp(self.A_shift.T, self.sigma)
-		op.params = self.params.copy()
-		op.solver = self.solver.copy()
-		return op
+	def _rmatvec(self, x, **kwargs):
+		self.num_matvecs += 1
+		params = self.params | kwargs
+		return self.solver(self.A_shift_T, x, **params)[0]
+
+	# def _adjoint(self):
+	# 	self.num_adjoint += 1
+	# 	op = ShiftedInvOp(self.A_shift.T, self.sigma)
+	# 	op.params = self.params.copy()
+	# 	op.solver = self.solver.copy()
+	# 	return op
+	

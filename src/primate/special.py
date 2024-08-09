@@ -22,7 +22,7 @@ def softsign(x: np.ndarray = None, q: int = 1):
     return sx if len(sx) > 1 else np.take(sx,0)
   return _sign(x) if x is not None else _sign
 
-def smoothstep(x: np.ndarray = None, a: float = 0.0, b: float = 1.0) -> np.ndarray:
+def smoothstep(x: np.ndarray = None, a: float = 0.0, b: float = 1.0, deg: int = 3) -> np.ndarray:
   """Smoothstep function.
   
   This function computes a continuous version of the standard 'step' function by 
@@ -32,7 +32,9 @@ def smoothstep(x: np.ndarray = None, a: float = 0.0, b: float = 1.0) -> np.ndarr
   see the wikipedia page "smoothstep" for more details. Also see [this video](https://www.youtube.com/watch?v=60VoL-F-jIQ)
   for desmos visualization that derives it. 
   """
+  assert (deg % 2) == 1, "Degree must be odd"
   d: float = (b-a) if a != b else 1.0
+  
   def _smoothstep(x):
     y = np.clip((x-a)/d, 0.0, 1.0) # maps [a,b] |-> [0,1]
     y = 3*y**2 - 2*y**3
@@ -53,7 +55,7 @@ def step(x: np.ndarray = None, c: float = 0.0, nonnegative: bool = False):
     return np.where(x < c, 0.0, 1.0)
   return _step(x) if x is not None else _step
 
-def param_callable(fun: str, **kwargs) -> Callable:
+def param_callable(fun: str, kwargs: dict) -> Callable:
   # assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
   if fun == "identity":
     return identity

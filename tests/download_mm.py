@@ -1,46 +1,286 @@
 import numpy as np
 import ssgetpy
 from ssgetpy import search, fetch
+import pathlib
 
-from collections import namedtuple
-MatrixRecord = namedtuple("MatrixRecord", ["matrix_norm", "spectral_gap", "rank", "nullity"])
+from primate.operator import ShiftedOp
 
-def download_ssmc(matrix_list):
+def infer_literal(s):
+  """Attempts to convert the type of 's' into a natural base type, e.g. int, float, or str"""
+  from ast import literal_eval
+  if isinstance(s, str):
+    try:
+      val = literal_eval(s)
+    except:
+      val = s
+  else:
+    val = s
+  val = int(val) if isinstance(val, float) and val.is_integer() else val
+  return val
+  
+def download_ssmc(matrix_list, output_dir: str):
   assert isinstance(matrix_list, ssgetpy.matrix.MatrixList), "Invalid matrix list given"
-  from scipy.io import loadmat
+  from scipy.io import loadmat, savemat
+  from scipy.sparse import save_npz
+  import pickle
   import requests
   import pandas as pd
-  SP = []
+  import os.path
+  from collections import namedtuple
+  MatrixRecord = namedtuple("MatrixRecord", ["matrix_norm", "spectral_gap", "rank", "nullity"])
+
   for M in matrix_list:
     url = M.url().replace("MM/", "")[:-7]
     html = requests.get(url).content
     df_list = pd.read_html(html)
-    di = df_list[2].to_dict()['SVD Statistics.1']
-    sp_meta = MatrixRecord(float(di[0]), float(di[1]), int(di[3]), int(di[5]))
-    file_lst = M.download(format="MAT")
-    sp_mat = loadmat(file_lst[0])['Problem'][0][0][1]
-    SP.append((sp_mat, sp_meta))
-  return SP
+    sp_name = df_list[0].to_dict()[1][0]
+    out_file = output_dir + "/" + sp_name + ".npz"
+    di = df_list[2].to_dict()
+    if 'SVD Statistics.1' in di and not os.path.isfile(out_file):
+      di = di['SVD Statistics.1']
+      sp_meta = MatrixRecord(float(di[0]), float(di[1]), int(di[3]), int(di[5]))
+      file_lst = M.download(format="MAT")
+      sp_mat = loadmat(file_lst[0])['Problem'][0][0][1]
+      sp_meta1 = dict(zip(df_list[0].to_dict()[0].values(), df_list[0].to_dict()[1].values()))
+      sp_meta2 = dict(zip(df_list[1].to_dict()[0].values(), df_list[1].to_dict()[1].values()))
+      sp_meta3 = {
+        "matrix_norm" : float(di[0]), 
+        "spectral_gap": float(di[1]), 
+        "rank" : int(di[3]),
+        "nullity": int(di[5])
+      }
+      sp_meta = sp_meta1 | sp_meta2 | sp_meta3
+      sp_meta = { k : infer_literal(v) for k,v in sp_meta.items() }
+      # savemat(out_file, {'matrix' : sp_mat, 'meta': sp_meta},  do_compression=True)
+      np.savez_compressed(out_file, matrix=sp_mat, meta=sp_meta)
 
-mat_results = ssgetpy.search(isspd=False, dtype="real", rowbounds=(10, 1e5), limit=20)
-sp_mats = download_ssmc(mat_results)
 
-# eigvalsh_tridiagonal
+mat_results = ssgetpy.search(isspd=True, dtype="real", rowbounds=(10, 1e5), limit=250)
+download_ssmc(mat_results, '/Users/mpiekenbrock/primate/data')
+
+
+w = np.load("/Users/mpiekenbrock/primate/data/testing.npz", allow_pickle=True)
+
+
+# %% 
+npz_file = np.load("/Users/mpiekenbrock/primate/data/bcsstk05.npz", allow_pickle=True)
+A, meta = npz_file['matrix'], npz_file['meta']
+['matrix']
+
 
 # %% Parameter optimization 
 import optuna
-
-
+import os
 from primate.functional import numrank
 from primate.trace import hutch
+from primate.functional import spectral_density, spectral_gap
+from primate.quadrature import sl_gauss
 
-M, sp_info = sp_mats[3]
-sw = np.linalg.svd(M.todense())[1]
+pd = []
+npz_files = [fn for fn in os.listdir("/Users/mpiekenbrock/primate/data") if fn[-3:] == 'npz']
+for npz in npz_files:
+  npz_file = np.load("/Users/mpiekenbrock/primate/data/" + npz, allow_pickle=True)
+  A, meta = npz_file['matrix'].item(), npz_file['meta'].item()
+  if meta['Symmetric'].lower() == 'yes': # and meta['Positive Definite'].lower() == 'yes':
+    pd.append((A, meta))
+
+full_rank = np.array([meta['Num Rows'] == meta['rank'] for (A, meta) in pd])
+print(f"Full rank: {np.sum(full_rank)}/{len(pd)}")
+rank_deficient = [(A, meta) for (A,meta), is_fr in zip(pd, full_rank) if not is_fr]
+
+## Load a rank deficient matrix 
+from primate.functional import normalize_spectrum
+A, meta = rank_deficient[2]
+# A.data = np.sign(A.data)
+A, sr = normalize_spectrum(A)
+ew = np.linalg.eigh(A.todense())[0]
+pos_ew = np.sort(ew)[-meta['rank']:]
+gap = np.min(pos_ew)
+print(f"True gap: {gap}, True rank: {meta['rank']}, shape: {A.shape}, interval: [{np.min(ew)}, {np.max(ew)}]")
+from scipy.sparse import csr_array
+# gap_est = spectral_gap(A, shortcut=True)  
+# print(np.isclose(gap_est, gap))
+
+## Maybe just try 
+
+
+from scipy.sparse.linalg import eigsh
+B = ShiftedOp(A)
+# eigsh(B, k=1, which='LM', sigma=0.0)
+# B.num_matvecs
+# Stopped at 340k!
+
+## lsmr is indeed better
+from scipy.sparse.linalg import cg, cgs, lgmres, lsqr, lsmr
+from primate.operator import ShiftedInvOp
+x = np.random.uniform(size=B.shape[0])
+# b = B @ x
+b = np.ones(B.shape[0])
+lsqr(B, b)
+lsmr(B, b)
+B.num_matvecs = 0
+cgs(B, b)
+cg(B, b)
+
+op = ShiftedInvOp(A, sigma=1e-9, solver="lsmr")
+eigsh(op, which='LM', k=1, sigma=op.sigma, OPinv=op, return_eigenvectors=False, tol=0).take(0)
+op.num_matvecs
+op.A_shift.num_matvecs
+
+
+from primate.diagonalize import lanczos, rayleigh_ritz, eigh_tridiagonal
+from scipy.sparse.linalg import aslinearoperator
+# (a,b), Q = lanczos(B, deg=B.shape[0], return_basis = True)
+# rw, Y = eigh_tridiagonal(a, b)
+rw, Y, Q = rayleigh_ritz(B, deg=20, return_eigenvectors=True, return_basis=True)
+
+Minv = Q @ Y @ np.diag(1/rw) @ Y.T @ Q.T
+cgs(B, b, M=Minv)
+lsmr(B, x)
+
+# rw, Y = rayleigh_ritz(B, deg = 20, return_eigenvectors=True)
+
+Minv = np.diag(np.reciprocal(rw))
+def preconditioner(x):
+  return Y @ Minv @ Y.T @ x
+
+aslinearoperator(preconditioner)
+cg(B, b, M=preconditioner)
+
+## All the non-least-squares solvers returns junk (every element is +/- Ce+17) after 48750 (10*n) iterations
+## unless b is actually in the image of A
+
+from primate.diagonalize import rayleigh_ritz
+rayleigh_ritz(A, deg=500)
+
+# %% Try shift-invert tridiagonal 
+from primate.random import symmetric
+from primate.diagonalize import lanczos 
+np.random.seed(1234)
+ew = np.random.uniform(size=100, low=0, high=1.0)
+ew[ew <= 0.10] = 0.0
+# ew = np.array([0, 0, 0.001, 0.1, 0.5, 0.75, 0.75, 0.80, 0.90, 1.0])
+A = symmetric(len(ew), pd=False, ew=ew) 
+
+B = lanczos(A, deg=A.shape[0], sparse_mat=True)
+from scipy.linalg import solve_triangular, eigvalsh_tridiagonal
+from scipy.sparse.linalg import aslinearoperator, spsolve_triangular
+
+from line_profiler import LineProfiler
+op = ShiftedInvOp(B, sigma=1e-5, solver="lgmres")
+
+profile = LineProfiler()
+# profile.add_function(eigsh)
+profile.add_function(hutch)
+profile.add_function(op._matvec)
+profile.enable_by_count()
+
+profile.print_stats()
+
+eigsh(op, which='LM', k=1, sigma=op.sigma, OPinv=op, return_eigenvectors=False, tol=0).take(0)
+
+from primate.trace import hutch
+hutch(A, fun="smoothstep", a=1e-9, b=9.78158977673704e-06, verbose=True, deg=1000, maxiter=10)
+
+from scipy.linalg import eigh_tridiagonal
+
+a,b = lanczos(A, deg=A.shape[0])
+rw = rayleigh_ritz(A, deg=A.shape[0])
+rw_min, rv_min = eigh_tridiagonal(a, b, eigvals_only=False, select='i', select_range=(2,2))
+
+op = ShiftedInvOp(A, sigma=rw_min, solver="lgmres", maxiter=10)
+eigsh(op, which='LM', k=1, sigma=op.sigma, OPinv=op, return_eigenvectors=False, tol=0.4).take(0)
+
+op.num_matvecs
+
+H = (A - rw_min*np.eye(A.shape[0])) @ (A - rw_min*np.eye(A.shape[0]))
+from scipy.sparse.linalg import eigsh
+
+from scipy.sparse.linalg._interface import _PowerLinearOperator
+from primate.operator import ShiftedOp
+from scipy.optimize import minimize_scalar
+HS = ShiftedOp(A, sigma=rw_min.item())
+HP = _PowerLinearOperator(HS, 2)
+# eigsh(A, k=1, which='LM', return_eigenvectors=False)
+omega = spectral_radius(HP)
+B = ShiftedOp(HP, sigma=omega)
+eigsh(B, k=1, which='LM', return_eigenvectors=False)
+
+xp = spectral_radius(B, rtol=0.00001)
+obj = lambda x: (xp - ((x - rw_min)**2 + omega))**2 
+res = minimize_scalar(obj)
+res.x
+
+B, sr = normalize_spectrum(A)
+hutch(B, fun="smoothstep", a=1e-9, b=6.79706e-07, deg=B.shape[0])
+
+
+from scipy.sparse.linalg import lgmres, cg, cgs
+_, V = eigh_tridiagonal(a, b, eigvals_only=False, select='i', select_range=(1,3))
+
+cgs(A, b=rv_min)
+cg(A, b=rv_min, rtol=0.01, atol=1e-5)
+
+(rv_test, _) = lgmres(A, b=rv_min, x0=rv_min, rtol=0.01, atol=1e-5, outer_k=3, outer_v=[(v, None) for v in V.T])
+rv_test /= np.linalg.norm(rv_test)
+rw_test = np.linalg.norm(A @ rv_test)
+
+diffs = A.dot( rv_test ) - rv_test * rw_test
+maxdiffs = np.linalg.norm( diffs, axis=0, ord=np.inf )
+print("|Av - λv|_max:", maxdiffs)
+
+
+cg(A, )
+
+import timeit
+timeit.timeit(lambda: op @ np.random.uniform(size=op.shape[1]), number=10)
+timeit.timeit(lambda: A @ np.random.uniform(size=op.shape[1]), number=10)
+
+
+np.linalg.norm((A @ rv_min) - rw_min * rv_min)
+# eigsh(aslinearoperator(A), which='LM', k=1, sigma=rw_min.item(), return_eigenvectors=False, tol=0.1, v0=rv_min.flatten())
+# eigsh(aslinearoperator(A), which='LM', k=1, sigma=9.76243e-06, return_eigenvectors=False, tol=0.1)
+
+
+# from primate.operator import ShiftedInvOp
+# from scipy.sparse.linalg import eigsh, aslinearoperator
+# # "bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr"
+# op = ShiftedInvOp(A, sigma=1e-6, solver="bicgstab", maxiter=20)
+# eigsh(op, which='LM', k=1, sigma=op.sigma, OPinv=op, return_eigenvectors=False, tol=0.4).take(0)
+    
+# op.num_matvecs
+# op.num_adjoint
+# eigsh(aslinearoperator(A), k=1, which='LM', sigma=1e-2, return_eigenvectors=False, tol=0.4)
+# nodes, weights = sl_gauss(A, n=50, deg=50).T
+
+x = np.random.uniform(size=A.shape[0])
+# x = np.random.choice([-1.0,1.0], size=A.shape[0])
+x /= np.linalg.norm(x)
+x @ A @ x
+
+
+
+spectral_density(A, plot=False)
+
+nodes, weights = sl_gauss(A, n=150, deg=20).T
+np.min(nodes)
+
+gap
+
+
+p = figure()
+p.scatter(np.arange(len(rdiffs)), rdiffs)
+show(p)
+
+# sw = np.linalg.svd(A.todense())[1]
 max_b = min(sw[~np.isclose(sw, 0.0)])
 min_a = min(sw)
 
+
+
+# %% 
 from primate.functional import estimate_spectral_radius
-estimate_spectral_radius(M, rtol = 0.0001, full_output=True)
+estimate_spectral_radius(A, rtol = 0.0001, full_output=True)
 
 def objective(trial):
   a = trial.suggest_float('a', 0.10 * min_a, 100 * min_a)

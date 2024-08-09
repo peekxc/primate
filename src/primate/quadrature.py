@@ -5,7 +5,7 @@ from scipy.sparse.linalg import LinearOperator
 from scipy.linalg import solve_triangular
 from scipy.stats import t
 from scipy.special import erfinv
-from numbers import Real
+from numbers import Real, Number
 
 ## Package imports
 from .random import _engine_prefixes, _engines, isotropic

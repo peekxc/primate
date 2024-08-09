@@ -138,6 +138,24 @@ PYBIND11_MODULE(_lanczos, m) {
     return ritz_values;
   });
 
+  m.def("ritz_vectors", [](py_array< double > alpha, py_array< double > beta, const int k) -> py::tuple { 
+    using VectorF = Eigen::Array< double, Dynamic, 1>;
+    // using MatrixF = Eigen::Array< double, Dynamic, 2>;
+    using MatrixF = Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic >;
+    assert(beta[0] == 0.0);
+    const double* alpha_ptr = alpha.data();
+    const double* beta_ptr = beta.data();
+    Eigen::Map< const VectorF > a(alpha_ptr, k);        // diagonal elements
+    Eigen::Map< const VectorF > b(beta_ptr+1, k-1);     // subdiagonal elements (offset by 1!)
+    auto solver = Eigen::SelfAdjointEigenSolver< DenseMatrix< double > >(k);
+    solver.computeFromTridiagonal(a, b, Eigen::DecompositionOptions::ComputeEigenvectors);
+    auto theta = static_cast< VectorF >(solver.eigenvalues()); // Rayleigh-Ritz values == nodes
+    auto V = static_cast< MatrixF >(solver.eigenvectors());  
+    auto ritz_values = py_array< double >(theta.size(), theta.data());
+    // auto ritz_vectors = py_array< double >(V.size(), V.data());
+    return py::make_tuple(ritz_values, V);
+  });
+
 };
 
 

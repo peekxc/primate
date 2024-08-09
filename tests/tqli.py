@@ -372,6 +372,9 @@ def sign(a, b):
   return int(b > 1) - int(a < 0) + 1
 
 ## Based on: https://github.com/rappoccio/PHY410/blob/f6a183eb48807841f6d35be45b4aa845d905a04c/cpt_python/cpt.py#L438
+## This uses Givens rotations instead of divide-and-conquer to find the eigenvalues of a tridiagonal matrix 
+## Uses O(1) space, thus is preferred over Golub-Welsch if only ritz values are needed and space is an issue. 
+## However this is much slower and less stable than divide-and-conquer, if can fit in memory. 
 @nb.jit(nopython=True)
 def tqli(d: np.ndarray, e: np.ndarray, max_iter: int = 30):
   """Tridiagonal QL Implicit algorithm w/ shifts to determine the eigenvalues of a real symmetric tridiagonal matrix
@@ -429,6 +432,10 @@ def tqli(d: np.ndarray, e: np.ndarray, max_iter: int = 30):
           p = s * r
           d[i+1] = g + p
           g = c * r - b
+          # for k in range(n):
+          #   f = z[k][i+1]
+          #   z[k][i+1] = s * z[k][i] + c * f
+          #   z[k][i] = c * z[k][i] - s * f
         if r == 0.0 and i >= l:
           continue
         d[l] -= p

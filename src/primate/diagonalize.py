@@ -1,7 +1,9 @@
 import numpy as np
 from typing import Optional
+from numpy.linalg import LinAlgError
 from scipy.sparse import spdiags
 from scipy.sparse.linalg import LinearOperator
+from scipy.linalg import eigvalsh_tridiagonal, eigh_tridiagonal
 import _lanczos
 
 def lanczos(
@@ -108,3 +110,31 @@ def lanczos(
 	else:
 		a, b = alpha[:deg], beta[1:deg]
 		return (a, b) if not return_basis else ((a, b), Q)
+
+def rayleigh_ritz(A, deg: int = None, return_eigenvectors: bool = False, method: str = "RRR", **kwargs):
+	n: int = A.shape[0]
+	deg: int = A.shape[1] if deg is None else min(deg, A.shape[1])
+	assert deg > 0, "Number of steps must be positive!"
+
+	## Run the lanczos method
+	deg = np.clip([deg], 2, n).item()
+	Q_basis = kwargs.pop("return_basis", False)
+	if Q_basis:
+		(a,b), Q = lanczos(A, deg=deg, return_basis=True, **kwargs)
+	else: 
+		(a,b) = lanczos(A, deg=deg, return_basis=False, **kwargs)
+	
+	## Try using the Relatively Robust Representations (RRR) method first
+	## Falls back to implicit symmetric QR with Wilkinson shifts (algorithm 8.3.2 from Golub's "Matrix Computations")
+	if not return_eigenvectors:
+		try:
+			rw = eigvalsh_tridiagonal(a, b, select='a', lapack_driver='stemr')
+		except LinAlgError:
+			rw = _lanczos.ritz_values(a, np.append(0, b), deg)
+		return rw if not Q_basis else (rw, Q)
+	else:
+		try:
+			rw, rv = eigh_tridiagonal(a, b, eigvals_only=False)
+		except LinAlgError:
+			rw, rv = _lanczos.ritz_vectors(a, np.append(0, b), deg)
+		return (rw, rv) if not Q_basis else (rw, rv, Q)
