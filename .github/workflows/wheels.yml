@@ -47,6 +47,10 @@ jobs:
       - name: Set VSDev RC (windows only)
         if: runner.os == 'Windows'
         run: | 
+          choco install -y llvm --params "clang;compiler=clang" --version 18.1.0
+          $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
+          clang --version
+          
           function Invoke-VSDevEnvironment {
             $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
               $installationPath = & $vswhere -prerelease -legacy -latest -property installationPath
@@ -61,7 +65,7 @@ jobs:
           Get-Command rc.exe | Format-Table -AutoSize
 
       - name: Build wheels via cibuildwheel
-        uses: pypa/cibuildwheel@v2.16.2
+        uses: pypa/cibuildwheel@v2.17.0
         env:
           CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }}*
           CIBW_ARCHS: ${{ matrix.buildplat[2] }}

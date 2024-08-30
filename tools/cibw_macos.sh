@@ -3,14 +3,22 @@
 rm -rf /usr/local/bin/2to3/*
 brew install --force libomp llvm openblas
 
+export LDDFLAGS="$LDFLAGS -L/opt/homebrew/opt/libomp"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig:$PKG_CONFIG_PATH"
+
 export CC=/usr/local/opt/llvm/bin/clang
 export CXX=/usr/local/opt/llvm/bin/clang++
+export PREFIX=
 export CPPFLAGS="$CPPFLAGS -Xpreprocessor -fopenmp"
 export CFLAGS="$CFLAGS -Wno-implicit-function-declaration -I$PREFIX/include"
 export CXXFLAGS="$CXXFLAGS -I$PREFIX/include"
 export LDFLAGS="$LDFLAGS -Wl,-rpath,$PREFIX/lib -L$PREFIX/lib -lomp"
 export LDFLAGS="$LDFLAGS -Wl,-S -Wl,-rpath,$PREFIX/lib -L$PREFIX/lib -lomp"
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+# Add OpenMP LD FLags
+export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/libomp/lib"
+export CXXFLAGS="$CXXFLAGS -I/opt/homebrew/opt/libomp/include"
 
 if [[ $(uname -m) == "arm64" && "$CIBW_BUILD" == "cp38-macosx_arm64" ]]; then
   # Enables native building and testing for macosx arm on Python 3.8. For details see:

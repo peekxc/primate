@@ -10,7 +10,7 @@
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-Estimator approximations are obtained via the _Lanczos_[^1] and _stochastic Lanczos quadrature_[^2] methods, which are well-suited for sparse or structured operators supporting fast $v \mapsto Av$ actions.
+This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the trace inverse, the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the trace of [matrix exponentials](https://en.wikipedia.org/wiki/Matrix_exponential), the [eigencount](https://doi.org/10.1002/nla.2048), the [spectral density](https://doi.org/10.1137/130934283), etc. 
 
 Notable features of `primate` include:
 
@@ -20,10 +20,24 @@ Notable features of `primate` include:
 - Support for _arbitrary_ `LinearOperator`'s, e.g. those in [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator) or [Pylops](https://pylops.readthedocs.io/en/stable/index.html)
 - Matrix-free interface to the _Lanczos_, _Golub-Welsch_, and _Gram Schmidt_ methods
 
+`primate` was partially inspired by the [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](https://peekxc.github.io/primate/imate_compare.html).
+
+## Applications 
+
+Applications of matrix functions include [characterizing folding in proteins](https://en.wikipedia.org/wiki/Estrada_index), [principal component regression](https://en.wikipedia.org/wiki/Principal_component_regression), [spectral clustering](https://en.wikipedia.org/wiki/Spectral_clustering),  [Gaussian process likelihood estimation](https://en.wikipedia.org/wiki/Gaussian_process), [counting triangles in distributed-memory networks](https://doi.org/10.1137/23M1548323), [characterizing graph similarity](https://doi.org/10.1016/j.patcog.2008.12.029), and [deep neural loss landscape analysis](https://proceedings.mlr.press/v97/ghorbani19b).
 <!-- Moreover, `primate`'s C++ API uses a generic template interface written with [C++20 Concepts](https://en.cppreference.com/w/cpp/language/constraints)---thus, any `LinearOperator` [fitting the constraints](https://github.com/peekxc/primate/blob/d09459c017fcba68a11eaeb56296ef0c97d6c053/include/_linear_operator/linear_operator.h#L21-L49).  -->
 <!-- To use,, the library is is [header-only](https://en.wikipedia.org/wiki/Header-only), so integration is a si.  -->
 
-`primate` was partially inspired by the [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](https://peekxc.github.io/primate/imate_compare.html).
+
+## Installation
+
+`primate` is a standard PEP-517 package that can be installed via pip:
+
+```{bash}
+python -m pip install scikit-primate
+```
+
+Assuming your platform is supported, no compilation is needed—see the [installation page](https://peekxc.github.io/primate/basic/install.html) for details.
 
 [^1]: Musco, Cameron, Christopher Musco, and Aaron Sidford. (2018) "Stability of the Lanczos method for matrix function approximation."
 [^2]: Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature.
