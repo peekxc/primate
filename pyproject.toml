@@ -29,7 +29,7 @@ include = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"]
+test = ["pytest", "pytest-cov", "pytest-benchmark"] # "bokeh"
 doc = ["quartodoc"]
 dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
 
@@ -44,7 +44,7 @@ norecursedirs = ["docs", "*.egg-info", ".git"]
 
 
 [tool.cibuildwheel]
-test-requires = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"] # coverage-badge
+test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badg, # "bokeh"
 # test-command = "coverage run --source={package} -m pytest {package}/tests" # "coverage report -m"
 test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
 build-verbosity = 1
@@ -53,16 +53,16 @@ skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit
 manylinux-x86_64-image = "manylinux2014"
 
 [tool.cibuildwheel.linux]
-before-build = "bash {project}/tools/cibw_linux.sh {project}"
+# before-build = "bash {project}/tools/cibw_linux.sh {project}"
 environment = { CC="gcc", CXX="g++" } # for manylinux2014
 # environment = { CC="clang", CXX="clang++" } # for manylinux_2_28
 
 # before-build = ["ulimit -n 4096", "yum install -y clang", "yum install -y openblas"]
 
 [tool.cibuildwheel.macos]
-before-build = "bash {project}/tools/cibw_macos.sh"
+# before-build = "bash {project}/tools/cibw_macos.sh"
 environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
 
 [tool.cibuildwheel.windows]
-before-build = "bash {project}/tools/cibw_windows.sh"
+# before-build = "bash {project}/tools/cibw_windows.sh"
 environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang-cl", CXX="clang-cl"}
