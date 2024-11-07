@@ -171,4 +171,4 @@ _cpp_args += cpp.get_supported_arguments(
 # openblas_link_args = ['-L' + openblas_lib, '-lopenblas']
 
 ## Compile the package directory
-subdir('src' / 'primate2')
+subdir('src' / 'primate')

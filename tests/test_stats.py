@@ -5,8 +5,9 @@ from primate.stats import MeanEstimatorCLT, confidence_interval
 def test_CLT():
 	rng = np.random.default_rng(1234)
 	mu = 5.0
-	est = MeanEstimatorCLT()
+	est = MeanEstimatorCLT(confidence=0.95)
 	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
+	est(samples)
 	assert est.n_samples == len(samples)
 	ci_test = np.array([est.mu_est - est.margin_of_error, est.mu_est + est.margin_of_error])
 	ci_true = np.array(confidence_interval(samples, confidence=0.95, sdist="normal"))

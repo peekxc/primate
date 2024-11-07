@@ -15,17 +15,17 @@ from geomcover.csgraph import cycle_graph
 from map2color import map2hex
 from memray import Tracker
 from notebooks.sparsifier import spectral_sparsifier
-from primate2.lanczos import lanczos
-from primate2.estimators import hutch
-from primate2.operators import MatrixFunction, Toeplitz, normalize_unit
-from primate2.special import param_callable
-from primate2.stochastic import symmetric
-from primate2.quadrature import lanczos_quadrature
+from primate.lanczos import lanczos
+from primate.estimators import hutch
+from primate.operators import MatrixFunction, Toeplitz, normalize_unit
+from primate.special import param_callable
+from primate.stochastic import symmetric
+from primate.quadrature import lanczos_quadrature
 from scipy.linalg import toeplitz
 from scipy.sparse import diags, sparray
 from scipy.sparse.linalg import eigsh
 
-from primate2.tridiag import eigvalsh_tridiag
+from primate.tridiag import eigvalsh_tridiag
 
 output_notebook()
 
@@ -127,7 +127,7 @@ d = A @ np.ones(A.shape[0])
 L = diags(d) - A
 
 
-from primate2.tridiag import eigvalsh_tridiag, eigh_tridiag
+from primate.tridiag import eigvalsh_tridiag, eigh_tridiag
 
 ew, _ = np.linalg.eigh(L.todense())
 np.sum(ew)
@@ -143,7 +143,7 @@ np.sum(ew)
 # np.mean(hutch(L, maxiter=15000, atol=0, rtol=0, seed=0))
 
 # %%
-# from primate2.stats import MeanEstimatorCLT, ControlVariateEstimator, control_variate_estimator
+# from primate.stats import MeanEstimatorCLT, ControlVariateEstimator, control_variate_estimator
 
 # est = MeanEstimatorCLT()
 # est(samples)

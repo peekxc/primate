@@ -4,7 +4,7 @@ build-backend = 'mesonpy'
 requires = ['meson-python', 'numpy', 'pythran', 'pythran-openblas', 'pybind11', 'nanobind']
 
 [project]
-name = 'primate'
+name = 'scikit-primate'
 version = '0.5.0'
 description = 'Package for implicit matrix function, trace, and diagonal estimation.'
 readme = 'README.md'

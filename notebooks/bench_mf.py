@@ -15,13 +15,13 @@ from bokeh.models import Legend, NumeralTickFormatter, BasicTickFormatter, Custo
 from geomcover.csgraph import cycle_graph
 from map2color import map2hex
 from memray import Tracker
-from primate2.operators import MatrixFunction, Toeplitz
-from primate2.stochastic import symmetric
-from primate2.special import param_callable
+from primate.operators import MatrixFunction, Toeplitz
+from primate.stochastic import symmetric
+from primate.special import param_callable
 from scipy.linalg import toeplitz
 from scipy.sparse import diags, sparray
 from scipy.sparse.linalg import eigsh, LinearOperator
-from primate2.operators import normalize_unit
+from primate.operators import normalize_unit
 
 
 output_notebook()

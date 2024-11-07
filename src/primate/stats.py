@@ -40,8 +40,6 @@ def confidence_interval(a: np.ndarray, confidence: float = 0.95, sdist: str = "t
 # 		self.it += 1
 # 		return self.it > self.maxiter
 
-from scipy.stats import sem, norm
-
 
 class ControlVariateEstimator:
 	def __init__(self, f: Callable[np.ndarray, float], ev: float, alpha: Optional[float] = None):
@@ -66,7 +64,7 @@ class ControlVariateEstimator:
 
 
 def control_variate_estimator(samples: np.ndarray, cvs: np.ndarray, mu: float, alpha: Optional[float] = None):
-	assert len(samples) == len(cvs), "Number fo control variables must match number of samples."
+	assert len(samples) == len(cvs), "Number of control variables must match number of samples."
 	n = len(samples)
 	if alpha is None:
 		C = np.cov(samples, cvs, ddof=1)  # sample covariance
@@ -81,18 +79,20 @@ def control_variate_estimator(samples: np.ndarray, cvs: np.ndarray, mu: float, a
 	return cv_est, (cv_est[-1] - z * SE, cv_est[-1] - z * SE)
 
 
-# Parameterize when to stop using either the CLT over the given confidence level or
+#
 # See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
 # def _parameterize_stop(criterion: str = "confidence") -> Callable:
 class MeanEstimatorCLT:
-	def __init__(
-		self,
-		samples: list = None,
-		confidence: float = 0.95,
-		atol: float = 0.05,
-		rtol: float = 0.01,
-		cvs: Optional[tuple] = None,
-	) -> None:
+	"""Parameterizes an expected value estimator that checks convergence within a confidence interval using the CLT.
+
+	Provides the following methods:
+		- __call__ = Updates the estimator with newly measured samples
+		- converged = Checks convergence of the estimator within an interval
+		-	plot = Plots the samples and their sample distribution CI's
+
+	"""
+
+	def __init__(self, samples: list = None, confidence: float = 0.95, atol: float = 0.05, rtol: float = 0.01) -> None:
 		self.mu_est, self.vr_est = 0.0, 0.0
 		self.mu_pre, self.vr_pre = 0.0, 0.0
 		self.n_samples = 0

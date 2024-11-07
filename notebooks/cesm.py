@@ -2,11 +2,11 @@
 import numpy as np
 from bokeh.io import output_notebook
 from bokeh.plotting import figure, show
-from primate2.quadrature import lanczos_quadrature, spectral_density
-from primate2.stochastic import symmetric
-from primate2.lanczos import lanczos, OrthogonalPolynomialBasis
-from primate2.stochastic import symmetric
-from primate2.quadrature import spectral_density
+from primate.quadrature import lanczos_quadrature, spectral_density
+from primate.stochastic import symmetric
+from primate.lanczos import lanczos, OrthogonalPolynomialBasis
+from primate.stochastic import symmetric
+from primate.quadrature import spectral_density
 from landmark import landmarks
 
 output_notebook()

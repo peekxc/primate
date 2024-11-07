@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Union, Any
 
 import numpy as np
-from scipy.sparse.linalg import LinearOperator, aslinearoperator
+from scipy.sparse.linalg import eigsh, LinearOperator, aslinearoperator
 from scipy.sparse.linalg._interface import IdentityOperator
 
 from .lanczos import _lanczos, _validate_lanczos
@@ -28,7 +28,7 @@ class MatrixFunction(LinearOperator):
 		assert deg >= 2, "Degree must be >= 2"
 		if fun is not None:
 			assert isinstance(fun, Callable), "Function must be numpy ufunc"
-		self._fun = fun
+		self._fun = fun if fun is not None else lambda x: x
 		self._deg = min(deg, A.shape[0])
 		self._alpha = np.zeros(self._deg + 1, dtype=dtype)
 		self._beta = np.zeros(self._deg + 1, dtype=dtype)
@@ -106,8 +106,6 @@ def normalize_unit(A: LinearOperator) -> LinearOperator:
 	"""Produces a normalized linear operator whose eigenvalues lie in the unit interval"""
 	A = aslinearoperator(A) if not isinstance(A, LinearOperator) else A
 	assert isinstance(A, LinearOperator), "A must be a linear operator"
-	from scipy.sparse.linalg import eigsh
-
 	alpha = eigsh(A, k=1, which="LM", return_eigenvectors=False).item()
 	I_op = IdentityOperator(A.shape)
 	return (A + alpha * I_op) / (2 * alpha)

@@ -2,8 +2,8 @@
 import numpy as np
 from bokeh.io import output_notebook
 from bokeh.plotting import figure, show
-from primate2.quadrature import lanczos_quadrature, spectral_density
-from primate2.stochastic import symmetric
+from primate.quadrature import lanczos_quadrature, spectral_density
+from primate.stochastic import symmetric
 
 output_notebook()
 
@@ -34,9 +34,9 @@ show(p)
 from bokeh.layouts import column, row
 from bokeh.models import Band, ColumnDataSource
 from landmark import landmarks
-from primate2.lanczos import lanczos, OrthogonalPolynomialBasis
-from primate2.stochastic import symmetric
-from primate2.quadrature import spectral_density
+from primate.lanczos import lanczos, OrthogonalPolynomialBasis
+from primate.stochastic import symmetric
+from primate.quadrature import spectral_density
 
 rng = np.random.default_rng(1234)
 xx = rng.uniform(size=35, low=0, high=1)
@@ -173,9 +173,9 @@ for deg in [2, 6, 10, 14, 18, 22]:
 
 
 # %% Orthogonal polynomials
-from primate2 import fttr
-from primate2.lanczos import lanczos
-from primate2.tridiag import eigh_tridiag
+from primate import fttr
+from primate.lanczos import lanczos
+from primate.tridiag import eigh_tridiag
 
 
 a, b = lanczos(A, deg=10)
@@ -216,7 +216,7 @@ basis(np.linspace(0, 1, 10))
 
 # %% Cumulative empirical spectral measure
 # np.power(ev.T @ v, 2)
-from primate2.lanczos import rayleigh_ritz
+from primate.lanczos import rayleigh_ritz
 
 rw, Y, Q = rayleigh_ritz(A, deg=20, return_eigenvectors=True, v0=v, return_basis=True)
 cw = np.square((Q @ Y).T @ v)
