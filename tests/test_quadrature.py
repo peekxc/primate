@@ -1,7 +1,7 @@
 import numpy as np
-from primate2.lanczos import lanczos
-from primate2.stochastic import symmetric
-from primate2.quadrature import lanczos_quadrature
+from primate.lanczos import lanczos
+from primate.stochastic import symmetric
+from primate.quadrature import lanczos_quadrature
 
 
 def test_quadrature():

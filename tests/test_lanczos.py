@@ -2,8 +2,8 @@
 
 import numpy as np
 from numpy.random import default_rng
-from primate2.lanczos import lanczos
-from primate2 import _lanczos
+from primate.lanczos import lanczos
+from primate import _lanczos
 from scipy.linalg import eigvalsh_tridiagonal
 
 

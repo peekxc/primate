@@ -1,6 +1,6 @@
 import numpy as np
-from primate2.estimators import hutch
-from primate2.stochastic import symmetric
+from primate.estimators import hutch
+from primate.stochastic import symmetric
 
 
 def test_hutch():

@@ -2,10 +2,10 @@
 
 import numpy as np
 from numpy.random import default_rng
-from primate2.lanczos import lanczos
-from primate2.tridiag import eigvalsh_tridiag, eigh_tridiag
-from primate2.stochastic import symmetric
-from primate2.tqli import tqli
+from primate.lanczos import lanczos
+from primate.tridiag import eigvalsh_tridiag, eigh_tridiag
+from primate.stochastic import symmetric
+from primate.tqli import tqli
 
 
 def test_tqli():

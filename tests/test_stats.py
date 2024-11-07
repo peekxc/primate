@@ -1,5 +1,5 @@
 import numpy as np
-from primate2.stats import MeanEstimatorCLT, confidence_interval
+from primate.stats import MeanEstimatorCLT, confidence_interval
 
 
 def test_CLT():

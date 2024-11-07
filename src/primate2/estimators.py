@@ -132,7 +132,7 @@ def hutch(
 
 	Examples:
 		```{python}
-		from primate2.estimators import hutch
+		from primate.estimators import hutch
 		```
 	"""
 	assert pdf in {"rademacher", "normal"}, f"Invalid distribution '{pdf}'; Must be one of 'rademacher' or 'normal'."

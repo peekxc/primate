@@ -1,10 +1,10 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
-from primate2.operators import matrix_function, MatrixFunction
-from primate2.stochastic import symmetric
-from primate2.lanczos import lanczos
-from primate2.tridiag import eigh_tridiag
-from primate2.special import param_callable, _builtin_matrix_functions
+from primate.operators import matrix_function, MatrixFunction
+from primate.stochastic import symmetric
+from primate.lanczos import lanczos
+from primate.tridiag import eigh_tridiag
+from primate.special import param_callable, _builtin_matrix_functions
 
 
 def test_operator_logic():

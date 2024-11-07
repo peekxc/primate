@@ -34,7 +34,7 @@ foreach pythran_ext : pythran_modules
 		cpp_args: [_cpp_args],
 		dependencies: [np_dep, pythran_dep],
 		install: true, 
-		subdir: 'primate2'
+		subdir: 'primate'
 	)
 endforeach
 
@@ -50,7 +50,7 @@ foreach ext: extensions
 		cpp_args: [_cpp_args],
 		dependencies: [np_dep],
 		install: true, 
-		subdir: 'primate2'
+		subdir: 'primate'
 	)
 endforeach
 
@@ -71,7 +71,7 @@ python_sources = [
 message('Source install dir = '+py.get_install_dir())
 py.install_sources(
   python_sources,
-  subdir: 'primate2', 
+  subdir: 'primate', 
   pure: false       # Will be installed next to binaries
 )
 
@@ -83,6 +83,6 @@ include_sources = [
 ]
 py.install_sources(
   include_sources,
-  subdir: 'primate2' / 'include', 
+  subdir: 'primate' / 'include', 
   pure: false       # Will be installed next to binaries
 )
