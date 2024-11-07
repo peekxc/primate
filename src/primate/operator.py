@@ -7,6 +7,7 @@ from numpy.typing import ArrayLike
 from .special import _builtin_matrix_functions
 import _operators
 
+
 def matrix_function(
 	A: Union[LinearOperator, np.ndarray],
 	fun: Union[str, Callable] = "identity",
@@ -15,24 +16,24 @@ def matrix_function(
 	orth: int = 0,
 	**kwargs,
 ) -> LinearOperator:
-	"""Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`. 
+	"""Constructs a `LinearOperator` approximating the action of the matrix function `fun(A)`.
 
 	This function uses the Lanczos method to approximate the action of matrix function:
 	$$ v \\mapsto f(A)v, \\quad f(A) = U f(\\lambda) U^T $$
 	The resulting operator may be used in conjunction with other methods, such as `hutch` or `xtrace`.
 
-	The resulting operator also supports fast evaluation of $f(A)$'s quadratic form: 
+	The resulting operator also supports fast evaluation of $f(A)$'s quadratic form:
 	$$ v \\mapsto v^T f(A) v $$
-	The weights of the quadrature may be computed using either the Golub-Welsch (GW) or 
-	Forward Three Term Recurrence algorithms (FTTR) (see the `method` parameter). 
-	
-	For a description of all other parameters, see the Lanczos function. 
+	The weights of the quadrature may be computed using either the Golub-Welsch (GW) or
+	Forward Three Term Recurrence algorithms (FTTR) (see the `method` parameter).
+
+	For a description of all other parameters, see the Lanczos function.
 
 	:::{.callout-note}
-	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts, 
-	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute, 
-	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability. 
-	If `deg` is large, `fttr` is preferred. 
+	To compute the weights of the quadrature, the GW computation uses implicit symmetric QR steps with Wilkinson shifts,
+	while the FTTR algorithm uses the explicit expression for orthogonal polynomials. While both require $O(\\mathrm{deg}^2)$ time to execute,
+	the former requires $O(\\mathrm{deg}^2)$ space but is highly accurate, while the latter uses only $O(1)$ space at the cost of stability.
+	If `deg` is large, `fttr` is preferred.
 	:::
 
 	Parameters
@@ -52,7 +53,7 @@ def matrix_function(
 
 	Returns
 	-------
-	: 
+	:
 		a `LinearOperator` approximating the action of `fun` on the spectrum of `A`
 
 	"""
@@ -73,19 +74,23 @@ def matrix_function(
 
 	## Get the dtype; infer it if it's not available
 	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
-	assert (f_dtype.type == np.float32 or f_dtype.type == np.float64), "Only 32- or 64-bit floating point numbers are supported."
+	assert (
+		f_dtype.type == np.float32 or f_dtype.type == np.float64
+	), "Only 32- or 64-bit floating point numbers are supported."
 	module_func += "F" if f_dtype.type == np.float32 else "D"
 
 	## Argument checking
 	rtol = np.finfo(f_dtype).eps if rtol is None else f_dtype.type(rtol)
 	orth = np.clip(orth, 0, deg)
-	deg = np.clip(deg, 2, A.shape[0])   # Should be at least two
+	deg = np.clip(deg, 2, A.shape[0])  # Should be at least two
 
 	## Parameterize the matrix function and trace call
-	if fun is None: 
+	if fun is None:
 		kwargs["function"] = "None"
 	elif isinstance(fun, str):
-		assert fun in _builtin_matrix_functions, f"If given as a string, 'fun' must be one of {str(_builtin_matrix_functions)}."
+		assert (
+			fun in _builtin_matrix_functions
+		), f"If given as a string, 'fun' must be one of {str(_builtin_matrix_functions)}."
 		kwargs["function"] = fun  # _builtin_matrix_functions.index(matrix_function)
 	elif isinstance(fun, Callable):
 		kwargs["function"] = "generic"
@@ -98,33 +103,34 @@ def matrix_function(
 	M = getattr(_operators, module_func)(A, deg, rtol, orth, deg, **kwargs)
 	return M
 
+
 ## From: https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
 class Toeplitz(LinearOperator):
-	def __init__(self, c: ArrayLike, r: ArrayLike = None, dtype = None):
+	def __init__(self, c: ArrayLike, r: ArrayLike = None, dtype=None):
 		self.c = np.array(c)
 		self.r = np.array(c if r is None else r)
-		self._d = np.concatenate((self.c,[0],np.flip(self.r[1:])))
+		self._d = np.concatenate((self.c, [0], np.flip(self.r[1:])))
 		self._dfft = np.real(np.fft.fft(self._d))
-		self._z = np.zeros(len(c)*2) # workspace
+		self._z = np.zeros(len(c) * 2)  # workspace
 		self.shape = (len(c), len(c))
 		self.dtype = np.dtype(np.float64) if dtype is None else dtype
-	
+
 	def _matvec(self, x: np.ndarray) -> np.ndarray:
 		assert len(x) == len(self.c), f"Invalid shape of input vector 'x'; must have length {len(self.c)}"
-		self._z[:len(x)] = x
+		self._z[: len(x)] = x
 		x_fft = np.fft.fft(self._z)
 		y = np.real(np.fft.ifft(self._dfft * x_fft))
-		return y[:len(x)]
+		return y[: len(x)]
 
 
-## For use with e.g. Hutch++ 
+## For use with e.g. Hutch++
 class OrthComplement(LinearOperator):
 	def __init__(self, A: Union[LinearOperator, np.ndarray], Q: np.ndarray):
-		self.A = A 
-		self.Q = Q 
+		self.A = A
+		self.Q = Q
 		self.shape = A.shape
 		self.dtype = self.Q.dtype
-	
+
 	def _deflate(self, w: np.ndarray) -> np.ndarray:
 		return w - self.Q @ (self.Q.T @ w)
 
@@ -132,47 +138,52 @@ class OrthComplement(LinearOperator):
 		y = self._deflate(x)
 		return self._deflate(self.A @ y)
 
+
 class ShiftedOp(LinearOperator):
 	"""Shifted Operator implementing shifted matrix-vector multiplication of the form (A - \\sigma) x."""
-	def __init__(self, A, sigma = 0.0):
+
+	def __init__(self, A, sigma=0.0):
 		self.A = A
-		self.dtype = A.dtype 
+		self.dtype = A.dtype
 		self.shape = A.shape
 		self.sigma = sigma
 		self.num_matvecs = 0
 		self.num_adjoint = 0
 
 	def _matvec(self, x: np.ndarray) -> np.ndarray:
-		x = x[:,np.newaxis] if x.ndim == 1 else x
+		x = x[:, np.newaxis] if x.ndim == 1 else x
 		self.num_matvecs += 1
 		return self.A @ x - self.sigma * x
 
-	def _rmatvec(self, x: np.ndarray) -> np.ndarray: 
-		x = x[:,np.newaxis] if x.ndim == 1 else x
+	def _rmatvec(self, x: np.ndarray) -> np.ndarray:
+		x = x[:, np.newaxis] if x.ndim == 1 else x
 		self.num_matvecs += 1
 		self.num_adjoint += 1
 		return self.A.T @ x - self.sigma * x
 
 	def _matmat(self, X: np.ndarray) -> np.ndarray:
-		X = X[:,np.newaxis] if X.ndim == 1 else X
+		X = X[:, np.newaxis] if X.ndim == 1 else X
 		self.num_matvecs += X.shape[1]
 		return self.A @ X - self.sigma * X
-
 
 	# def _adjoint(self):
 	# 	return ShiftedOp(self.A.T, self.sigma)
 
-ITERATIVE_SOLVERS = ["bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr", "lsqr", "lsmr"]
+
+ITERATIVE_SOLVERS = ["bicg", "bicgstab", "cg", "cgs", "gmres", "lgmres", "minres", "qmr", "gcrotmk", "tfqmr", "lsqr", "lsmr"]  # fmt: skip
+
 
 class ShiftedInvOp(LinearOperator):
 	"""Generic Linear Operator for iterative"""
+
 	def __init__(self, A: LinearOperator, sigma: float = 0.0, solver: str = "cg", **kwargs):
 		import scipy.sparse.linalg as sp_linalg
+
 		# assert isinstance(A_shift, ShiftedOp)
 		assert solver in ITERATIVE_SOLVERS, f"Solver must be one of: {str(ITERATIVE_SOLVERS)}"
 		self.A_shift = ShiftedOp(A, sigma)
 		self.A_shift_T = ShiftedOp(A.T, sigma)
-		self.dtype = self.A_shift.dtype 
+		self.dtype = self.A_shift.dtype
 		self.shape = self.A_shift.shape
 		self.solver = getattr(sp_linalg, solver)
 		assert isinstance(self.solver, Callable), f"Unknown solver '{str(solver)}'"
@@ -205,4 +216,3 @@ class ShiftedInvOp(LinearOperator):
 	# 	op.params = self.params.copy()
 	# 	op.solver = self.solver.copy()
 	# 	return op
-	
