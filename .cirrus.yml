@@ -20,8 +20,6 @@ linux_task:
     fingerprint_script: echo $PYTHON_VERSION
   before_script: |
     python -m pip install --upgrade pip
-  dependencies_script: |
-    bash tools/cibw_linux.sh
   build_script: |
     python -m pip install '.[test]' --verbose
   test_script: |
