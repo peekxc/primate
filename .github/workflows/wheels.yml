@@ -2,7 +2,7 @@ name: Package Wheels
 
 on:
   push: 
-    branches: ["main"]
+    branches: ["pythran_overhaul"]
   # release:
   #   branches: [ "main" ]
 
@@ -25,7 +25,7 @@ jobs:
         # os: [windows-latest]
         # cibw_arch: ["AMD64"]
         # cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
-        python: [["cp38", "3.8"], ["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"]]
+        python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"], ["cp313", "3.13"]]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -81,20 +81,20 @@ jobs:
             wheelhouse
             dist/wheelhouse
 
-  upload_all:
-    needs: [build_wheels]
-    environment: pypi
-    permissions:
-      id-token: write
-    runs-on: ubuntu-latest
-    # if: github.event_name == 'release' && github.event.action == 'published'
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: artifact
-        path: |
-          dist
-          wheelhouse
-          dist/wheelhouse
-    - uses: pypa/gh-action-pypi-publish@release/v1
+  # upload_all:
+  #   needs: [build_wheels]
+  #   environment: pypi
+  #   permissions:
+  #     id-token: write
+  #   runs-on: ubuntu-latest
+  #   # if: github.event_name == 'release' && github.event.action == 'published'
+  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+  #   steps:
+  #   - uses: actions/download-artifact@v3
+  #     with:
+  #       name: artifact
+  #       path: |
+  #         dist
+  #         wheelhouse
+  #         dist/wheelhouse
+  #   - uses: pypa/gh-action-pypi-publish@release/v1

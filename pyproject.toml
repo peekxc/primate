@@ -1,7 +1,9 @@
 # python -m build -Ccompile-args="-j6" . --no-isolation
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', 'numpy', 'pythran', 'pythran-openblas', 'pybind11', 'nanobind']
+requires = ['meson-python', 'numpy', 'pythran', 'pybind11']
+#  'pythran-openblas'
+#  'nanobind'
 
 [project]
 name = 'scikit-primate'

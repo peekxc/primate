@@ -1,43 +1,17 @@
 # %% Imports
 import numpy as np
 from bokeh.io import output_notebook
+from bokeh.layouts import column, row
+from bokeh.models import Band, ColumnDataSource
 from bokeh.plotting import figure, show
+from landmark import landmarks
+from primate.lanczos import OrthogonalPolynomialBasis, lanczos
 from primate.quadrature import lanczos_quadrature, spectral_density
 from primate.stochastic import symmetric
 
 output_notebook()
 
-## trace == 1
-A = symmetric(n=5, ew=[0, 0.1, 0.2, 0.3, 0.4], pd=False)
-
-## Q1: can we infer the nullspace from a degree-r Krylov expansion?
-(dens, bins), info = spectral_density(A, bw=0.01, plot=True, rtol=0.0001, deg=3, orth=0, info=True)
-
-## Q2: Is the error associated with the Krylov expansion 'uniform' in any sense?
-density = np.zeros(100)
-for i in range(1500):
-	(dens, bins), info = spectral_density(A, bw=0.01, plot=False, deg=3, rtol=0.0001)
-	density += dens
-
-## Q2a: given a density that 'looks nice', does the area under the curve line up with the rank?
-np.sum(dens[bins <= 0.05]) / np.sum(dens)  # about 20.9%
-np.sum(dens[bins > 0.05]) / np.sum(dens)  # about 80%
-
-## Ans: while the density does seem to converge to something, its not centered at the eigenvalues
-p = figure(width=350, height=150)
-p.line(bins, density)
-show(p)
-
-# np.linalg.eigh(A)[0]
-
 # %%
-from bokeh.layouts import column, row
-from bokeh.models import Band, ColumnDataSource
-from landmark import landmarks
-from primate.lanczos import lanczos, OrthogonalPolynomialBasis
-from primate.stochastic import symmetric
-from primate.quadrature import spectral_density
-
 rng = np.random.default_rng(1234)
 xx = rng.uniform(size=35, low=0, high=1)
 ew = np.sort(xx[landmarks(xx[:, np.newaxis], 25)])
@@ -97,9 +71,9 @@ for deg in [2, 6, 10, 14, 18, 22]:
 	## Get the above and below shapes
 	from itertools import pairwise
 
-	from shapely.ops import split
 	from scipy.optimize import brentq
 	from shapely import LineString, Polygon
+	from shapely.ops import split
 
 	def find_intersections(f, g, a, b, num_points=1000):
 		def h(x):
@@ -166,7 +140,6 @@ for deg in [2, 6, 10, 14, 18, 22]:
 from primate import fttr
 from primate.lanczos import lanczos
 from primate.tridiag import eigh_tridiag
-
 
 a, b = lanczos(A, deg=10)
 theta, rv = eigh_tridiag(a, b)
@@ -250,15 +223,26 @@ show(p)
 
 from numpy.polynomial import Legendre, Polynomial
 from numpy.polynomial.legendre import legfit
+from numpy.polynomial.power import polyfit
 
 coef = legfit(x, csm(x), deg=9)
 LP = Legendre(coef)
+
+np.real(LP.roots())
 
 x = np.linspace(0, 1, 1500)
 p = figure(width=350, height=250)
 p.line(x, csm(x), color="black")
 p.line(x, LP(x), color="blue")
 show(p)
+
+## Show the Legendre polynomials of varying degrees
+x = np.linspace(-1, 1, 1500)
+p = figure(width=350, height=250)
+for b in range(6):
+	p.line(x, LP.basis(b)(x), color="blue")
+show(p)
+# p.line(x, csm(x), color="black")
 
 
 # Polynomial.fit(x, csm(x), deg=2)
