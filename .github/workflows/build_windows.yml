@@ -2,9 +2,9 @@ name: Build Windows package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "pythran_overhaul" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "pythran_overhaul" ]
 
 jobs:
   build_windows:      
@@ -12,14 +12,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CC: clang-cl
-      CXX: clang-cl
-      LDFLAGS: "-Wl,-S"
+      # CC: clang-cl
+      # CXX: clang-cl
+      # LDFLAGS: "-Wl,-S"
     strategy:
       fail-fast: false
       matrix:
         os: ["windows-latest"]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
     - name: Checkout 
       uses: actions/checkout@v3

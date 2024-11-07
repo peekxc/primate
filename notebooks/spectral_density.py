@@ -59,22 +59,10 @@ csm = lambda x: np.searchsorted(ew, x) * (1 / len(ew))
 
 best_fit = False
 
+from primate.plotting import figure_csm
+
 for deg in [2, 6, 10, 14, 18, 22]:
-	p = figure(
-		width=350,
-		height=250,
-		title="Cumulative spectral density",
-		x_axis_label="Spectrum",
-		y_axis_label=r"$$\mathbf{1}(\lambda \leq x)$$",
-	)
-	p.title.align = "center"
-	p.line(x, csm(x))
-	p.scatter(ew, 0, size=7.5, color="red", marker="x", legend_label="Eigenvalues")
-	p.varea_step(x=np.append(ew, 1.0), y1=np.zeros(len(ew) + 1), y2=np.append(csm(ew), 1.0), fill_alpha=0.15)
-	p.legend.location = "top_left"
-	p.legend.margin = 5
-	p.legend.padding = 2
-	p.toolbar_location = None
+	p = figure_csm(ew)
 	# show(p)
 
 	## Quadrature approximation
@@ -88,6 +76,8 @@ for deg in [2, 6, 10, 14, 18, 22]:
 		f = np.poly1d(p_coeff)
 		y = f(x)
 	else:
+		from primate.lanczos import OrthogonalPolynomialBasis
+
 		f = OrthogonalPolynomialBasis(A, deg=deg)
 		y = f.fit(x, csm(x))
 
@@ -107,7 +97,7 @@ for deg in [2, 6, 10, 14, 18, 22]:
 	## Get the above and below shapes
 	from itertools import pairwise
 
-	import shapely as sp
+	from shapely.ops import split
 	from scipy.optimize import brentq
 	from shapely import LineString, Polygon
 
@@ -137,7 +127,7 @@ for deg in [2, 6, 10, 14, 18, 22]:
 		y1, y2 = min(f(x1 + 1e-9), csm(x1 + 1e-9)), max(f(x2), csm(x2))
 		f_poly = Polygon([[x1, y1], [x2, y1], [x2, y2], [x1, y2]])
 		f_line = LineString(np.c_[np.linspace(x1, x2, 15), f(np.linspace(x1, x2, 15))])
-		polys_ud = sp.ops.split(f_poly, f_line)
+		polys_ud = split(f_poly, f_line)
 
 		if len(polys_ud.geoms) == 2:
 			st_xy = np.array(list(polys_ud.geoms[0].exterior.coords))
@@ -209,9 +199,12 @@ p.line(dom, P @ c)
 show(p)
 
 
-basis = OrthogonalPolynomialBasis(A, 20)
-basis.fit(dom, csm(dom))
-basis(np.linspace(0, 1, 10))
+# basis = OrthogonalPolynomialBasis(A, 20)
+# basis.fit(dom, csm(dom))
+# basis(np.linspace(0, 1, 10))
+
+
+# %% Show radar plot
 
 
 # %% Cumulative empirical spectral measure
@@ -253,3 +246,19 @@ show(p)
 # rectangles = [Polygon([(xl, 0), (xr, 0), (xr, yt), (xl, yt)]) for ((xl, xr), yt) in zip(pairwise(xr), yr)]
 # varea = MultiPolygon(rectangles)
 # varea = varea.union(varea)
+
+
+from numpy.polynomial import Legendre, Polynomial
+from numpy.polynomial.legendre import legfit
+
+coef = legfit(x, csm(x), deg=9)
+LP = Legendre(coef)
+
+x = np.linspace(0, 1, 1500)
+p = figure(width=350, height=250)
+p.line(x, csm(x), color="black")
+p.line(x, LP(x), color="blue")
+show(p)
+
+
+# Polynomial.fit(x, csm(x), deg=2)

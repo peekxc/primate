@@ -64,7 +64,7 @@ def lanczos(
 		dtype: The precision dtype to specialize the computation.
 
 	Returns:
-		A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If `return_basis=True`,
+		A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If `return_basis=True`,
 		the tuple `(a,b), Q` is returned, where `Q` represents an orthogonal basis for the degree-`deg` Krylov subspace.
 
 	See Also:
@@ -180,7 +180,7 @@ def _orth_vector(v, U, start_idx, p, reverse=False):
 			v -= (s_proj / u_norm) * U[:, i]
 
 
-def lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):
+def _lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):
 	n, m = A.shape
 	residual_tol = np.sqrt(n) * rtol
 
@@ -210,7 +210,10 @@ def lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):
 	return alpha, beta[:-1], Q
 
 
-class OrthogonalPolynomialBasis:
+from numpy.polynomial import Polynomial
+
+
+class OrthogonalPolynomialBasis(Polynomial):
 	def __init__(self, A, deg: int) -> None:
 		self.a, self.b = lanczos(A, deg=deg)
 		self.theta, self.rv = eigh_tridiag(self.a, self.b)
@@ -223,14 +226,14 @@ class OrthogonalPolynomialBasis:
 		deg = len(self.a)
 		self.Z_ = np.zeros((len(x), deg), dtype=self.dtype)
 		for i, xi in enumerate(x):
-			fttr.ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, self.Z_[i, :], deg)
-		self.c_ = np.linalg.solve(self.Z_.T @ self.Z_, self.Z_.T @ y)
-		return self.Z_ @ self.c_
+			ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, self.Z_[i, :], deg)
+		self.coef = np.linalg.solve(self.Z_.T @ self.Z_, self.Z_.T @ y)
+		return self.Z_ @ self.coef
 
 	def __call__(self, x: np.ndarray):
 		x = np.atleast_1d(x)
 		deg = len(self.a)
 		Z = np.zeros((len(x), deg), dtype=self.dtype)
 		for i, xi in enumerate(x):
-			fttr.ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, Z[i, :], deg)
-		return Z @ self.c_
+			ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, Z[i, :], deg)
+		return Z @ self.coef

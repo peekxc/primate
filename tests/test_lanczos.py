@@ -2,8 +2,8 @@
 
 import numpy as np
 from numpy.random import default_rng
-from primate.lanczos import lanczos
 from primate import _lanczos
+from primate.lanczos import lanczos
 from scipy.linalg import eigvalsh_tridiagonal
 
 
@@ -17,8 +17,3 @@ def test_lanczos():
 	ew_lan = eigvalsh_tridiagonal(a, b)
 	ew_dac = np.linalg.eigvalsh(A)
 	assert np.allclose(ew_lan, ew_dac), "Eigenvalues not similar"
-
-
-# import timeit
-# timeit.timeit(lambda: _lanczos(A, v0, k=50, tol=1e-8), number=20)
-# timeit.timeit(lambda: lanczos_py(A, v0, k=50, tol=1e-8), number=20)

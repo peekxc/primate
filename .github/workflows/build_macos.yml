@@ -2,9 +2,9 @@ name: Build Macos package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "pythran_overhaul" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "pythran_overhaul" ]
 
 jobs:
   build_macos:      
@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ["macos-latest"] 
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     steps:
     - name: Checkout 
       uses: actions/checkout@v3
@@ -26,29 +26,29 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Clang with OpenMP support
-      run: |
-        brew install --force libomp llvm
-    - name: Update environment flags for Clang 
-      run: |
-        export PATH="/usr/local/opt/llvm/bin:$PATH"
-        export LDFLAGS="-L/usr/local/opt/llvm/lib"
-        export CPPFLAGS="-I/usr/local/opt/llvm/include"
-        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
-        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> /Users/runner/.bash_profile
-        source ~/.bash_profile
-    - name: Verify Clang version 
-      run: | 
-        /usr/local/opt/llvm/bin/clang --version
-      env:
-        CC: /usr/local/opt/llvm/bin/clang
-        CXX: /usr/local/opt/llvm/bin/clang
-    - name: Install OpenBLAS
-      run: |
-        brew install openblas
-        export LDFLAGS="-L/usr/local/opt/openblas/lib"
-        export CPPFLAGS="-I/usr/local/opt/openblas/include"
-        brew info openblas
+    # - name: Install Clang with OpenMP support
+    #   run: |
+    #     brew install --force libomp llvm
+    # - name: Update environment flags for Clang 
+    #   run: |
+    #     export PATH="/usr/local/opt/llvm/bin:$PATH"
+    #     export LDFLAGS="-L/usr/local/opt/llvm/lib"
+    #     export CPPFLAGS="-I/usr/local/opt/llvm/include"
+    #     echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> ~/.bash_profile
+    #     echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> /Users/runner/.bash_profile
+    #     source ~/.bash_profile
+    # - name: Verify Clang version 
+    #   run: | 
+    #     /usr/local/opt/llvm/bin/clang --version
+    #   env:
+    #     CC: /usr/local/opt/llvm/bin/clang
+    #     CXX: /usr/local/opt/llvm/bin/clang
+    # - name: Install OpenBLAS
+    #   run: |
+    #     brew install openblas
+    #     export LDFLAGS="-L/usr/local/opt/openblas/lib"
+    #     export CPPFLAGS="-I/usr/local/opt/openblas/include"
+    #     brew info openblas
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip build ninja 
@@ -56,9 +56,9 @@ jobs:
     - name: Install package
       run: |
         python -m pip install . --verbose
-      env:
-        CC: /usr/local/opt/llvm/bin/clang
-        CXX: /usr/local/opt/llvm/bin/clang++
+      # env:
+      #   CC: /usr/local/opt/llvm/bin/clang
+      #   CXX: /usr/local/opt/llvm/bin/clang++
     - name: Test with pytest
       run: |
         python -m pytest tests/ --cov=primate --benchmark-skip

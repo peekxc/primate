@@ -66,6 +66,7 @@ python_sources = [
 	'stats.py',
 	'operators.py',
 	'special.py',
+	'plotting.py',
   '__init__.py'
 ]
 message('Source install dir = '+py.get_install_dir())

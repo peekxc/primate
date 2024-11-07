@@ -2,12 +2,10 @@
 import numpy as np
 from bokeh.io import output_notebook
 from bokeh.plotting import figure, show
+from landmark import landmarks
+from primate.lanczos import OrthogonalPolynomialBasis, lanczos
 from primate.quadrature import lanczos_quadrature, spectral_density
 from primate.stochastic import symmetric
-from primate.lanczos import lanczos, OrthogonalPolynomialBasis
-from primate.stochastic import symmetric
-from primate.quadrature import spectral_density
-from landmark import landmarks
 
 output_notebook()
 
@@ -18,3 +16,6 @@ ew = np.sort(xx[landmarks(xx[:, np.newaxis], 25)])
 
 
 # %%
+from primate.plotting import figure_csm
+
+show(figure_csm(ew))

@@ -1,21 +1,16 @@
+import importlib
+from importlib.machinery import ExtensionFileLoader
+
 import primate
-from importlib.machinery import ExtensionFileLoader, EXTENSION_SUFFIXES
 
 
 def test_import():
 	assert str(type(primate)) == "<class 'module'>"
 
 
+## Ensure the pybind11 + pythran modules are indeed compiled extension modules
 def test_pythran_imports():
-	import primate.tqli
-
-	assert isinstance(getattr(primate.tqli, "__loader__", None), ExtensionFileLoader), "tqli pythran extension not loaded"
-	assert getattr(primate.tqli, "__package__") == "primate"
-
-	import primate.fttr
-
-	assert isinstance(getattr(primate.fttr, "__loader__", None), ExtensionFileLoader), "fttr pythran extension not loaded"
-
-	from primate import _lanczos
-
-	assert isinstance(getattr(_lanczos, "__loader__", None), ExtensionFileLoader), "_lanczos pythran extension not loaded"
+	for mod in ["primate.tqli", "primate.fttr", "primate._lanczos"]:
+		p_mod = importlib.import_module(mod)
+		assert isinstance(getattr(p_mod, "__loader__", None), ExtensionFileLoader), "tqli pythran extension not loaded"
+		assert getattr(p_mod, "__package__") == "primate"
