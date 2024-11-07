@@ -1,69 +1,25 @@
 [build-system]
 build-backend = 'mesonpy'
-requires = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy', 'combin'] # 'pythran-openblas'  "cmake". nanobind
+requires = ['meson-python', 'numpy', 'pythran', 'pythran-openblas', 'pybind11', 'nanobind']
+# requires = ['meson-python', 'numpy', 'pythran', 'pythran-openblas', 'pybind11']
+# requires = ["setuptools >= 40.9.0",]
+# build-backend = "setuptools.build_meta"
+
 
 [project]
-name = "scikit-primate"
-version = "0.4.0"
-readme = "README.md"
-classifiers = [
-	"Intended Audience :: Science/Research",
-	"Development Status :: 3 - Alpha",
-	"License :: OSI Approved :: Apache Software License",
-	"Programming Language :: Python :: 3"
-]
-authors = [
-	{ name = "Matt Piekenbrock", email = "matt.piekenbrock@gmail.com" }
-]
-requires-python = ">=3.8"
-dependencies = [
-  "numpy", 
-  "scipy",
-	"more_itertools", 
-	"combin"
-]
-license = {file = "LICENSE"}
-include = [
-	{ path = "primate/**/*.so", format = "wheel" },
-	{ path = "primate/**/*.pyd", format = "wheel" }
-]
+name = 'primate2'
+version = '0.1.1'
+description = 'Our example package using meson-python!'
+readme = 'README.md'
+requires-python = '>=3.8'
+license = { text = "Apache License" }
+authors = [{ name = 'Matt Piekenbrock', email = 'matt.piekenbrock@gmail.com' }]
+# python -m build -Ccompile-args="-j6" . --no-isolation
 
-[project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"]
-doc = ["quartodoc"]
-dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
-
+# [tool.meson-python.args]
+# setup = ['-DPYTHRANRC=.pythranrc']
 [tool.pytest.ini_options]
-addopts = "-ra --benchmark-skip"
-
-[tool.meson-python.args]
-setup = ['--default-library=static']
-
-[tool.cibuildwheel]
-test-requires = ["pytest", "pytest-cov", "pytest-benchmark", "bokeh"] # coverage-badge
-# test-command = "coverage run --source={package} -m pytest {package}/tests" # "coverage report -m"
-test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
-build-verbosity = 1
-skip = "cp36-* pp* cp37-* *_ppc64le *_i686 *_s390x *-musllinux*" # todo: revisit musllinux
-# manylinux-x86_64-image = "manylinux_2_28" # prefer the newer one
-manylinux-x86_64-image = "manylinux2014"
-
-[tool.cibuildwheel.linux]
-before-build = "bash {project}/tools/cibw_linux.sh {project}"
-environment = { CC="gcc", CXX="g++" } # for manylinux2014
-# environment = { CC="clang", CXX="clang++" } # for manylinux_2_28
-
-# before-build = ["ulimit -n 4096", "yum install -y clang", "yum install -y openblas"]
-
-[tool.cibuildwheel.macos]
-before-build = "bash {project}/tools/cibw_macos.sh"
-environment = { CC="/usr/local/opt/llvm/bin/clang", CXX="/usr/local/opt/llvm/bin/clang++" }
-
-[tool.cibuildwheel.windows]
-before-build = "bash {project}/tools/cibw_windows.sh"
-environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang-cl", CXX="clang-cl"}
-# environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang", CXX="clang++"}
-# repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
-# before-build = "choco install rtools -y --no-progress --force --version=4.0.0.20220206 && set PATH=C:\\rtools40\\ucrt64\\bin\\;%PATH%"
-# repair-wheel-command = "bash ./tools/repair_windows.sh {wheel} {dest_dir}"
-
+minversion = "6.0"
+addopts = "-rA"
+testpaths = ["tests"]
+norecursedirs = ["docs", "*.egg-info", ".git"]

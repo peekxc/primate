@@ -1,0 +1,37 @@
+.navbar {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+#quarto-document-content{
+  margin-top: 0;
+}
+
+
+.sidebar-menu-container > ul > li.sidebar-item-section > .sidebar-item-container .menu-text {
+  font-weight: bold;
+  font-size: 1.05em;
+  color: darkslategray;
+  padding-top: 0.20em;
+  padding-bottom: 0.20em;
+  /* text-decoration: underline; */
+}
+.quarto-search-input::placeholder {
+	content: "'k' for search"; /* The text to show in the input field */
+	font-style: italic;
+	color: #888; /* Placeholder text color */
+}
+
+h2 {
+	/* margin: 0 !important; */
+	font-size: 1.05rem !important;
+	margin-bottom: 0 !important;
+	margin-top: 1em !important;
+}
+table.caption-top.table {
+	margin: 0 !important;
+}
+
+#function-reference table.caption-top td {
+	min-width: 15em !important;
+	padding: 0.25em !important;
+}

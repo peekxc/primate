@@ -1,0 +1,7 @@
+# quadrature.lanczos_quadrature { #quadrature.lanczos_quadrature }
+
+```python
+lanczos_quadrature(d, e, deg=20, quad='gw', **kwargs)
+```
+
+Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator.

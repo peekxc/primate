@@ -1,57 +1,43 @@
-import numpy as np 
-from scipy.linalg import eigh_tridiagonal
-from scipy.sparse.linalg import eigsh, aslinearoperator
-from scipy.sparse import csc_array, csr_array
-from more_itertools import * 
+import numpy as np
+from primate2.stats import MeanEstimatorCLT, confidence_interval
 
-## Add the test directory to the sys path 
-import sys
-import primate
-rel_dir = primate.__file__[:(primate.__file__.find('primate') + 7)]
-sys.path.insert(0, rel_dir + '/tests')
-
-def test_incremental_est():
-  np.random.seed(1234)
-  x = np.random.uniform(size=10)
-  mu, vr = np.zeros(len(x)), np.zeros(len(x))
-  mu_prev, vr_prev = 0.0, 0.0
-  for i, n in enumerate(range(1, len(x) + 1)):
-    mu[i] = (x[i] + (n-1) * mu_prev) / n
-    L = (n-2)/(n-1) if (n-2) > 0 else 0
-    mu_prev = mu[i] if i == 0 else mu_prev # update before variance estimate
-    vr[i] = L * vr_prev + (1.0 / n) * (x[i] - mu_prev)**2
-    mu_prev = mu[i]
-    vr_prev = vr[i]
-  mu_true = np.cumsum(x) / np.arange(1, len(x)+1)
-  vr_true = np.array([np.std(x[:i], ddof=1)**2 if i > 1 else 0.0 for i in range(1, len(x)+1)])
-  assert np.allclose(mu_true, mu)
-  assert np.allclose(vr_true, vr)
 
 def test_CLT():
-  from scipy.special import erfinv
-  from scipy.stats import norm
-  from primate.stats import sample_mean_cinterval
-  np.random.seed(1234)
-  x = np.random.normal(size=1500, loc=5.0, scale=3)
-  sq_n, dof = np.sqrt(len(x)), len(x) - 1
-  mu_est, sd_est = np.mean(x), np.std(x, ddof=1)
-  
-  z = np.sqrt(2) * erfinv(0.95)
-  margin_of_error = z * sd_est / sq_n  
-  ci_test = np.array([mu_est - margin_of_error, mu_est + margin_of_error])
-  ci_true = norm.interval(0.95, loc = mu_est, scale= sd_est / sq_n)
-  ci_lib = sample_mean_cinterval(x, conf=0.95, sdist='normal')
-  assert np.allclose(ci_test, ci_true)
-  assert np.allclose(ci_lib, ci_test)
+	rng = np.random.default_rng(1234)
+	mu = 5.0
+	est = MeanEstimatorCLT()
+	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
+	assert est.n_samples == len(samples)
+	ci_test = np.array([est.mu_est - est.margin_of_error, est.mu_est + est.margin_of_error])
+	ci_true = np.array(confidence_interval(samples, confidence=0.95, sdist="normal"))
+	assert np.allclose(ci_test, ci_true)
 
-  # atol = 0.50
-  # for i in range(2, 50):
-  #   mu = np.mean(x[:i])
-  #   ci = sample_mean_cinterval(x[:i], conf=0.99, sdist='normal')
-  #   print(f"{i}: est = {mu:.4}, |x - mu| = {(mu - 5.0):.4}, conf len: {np.take(np.diff(ci),0):.4}, CI says converged? { 0.50*np.diff(ci) <= atol }, actually converged? {(mu - 5.0) <= atol}")
+	## TODO: test the statistcial difference between many trials
+	# intervals = []
+	# for _ in range(1500):
+	# est = MeanEstimatorCLT()
+	# while not est.converged():
+	# 	est(rng.normal(size=10, loc=mu, scale=1 / 2))
+	# 	intervals.append([est.mu_est - est.margin_of_error, est.mu_est + est.margin_of_error])
+	# intervals = np.array(intervals)
+	# containing_intervals = np.sum(np.logical_and(intervals[:, 0] <= mu, mu <= intervals[:, 1]))
+	# containing_intervals / 1500
 
-def test_suggest():
-  from primate.stats import suggest_nv_trace
-  assert suggest_nv_trace(0.95, eps = 0.1) == 2213
+	# valid_ci = 0
+	# for _ in range(1500):
+	# 	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
+	# 	lb, ub = sample_mean_cinterval(samples, confidence=0.95, sdist="normal")
+	# 	valid_ci += lb <= mu and mu <= ub
+
+	# assert (est.mu_est - est.margin_of_error) <= 5 <= (est.mu_est + est.margin_of_error)
+	# from bokeh.plotting import show
+
+	# show(est.plot(samples))
 
 
+def test_confidence_interval():
+	rng = np.random.default_rng(1234)
+	samples = rng.normal(size=1500, loc=0, scale=1 / 2)
+	ci_normal = confidence_interval(samples, confidence=0.95, sdist="normal")
+	ci_tdist = confidence_interval(samples, confidence=0.95, sdist="t")
+	assert np.max(np.abs(np.array(ci_normal) - np.array(ci_tdist))) <= 1e-4

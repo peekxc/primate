@@ -1,0 +1,7 @@
+# operators.MatrixFunction { #operators.MatrixFunction }
+
+```python
+MatrixFunction(self, A, fun=None, deg=20, dtype=np.float64, **kwargs)
+```
+
+Linear operator class for matrix functions.

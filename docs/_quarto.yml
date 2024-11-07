@@ -1,0 +1,111 @@
+project:
+  type: website
+  output-dir: _site
+  preview:
+    port: 8085
+    browser: false
+
+metadata-files:
+  - _sidebar.yml
+
+website: 
+  navbar:
+    title: PRIMATE2
+    right: 
+      - icon: github
+        href: https://github.com/peekxc/primate2
+        aria-label: GitHub
+    left:
+      - file: reference/index.qmd
+        text: Reference
+  
+  search:
+    keyboard-shortcut: ['f', '/', 'k']
+    location: navbar # sidebar navbar 
+    type: "overlay" # textbox or overlay
+    copy-button: true
+  
+  sidebar:
+    search: true
+    style: floating
+    border: false
+    contents:
+      - href: index.qmd
+        text: Overview
+      - section: Basics 
+        contents:
+          - text: Comparison to *imate*
+            href: imate_compare.qmd
+      - section: API Reference 
+        href: reference/index.qmd
+        contents:
+          - section: Estimators
+            contents: 
+              - reference/estimators.hutch.qmd
+          - section: Operators
+            contents:
+              - reference/operators.MatrixFunction.qmd
+              - reference/operators.Toeplitz.qmd
+              - reference/operators.normalize_unit.qmd
+          - section: Stochastic
+            contents:
+              - reference/stochastic.isotropic.qmd
+              - reference/stochastic.symmetric.qmd
+              - reference/stats.confidence_interval.qmd
+              - reference/stats.MeanEstimatorCLT.qmd
+          - section: Lanczos
+            contents: 
+              - reference/lanczos.lanczos.qmd
+              - reference/lanczos.rayleigh_ritz.qmd
+              - reference/quadrature.lanczos_quadrature.qmd
+  reader-mode: true     # reader mode collapses sidebar 
+  page-navigation: true # ability to go to next / prev 
+  page-footer: "Copyright 2024, Matt Piekenbrock" 
+
+quartodoc:
+  package: null
+  # package: primate2
+  source_dir: ../src/primate2
+  sidebar: _sidebar.yml
+  out_index: index.qmd
+  parser: google
+  style: pkgdown # pkgdown, single-page
+  sections:
+    - title: Estimators
+      contents:
+        - estimators.hutch
+    - title: Operators
+      contents:
+        - operators.MatrixFunction
+        - operators.Toeplitz
+        - operators.normalize_unit
+    - title: Stochastic
+      contents:
+        - stochastic.isotropic
+        - stochastic.symmetric
+        - stats.confidence_interval
+        - stats.MeanEstimatorCLT
+    - title: Lanczos
+      contents: 
+        - lanczos.lanczos
+        - lanczos.rayleigh_ritz
+        - quadrature.lanczos_quadrature
+
+filters:
+  - pseudocode  
+
+format:
+  html:
+    theme: 
+      light: flatly
+      dark: darkly
+    css: custom.css
+    toc: true
+    margin-left: 0em
+    html-math-method: katex
+    # highlight-style: a11y
+    # mainfont: "Atkinson Hyperlegible"
+    code-copy: true
+    code-overflow: wrap
+
+

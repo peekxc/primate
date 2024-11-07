@@ -1,0 +1,25 @@
+website:
+  sidebar:
+  - contents:
+    - reference/index.qmd
+    - contents:
+      - reference/estimators.hutch.qmd
+      section: Estimators
+    - contents:
+      - reference/operators.MatrixFunction.qmd
+      - reference/operators.Toeplitz.qmd
+      - reference/operators.normalize_unit.qmd
+      section: Operators
+    - contents:
+      - reference/stochastic.isotropic.qmd
+      - reference/stochastic.symmetric.qmd
+      - reference/stats.confidence_interval.qmd
+      - reference/stats.MeanEstimatorCLT.qmd
+      section: Stochastic
+    - contents:
+      - reference/lanczos.lanczos.qmd
+      - reference/lanczos.rayleigh_ritz.qmd
+      - reference/quadrature.lanczos_quadrature.qmd
+      section: Lanczos
+    id: reference
+  - id: dummy-sidebar

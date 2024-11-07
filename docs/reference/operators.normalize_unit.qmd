@@ -1,0 +1,7 @@
+# operators.normalize_unit { #operators.normalize_unit }
+
+```python
+normalize_unit(A)
+```
+
+Produces a normalized linear operator whose eigenvalues lie in the unit interval

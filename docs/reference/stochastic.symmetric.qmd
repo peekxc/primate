@@ -1,0 +1,22 @@
+# stochastic.symmetric { #stochastic.symmetric }
+
+```python
+symmetric(n, dist='normal', pd=True, ew=None, seed=None)
+```
+
+Generates a random symmetric matrix of size `n` with eigenvalues `ew`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type       | Description                                                                                 | Default    |
+|--------|------------|---------------------------------------------------------------------------------------------|------------|
+| n      | int        | The size of the matrix.                                                                     | _required_ |
+| dist   | str        | Distribution of individual matrix entries.                                                  | `'normal'` |
+| pd     | bool       | Whether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues. | `True`     |
+| ew     | np.ndarray | Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1].   | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type       | Description                                               |
+|--------|------------|-----------------------------------------------------------|
+|        | np.ndarray | A random symmetric matrix with the presribed eigenvalues. |
