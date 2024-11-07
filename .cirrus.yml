@@ -4,10 +4,14 @@ env:
 # quay.io/pypa/manylinux2014_x86_64  # CentOS 7  (use GCC 10)
 # quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
 # quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
-linux_task:
+
+
+build_and_test_task:
   container:
     # image: quay.io/pypa/manylinux_2_28_x86_64
-    image: quay.io/pypa/manylinux2014_x86_64
+    matrix: 
+      - image: quay.io/pypa/manylinux2014_x86_64
+      - image: ghcr.io/cirruslabs/macos-runner:sonoma
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
     # CC: clang 

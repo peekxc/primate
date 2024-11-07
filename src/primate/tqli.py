@@ -1,7 +1,7 @@
 import numpy as np
-# from typing import Union, Optional
 
 
+# pythran export sign(float, float)
 def sign(a: float, b: float):
 	# return 1 if b > 0 else (-1 if a < 0 else 1)
 	return int(b > 1) - int(a < 0) + 1
@@ -17,15 +17,15 @@ def tqli(d: np.ndarray, e: np.ndarray, Z: np.ndarray, max_iter: int = 30):
 
 	Note that with shifting, the eigenvalues no longer necessarily appear on the diagonal in order of increasing absolute magnitude.
 
-	Based on pseudocode from the Chapter on "Eigenvalues and Eigenvectors of a Tridiagonal Matrix" in NUMERICAL RECIPES IN FORTRAN 77: \
+	Based on pseudocode from the Chapter on "Eigenvalues and Eigenvectors of a Tridiagonal Matrix" in NUMERICAL RECIPES IN FORTRAN 77:
 	THE ART OF SCIENTIFIC COMPUTING.
 
 	Parameters:
 	  d = Diagonal elements of the tridiagonal matrix.
 	  e = Subdiagonal elements of the tridiagonal matrix.
 	  max_iter = Number of iterations to align the eigenspace(s).
-		Z:  Matrix to store eigenvectors. Can be empty array to avoid compute eigenvectors entirely. 
-	
+		Z:  Matrix to store eigenvectors. Can be empty array to avoid compute eigenvectors entirely.
+
 	Returns:
 	  w = The eigenvalues of the tridiagonal matrix T(d,e).
 	"""
