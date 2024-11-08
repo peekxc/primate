@@ -33,15 +33,11 @@ test = ["pytest", "pytest-cov", "pytest-benchmark"] # "bokeh"
 doc = ["quartodoc"]
 dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
 
-# [tool.meson-python.args]
-# setup = ['-DPYTHRANRC=.pythranrc']
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-rA"
 testpaths = ["tests"]
-norecursedirs = ["docs", "*.egg-info", ".git"]
-
+norecursedirs = ["docs", "*.egg-info", ".git", "build", "dist"]
 
 [tool.cibuildwheel]
 before-all = "python -m pip install --upgrade pip cibuildwheel"

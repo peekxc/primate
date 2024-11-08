@@ -10,10 +10,11 @@ build_and_test_task:
   container:
     # image: quay.io/pypa/manylinux_2_28_x86_64
     matrix: 
-      - image: quay.io/pypa/manylinux2014_x86_64
+      - image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
+      - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian
+      - image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
       # - image: ghcr.io/cirruslabs/macos-runner:sonoma
-      - image: cirrusci/windowsservercore:2019
-      - image: quay.io/pypa/manylinux_2_28_x86_64
+      # - image: cirrusci/windowsservercore:2019
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
     # CC: clang 
