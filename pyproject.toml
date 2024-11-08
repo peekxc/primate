@@ -64,6 +64,6 @@ environment = { CC="gcc", CXX="g++" } # for manylinux2014
 # before-build = "bash {project}/tools/cibw_macos.sh"
 environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
 
-[tool.cibuildwheel.windows]
+# [tool.cibuildwheel.windows]
 # before-build = "bash {project}/tools/cibw_windows.sh"
-environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang-cl", CXX="clang-cl"}
+# environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang-cl", CXX="clang-cl"}
