@@ -1,4 +1,4 @@
-project('primate2',
+project('primate',
 	'cpp',
 	# 'cpp', 'cython', 
 	# version: run_command(['tools/gitversion.py'], check: true).stdout().strip(),
@@ -13,18 +13,13 @@ project('primate2',
   ],
 )
 project_root = meson.project_source_root()
-OS_platform = host_machine.system()
-env = environment()
+os_platform = host_machine.system()
+dependency_map = {}
 
 ## Configure C++ compiler
 cpp = meson.get_compiler('cpp')
-# cy = meson.get_compiler('cython')
-use_openmp = get_option('use_openmp') and OS_platform != 'windows' and host_machine.cpu() == 'x86_64'
-if use_openmp
-  add_global_arguments('-DOMP_MULTITHREADED=1', language : 'cpp')
-  message('Compiling with OpenMP support')
-endif
 message('C++ compiler = '+cpp.get_id()+', version: '+cpp.version())
+
 _cpp_args = cpp.get_supported_arguments(
   '-Wno-unused-but-set-variable',
   '-Wno-unused-function',
@@ -38,23 +33,8 @@ _cpp_args = cpp.get_supported_arguments(
   '-Wno-deprecated-anon-enum-enum-conversion' # to silence Eigen 3.4 warnings
 )
 
-## Import python interpreter
-py_mod = import('python')
-py = py_mod.find_installation(pure: true)
-py_dep = py.dependency()
-message('Python path =' + py.full_path())
-message('Numpy version =' + run_command(py, ['-c', 'import numpy; print(numpy.__version__)'], check: true).stdout().strip())
-if py.language_version().version_compare('< 3.8')
-  error('Invalid Python version, only >= 3.8 is supported.')
-endif
-
-## Configure Numpy include
-incdir_numpy = run_command(py,
-  ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'],
-  check : true
-).stdout().strip()
-inc_np = include_directories(incdir_numpy)
-np_dep = declare_dependency(include_directories: inc_np)
+## Add C++20 
+_cpp_args += cpp.get_supported_arguments('-std=c++20')
 
 ## Debug build 
 _cpp_args += cpp.get_supported_arguments(
@@ -75,19 +55,26 @@ _cpp_args += cpp.get_supported_arguments(
 #   # '-march=native' # either this or lto seems to not work on multiple builds
 # )
 
-## Require C++20 concepts support
-# concept_code = '''
-# #include <concepts>
-# #include <type_traits>
-# template <class T>
-# concept integral = std::is_integral_v<T>;
-# '''
-# concepts_check = cpp.compiles(concept_code, name : 'concepts check')
-# if concepts_check
-_cpp_args += cpp.get_supported_arguments('-std=c++20')
-# else 
-#   error('A C++20-compliant compiler is required')
-# endif
+## Configure OpenMP, if option configured
+subdir('openmp')
+
+## Import python interpreter
+py_mod = import('python')
+py = py_mod.find_installation(pure: true)
+py_dep = py.dependency()
+message('Python path =' + py.full_path())
+message('Numpy version =' + run_command(py, ['-c', 'import numpy; print(numpy.__version__)'], check: true).stdout().strip())
+if py.language_version().version_compare('< 3.8')
+  error('Invalid Python version, only >= 3.8 is supported.')
+endif
+
+## Configure Numpy include
+incdir_numpy = run_command(py,
+  ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'],
+  check : true
+).stdout().strip()
+inc_np = include_directories(incdir_numpy)
+np_dep = declare_dependency(include_directories: inc_np)
 
 ## Include directories
 incdir_numpy = run_command(py, ['-c', 'import os; os.chdir(".."); import numpy; print(numpy.get_include())'], check : true).stdout().strip()
@@ -106,43 +93,8 @@ else
 	inc_ffi = include_directories(incdir_pybind11)
 endif 
 
-## Add dependencies, if they are available
-dependency_map = {}
-
-## Include OpenMP (mandatory ; but exclude on windows because it's too difficult to link) 
-if use_openmp
-  omp = dependency('openmp', required: false)
-  openmp_flags = []
-  if omp.found()
-    ## Handle msvc, gcc, clang, or clang-cl
-    if OS_platform == 'windows' and cpp.get_id() == 'msvc'
-      # https://devblogs.microsoft.com/cppblog/improved-openmp-support-for-cpp-in-visual-studio/
-      openmp_flags += cpp.get_supported_arguments('/openmp', '/openmp:experimental', '/openmp:llvm')
-    elif cpp.get_id() == 'gcc'
-      openmp_flags += cpp.get_supported_arguments('-fopenmp', '-fopenmp=libgomp', '-lgomp')
-    elif cpp.get_id() == 'clang-cl'
-      openmp_flags += cpp.get_supported_arguments('-Xclang', '-fopenmp') 
-    elif cpp.get_id() == 'llvm' or cpp.get_id() == 'clang'
-      openmp_flags += cpp.get_supported_arguments('-fopenmp', '-fopenmp=libomp', '-lomp')
-    endif 
-    add_project_link_arguments(openmp_flags, language : 'cpp')
-    dependency_map += { 'OpenMP' : omp }
-  elif cpp.has_argument('-fopenmp')
-    _c = cpp.has_argument('-fopenmp', required: false)
-    _h = cpp.has_header('omp.h', required: true)
-    omp = declare_dependency(compile_args:'-fopenmp', link_args:'-fopenmp')
-    dependency_map += { 'OpenMP' : omp }
-  else
-    error('OpenMP not detected in the system.')
-  endif
-endif 
-
-
 ## Configure Pythran include
-incdir_pythran = run_command(py,
-	['-c', 'import os; os.chdir(".."); import pythran; print(pythran.get_include())'], 
-	check: true
-).stdout().strip()
+incdir_pythran = run_command(py, ['-c', 'import os; os.chdir(".."); import pythran; print(pythran.get_include())'], check: true).stdout().strip()
 pythran_dep = declare_dependency(
   include_directories: incdir_pythran,
 )
@@ -155,6 +107,7 @@ _cpp_args += [
 	# '-DPYTHRAN_BLAS_NONE'
 ]
 
+## Pythran specific compiler flags
 _cpp_args += cpp.get_supported_arguments(
   '-Wno-unused-but-set-variable',
   '-Wno-unused-function',

@@ -1,2 +1,2 @@
-option('use_openmp', type : 'boolean', value : true, description : 'Whether to compile with OpenMP support')
+option('use_openmp', type : 'boolean', value : false, description : 'Whether to compile with OpenMP support')
 option('use_nanobind', type : 'boolean', value : false, description : 'Whether to bind extension modules using nanobind')

@@ -7,7 +7,7 @@ requires = ['meson-python', 'numpy', 'pythran', 'pybind11']
 
 [project]
 name = 'scikit-primate'
-version = '0.5.0'
+version = '0.5.1'
 description = 'Package for implicit matrix function, trace, and diagonal estimation.'
 readme = 'README.md'
 requires-python = '>=3.8'
@@ -44,6 +44,7 @@ norecursedirs = ["docs", "*.egg-info", ".git"]
 
 
 [tool.cibuildwheel]
+before-all = "python -m pip install --upgrade pip cibuildwheel"
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badg, # "bokeh"
 # test-command = "coverage run --source={package} -m pytest {package}/tests" # "coverage report -m"
 test-command = "python -m pytest {package}/tests/ --cov={package} --benchmark-skip"
