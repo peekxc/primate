@@ -1,6 +1,8 @@
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
+# See: https://github.com/pypa/manylinux
+# 2_24_x86_64 is EOF / discontinued. 
 # quay.io/pypa/manylinux2014_x86_64  # CentOS 7  (use GCC 10)
 # quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
 # quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
@@ -8,10 +10,10 @@ env:
 
 build_and_test_task:
   container:
-    # image: quay.io/pypa/manylinux_2_28_x86_64
+    # See: https://github.com/pypa/manylinux
     matrix: 
       - image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
-      - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian
+      # - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian, no c++20 support
       - image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
       # - image: ghcr.io/cirruslabs/macos-runner:sonoma
       # - image: cirrusci/windowsservercore:2019
