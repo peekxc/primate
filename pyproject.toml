@@ -62,7 +62,7 @@ environment = { CC="gcc", CXX="g++" } # for manylinux2014
 
 [tool.cibuildwheel.macos]
 # before-build = "bash {project}/tools/cibw_macos.sh"
-environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
+# environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
 
 # [tool.cibuildwheel.windows]
 # before-build = "bash {project}/tools/cibw_windows.sh"
