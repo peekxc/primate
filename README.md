@@ -2,9 +2,16 @@
 [![build_macos](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_macos.yml?logo=apple&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml) 
 [![build_windows](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_windows.yml?logo=windows&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml) 
 [![build_linux](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_linux.yml?logo=linux&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml)
-[![Python versions](https://flat.badgen.net/badge/Python/3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13/blue)](https://github.com/peekxc/primate/actions)
+[![Python versions](https://badgen.net/badge/python/3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13/blue)](https://github.com/peekxc/primate/actions)
+[![PyPI Version](https://badgen.net/pypi/v/scikit-primate)](https://pypi.org/project/scikit-primate/)
 <!-- [![coverage_badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/peekxc/ef42349965f40edf4232737026690c5f/raw/coverage_info.json)](https://coveralls.io/github/peekxc/simplextree-py)  -->
 <!-- [![PyPI Version](https://img.shields.io/pypi/v/simplextree)](https://pypi.org/project/simplextree) -->
+
+
+<!-- https://badgen.net/github/checks/peekxc/primate/pythran_overhaul?label=tests -->
+
+<!-- https://badgen.net/pypi/v/scikit-primate -->
+<!-- https://badgen.net/pypi/python/scikit-primate -->
 
 `primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is a Python package that provides estimators of quantities derived from [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix); that is, matrices parameterized by functions:
 

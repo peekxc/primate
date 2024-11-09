@@ -22,16 +22,12 @@ jobs:
         - [macos-latest, macosx, x86_64]
         - [macos-latest, macosx, arm64]
         - [windows-latest, win, native]
-        # - [windows-2019, win, native] 
-        # os: [windows-latest]
-        # cibw_arch: ["AMD64"]
-        # cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
         python: [["cp39", "3.9"], ["cp310", "3.10"], ["cp311", "3.11"], ["cp312", "3.12"], ["cp313", "3.13"]]
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: true 
@@ -74,9 +70,9 @@ jobs:
           # -Wl,-S equivalent to gcc's -Wl,--strip-debug
           # LDFLAGS: "-Wl,-S"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.runs-on }}
           path: |
             dist
             wheelhouse
