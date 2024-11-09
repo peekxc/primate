@@ -9,6 +9,7 @@ env:
 
 
 build_and_test_task:
+  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}')
   container:
     # See: https://github.com/pypa/manylinux
     matrix: 
@@ -19,7 +20,6 @@ build_and_test_task:
       # - image: cirrusci/windowsservercore:2019
       - image: mcr.microsoft.com/windows/servercore:ltsc2019
       # - image: windows-2019
-  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}') 
   env:
     # CC: clang 
     # CXX: clang++
