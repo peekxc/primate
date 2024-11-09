@@ -79,11 +79,10 @@ def control_variate_estimator(samples: np.ndarray, cvs: np.ndarray, mu: float, a
 	return cv_est, (cv_est[-1] - z * SE, cv_est[-1] - z * SE)
 
 
-#
 # See: https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation
 # def _parameterize_stop(criterion: str = "confidence") -> Callable:
 class MeanEstimatorCLT:
-	"""Parameterizes an expected value estimator that checks convergence within a confidence interval using the CLT.
+	"""Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.
 
 	Provides the following methods:
 		- __call__ = Updates the estimator with newly measured samples
@@ -138,8 +137,8 @@ class MeanEstimatorCLT:
 		msg += f" #S:{ self.n_samples })"
 		return msg
 
-	def plot(self, samples: np.ndarray, real_trace: Optional[float] = None, **kwargs: dict):
-		"""Generates figures showing the convergence of sample trace estimates."""
+	def plot(self, samples: np.ndarray, mu: Optional[float] = None, **kwargs: dict):
+		"""Generates figures showing the convergence of sample estimates."""
 		from bokeh.layouts import column, row
 		from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
 		from bokeh.plotting import figure
@@ -166,8 +165,8 @@ class MeanEstimatorCLT:
 		p.legend.location = "top_left"
 		p.yaxis.axis_label = f"Estimates ({(self.confidence*100):.0f}% CI band)"
 		p.xaxis.axis_label = "Sample index"
-		if real_trace is not None:
-			true_sp = Span(location=real_trace, dimension="width", line_dash="solid", line_color="red", line_width=1.0)
+		if mu is not None:
+			true_sp = Span(location=mu, dimension="width", line_dash="solid", line_color="red", line_width=1.0)
 			p.add_layout(true_sp)
 		p.line(sample_index, sample_avgs, line_color="black", line_width=2.0, legend_label="mean estimate")
 
