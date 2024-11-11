@@ -48,6 +48,8 @@ addopts = "-rA"
 testpaths = ["tests"]
 norecursedirs = ["docs", "*.egg-info", ".git", "build", "dist"]
 
+## NOTE: https://github.com/pypi/warehouse/blob/8060bfa3cb00c7f68bb4b10021b5361e92a04017/warehouse/forklift/legacy.py#L70-L72
+## PyPI limits file sizes to 100 MB and project sizes to 10 GB
 [tool.cibuildwheel]
 before-all = "python -m pip install --upgrade pip cibuildwheel"
 test-requires = ["pytest", "pytest-cov", "pytest-benchmark"] # coverage-badg, # "bokeh"
@@ -70,6 +72,7 @@ environment = { CC="gcc", CXX="g++" } # for manylinux2014
 # environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
 
 [tool.cibuildwheel.windows]
+environment = { CC="msvc", CXX="msvc" }
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 # before-build = "bash {project}/tools/cibw_windows.sh"

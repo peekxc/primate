@@ -30,7 +30,6 @@ _cpp_args = cpp.get_supported_arguments(
 	'-Wno-cast-function-type',
   '-fPIC', 
   '-fvisibility=hidden', # only expose exported definitions; reduces binary size
-  # '-flto',             # release only: monolithic LTO 
   '-Wno-deprecated-anon-enum-enum-conversion', # to silence Eigen 3.4 warnings
 	'-Wl,-s',       # strip symbols to reduce binary size
 )
@@ -42,7 +41,7 @@ _cpp_args += cpp.get_supported_arguments('-std=c++20')
 ## Choose release vs debug mode
 if get_option('release')
 	_cpp_args += cpp.get_supported_arguments(
-		'-Os',          # full optimizations
+		'-O3',          # full optimizations
 		'-DNDEBUG',     # remove assertions
 		# '-march=native' # either this or lto seems to not work on multiple builds
 		'-fno-unroll-loops',	# no unrolled loops
@@ -50,7 +49,8 @@ if get_option('release')
 	_link_args += cpp.get_supported_link_arguments(
 		'-Wl,-s',       # strip symbols to reduce binary size
 	)
-	## Add link-time optimization 
+	## Add link-time optimization
+	## NOTE: this reduces the size of the binaries significantly!
 	## see: https://gcc.gnu.org/onlinedocs/gccint/LTO-Overview.html and https://stackoverflow.com/questions/23736507/is-there-a-reason-why-not-to-use-link-time-optimization-lto
 	if cpp.get_id() == 'clang'
 		_cpp_args += cpp.get_supported_arguments('-flto=thin')

@@ -68,7 +68,7 @@ jobs:
           # CC: gcc
           # CXX: g++
           # -Wl,-S equivalent to gcc's -Wl,--strip-debug
-          # LDFLAGS: "-Wl,-S"
+          LDFLAGS: "-Wl,-S"
 
       - uses: actions/upload-artifact@v4
         with:
