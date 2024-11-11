@@ -31,15 +31,16 @@ dependencies = [
   "scipy"
 ]
 license = {file = "LICENSE"}
-include = [
-	{ path = "primate/**/*.so", format = "wheel" },
-	{ path = "primate/**/*.pyd", format = "wheel" }
-]
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "pytest-benchmark"] # "bokeh"
 doc = ["quartodoc"]
 dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
+
+[tool.meson-python.args]
+setup = ['--python.bytecompile=2']
+compile = ['-j4']
+install = ['--tags=runtime,python-runtime', '-Dpython.bytecompile=2']
 
 [tool.pytest.ini_options]
 minversion = "6.0"

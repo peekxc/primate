@@ -30,7 +30,7 @@ foreach pythran_ext : pythran_modules
 		pythran_ext, 
 		pythran_gen.process(pythran_ext + '.py'),
 		# include_directories: [openblas_inc],
-		# link_args: openblas_link_args,
+		link_args: [_link_args],
 		cpp_args: [_cpp_args],
 		dependencies: [np_dep, pythran_dep],
 		install: true, 
@@ -46,7 +46,7 @@ foreach ext: extensions
 		'_lanczos', 
 		'_lanczos.cpp',
 		include_directories: [inc_pkg, inc_numpy, inc_eigen, inc_ffi], # openblas_inc
-		# link_args: openblas_link_args,
+		link_args: [_link_args],
 		cpp_args: [_cpp_args],
 		dependencies: [np_dep],
 		install: true, 
