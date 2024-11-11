@@ -71,7 +71,7 @@ environment = { CC="gcc", CXX="g++" } # for manylinux2014
 # environment = { CC="/opt/homebrew/opt/llvm/bin/clang", CXX="/opt/homebrew/opt/llvm/bin/clang++" }
 
 [tool.cibuildwheel.windows]
-environment = { CC="clang", CXX="clang++" }
+environment = { CC="clang-cl", CXX="clang-cl" }
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 # before-build = "bash {project}/tools/cibw_windows.sh"
