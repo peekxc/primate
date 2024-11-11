@@ -57,12 +57,12 @@ jobs:
           Invoke-VSDevEnvironment
           Get-Command rc.exe | Format-Table -AutoSize
 
-      - name: Install Clang with OpenMP support using Chocolatey
-        if: runner.os == 'Windows'
-        run: |
-          choco install -y llvm --params "clang;compiler=clang" --version 18.1.0
-          $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
-          clang --version
+      # - name: Install Clang with OpenMP support using Chocolatey
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     choco install -y llvm --params "clang;compiler=clang" --version 18.1.0
+      #     $env:PATH = "C:\Program Files\LLVM\bin;$env:PATH"
+      #     clang --version
 
       - name: Build wheels via cibuildwheel
         uses: pypa/cibuildwheel@v2.21.3
@@ -70,8 +70,7 @@ jobs:
           CIBW_BUILD: ${{ matrix.python[0] }}-${{ matrix.buildplat[1] }}*
           CIBW_ARCHS: ${{ matrix.buildplat[2] }}
           # define CC, CXX so meson will use clang-cl instead of MSVC
-          # CC: clang-cl
-          # CXX: clang-cl
+
           # CC: gcc
           # CXX: g++
           # -Wl,-S equivalent to gcc's -Wl,--strip-debug
