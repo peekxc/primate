@@ -1,9 +1,8 @@
 from numbers import Number
-from typing import Callable, Sized, Optional, Protocol, Union, runtime_checkable
+from typing import Callable, Optional, Protocol, Sized, Union, runtime_checkable
 
 import numpy as np
-from scipy.special import erfinv
-from scipy.stats import norm, sem, t
+import scipy as sp
 
 
 class Covariance:
@@ -84,12 +83,12 @@ def confidence_interval(a: np.ndarray, confidence: float = 0.95, sdist: str = "t
 	"""Confidence intervals for the sample mean of a set of measurements."""
 	assert isinstance(confidence, Number) and confidence >= 0.0 and confidence <= 1.0, "Invalid confidence measure"
 	if sdist == "t":
-		mean, std_err, m = np.mean(a), sem(a, ddof=1), t.ppf((1 + confidence) / 2.0, len(a) - 1)
+		mean, std_err, m = np.mean(a), sp.stats.sem(a, ddof=1), t.ppf((1 + confidence) / 2.0, len(a) - 1)
 		return mean - m * std_err, mean + m * std_err
 	elif sdist == "normal":
 		sq_n = np.sqrt(len(a))
 		mean, std = np.mean(a), np.std(a, ddof=1)
-		return norm.interval(confidence, loc=mean, scale=std / sq_n)
+		return sp.stats.norm.interval(confidence, loc=mean, scale=std / sq_n)
 	else:
 		raise ValueError(f"Unknown sampling distribution '{sdist}'.")
 
@@ -152,8 +151,8 @@ class CentralLimitEstimator(ConvergenceEstimator):
 		self.n_samples = 0
 		self.atol = 0.0 if atol is None else atol
 		self.rtol = 0.0 if rtol is None else rtol
-		self.z = 2 ** (1 / 2) * erfinv(confidence)
-		self.t_scores = t.ppf((confidence + 1.0) / 2.0, df=np.arange(30) + 1)
+		self.z = 2 ** (1 / 2) * sp.special.erfinv(confidence)
+		self.t_scores = sp.stats.t.ppf((confidence + 1.0) / 2.0, df=np.arange(30) + 1)
 		self.margin_of_error = np.inf
 		self.confidence = confidence
 		self.cov = Covariance(dim=1)

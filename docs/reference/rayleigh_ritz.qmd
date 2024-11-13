@@ -1,0 +1,6 @@
+# rayleigh_ritz { #lanczos.rayleigh_ritz }
+
+```python
+rayleigh_ritz(A, deg=None, return_eigenvectors=False, method='RRR', **kwargs)
+```
+

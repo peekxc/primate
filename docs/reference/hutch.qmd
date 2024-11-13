@@ -1,4 +1,4 @@
-# estimators.hutch { #estimators.hutch }
+# hutch { #estimators.hutch }
 
 ```python
 hutch(

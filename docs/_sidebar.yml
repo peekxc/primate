@@ -1,30 +1,43 @@
 website:
   sidebar:
-  - contents:
-    - reference/index.qmd
+  - border: false
+    contents:
+    - href: index.qmd
+      text: Overview
     - contents:
-      - reference/estimators.hutch.qmd
-      section: Estimators
+      - href: basic/install.qmd
+        text: Installing
+      - href: basic/imate_compare.qmd
+        text: Comparison to *imate*
+      section: Basics
     - contents:
-      - reference/operators.MatrixFunction.qmd
-      - reference/operators.Toeplitz.qmd
-      - reference/operators.normalize_unit.qmd
-      section: Operators
-    - contents:
-      - reference/stochastic.isotropic.qmd
-      - reference/stochastic.symmetric.qmd
-      section: Stochastic
-    - contents:
-      - reference/lanczos.lanczos.qmd
-      - reference/lanczos.rayleigh_ritz.qmd
-      - reference/quadrature.lanczos_quadrature.qmd
-      section: Lanczos
-    - contents:
-      - reference/stats.Covariance.qmd
-      - reference/stats.ConvergenceEstimator.qmd
-      - reference/stats.MeanEstimator.qmd
-      - reference/stats.CentralLimitEstimator.qmd
-      - reference/stats.ControlVariableEstimator.qmd
-      section: Stats
+      - reference/index.qmd
+      - contents:
+        - reference/hutch.qmd
+        section: Estimators
+      - contents:
+        - reference/MatrixFunction.qmd
+        - reference/Toeplitz.qmd
+        - reference/normalize_unit.qmd
+        section: Operators
+      - contents:
+        - reference/isotropic.qmd
+        - reference/symmetric.qmd
+        section: Stochastic
+      - contents:
+        - reference/lanczos.qmd
+        - reference/rayleigh_ritz.qmd
+        - reference/lanczos_quadrature.qmd
+        section: Lanczos
+      - contents:
+        - reference/stats.Covariance.qmd
+        - reference/stats.ConvergenceEstimator.qmd
+        - reference/stats.MeanEstimator.qmd
+        - reference/stats.CentralLimitEstimator.qmd
+        - reference/stats.ControlVariableEstimator.qmd
+        section: Stats
+      section: API Reference
     id: reference
+    search: true
+    style: floating
   - id: dummy-sidebar

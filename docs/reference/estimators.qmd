@@ -1,4 +1,16 @@
-# estimators.hutch { #estimators.hutch }
+# estimators { #estimators }
+
+``
+
+Estimators involving matrix function, trace, and diagonal estimation.
+
+## Functions
+
+| Name | Description |
+| --- | --- |
+| [hutch](#estimators.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
+
+### hutch { #estimators.hutch }
 
 ```python
 hutch(
@@ -24,7 +36,7 @@ Convergence behavior is controlled by the `estimator` parameter: "confidence" us
 intervals on the fly, which may be used in conjunction with `atol` and `rtol` to upper-bound the error of the approximation.
 :::
 
-## Parameters {.doc-section .doc-section-parameters}
+#### Parameters {.doc-section .doc-section-parameters}
 
 | Name      | Type                                    | Description                                                                       | Default        |
 |-----------|-----------------------------------------|-----------------------------------------------------------------------------------|----------------|
@@ -35,23 +47,23 @@ intervals on the fly, which may be used in conjunction with `atol` and `rtol` to
 | seed      | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
 | full      | bool                                    | Whether to return additional information about the computation.                   | `False`        |
 
-## Returns {.doc-section .doc-section-returns}
+#### Returns {.doc-section .doc-section-returns}
 
 | Name   | Type                  | Description                                                                                                    |
 |--------|-----------------------|----------------------------------------------------------------------------------------------------------------|
 |        | Union\[float, tuple\] | Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned. |
 
-## See Also {.doc-section .doc-section-see-also}
+#### See Also {.doc-section .doc-section-see-also}
 
 - [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
 - [CentralLimitEstimator](/reference/CentralLimitEstimator.md): Standard estimator of the mean from iid samples.
 
-## Reference {.doc-section .doc-section-reference}
+#### Reference {.doc-section .doc-section-reference}
 
 1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
 2. Hutchinson, Michael F. "A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines." Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.
 
-## Examples {.doc-section .doc-section-examples}
+#### Examples {.doc-section .doc-section-examples}
 
 ```{python}
 from primate.trace import hutch

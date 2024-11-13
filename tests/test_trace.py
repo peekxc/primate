@@ -1,5 +1,5 @@
 import numpy as np
-from primate.estimators import hutch
+from primate.trace import hutch
 from primate.operators import MatrixFunction
 from primate.stochastic import symmetric, isotropic
 
@@ -46,7 +46,7 @@ def bench_slq():
 	ew, U = np.linalg.eigh(G)
 	GM = U @ np.diag(f(ew)) @ U.T
 
-	from primate.estimators import hutch
+	from primate.trace import hutch
 
 	s1 = hutch(T, fun=f, maxiter=150, atol=0.0, deg=20, seed=0)
 	s2 = hutch(M, maxiter=150, atol=0.0, seed=0)

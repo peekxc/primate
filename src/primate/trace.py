@@ -122,7 +122,7 @@ def hutch(
 
 	Examples:
 		```{python}
-		from primate.estimators import hutch
+		from primate.trace import hutch
 		```
 	"""
 	f_dtype = _operator_checks(A)
@@ -169,6 +169,14 @@ def hutch(
 			estimator.update(quad_form(pdf(size=(N, 1), seed=rng).astype(f_dtype)))
 			converged = estimator.converged() or len(estimator) >= maxiter
 		return estimator.estimate
+
+
+# def diag_hutch():
+# 	while not converged:
+# 		v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
+# 		estimator.update(v * (A @ v))
+# 		converged = estimator.converged() or len(estimator) >= maxiter
+# 	return estimator.estimate
 
 
 # else:

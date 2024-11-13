@@ -1,12 +1,12 @@
-from typing import Callable, Optional, Union, Any
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
-from scipy.sparse.linalg import eigsh, LinearOperator, aslinearoperator
+from scipy.sparse.linalg import LinearOperator, aslinearoperator, eigsh
 from scipy.sparse.linalg._interface import IdentityOperator
 
 from .lanczos import _lanczos, _validate_lanczos
-from .tridiag import eigh_tridiag
 from .quadrature import lanczos_quadrature
+from .tridiag import eigh_tridiag
 
 
 def _is_linear_op(A: Any) -> bool:
@@ -85,12 +85,6 @@ class MatrixFunction(LinearOperator):
 		return np.sum(self._fun(self._nodes) * self._weights, axis=-1) * x_norm_sq
 
 
-## TODO: a control variate should be a triple (f, l, alpha), where:
-## 1. f is an aggregation function which operates on the *nodes*, produces a real-valued output repr. expected value
-## 2. l is the population expected value of f, known ahead of time (required)
-## 3. alpha in [-1, 1] is the Pearson correlation coefficient, known ahead of time or estimated (optionally)
-
-
 ## NOTE: this could act as a nice way of handling keyword argumetns in kwargs to generate a MF
 def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.ndarray = None, deg: int = 20):
 	# (a, b), Q = lanczos(A, v0=v, deg=deg, return_basis=True)  # O(nd)  space
@@ -103,6 +97,8 @@ def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.nda
 
 ## From: https://www.mathworks.com/matlabcentral/fileexchange/8548-toeplitzmult
 class Toeplitz(LinearOperator):
+	"""Matrix-free operator for representing Toeplitz or circulant matrices."""
+
 	def __init__(self, c: np.ndarray, r: np.ndarray = None, dtype=None):
 		self.c = np.array(c)
 		self.r = np.array(c if r is None else r)
@@ -115,10 +111,10 @@ class Toeplitz(LinearOperator):
 	## NOTE: We return a copy because the output cannot be a view
 	def _matvec(self, x: np.ndarray) -> np.ndarray:
 		assert len(x) == len(self.c), f"Invalid shape of input vector 'x'; must have length {len(self.c)}"
-		self._z[: self.shape[0]] = x.ravel()
+		self._z[: self.shape[0]] = x.ravel().astype(self.dtype, copy=False)
 		x_fft = np.fft.fft(self._z)
 		y = np.real(np.fft.ifft(self._dfft * x_fft))
-		return y[: self.shape[0]].copy()
+		return y[: self.shape[0]].astype(self.dtype)
 
 
 def normalize_unit(A: LinearOperator, interval: tuple = (-1, 1)) -> LinearOperator:

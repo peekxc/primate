@@ -25,6 +25,56 @@ website:
     type: "overlay" # textbox or overlay
     copy-button: true
   
+  reader-mode: true     # reader mode collapses sidebar 
+  page-navigation: true # ability to go to next / prev 
+  page-footer: "Copyright 2024, Matt Piekenbrock" 
+
+quartodoc:
+  package: null
+  # package: primate
+  source_dir: ../src/primate
+  # sidebar: _sidebar.yml
+  out_index: index.qmd
+  parser: google
+  style: pkgdown # pkgdown, single-page
+  # dynamic: true
+  sections:
+    - title: Estimators
+      contents:
+        - name: hutch
+          package: estimators
+          signature_name: short
+    - title: Operators
+      contents:
+        - name: MatrixFunction
+          package: operators
+        - name: Toeplitz
+          package: operators
+        - name: normalize_unit
+          package: operators
+    - title: Stochastic
+      contents:
+        - name: isotropic
+          package: stochastic
+          signature_name: full
+        - name: symmetric
+          package: stochastic
+    - title: Lanczos
+      contents: 
+        - name: lanczos
+          package: lanczos
+        - name: rayleigh_ritz
+          package: lanczos
+        - name: lanczos_quadrature
+          package: quadrature
+        # - quadrature.spectral_density
+    - title: Stats
+      contents: 
+        - stats.Covariance
+        - stats.ConvergenceEstimator
+        - stats.MeanEstimator
+        - stats.CentralLimitEstimator
+        - stats.ControlVariableEstimator
   sidebar:
     file: "_sidebar.yml"
     search: true
@@ -35,50 +85,13 @@ website:
         text: Overview
       - section: Basics 
         contents:
+          - text: Installing
+            href: basic/install.qmd
           - text: Comparison to *imate*
-            href: imate_compare.qmd
+            href: basic/imate_compare.qmd
       - section: "API Reference"
         contents:
           - "{{ contents }}"
-  reader-mode: true     # reader mode collapses sidebar 
-  page-navigation: true # ability to go to next / prev 
-  page-footer: "Copyright 2024, Matt Piekenbrock" 
-
-quartodoc:
-  package: null
-  # package: primate
-  source_dir: ../src/primate
-  sidebar: _sidebar.yml
-  out_index: index.qmd
-  parser: google
-  style: pkgdown # pkgdown, single-page
-  sections:
-    - title: Estimators
-      contents:
-        - estimators.hutch
-    - title: Operators
-      contents:
-        - operators.MatrixFunction
-        - operators.Toeplitz
-        - operators.normalize_unit
-    - title: Stochastic
-      contents:
-        - stochastic.isotropic
-        - stochastic.symmetric
-    - title: Lanczos
-      contents: 
-        - lanczos.lanczos
-        - lanczos.rayleigh_ritz
-        - quadrature.lanczos_quadrature
-        # - quadrature.spectral_density
-    - title: Stats
-      contents: 
-        - stats.Covariance
-        - stats.ConvergenceEstimator
-        - stats.MeanEstimator
-        - stats.CentralLimitEstimator
-        - stats.ControlVariableEstimator
-
 filters:
   - pseudocode  
 

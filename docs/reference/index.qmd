@@ -4,30 +4,30 @@
 
 | | |
 | --- | --- |
-| [estimators.hutch](estimators.hutch.qmd#estimators.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
+| [hutch](hutch.qmd#estimators.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
 
 ## Operators
 
 | | |
 | --- | --- |
-| [operators.MatrixFunction](operators.MatrixFunction.qmd#operators.MatrixFunction) | Linear operator class for matrix functions. |
-| [operators.Toeplitz](operators.Toeplitz.qmd#operators.Toeplitz) |  |
-| [operators.normalize_unit](operators.normalize_unit.qmd#operators.normalize_unit) | Normalizes a linear operator to have its spectra contained in the interval [-1,1]. |
+| [MatrixFunction](MatrixFunction.qmd#operators.MatrixFunction) | Linear operator class for matrix functions. |
+| [Toeplitz](Toeplitz.qmd#operators.Toeplitz) |  |
+| [normalize_unit](normalize_unit.qmd#operators.normalize_unit) | Normalizes a linear operator to have its spectra contained in the interval [-1,1]. |
 
 ## Stochastic
 
 | | |
 | --- | --- |
-| [stochastic.isotropic](stochastic.isotropic.qmd#stochastic.isotropic) | Generates random vectors from a specified isotropic distribution. |
-| [stochastic.symmetric](stochastic.symmetric.qmd#stochastic.symmetric) | Generates a random symmetric matrix of size `n` with eigenvalues `ew`. |
+| [isotropic](isotropic.qmd#stochastic.isotropic) | Generates random vectors from a specified isotropic distribution. |
+| [symmetric](symmetric.qmd#stochastic.symmetric) | Generates a random symmetric matrix of size `n` with eigenvalues `ew`. |
 
 ## Lanczos
 
 | | |
 | --- | --- |
-| [lanczos.lanczos](lanczos.lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
-| [lanczos.rayleigh_ritz](lanczos.rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
-| [quadrature.lanczos_quadrature](quadrature.lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
+| [lanczos](lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
+| [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
+| [lanczos_quadrature](lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
 
 ## Stats
 

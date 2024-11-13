@@ -1,0 +1,6 @@
+# Toeplitz { #operators.Toeplitz }
+
+```python
+Toeplitz(self, c, r=None, dtype=None)
+```
+

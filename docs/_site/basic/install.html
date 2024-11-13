@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Package overview</title>
+<title>Installation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,28 +20,63 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./basic/install.html" rel="next">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../basic/imate_compare.html" rel="next">
+<link href="../index.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -70,51 +105,8 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
 
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
-
-<link rel="stylesheet" href="custom.css">
+<link rel="stylesheet" href="../custom.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -124,7 +116,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">PRIMATE</span>
     </a>
   </div>
@@ -135,7 +127,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./reference/index.html" aria-current="page"> 
+    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -162,7 +154,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Overview</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="../basic/install.html">Installing</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -184,7 +176,7 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -199,13 +191,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./basic/install.html" class="sidebar-item-text sidebar-link">
+  <a href="../basic/install.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Installing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./basic/imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="../basic/imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -222,7 +214,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Function reference</span></a>
   </div>
 </li>
@@ -237,7 +229,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/hutch.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutch</span></a>
   </div>
 </li>
@@ -254,19 +246,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Toeplitz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">normalize_unit</span></a>
   </div>
 </li>
@@ -283,13 +275,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/isotropic.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">isotropic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/symmetric.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">symmetric</span></a>
   </div>
 </li>
@@ -306,19 +298,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">rayleigh_ritz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos_quadrature</span></a>
   </div>
 </li>
@@ -335,31 +327,31 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.ConvergenceEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.ConvergenceEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.ConvergenceEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.MeanEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.MeanEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.MeanEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.CentralLimitEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.CentralLimitEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.CentralLimitEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.ControlVariableEstimator</span></a>
   </div>
 </li>
@@ -372,15 +364,23 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#platform-support" id="toc-platform-support" class="nav-link active" data-scroll-target="#platform-support">Platform support</a></li>
+  <li><a href="#compiling-from-source" id="toc-compiling-from-source" class="nav-link" data-scroll-target="#compiling-from-source">Compiling from source</a></li>
+  <li><a href="#c-installation" id="toc-c-installation" class="nav-link" data-scroll-target="#c-installation">C++ Installation</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="../basic/install.html">Installing</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Package overview</h1>
+<h1 class="title">Installation</h1>
 </div>
 
 
@@ -397,29 +397,112 @@ window.Quarto = {
 </header>
 
 
-<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is Python package that performs randomized matrix trace estimation of <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>—that is, matrices parameterized by functions:</p>
-<p><span class="math display"> \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}</span></p>
-<p>Trace estimates are obtained in a Monte-Carlo fashion via the <em>stochastic Lanczos method</em> (SLQ)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This method is useful for sparse or highly structured matrices with efficiently computable <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a>.</p>
-<p>Notable features of <code>primate</code> include:</p>
-<ul>
-<li>A highly-parametrizable trace estimator (see SLQ)</li>
-<li>Various distribution / engine choices for random vector generation (the stochastic part!)</li>
-<li>Orthogonalization routines, such as the <em>Lanczos</em>, <em>Golub Kahan</em>, and <em>Gram Schmidt</em> methods</li>
-<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> (C++)</li>
-<li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator">SciPy</a> or <a href="https://pylops.readthedocs.io/en/stable/index.html">Pylops</a></li>
-</ul>
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>—for a comparison of the two, see <a href="imate_compare.qmd">here</a>.</p>
+<p><code>primate</code> is a standard <a href="https://peps.python.org/pep-0517/">PEP-517</a> package that can be installed via <code>pip</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>python <span class="op">-</span>m pip install scikit<span class="op">-</span>primate  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Assuming your platform is supported, no compilation is needed—see <a href="#platform-support">platform support</a> for details.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Like many packages registered on PyPI (e.g.&nbsp;<code>sklearn</code>), the <em>distribution package</em> (<code>scikit-primate</code>) differs from the <em>import package</em> (<code>primate</code>) (see <a href="https://packaging.python.org/en/latest/discussions/distribution-package-vs-import-package/">here</a>). Thus, to install, use the <code>scikit-</code> prefix, but to import no prefix is needed. <code>primate</code> does not rely on organizational prefixes use by some <a href="https://projects.scipy.org/scikits.html">scikits</a> (e.g.&nbsp;<code>scikit-learn</code> -&gt; <code>sklearn</code>).</p>
+</div>
+</div>
+<section id="platform-support" class="level3">
+<h3 class="anchored" data-anchor-id="platform-support">Platform support</h3>
+<p>For most platforms, <code>primate</code> can be installed from PyPI without compilation. In particular, native wheels are currently built with <a href="https://cibuildwheel.readthedocs.io/en/stable/">cibuildwheel</a> on the following platforms:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Platform</th>
+<th style="text-align: center;">3.9</th>
+<th style="text-align: center;">3.10</th>
+<th style="text-align: center;">3.11</th>
+<th style="text-align: center;">3.12</th>
+<th style="text-align: center;">3.13</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Linux (manylinux x86_64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="even">
+<td><strong>MacOS (x86_64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="odd">
+<td><strong>MacOS ARM (arm64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+<tr class="even">
+<td><strong>Windows (AMD64)</strong></td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+<td style="text-align: center;">✅</td>
+</tr>
+</tbody>
+</table>
+<p>Currently, there is no support for <a href="https://www.pypy.org/">PyPy</a>, 32-bit systems, or <a href="https://devguide.python.org/versions/#supported-versions">unsupported versions of CPython</a>.</p>
+<p>If your platform isn’t on this table but you would like it to be supported, feel free to <a href="https://github.com/peekxc/primate">make an issue</a>.</p>
+</section>
+<section id="compiling-from-source" class="level3">
+<h3 class="anchored" data-anchor-id="compiling-from-source">Compiling from source</h3>
+<p>A C++20 compiler is required to compile the package from its source distribution. Current builds all compile with some variant of <a href="https://clang.llvm.org/">clang</a> (version 15.0+) or gcc. For platform- and compiler-specific settings, consult the <a href="https://github.com/peekxc/primate/blob/main/meson.build">build scripts</a> and <a href="https://github.com/peekxc/primate/tree/main/.github/workflows">CI configuration files</a>.</p>
+</section>
+<section id="c-installation" class="level3">
+<h3 class="anchored" data-anchor-id="c-installation">C++ Installation</h3>
+<p><code>primate</code>’s C++ interface is <a href="https://en.wikipedia.org/wiki/Header-only">header-only</a>, making it easy to compile your own <a href="https://docs.python.org/3/extending/extending.html">extension modules</a>. The simplest way to link these headers is to add <code>primate</code> as a <a href="https://peps.python.org/pep-0631/">dependency</a> to your package and use the <code>get_include()</code> function to find the appropriate directory.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">setuptools</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">meson-python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">git submodule</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># setup.py</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> primate <span class="im">as</span> pm</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>Extension(<span class="st">'extension_name'</span>, ..., include_dirs<span class="op">=</span>[pm.get_include()])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># meson.build</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>primate_include_dirs <span class="op">=</span> run_command(py, </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  [<span class="st">'-c'</span>, <span class="st">'import primate as pm; print(pm.get_include())'</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>).stdout().strip()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Assuming your headers are located in <code>extern</code>, from your git repository, you can use:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule add https://github.com/peekxc/primate extern/primate</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> submodule update <span class="at">--init</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>From here, you can now include <code>extern/primate/include</code> into your C++ source files, or you can add this directory to the search path used other various build tools, such as <a href="https://cmake.org/">CMake</a> or <a href="https://mesonbuild.com/">Meson</a>.</p>
+</div>
+</div>
+</div>
 
 
+</section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>This includes <a href="https://en.cppreference.com/w/cpp/utility/functional/function">std::function</a>’s, C-style function pointers, <a href="https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses">functors</a>, and <a href="https://en.cppreference.com/w/cpp/language/lambda">lambda expressions</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -986,10 +1069,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../index.html" class="pagination-link" aria-label="Overview">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./basic/install.html" class="pagination-link" aria-label="Installing">
-        <span class="nav-page-text">Installing</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../basic/imate_compare.html" class="pagination-link" aria-label="Comparison to *imate*">
+        <span class="nav-page-text">Comparison to <em>imate</em></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Package overview</title>
+<title>lanczos</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,28 +20,63 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./basic/install.html" rel="next">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../reference/rayleigh_ritz.html" rel="next">
+<link href="../reference/symmetric.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -114,7 +149,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="custom.css">
+<link rel="stylesheet" href="../custom.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -124,7 +159,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">PRIMATE</span>
     </a>
   </div>
@@ -135,7 +170,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./reference/index.html" aria-current="page"> 
+    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -162,7 +197,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Overview</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/lanczos.html">Lanczos</a></li><li class="breadcrumb-item"><a href="../reference/lanczos.html">lanczos</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -184,7 +219,7 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
@@ -199,13 +234,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./basic/install.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Installing</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./basic/imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -222,7 +251,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Function reference</span></a>
   </div>
 </li>
@@ -237,7 +266,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/hutch.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutch</span></a>
   </div>
 </li>
@@ -254,19 +283,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Toeplitz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">normalize_unit</span></a>
   </div>
 </li>
@@ -283,13 +312,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/isotropic.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">isotropic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/symmetric.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">symmetric</span></a>
   </div>
 </li>
@@ -297,28 +326,28 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
  <span class="menu-text">Lanczos</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">lanczos</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">rayleigh_ritz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos_quadrature</span></a>
   </div>
 </li>
@@ -335,31 +364,31 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.ConvergenceEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.ConvergenceEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.ConvergenceEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.MeanEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.MeanEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.MeanEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.CentralLimitEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.CentralLimitEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.CentralLimitEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./reference/stats.ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/stats.ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.ControlVariableEstimator</span></a>
   </div>
 </li>
@@ -372,54 +401,161 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lanczos.lanczos" id="toc-lanczos.lanczos" class="nav-link active" data-scroll-target="#lanczos.lanczos">lanczos</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Package overview</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<p><code>primate</code>, short for <strong>Pr</strong>obabalistic <strong>I</strong>mplicit <strong>Ma</strong>trix <strong>T</strong>race <strong>E</strong>stimator, is Python package that performs randomized matrix trace estimation of <a href="https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix">matrix functions</a>—that is, matrices parameterized by functions:</p>
-<p><span class="math display"> \mathrm{tr}(f(A)) \triangleq \mathrm{tr}(U f(\Lambda) U^{\intercal}), \quad \quad f : [a,b] \to \mathbb{R}</span></p>
-<p>Trace estimates are obtained in a Monte-Carlo fashion via the <em>stochastic Lanczos method</em> (SLQ)<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This method is useful for sparse or highly structured matrices with efficiently computable <a href="https://en.wikipedia.org/wiki/Quadratic_form#Associated_symmetric_matrix">quadratic forms</a>.</p>
-<p>Notable features of <code>primate</code> include:</p>
+<section id="lanczos.lanczos" class="level1">
+<h1>lanczos</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>lanczos(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    v0<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    deg<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    rtol<span class="op">=</span><span class="fl">1e-08</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    orth<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    sparse_mat<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    return_basis<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    dtype<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Lanczos method for symmetric tridiagonalization.</p>
+<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization.</p>
+<p>The Lanczos method builds a tridiagonal <code>T</code> from a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the diagonals of the resulting tridiagonal matrix <code>T</code>.</p>
+<p>Rayleigh-Ritz approximations of the eigenvalues of <code>A</code> can be further obtained by diagonalizing <code>T</code> via any symmetric tridiagonal eigenvalue solver, <code>scipy.linalg.eigh_tridiagonal</code> though note unlike <code>eigsh</code> no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
+<section id="parameters" class="level2 doc-section doc-section-parameters">
+<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 32%">
+<col style="width: 48%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A</td>
+<td>Union[np.ndarray, sparray, LinearOperator]</td>
+<td>Symmetric operator to tridiagonalize.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>v0</td>
+<td>Optional[np.ndarray]</td>
+<td>Initial vector to orthogonalize against.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="odd">
+<td>deg</td>
+<td>Optional[int]</td>
+<td>Size of the Krylov subspace to expand.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>rtol</td>
+<td>float</td>
+<td>Relative tolerance to consider the invariant subspace as converged.</td>
+<td><code>1e-08</code></td>
+</tr>
+<tr class="odd">
+<td>orth</td>
+<td>int</td>
+<td>Number of additional Lanczos vectors to orthogonalize against.</td>
+<td><code>0</code></td>
+</tr>
+<tr class="even">
+<td>sparse_mat</td>
+<td>bool</td>
+<td>Whether to output the tridiagonal matrix as a sparse matrix.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="odd">
+<td>return_basis</td>
+<td>bool</td>
+<td>If <code>True</code>, returns the Krylov basis vectors <code>Q</code>.</td>
+<td><code>False</code></td>
+</tr>
+<tr class="even">
+<td>dtype</td>
+<td>Optional[np.dtype]</td>
+<td>The precision dtype to specialize the computation.</td>
+<td><code>None</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level2 doc-section doc-section-returns">
+<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 88%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td>tuple</td>
+<td>A tuple <code>(a,b)</code> parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If <code>return_basis=True</code>,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>tuple</td>
+<td>the tuple <code>(a,b), Q</code> is returned, where <code>Q</code> represents an orthogonal basis for the degree-<code>deg</code> Krylov subspace.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="see-also" class="level2 doc-section doc-section-see-also">
+<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <ul>
-<li>A highly-parametrizable trace estimator (see SLQ)</li>
-<li>Various distribution / engine choices for random vector generation (the stochastic part!)</li>
-<li>Orthogonalization routines, such as the <em>Lanczos</em>, <em>Golub Kahan</em>, and <em>Gram Schmidt</em> methods</li>
-<li>Support for <em>arbitrary</em> matrix functions, i.e.&nbsp;<code>Callable</code>’s (Python) and <code>invocable</code>’s<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> (C++)</li>
-<li>Support for <em>arbitrary</em> <code>LinearOperator</code>’s, e.g.&nbsp;those in <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator">SciPy</a> or <a href="https://pylops.readthedocs.io/en/stable/index.html">Pylops</a></li>
+<li>scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.</li>
+<li>operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.</li>
 </ul>
-<p>Much of <code>primate</code>’s computational code was directly ported from the (excellent) <a href="https://github.com/ameli/imate"><code>imate</code> package</a>—for a comparison of the two, see <a href="imate_compare.qmd">here</a>.</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>This includes <a href="https://en.cppreference.com/w/cpp/utility/functional/function">std::function</a>’s, C-style function pointers, <a href="https://stackoverflow.com/questions/356950/what-are-c-functors-and-their-uses">functors</a>, and <a href="https://en.cppreference.com/w/cpp/language/lambda">lambda expressions</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</section>
+<section id="references" class="level2 doc-section doc-section-references">
+<h2 class="doc-section doc-section-references anchored" data-anchor-id="references">References</h2>
+<ol type="1">
+<li>Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.</li>
 </ol>
-</section></div></main> <!-- /main -->
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -986,10 +1122,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../reference/symmetric.html" class="pagination-link" aria-label="symmetric">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">symmetric</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./basic/install.html" class="pagination-link" aria-label="Installing">
-        <span class="nav-page-text">Installing</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/rayleigh_ritz.html" class="pagination-link" aria-label="rayleigh_ritz">
+        <span class="nav-page-text">rayleigh_ritz</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
