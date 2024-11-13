@@ -9,7 +9,7 @@ from .tridiag import eigh_tridiag
 from .quadrature import lanczos_quadrature
 
 
-def is_linear_op(A: Any) -> bool:
+def _is_linear_op(A: Any) -> bool:
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	is_valid_op = True
 	is_valid_op &= any(attr_checks)  # , "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
@@ -24,7 +24,7 @@ class MatrixFunction(LinearOperator):
 	def __init__(
 		self, A: np.ndarray, fun: np.ufunc = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
 	) -> None:
-		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
+		assert _is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
 		if fun is not None:
 			assert isinstance(fun, Callable), "Function must be numpy ufunc"
@@ -46,6 +46,10 @@ class MatrixFunction(LinearOperator):
 		self._A = A
 		self.shape = A.shape
 		self.dtype = np.dtype(dtype)
+
+	@property
+	def degree(self) -> int:
+		return self._deg
 
 	def _adjoint(self):
 		return self
@@ -70,8 +74,8 @@ class MatrixFunction(LinearOperator):
 		$$ x \mapsto x^T f(A) x $$
 		The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of $f(A)$.
 
-		Note this method is similar though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
-		which first applies $x \mapsto f(A)x$ and then performs a dot product.
+		Note this method is mathematically equivalent though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
+		which first applies $x \mapsto f(A)x$ and then performs a dot product. In particular, the
 		"""
 		assert self._Q.shape[1] >= self._orth, "Auxiliary memory `Q` is not large enough for reorthogonalization."
 		x = x.astype(self.dtype).reshape(-1)

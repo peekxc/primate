@@ -8,7 +8,7 @@ __version__ = importlib.metadata.version("scikit-primate")
 # from .lanczos import OrthogonalPolynomialBasis, lanczos, rayleigh_ritz
 # from .operators import MatrixFunction, is_linear_op, normalize_unit
 # from .quadrature import spectral_density, lanczos_quadrature
-# from .stats import ControlVariateEstimator, CentralLimitEstimator
+# from .stats import ControlVariableEstimator, CentralLimitEstimator
 # from .stochastic import isotropic, symmetric
 # from .tridiag import eigh_tridiag, eigvalsh_tridiag
 

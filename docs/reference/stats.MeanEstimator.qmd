@@ -1,0 +1,6 @@
+# stats.MeanEstimator { #stats.MeanEstimator }
+
+```python
+MeanEstimator(self, dim=1)
+```
+

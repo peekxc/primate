@@ -5,3 +5,24 @@ MatrixFunction(self, A, fun=None, deg=20, dtype=np.float64, **kwargs)
 ```
 
 Linear operator class for matrix functions.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [quad](#operators.MatrixFunction.quad) | Estimates the quadratic form of the matrix function using Lanczos quadrature. |
+
+### quad { #operators.MatrixFunction.quad }
+
+```python
+MatrixFunction.quad(x)
+```
+
+Estimates the quadratic form of the matrix function using Lanczos quadrature.
+
+This function uses the Lanczos method to estimate the quadratic form:
+$$ x \mapsto x^T f(A) x $$
+The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of $f(A)$.
+
+Note this method is mathematically equivalent though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
+which first applies $x \mapsto f(A)x$ and then performs a dot product. In particular, the

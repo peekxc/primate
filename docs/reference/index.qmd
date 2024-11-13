@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| [estimators.hutch](estimators.hutch.qmd#estimators.hutch) | Estimates the trace of a symmetric `A` or matrix function `fun(A)` via the Girard-Hutchinson estimator. |
+| [estimators.hutch](estimators.hutch.qmd#estimators.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
 
 ## Operators
 
@@ -12,7 +12,7 @@
 | --- | --- |
 | [operators.MatrixFunction](operators.MatrixFunction.qmd#operators.MatrixFunction) | Linear operator class for matrix functions. |
 | [operators.Toeplitz](operators.Toeplitz.qmd#operators.Toeplitz) |  |
-| [operators.normalize_unit](operators.normalize_unit.qmd#operators.normalize_unit) | Produces a normalized linear operator whose eigenvalues lie in the unit interval |
+| [operators.normalize_unit](operators.normalize_unit.qmd#operators.normalize_unit) | Normalizes a linear operator to have its spectra contained in the interval [-1,1]. |
 
 ## Stochastic
 
@@ -20,8 +20,6 @@
 | --- | --- |
 | [stochastic.isotropic](stochastic.isotropic.qmd#stochastic.isotropic) | Generates random vectors from a specified isotropic distribution. |
 | [stochastic.symmetric](stochastic.symmetric.qmd#stochastic.symmetric) | Generates a random symmetric matrix of size `n` with eigenvalues `ew`. |
-| [stats.confidence_interval](stats.confidence_interval.qmd#stats.confidence_interval) | Confidence intervals for the sample mean of a set of measurements. |
-| [stats.MeanEstimatorCLT](stats.MeanEstimatorCLT.qmd#stats.MeanEstimatorCLT) |  |
 
 ## Lanczos
 
@@ -29,4 +27,14 @@
 | --- | --- |
 | [lanczos.lanczos](lanczos.lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
 | [lanczos.rayleigh_ritz](lanczos.rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
-| [quadrature.lanczos_quadrature](quadrature.lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator. |
+| [quadrature.lanczos_quadrature](quadrature.lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
+
+## Stats
+
+| | |
+| --- | --- |
+| [stats.Covariance](stats.Covariance.qmd#stats.Covariance) | Updateable covariance matrix. |
+| [stats.ConvergenceEstimator](stats.ConvergenceEstimator.qmd#stats.ConvergenceEstimator) | Protocol for generic stopping criteria for sequences. |
+| [stats.MeanEstimator](stats.MeanEstimator.qmd#stats.MeanEstimator) |  |
+| [stats.CentralLimitEstimator](stats.CentralLimitEstimator.qmd#stats.CentralLimitEstimator) | Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT. |
+| [stats.ControlVariableEstimator](stats.ControlVariableEstimator.qmd#stats.ControlVariableEstimator) |  |

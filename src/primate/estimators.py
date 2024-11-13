@@ -35,7 +35,7 @@ class MonteCarloResult:
 
 
 ## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
-def suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rademacher") -> int:
+def _suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rademacher") -> int:
 	"""Suggests a number of sample vectors to use to get an eps-accurate trace estimate with probability p."""
 	assert p >= 0 and p < 1, "Probability of success 'p' must be  must be between [0, 1)"
 	eta = 1.0 - p
@@ -80,50 +80,34 @@ def _reduce(nodes: np.ndarray, weights: np.ndarray) -> np.ndarray:
 	return np.sum(nodes * weights[:, np.newaxis], axis=-1)
 
 
-## pdf should be either a string or a function of type pdf(size=..., seed=...)
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
 	maxiter: int = 200,
 	pdf: Union[str, Callable] = "rademacher",
-	stop: Union[str, ConvergenceEstimator] = "confidence",
+	estimator: Union[str, ConvergenceEstimator] = "confidence",
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
-	verbose: bool = False,
 	callback: Optional[Callable] = None,
 	**kwargs: dict,
 ) -> Union[float, tuple]:
-	r"""Estimates the trace of a symmetric `A` or matrix function `fun(A)` via the Girard-Hutchinson estimator.
+	r"""Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator.
 
-	This function uses up to `maxiter` random isotropic vectors to estimate of the trace of $f(A)$, where:
-	$$ \mathrm{tr}(f(A)) = \mathrm{tr}(U f(\Lambda) U^T) = \sum_{i=1}^n f(\lambda_i), \quad A = U \Lambda U^T $$
-	The estimator is obtained by averaging quadratic forms $v \mapsto v^T f(A)v$, rescaling as necessary.
+	This function uses up to `maxiter` random vectors to estimate of the trace of $A$ via the approximation:
+	$$ \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v $$
+	When $v$ are isotropic, this approximation forms an unbiased estimator of the trace.
 
 	:::{.callout-note}
-	Convergence behavior is controlled by the `stop` parameter: "confidence" uses the central limit theorem to generate confidence
+	Convergence behavior is controlled by the `estimator` parameter: "confidence" uses the central limit theorem to generate confidence
 	intervals on the fly, which may be used in conjunction with `atol` and `rtol` to upper-bound the error of the approximation.
-	Alternatively, when `stop` = 'change', the estimator is considered converged when the error between the last two iterates is less than
-	`atol` (or `rtol`, respectively), similar to the behavior of scipy.integrate.quadrature.
 	:::
 
 	Parameters:
-		A: real symmetric operator.
-		fun: real- or vector-valued function defined on the spectrum of `A`.
-		reduce: per-estimate aggregation function. Required when `fun` is vector-valued. Default to identity.
+		A: real symmetric matrix or linear operator.
 		maxiter: Maximum number of random vectors to sample for the trace estimate.
-		deg: Degree of the quadrature approximation. Must be at least 1.
-		atol: Absolute tolerance to signal convergence for early-stopping. See notes.
-		rtol: Relative tolerance to signal convergence for early-stopping. See notes.
-		stop: Early-stopping criteria to test estimator convergence. See details.
-		ncv: Number of Lanczos vectors to allocate. Must be at least 2.
-		orth: Number of additional Lanczos vectors to orthogonalize against. Must be less than `ncv`.
-		quad: Method used to obtain the weights of the Gaussian quadrature. See notes.
-		confidence: Confidence level to consider estimator as converged. Only used when `stop` = "confidence".
 		pdf: Choice of zero-centered distribution to sample random vectors from.
+		estimator: Type of estimator to use for convergence testing. See details.
 		seed: Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
-		num_threads: Number of threads to use to parallelize the computation. Set to <= 0 to let OpenMP decide.
-		plot: If true, plots the samples of the trace estimate along with their convergence characteristics.
-		info: If True, returns a dictionary containing all relevant information about the computation.
-		kwargs: additional key-values to parameterize the chosen function 'fun'.
+		full: Whether to return additional information about the computation.
 
 	Returns:
 		Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
@@ -131,13 +115,6 @@ def hutch(
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
 		- [CentralLimitEstimator](/reference/CentralLimitEstimator.md): Standard estimator of the mean from iid samples.
-
-	Notes:
-		To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former uses implicit symmetric QR
-		steps with Wilkinson shifts, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. While both require
-		$O(\mathrm{deg}^2)$ time to execute, the former requires $O(\mathrm{deg}^2)$ space but is highly accurate, while the latter uses
-		only $O(1)$ space at the cost of stability. If `deg` is large, `fttr` is preferred for performance, though pilot testing should be
-		done to ensure that instability does not cause a large bias in the approximation.
 
 	Reference:
 		1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
@@ -148,47 +125,50 @@ def hutch(
 		from primate.estimators import hutch
 		```
 	"""
-	assert stop in {"confidence", "change", None}
 	f_dtype = _operator_checks(A)
 	N: int = A.shape[0]
-
-	## Catch degenerate cases
-	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
-		return 0
 
 	## Parameterize the random vector generation
 	if isinstance(pdf, str):
 		_isotropic = {"rademacher", "normal", "sphere"}
 		assert pdf in _isotropic, f"Invalid distribution '{pdf}'; Must be one of {','.join(_isotropic)}."
-		pdf = partial(isotropic, method=pdf)
+		pdf = partial(isotropic, pdf=pdf)
+	assert isinstance(pdf, Callable), "`pdf` must be a Callable."
 	rng = np.random.default_rng(seed)
 
 	## Parameterize the convergence checking
-	stop_criteria = CentralLimitEstimator() if stop == "confidence" else MeanEstimator
-	assert isinstance(stop_criteria, ConvergenceEstimator), "`stop` must meet the ConvergenceEstimator protocol."
+	if isinstance(estimator, str):
+		assert estimator in {"confidence"}, "Only confidence estimator is supported for now."
+		estimator = CentralLimitEstimator(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
+	elif estimator is None:
+		estimator = MeanEstimator(dim=1)
+	assert isinstance(estimator, ConvergenceEstimator), "`estimator` must satisfy the ConvergenceEstimator protocol."
 
 	## Prepare quadratic form evaluator
 	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
 
-	## Monte-carlo iterations
+	## Catch degenerate case
+	if np.prod(A.shape) == 0:
+		return 0.0 if not full else (0.0, MonteCarloResult(0.0, False, "", 0, []))
+
+	## Commence the monte-carlo iterations
 	converged = False
 	if full or callback is not None:
 		result = MonteCarloResult(0.0, False, "", 0, [])
 		while not converged:
-			v = pdf(size=(N, 1), seed=rng)
-			print(v.ravel())
+			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
 			sample = quad_form(v)
-			stop_criteria.update(sample)
-			converged = stop_criteria.converged() or len(stop_criteria) >= maxiter
-			result.update(stop_criteria, sample)
+			estimator.update(sample)
+			converged = estimator.converged() or len(estimator) >= maxiter
+			result.update(estimator, sample)
 			if callback is not None:
 				callback(result)
-		return (stop_criteria.estimate, result)
+		return (estimator.estimate, result)
 	else:
 		while not converged:
-			stop_criteria.update(quad_form(pdf(size=(N, 1), seed=rng)))
-			converged = stop_criteria.converged() or len(stop_criteria) >= maxiter
-		return stop_criteria.estimate
+			estimator.update(quad_form(pdf(size=(N, 1), seed=rng).astype(f_dtype)))
+			converged = estimator.converged() or len(estimator) >= maxiter
+		return estimator.estimate
 
 
 # else:

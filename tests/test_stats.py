@@ -42,7 +42,7 @@ def test_CLT():
 	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
 	sc.update(samples)
 	assert sc.n_samples == len(samples)
-	ci_test = np.array([sc.var.mean - sc.margin_of_error, sc.var.mean + sc.margin_of_error])
+	ci_test = np.array([sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error])
 	ci_true = np.array(confidence_interval(samples, confidence=0.95, sdist="normal"))
 	assert np.allclose(ci_test, ci_true)
 
@@ -53,8 +53,8 @@ def test_CLT():
 		intervals = []
 		while not sc.converged():
 			sc.update(rng.normal(size=30, loc=mu, scale=1 / 2))
-			intervals.append([sc.var.mean - sc.margin_of_error, sc.var.mean + sc.margin_of_error])
-		interval = [sc.var.mean - sc.margin_of_error, sc.var.mean + sc.margin_of_error]
+			intervals.append([sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error])
+		interval = [sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error]
 		containing_intervals += interval[0] <= mu and mu <= interval[1]
 	assert abs((containing_intervals / 1500) - 0.95) < (100 / 1500)
 

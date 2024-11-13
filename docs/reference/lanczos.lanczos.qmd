@@ -2,16 +2,16 @@
 
 ```python
 lanczos(
-    A
-    v0=None
-    deg=None
-    rtol=1e-08
-    orth=0
-    sparse_mat=False
-    return_basis=False
-    seed=None
-    dtype=None
-    **kwargs
+    A,
+    v0=None,
+    deg=None,
+    rtol=1e-08,
+    orth=0,
+    sparse_mat=False,
+    return_basis=False,
+    seed=None,
+    dtype=None,
+    **kwargs,
 )
 ```
 
@@ -48,10 +48,10 @@ though note the number of matvecs scales linearly with `deg` and the number of i
 
 ## Returns {.doc-section .doc-section-returns}
 
-| Name   | Type   | Description                                                                                                      |
-|--------|--------|------------------------------------------------------------------------------------------------------------------|
-|        | tuple  | A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal matrix. If `return_basis=True`,  |
-|        | tuple  | the tuple `(a,b), Q` is returned, where `Q` represents an orthogonal basis for the degree-`deg` Krylov subspace. |
+| Name   | Type   | Description                                                                                                            |
+|--------|--------|------------------------------------------------------------------------------------------------------------------------|
+|        | tuple  | A tuple `(a,b)` parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If `return_basis=True`, |
+|        | tuple  | the tuple `(a,b), Q` is returned, where `Q` represents an orthogonal basis for the degree-`deg` Krylov subspace.       |
 
 ## See Also {.doc-section .doc-section-see-also}
 

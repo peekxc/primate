@@ -1,0 +1,21 @@
+# quadrature.spectral_density { #quadrature.spectral_density }
+
+```python
+spectral_density(
+    A
+    bins=100
+    bw='scott'
+    deg=20
+    rtol=0.01
+    verbose=False
+    info=False
+    plot=False
+    **kwargs
+)
+```
+
+Estimates the spectral density of an operator via stochastic Lanczos quadrature.
+
+## Return {.doc-section .doc-section-return}
+
+(density, bins) = Estimate of the spectral density at domain points 'bins'

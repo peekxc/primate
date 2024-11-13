@@ -143,7 +143,7 @@ np.sum(ew)
 # np.mean(hutch(L, maxiter=15000, atol=0, rtol=0, seed=0))
 
 # %%
-# from primate.stats import MeanEstimatorCLT, ControlVariateEstimator, control_variate_estimator
+# from primate.stats import MeanEstimatorCLT, ControlVariableEstimator, control_variate_estimator
 
 # est = MeanEstimatorCLT()
 # est(samples)
@@ -173,7 +173,7 @@ np.sum(ew)
 # assert abs(est.mu_est - mu) <= 0.01 * mu or abs(mu - est.mu_est) <= 0.5
 
 # mu_true = L.trace()
-# est = ControlVariateEstimator(f=np.mean, ev=mu_true)
+# est = ControlVariableEstimator(f=np.mean, ev=mu_true)
 
 # est(samples)
 

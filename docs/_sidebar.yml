@@ -13,13 +13,18 @@ website:
     - contents:
       - reference/stochastic.isotropic.qmd
       - reference/stochastic.symmetric.qmd
-      - reference/stats.confidence_interval.qmd
-      - reference/stats.MeanEstimatorCLT.qmd
       section: Stochastic
     - contents:
       - reference/lanczos.lanczos.qmd
       - reference/lanczos.rayleigh_ritz.qmd
       - reference/quadrature.lanczos_quadrature.qmd
       section: Lanczos
+    - contents:
+      - reference/stats.Covariance.qmd
+      - reference/stats.ConvergenceEstimator.qmd
+      - reference/stats.MeanEstimator.qmd
+      - reference/stats.CentralLimitEstimator.qmd
+      - reference/stats.ControlVariableEstimator.qmd
+      section: Stats
     id: reference
   - id: dummy-sidebar

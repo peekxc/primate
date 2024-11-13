@@ -1,0 +1,6 @@
+# stats.ControlVariableEstimator { #stats.ControlVariableEstimator }
+
+```python
+ControlVariableEstimator(self, ecv, alpha=None, **kwargs)
+```
+

@@ -203,7 +203,7 @@ class CentralLimitEstimator(ConvergenceEstimator):
 		return msg
 
 
-class ControlVariateEstimator(CentralLimitEstimator):
+class ControlVariableEstimator(CentralLimitEstimator):
 	def __init__(self, ecv: Union[float, np.ndarray], alpha: Optional[Union[float, np.ndarray]] = None, **kwargs: dict):
 		super().__init__(**kwargs)
 		ecv = np.atleast_1d(ecv).ravel()

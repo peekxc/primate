@@ -1,21 +1,7 @@
 import numpy as np
 from primate.estimators import hutch
 from primate.operators import MatrixFunction
-from primate.stochastic import symmetric
-
-
-rng = np.random.default_rng(1234)
-n = 50
-ew = rng.uniform(size=n, low=1 / n, high=1.0)
-A = symmetric(n, pd=True, ew=ew, seed=rng)
-M = MatrixFunction(A, deg=n, orth=n)
-
-# %%
-rng1 = np.random.default_rng(1234)
-est1, info1 = hutch(A, maxiter=2, seed=rng, full=True)
-
-rng2 = np.random.default_rng(1234)
-est2, info2 = hutch(M, maxiter=2, seed=rng, full=True)
+from primate.stochastic import symmetric, isotropic
 
 
 def test_hutch():
@@ -30,17 +16,16 @@ def test_hutch():
 	assert isinstance(info.samples, list) and len(info.samples) == n
 
 
-def test_hutch_mf():
-	# from scipy.sparse.linalg import aslinearoperator
-	# aslinearoperator(M)
+def test_hutch_mf_identity():
+	rng = np.random.default_rng(1234)
+	n = 50
+	ew = rng.uniform(size=n, low=1 / n, high=1.0)
+	A = symmetric(n, pd=True, ew=ew, seed=rng)
+	M = MatrixFunction(A, deg=n, orth=n)
 
-	from primate.stochastic import isotropic
-
-	v = isotropic(size=M.shape[0]).ravel()
-	# v = rng.uniform(size=n)
-	v @ (M @ v)
-	v @ (A @ v)
-	M.quad(v)
+	est1 = hutch(A, maxiter=150, seed=1234)
+	est2 = hutch(M, maxiter=150, seed=1234)
+	assert np.isclose(est1, est2, atol=1e-6)
 
 
 def bench_slq():
@@ -53,7 +38,7 @@ def bench_slq():
 
 	from timeit import timeit
 
-	timeit(lambda: hutch(T, fun=f, maxiter=150, atol=0.0, deg=20), number=10)
+	timeit(lambda: hutch(T, maxiter=150, atol=0.0), number=10)
 	timeit(lambda: hutch(M, maxiter=150, atol=0.0), number=10)
 
 	# %%

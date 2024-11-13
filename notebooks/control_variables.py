@@ -1,5 +1,5 @@
 import numpy as np
-from primate.stats import CentralLimitCriterion, ControlVariateEstimator
+from primate.stats import CentralLimitCriterion, ControlVariableEstimator
 from bokeh.plotting import show, figure
 from bokeh.io import output_notebook
 
@@ -47,7 +47,7 @@ print(sc)
 sc.estimate
 
 ## Control variable method
-sc = ControlVariateEstimator(mu_cv)
+sc = ControlVariableEstimator(mu_cv)
 sc.update(y, y_cv)
 print(sc)
 sc.estimate
@@ -67,7 +67,7 @@ p.line(np.arange(len(y))[1:], conf_band[1:, 1])
 show(p)
 
 # %%
-sc = ControlVariateEstimator(mu_cv)
+sc = ControlVariableEstimator(mu_cv)
 conf_band = []
 cv_var2 = []
 for yi, yci in zip(y, y_cv):

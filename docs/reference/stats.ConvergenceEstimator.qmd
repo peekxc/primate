@@ -1,0 +1,7 @@
+# stats.ConvergenceEstimator { #stats.ConvergenceEstimator }
+
+```python
+ConvergenceEstimator()
+```
+
+Protocol for generic stopping criteria for sequences.

@@ -10,10 +10,10 @@ metadata-files:
 
 website: 
   navbar:
-    title: PRIMATE2
+    title: PRIMATE
     right: 
       - icon: github
-        href: https://github.com/peekxc/primate2
+        href: https://github.com/peekxc/primate
         aria-label: GitHub
     left:
       - file: reference/index.qmd
@@ -26,6 +26,7 @@ website:
     copy-button: true
   
   sidebar:
+    file: "_sidebar.yml"
     search: true
     style: floating
     border: false
@@ -36,36 +37,17 @@ website:
         contents:
           - text: Comparison to *imate*
             href: imate_compare.qmd
-      - section: API Reference 
-        href: reference/index.qmd
+      - section: "API Reference"
         contents:
-          - section: Estimators
-            contents: 
-              - reference/estimators.hutch.qmd
-          - section: Operators
-            contents:
-              - reference/operators.MatrixFunction.qmd
-              - reference/operators.Toeplitz.qmd
-              - reference/operators.normalize_unit.qmd
-          - section: Stochastic
-            contents:
-              - reference/stochastic.isotropic.qmd
-              - reference/stochastic.symmetric.qmd
-              - reference/stats.confidence_interval.qmd
-              - reference/stats.MeanEstimatorCLT.qmd
-          - section: Lanczos
-            contents: 
-              - reference/lanczos.lanczos.qmd
-              - reference/lanczos.rayleigh_ritz.qmd
-              - reference/quadrature.lanczos_quadrature.qmd
+          - "{{ contents }}"
   reader-mode: true     # reader mode collapses sidebar 
   page-navigation: true # ability to go to next / prev 
   page-footer: "Copyright 2024, Matt Piekenbrock" 
 
 quartodoc:
   package: null
-  # package: primate2
-  source_dir: ../src/primate2
+  # package: primate
+  source_dir: ../src/primate
   sidebar: _sidebar.yml
   out_index: index.qmd
   parser: google
@@ -83,13 +65,19 @@ quartodoc:
       contents:
         - stochastic.isotropic
         - stochastic.symmetric
-        - stats.confidence_interval
-        - stats.MeanEstimatorCLT
     - title: Lanczos
       contents: 
         - lanczos.lanczos
         - lanczos.rayleigh_ritz
         - quadrature.lanczos_quadrature
+        # - quadrature.spectral_density
+    - title: Stats
+      contents: 
+        - stats.Covariance
+        - stats.ConvergenceEstimator
+        - stats.MeanEstimator
+        - stats.CentralLimitEstimator
+        - stats.ControlVariableEstimator
 
 filters:
   - pseudocode  
