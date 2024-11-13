@@ -3,7 +3,6 @@ from typing import Callable, Optional, Union
 from numbers import Number
 
 import numpy as np
-from scipy.linalg import eigh_tridiagonal
 from scipy.sparse.linalg import LinearOperator
 
 from .fttr import fttr
@@ -16,8 +15,8 @@ def lanczos_quadrature(
 	e: np.ndarray,
 	deg: Optional[int] = None,
 	quad: str = "gw",  # The method of computing the weights
-	# nodes: np.ndarray,  # Output nodes of the quadrature
-	# weights: np.ndarray,  # Output weights of the quadrature
+	nodes: Optional[np.ndarray] = None,  # Output nodes of the quadrature
+	weights: Optional[np.ndarray] = None,  # Output weights of the quadrature
 	**kwargs: dict,
 ):
 	"""Uses the Lanczos method to obtain Gaussian quadrature estimates of the spectrum of an arbitrary operator.
@@ -32,15 +31,18 @@ def lanczos_quadrature(
 		## Golub-Welsch approach: just compute eigen-decomposition from T using QR steps
 		theta, ev = eigh_tridiag(d[:deg], e[:deg], **kwargs)
 		tau = np.square(ev[0, :])
-		return theta, tau
 	elif quad == "fttr":
-		## Uses the Foward Three Term Recurrence (FTTR) approach
+		## Uses the Forward Three Term Recurrence (FTTR) approach
 		theta = eigvalsh_tridiag(d, e, **kwargs)
 		tau = np.zeros(len(theta), dtype=theta.dtype)
 		fttr(theta, d, e, deg, tau)
-		return theta, tau
 	else:
 		raise ValueError(f"Invalid quadrature method '{quad}' supplied")
+	if nodes is not None and weights is not None:
+		assert len(nodes) == deg and len(weights) == deg, "`nodes` and `weights` output arrays must be `deg` in length."
+		np.copyto(nodes, theta)
+		np.copyto(weights, tau)
+	return theta, tau
 
 
 def spectral_density(

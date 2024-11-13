@@ -51,7 +51,7 @@ def isotropic(
 	Parameters:
 		size: Output shape to generate.
 		method: Isotropic distribution to sample from. Must be "rademacher", "sphere", or "normal".
-		seed: Seed or generator for pseudo random number generation. .
+		seed: Seed or generator for pseudo random number generation.
 
 	Returns:
 		Randomly generated array of shape `size` with entries distributed according to `method`.
@@ -65,9 +65,9 @@ def isotropic(
 	elif method == "sphere":
 		# "On the real sphere with radius sqrt(m)"
 		# https://mathoverflow.net/questions/24688/efficiently-sampling-points-uniformly-from-the-surface-of-an-n-sphere
-		W = rng.normal(size=(n, m))
+		W = rng.normal(size=(n, m), loc=0.0, scale=1.0)
 		W /= np.linalg.norm(W, axis=1)[:, np.newaxis]
 		W *= np.sqrt(m)
 	else:
-		W = rng.normal(size=(n, m))
+		W = rng.normal(size=(n, m), loc=0.0, scale=1.0)
 	return W

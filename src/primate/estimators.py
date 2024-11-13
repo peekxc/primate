@@ -1,15 +1,37 @@
+"""Estimators involving matrix function, trace, and diagonal estimation."""
+
+from collections import namedtuple
+from dataclasses import dataclass, field
+from functools import partial
 from numbers import Integral, Real
 from typing import Any, Callable, Optional, Union
 
 import numpy as np
-from scipy.sparse.linalg import LinearOperator
 from scipy.sparse import sparray
+from scipy.sparse.linalg import LinearOperator
 
-from .special import param_callable
 from .lanczos import _lanczos, _validate_lanczos, lanczos
 from .quadrature import lanczos_quadrature
-from .stats import MeanEstimatorCLT
+from .special import param_callable
+from .stats import CentralLimitEstimator, ConvergenceEstimator, MeanEstimator
 from .stochastic import isotropic
+
+
+# MonteCarloResult = namedtuple("MonteCarloResult", ["estimate", "converged", "status", "nit", "samples"])
+@dataclass
+class MonteCarloResult:
+	estimate: float = 0.0
+	converged: bool = False
+	status: str = ""
+	nit: int = 0
+	samples: list = field(default_factory=list)
+
+	def update(self, est: ConvergenceEstimator, sample: float):
+		self.estimate = est.estimate
+		self.converged = est.converged()
+		self.status = est.__repr__()
+		self.nit = est.__len__()
+		self.samples.append(sample)
 
 
 ## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
@@ -58,25 +80,16 @@ def _reduce(nodes: np.ndarray, weights: np.ndarray) -> np.ndarray:
 	return np.sum(nodes * weights[:, np.newaxis], axis=-1)
 
 
+## pdf should be either a string or a function of type pdf(size=..., seed=...)
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
-	fun: Union[str, Callable, None] = None,
-	reduce: Union[Callable, None] = None,
 	maxiter: int = 200,
-	deg: int = 20,
-	atol: Optional[float] = None,
-	rtol: Optional[float] = None,
-	stop: str = "confidence",
-	ncv: int = 2,
-	orth: int = 0,
-	quad: str = "gw",
-	confidence: float = 0.95,
-	pdf: str = "rademacher",
-	seed: Optional[int] = None,
-	num_threads: int = 0,
+	pdf: Union[str, Callable] = "rademacher",
+	stop: Union[str, ConvergenceEstimator] = "confidence",
+	seed: Union[int, np.random.Generator, None] = None,
+	full: bool = False,
 	verbose: bool = False,
-	info: bool = False,
-	plot: bool = False,
+	callback: Optional[Callable] = None,
 	**kwargs: dict,
 ) -> Union[float, tuple]:
 	r"""Estimates the trace of a symmetric `A` or matrix function `fun(A)` via the Girard-Hutchinson estimator.
@@ -117,7 +130,7 @@ def hutch(
 
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
-		- [MeanEstimatorCLT](/reference/MeanEstimatorCLT.md): Standard estimator of the mean from iid samples.
+		- [CentralLimitEstimator](/reference/CentralLimitEstimator.md): Standard estimator of the mean from iid samples.
 
 	Notes:
 		To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former uses implicit symmetric QR
@@ -135,105 +148,121 @@ def hutch(
 		from primate.estimators import hutch
 		```
 	"""
-	assert pdf in {"rademacher", "normal"}, f"Invalid distribution '{pdf}'; Must be one of 'rademacher' or 'normal'."
 	assert stop in {"confidence", "change", None}
-	assert quad in {"gw", "fttr"}
-	assert 0 < confidence and confidence < 1, "Confidence must be in (0, 1)"
 	f_dtype = _operator_checks(A)
+	N: int = A.shape[0]
 
 	## Catch degenerate cases
 	if (np.prod(A.shape) == 0) or (np.sum(A.shape) == 0):
 		return 0
 
-	## Parameter validation and sensible default settings for Lanczos
+	## Parameterize the random vector generation
+	if isinstance(pdf, str):
+		_isotropic = {"rademacher", "normal", "sphere"}
+		assert pdf in _isotropic, f"Invalid distribution '{pdf}'; Must be one of {','.join(_isotropic)}."
+		pdf = partial(isotropic, method=pdf)
 	rng = np.random.default_rng(seed)
 
 	## Parameterize the convergence checking
-	est = MeanEstimatorCLT(atol=atol, rtol=rtol) if stop == "confidence" else lambda x: False
+	stop_criteria = CentralLimitEstimator() if stop == "confidence" else MeanEstimator
+	assert isinstance(stop_criteria, ConvergenceEstimator), "`stop` must meet the ConvergenceEstimator protocol."
 
-	## All arguments validated and allocated, proceed with Monte-Carlo
-	estimates = []  # trace estimates
+	## Prepare quadratic form evaluator
+	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+
+	## Monte-carlo iterations
 	converged = False
-	if fun is None:
+	if full or callback is not None:
+		result = MonteCarloResult(0.0, False, "", 0, [])
 		while not converged:
-			N = A.shape[0]
-			v = isotropic(size=(N, 1), seed=rng, method=pdf)
-			tr_est = (v.T @ (A @ v)).item()
-			estimates += [tr_est]
-			converged = est(estimates[-1]) or len(estimates) >= maxiter
-		return estimates
+			v = pdf(size=(N, 1), seed=rng)
+			print(v.ravel())
+			sample = quad_form(v)
+			stop_criteria.update(sample)
+			converged = stop_criteria.converged() or len(stop_criteria) >= maxiter
+			result.update(stop_criteria, sample)
+			if callback is not None:
+				callback(result)
+		return (stop_criteria.estimate, result)
 	else:
-		## Reduce function should ufunc-like that accepts
-		reduce = _reduce if reduce is None else reduce
-		N, ncv, deg, orth, atol, rtol = _validate_lanczos(N=A.shape[0], ncv=ncv, deg=deg, orth=orth, atol=atol, rtol=rtol)
-
-		## Allocate the tridiagonal elements + lanczos vectors in column-major storage
-		alpha, beta = np.zeros(deg + 1, dtype=f_dtype), np.zeros(deg + 1, dtype=f_dtype)
-		Q = np.zeros((N, ncv), dtype=f_dtype, order="F")
-
-		## Parameterize the matrix function
-		fun = param_callable(fun, **kwargs) if not isinstance(fun, Callable) else fun
-		q_samples = []  # quadrature nodes and weights
 		while not converged:
-			v = isotropic(size=(N, 1), seed=rng, method=pdf)
-			_lanczos.lanczos(A, v, deg, rtol, orth, alpha, beta, Q)
-			## Todo: replace this with stemr calls to scipy Lapack
-			nodes, weights = lanczos_quadrature(alpha, beta, deg=deg, quad="gw")
-			# assert np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights))
-			# if np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights)):
-			nodes = fun(nodes)
-			if info:
-				q_samples += [(nodes, weights)]
-			estimates += [N * np.sum(reduce(nodes, weights))]
-			converged = est(estimates[-1]) or len(estimates) >= maxiter
-		return np.fromiter(estimates, f_dtype) if not info else (np.fromiter(estimates, f_dtype), q_samples)
+			stop_criteria.update(quad_form(pdf(size=(N, 1), seed=rng)))
+			converged = stop_criteria.converged() or len(stop_criteria) >= maxiter
+		return stop_criteria.estimate
 
-	# # hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt, t_values, z) # fmt: skip
 
-	# ## Make the actual call
-	# # info_dict = _trace.hutch(A, *hutch_args, **kwargs)
-	# info_dict =
+# else:
+# 	## Reduce function should ufunc-like that accepts
+# 	reduce = _reduce if reduce is None else reduce
+# 	N, ncv, deg, orth, atol, rtol = _validate_lanczos(N=A.shape[0], ncv=ncv, deg=deg, orth=orth, atol=atol, rtol=rtol)
 
-	# ## Return as early as possible if no additional info requested for speed
-	# if not verbose and not info and not plot:
-	# 	return info_dict["estimate"]
+# 	## Allocate the tridiagonal elements + lanczos vectors in column-major storage
+# 	alpha, beta = np.zeros(deg + 1, dtype=f_dtype), np.zeros(deg + 1, dtype=f_dtype)
+# 	Q = np.zeros((N, ncv), dtype=f_dtype, order="F")
 
-	# ## Post-process info dict
-	# # std_err =
-	# info_dict["estimator"] = "Girard-Hutchinson"
-	# info_dict["valid"] = info_dict["samples"] != 0
-	# info_dict["n_samples"] = np.sum(info_dict["valid"])
-	# info_dict["n_matvecs"] = info_dict["n_samples"] * deg
-	# info_dict["std_error"] = np.std(info_dict["samples"][info_dict["valid"]], ddof=1) / np.sqrt(info_dict["n_samples"])
-	# info_dict["coeff_var"] = np.abs(info_dict["std_error"] / info_dict["estimate"])
-	# info_dict["margin_of_error"] = (t_values[info_dict["n_samples"]] if info_dict["n_samples"] < 30 else z) * info_dict[
-	# 	"std_error"
-	# ]
-	# info_dict["confidence"] = confidence
-	# info_dict["stop"] = stop
-	# info_dict["pdf"] = pdf
-	# info_dict["rng"] = _engines[engine_id]
-	# info_dict["seed"] = seed
-	# info_dict["function"] = kwargs["function"]
-	# info_dict["lanczos_kwargs"] = dict(orth=orth, ncv=ncv, deg=deg)
-	# info_dict["quad"] = quad
-	# info_dict["rtol"] = rtol
-	# info_dict["atol"] = atol
-	# info_dict["num_threads"] = "auto" if num_threads == 0 else num_threads
-	# info_dict["maxiter"] = nv
+# 	## Parameterize the matrix function
+# 	fun = param_callable(fun, **kwargs) if not isinstance(fun, Callable) else fun
+# 	q_samples = []  # quadrature nodes and weights
+# 	while not converged:
+# 		v = isotropic(size=(N, 1), seed=rng, method=pdf)
+# 		_lanczos.lanczos(A, v, deg, rtol, orth, alpha, beta, Q)
+# 		## Todo: replace this with stemr calls to scipy Lapack
+# 		nodes, weights = lanczos_quadrature(alpha, beta, deg=deg, quad="gw")
+# 		# assert np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights))
+# 		# if np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights)):
+# 		nodes = fun(nodes)
+# 		if info:
+# 			q_samples += [(nodes, weights)]
+# 		estimates += [N * np.sum(reduce(nodes, weights))]
+# 		converged = est(estimates[-1]) or len(estimates) >= maxiter
+# 	return np.fromiter(estimates, f_dtype) if not info else (np.fromiter(estimates, f_dtype), q_samples)
 
-	# ## Print the status if requested
-	# if verbose:
-	# 	print(_estimator_msg(info_dict))
+# # hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt, t_values, z) # fmt: skip
 
-	## Plot samples if requested
-	# if plot:
-	# 	from bokeh.plotting import show
-	# 	from .plotting import figure_trace
+# ## Make the actual call
+# # info_dict = _trace.hutch(A, *hutch_args, **kwargs)
+# info_dict =
 
-	# 	p = figure_trace(info_dict["samples"])
-	# 	show(p)
-	# 	info_dict["figure"] = figure_trace(info_dict["samples"])
+# ## Return as early as possible if no additional info requested for speed
+# if not verbose and not info and not plot:
+# 	return info_dict["estimate"]
 
-	## Final return
-	# return (info_dict["estimate"], info_dict) if info else info_dict["estimate"]
+# ## Post-process info dict
+# # std_err =
+# info_dict["estimator"] = "Girard-Hutchinson"
+# info_dict["valid"] = info_dict["samples"] != 0
+# info_dict["n_samples"] = np.sum(info_dict["valid"])
+# info_dict["n_matvecs"] = info_dict["n_samples"] * deg
+# info_dict["std_error"] = np.std(info_dict["samples"][info_dict["valid"]], ddof=1) / np.sqrt(info_dict["n_samples"])
+# info_dict["coeff_var"] = np.abs(info_dict["std_error"] / info_dict["estimate"])
+# info_dict["margin_of_error"] = (t_values[info_dict["n_samples"]] if info_dict["n_samples"] < 30 else z) * info_dict[
+# 	"std_error"
+# ]
+# info_dict["confidence"] = confidence
+# info_dict["stop"] = stop
+# info_dict["pdf"] = pdf
+# info_dict["rng"] = _engines[engine_id]
+# info_dict["seed"] = seed
+# info_dict["function"] = kwargs["function"]
+# info_dict["lanczos_kwargs"] = dict(orth=orth, ncv=ncv, deg=deg)
+# info_dict["quad"] = quad
+# info_dict["rtol"] = rtol
+# info_dict["atol"] = atol
+# info_dict["num_threads"] = "auto" if num_threads == 0 else num_threads
+# info_dict["maxiter"] = nv
+
+# ## Print the status if requested
+# if verbose:
+# 	print(_estimator_msg(info_dict))
+
+## Plot samples if requested
+# if plot:
+# 	from bokeh.plotting import show
+# 	from .plotting import figure_trace
+
+# 	p = figure_trace(info_dict["samples"])
+# 	show(p)
+# 	info_dict["figure"] = figure_trace(info_dict["samples"])
+
+## Final return
+# return (info_dict["estimate"], info_dict) if info else info_dict["estimate"]

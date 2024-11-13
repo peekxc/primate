@@ -32,8 +32,12 @@ class MatrixFunction(LinearOperator):
 		self._deg = min(deg, A.shape[0])
 		self._alpha = np.zeros(self._deg + 1, dtype=dtype)
 		self._beta = np.zeros(self._deg + 1, dtype=dtype)
+		self._nodes = np.zeros(self._deg, dtype=dtype)
+		self._weights = np.zeros(self._deg, dtype=dtype)
+
 		# ncv = kwargs.get("ncv", 3)
 		## NOTE: ncv is fixed to deg for matrix function to work
+		## NOTE: todo, change this to not allocate in-case quad is used
 		self._Q = np.zeros((A.shape[0], self._deg), dtype=dtype, order="F")
 		assert self._Q.flags["F_CONTIGUOUS"] and self._Q.flags["WRITEABLE"] and self._Q.flags["OWNDATA"]
 		self._rtol = 1e-8
@@ -41,7 +45,7 @@ class MatrixFunction(LinearOperator):
 		self._orth = self._deg if orth < 0 or orth > self._deg else orth
 		self._A = A
 		self.shape = A.shape
-		self.dtype = dtype
+		self.dtype = np.dtype(dtype)
 
 	def _adjoint(self):
 		return self
@@ -50,8 +54,8 @@ class MatrixFunction(LinearOperator):
 		if self._Q.shape[1] < self._deg:
 			self._Q = np.zeros((self.shape[0], self._deg), dtype=self.dtype, order="F")
 		# self.Q.fill(0)  # this is necessary to prevent orthogonalization
-		self._Q[:, -self._deg :].fill(0)  # this is necessary to prevent orthogonalization
-		x = x.reshape(-1).copy()
+		self._Q[:, -self._deg :].fill(0)  # this is necessary to prevent NaN's during re-orthogonalization
+		x = x.astype(self.dtype).reshape(-1)
 		x_norm = np.linalg.norm(x)
 		_lanczos.lanczos(self._A, x, self._deg, self._rtol, self._orth, self._alpha, self._beta, self._Q)
 
@@ -60,11 +64,21 @@ class MatrixFunction(LinearOperator):
 		return x_norm * self._Q @ Y @ (self._fun(rw) * Y[0, :])[:, np.newaxis]
 
 	def quad(self, x: np.ndarray):
+		r"""Estimates the quadratic form of the matrix function using Lanczos quadrature.
+
+		This function uses the Lanczos method to estimate the quadratic form:
+		$$ x \mapsto x^T f(A) x $$
+		The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of $f(A)$.
+
+		Note this method is similar though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
+		which first applies $x \mapsto f(A)x$ and then performs a dot product.
+		"""
 		assert self._Q.shape[1] >= self._orth, "Auxiliary memory `Q` is not large enough for reorthogonalization."
-		x = x.reshape(-1).copy()
+		x = x.astype(self.dtype).reshape(-1)
+		x_norm_sq = np.linalg.norm(x) ** 2
 		_lanczos.lanczos(self._A, x, self._deg, self._rtol, self._orth, self._alpha, self._beta, self._Q)
-		nodes, weights = lanczos_quadrature(self._alpha, self._beta, deg=self._deg, quad="gw")
-		return np.sum(self._fun(nodes) * weights, axis=-1)
+		lanczos_quadrature(self._alpha, self._beta, deg=self._deg, quad="gw", nodes=self._nodes, weights=self._weights)
+		return np.sum(self._fun(self._nodes) * self._weights, axis=-1) * x_norm_sq
 
 
 ## TODO: a control variate should be a triple (f, l, alpha), where:
@@ -73,6 +87,7 @@ class MatrixFunction(LinearOperator):
 ## 3. alpha in [-1, 1] is the Pearson correlation coefficient, known ahead of time or estimated (optionally)
 
 
+## NOTE: this could act as a nice way of handling keyword argumetns in kwargs to generate a MF
 def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.ndarray = None, deg: int = 20):
 	# (a, b), Q = lanczos(A, v0=v, deg=deg, return_basis=True)  # O(nd)  space
 	# rw, Y = eigh_tridiag(a, b)  # O(d^2) space
@@ -102,10 +117,11 @@ class Toeplitz(LinearOperator):
 		return y[: self.shape[0]].copy()
 
 
-def normalize_unit(A: LinearOperator) -> LinearOperator:
-	"""Produces a normalized linear operator whose eigenvalues lie in the unit interval"""
+def normalize_unit(A: LinearOperator, interval: tuple = (-1, 1)) -> LinearOperator:
+	"""Normalizes a linear operator to have its spectra contained in the interval [-1,1]."""
 	A = aslinearoperator(A) if not isinstance(A, LinearOperator) else A
 	assert isinstance(A, LinearOperator), "A must be a linear operator"
 	alpha = eigsh(A, k=1, which="LM", return_eigenvectors=False).item()
 	I_op = IdentityOperator(A.shape)
+	# np.diff(interval)
 	return (A + alpha * I_op) / (2 * alpha)

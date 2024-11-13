@@ -6,8 +6,8 @@ from scipy.sparse import sparray, spdiags
 from scipy.sparse.linalg import LinearOperator, eigsh
 
 from . import _lanczos
-from .tridiag import eigh_tridiag, eigvalsh_tridiag
 from .fttr import fttr, ortho_poly
+from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 
 def _validate_lanczos(N: int, ncv: int, deg: int, orth: int, atol: float, rtol: float) -> tuple:

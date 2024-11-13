@@ -1,15 +1,16 @@
 import importlib.metadata
-# from . import _lanczos_pythran
-# from . import lanczos
-# from .lanczos import lanczos
-
-# from .lanczos import lanczos, rayleigh_ritz
-# from .quadrature import lanczos_quadrature
-# from .operators import MatrixFunction
-# from .stochastic import isotropic
-# from .estimators import hutch
 
 __version__ = importlib.metadata.version("scikit-primate")
+
+## --- For benchmarking import times ---
+## > python -m benchmark_imports primate
+# from .estimators import hutch
+# from .lanczos import OrthogonalPolynomialBasis, lanczos, rayleigh_ritz
+# from .operators import MatrixFunction, is_linear_op, normalize_unit
+# from .quadrature import spectral_density, lanczos_quadrature
+# from .stats import ControlVariateEstimator, CentralLimitEstimator
+# from .stochastic import isotropic, symmetric
+# from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 
 ## Based on Numpy's usage: https://github.com/numpy/numpy/blob/v1.25.0/numpy/lib/utils.py#L75-L101
