@@ -1,4 +1,3 @@
-from bokeh.io import show
 import numpy as np
 from primate.diagonal import diag, xdiag
 
@@ -29,13 +28,17 @@ def test_xdiag():
 	assert isinstance(d, np.ndarray) and len(d) == A.shape[0]
 
 	## Ensure error is decreasing
-	err = np.inf
-	for i in range(1, 16):
-		d = xdiag(A, i * 10, pdf="signs", seed=rng)
-		error = np.linalg.norm(np.diag(A) - d)
-		assert error <= err
-		err = error
+	errors = []
+	budget = np.linspace(2, A.shape[0], 10).astype(int)
+	for m in budget:
+		d = xdiag(A, m, pdf="signs", seed=rng)
+		errors.append(np.linalg.norm(np.diag(A) - d))
 		print(f"Error: {np.linalg.norm(np.diag(A) - d)}")
+
+	y = np.array(errors)
+	B = np.c_[budget, np.ones(len(budget))]
+	m, c = np.linalg.lstsq(B, y)[0]
+	assert m < -0.50, "Error is not decreasing appreciably"
 
 
 # def test_diagonal():
