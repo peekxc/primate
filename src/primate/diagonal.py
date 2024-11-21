@@ -39,7 +39,7 @@ def diag(
 		full: Whether to return additional information about the computation.
 
 	Returns:
-		Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
+		Estimate the diagonal of $A$. If `full = True`, additional information about the computation is also returned.
 
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
@@ -58,12 +58,8 @@ def diag(
 	N: int = A.shape[0]
 
 	## Parameterize the random vector generation
-	if isinstance(pdf, str):
-		_isotropic = {"rademacher", "normal", "sphere"}
-		assert pdf in _isotropic, f"Invalid distribution '{pdf}'; Must be one of {','.join(_isotropic)}."
-		pdf = partial(isotropic, pdf=pdf)
-	assert isinstance(pdf, Callable), "`pdf` must be a Callable."
 	rng = np.random.default_rng(seed)
+	pdf = isotropic(pdf=pdf, seed=rng)
 
 	## Parameterize the convergence checking
 	if isinstance(estimator, str):
@@ -109,3 +105,34 @@ def diag(
 
 # def diagpp():
 # 	pass
+
+
+def xdiag(A: np.ndarray, m: int, pdf: str = "sphere", seed: Union[int, np.random.Generator, None] = None):
+	"""Based on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly."""
+	assert m >= 2, f"Number of matvecs must be at least 2."
+	n, m = A.shape[0], m // 2
+	# diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
+	diag_prod = lambda A, B: np.einsum("ij,ji->i", A.T, B)[:, np.newaxis]  # about 120-140% faster than above
+	col_norm = lambda X: np.linalg.norm(X, axis=0)
+	rng = np.random.default_rng(seed=seed)
+	pdf = isotropic(pdf="sphere", seed=rng)
+
+	## Sketching idea
+	N = pdf(size=(n, m))
+	Y = A @ N
+	Q, R = np.linalg.qr(Y, mode="reduced")
+
+	## Other quantities
+	Z = A.T @ Q
+	T = Z.T @ N
+	R_inv = np.linalg.inv(R)
+	S = R_inv / col_norm(R_inv)
+
+	## Vector quantities
+	dQZ, dQSSZ = diag_prod(Q.T, Z.T), diag_prod((Q @ S).T, (Z @ S).T)
+	dNQT, dNY = diag_prod(N.T, (Q @ T).T), diag_prod(N.T, Y.T)
+	dNQSST = diag_prod(N.T, (Q @ S @ np.diag(diag_prod(S, T).ravel())).T)
+
+	## Diagonal estimate
+	d = dQZ + (-dQSSZ + dNY - dNQT + dNQSST) / m
+	return d.ravel()
