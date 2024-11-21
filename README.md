@@ -4,6 +4,8 @@
 [![build_linux](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_linux.yml?logo=linux&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml)
 [![Python versions](https://badgen.net/badge/python/3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13/blue)](https://github.com/peekxc/primate/actions)
 [![PyPI Version](https://badgen.net/pypi/v/scikit-primate)](https://pypi.org/project/scikit-primate/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 <!-- [![coverage_badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/peekxc/ef42349965f40edf4232737026690c5f/raw/coverage_info.json)](https://coveralls.io/github/peekxc/simplextree-py)  -->
 <!-- [![PyPI Version](https://img.shields.io/pypi/v/simplextree)](https://pypi.org/project/simplextree) -->
 
@@ -13,18 +15,16 @@
 <!-- https://badgen.net/pypi/v/scikit-primate -->
 <!-- https://badgen.net/pypi/python/scikit-primate -->
 
-`primate`, short for **Pr**obabalistic **I**mplicit **Ma**trix **T**race **E**stimator, is a Python package that provides estimators of quantities derived from [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix):
+`primate`, short for **Pr**obabilistic **I**mplicit **Ma**trix **T**race **E**stimator, is a Python package that provides estimators of quantities from matrices, linear operators, and [matrix functions](https://en.wikipedia.org/wiki/Analytic_function_of_a_matrix):
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the inverse $A^{-1}$, the [matrix exponential](https://en.wikipedia.org/wiki/Matrix_exponential) $\mathrm{exp}(A)$, the [matrix logarithm](https://en.wikipedia.org/wiki/Logarithm_of_a_matrix) $\mathrm{log}(A)$, and so on. Composing these with _implicit trace estimators_ yields approximation techniques for the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), and so on. 
-
-More generally, `primate` also exports functionality for estimating [spectral density](https://doi.org/10.1137/130934283), etc. 
+The primary quantities of interest at trace- and diagonal-related quantities. This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the inverse $A^{-1}$, the [matrix exponential](https://en.wikipedia.org/wiki/Matrix_exponential) $\mathrm{exp}(A)$, the [matrix logarithm](https://en.wikipedia.org/wiki/Logarithm_of_a_matrix) $\mathrm{log}(A)$, and so on. Composing these with _implicit trace estimators_ yields approximation techniques for the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), and so on. `primate` also exports functionality for estimating the [spectral density](https://doi.org/10.1137/130934283) and for computing Gaussian quadrature rules from Jacobi matrices. 
 
 Notable features of `primate` include:
 
 - Efficient methods for trace, diagonal, and matrix function approximation
-- Support for _arbitrary_ `LinearOperator`'s, e.g. those in [SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator) or [Pylops](https://pylops.readthedocs.io/en/stable/index.html)
+- Support for _arbitrary_ matrix types, e.g. NumPy arrays, sparse matrices, or [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator)'s (including [Pylops](https://pylops.readthedocs.io/en/stable/index.html) ops)
 - Support for _arbitrary_ matrix functions, i.e. `Callable`'s (Python) and `invocable`'s[^3] (C++)
 - Various distribution / engine choices for random vector generation (the stochastic part!)
 - Matrix-free interface to the _Lanczos_ and _Golub-Welsch_ methods for tridiagonalization and quadrature computation
