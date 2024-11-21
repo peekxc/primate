@@ -1,6 +1,7 @@
 website:
   sidebar:
   - border: false
+    collapse-level: 3
     contents:
     - href: index.qmd
       text: Overview
@@ -14,7 +15,7 @@ website:
       - reference/index.qmd
       - contents:
         - reference/hutch.qmd
-        section: Estimators
+        section: Trace
       - contents:
         - reference/MatrixFunction.qmd
         - reference/Toeplitz.qmd

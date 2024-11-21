@@ -1,7 +1,7 @@
-# hutch { #estimators.hutch }
+# hutch { #trace.hutch }
 
 ```python
-hutch(
+trace.hutch(
     A,
     maxiter=200,
     pdf='rademacher',

@@ -4,3 +4,4 @@
 Toeplitz(self, c, r=None, dtype=None)
 ```
 
+Matrix-free operator for representing Toeplitz or circulant matrices.

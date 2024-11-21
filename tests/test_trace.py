@@ -1,12 +1,12 @@
 import numpy as np
 from primate.trace import hutch
 from primate.operators import MatrixFunction
-from primate.stochastic import symmetric, isotropic
+from primate.random import symmetric, isotropic
 
 
 def test_hutch():
 	rng = np.random.default_rng(1234)
-	n = 50
+	n = 54
 	ew = rng.uniform(size=n, low=1 / n, high=1.0)
 	A = symmetric(n, pd=True, ew=ew, seed=rng)
 	est = hutch(A, maxiter=n, seed=rng)
@@ -28,53 +28,14 @@ def test_hutch_mf_identity():
 	assert np.isclose(est1, est2, atol=1e-6)
 
 
-def bench_slq():
-	from primate.operators import Toeplitz, MatrixFunction
+def test_xtrace():
+	from primate.trace import xtrace
 
-	c = np.random.uniform(size=500)
-	T = Toeplitz(c)
-	f = lambda x: x + 0.50
-	M = MatrixFunction(T, fun=f, deg=20)
-
-	from timeit import timeit
-
-	timeit(lambda: hutch(T, maxiter=150, atol=0.0), number=10)
-	timeit(lambda: hutch(M, maxiter=150, atol=0.0), number=10)
-
-	# %%
-	G = T @ np.eye(T.shape[0])
-	ew, U = np.linalg.eigh(G)
-	GM = U @ np.diag(f(ew)) @ U.T
-
-	from primate.trace import hutch
-
-	s1 = hutch(T, fun=f, maxiter=150, atol=0.0, deg=20, seed=0)
-	s2 = hutch(M, maxiter=150, atol=0.0, seed=0)
-	s3 = hutch(GM, maxiter=150, atol=0.0, seed=0)
-
-	s1
-	s2
-
-	v = np.random.choice([-1, +1], size=M.shape[0])
-	v = np.random.uniform(low=0, high=1, size=M.shape[0])
-
-	# (v.T @ (T @ v)).item()
-	(v.T @ (GM @ v)).item()
-	(v.T @ (M @ v)).item()
-	M.quad(v).item()
-
-	# np.linalg.norm(v)**2
-
-	# from primate.operators import matrix_function
-	# matrix_function(T, fun=lambda x: x + 0.50, v=v, deg=20)
-
-	from primate.stochastic import isotropic
-
-	v = isotropic((M.shape[0], 1))
-
-	np.linalg.norm(v)
-
-	M.quad(v).item()
-
-	(v.T @ (GM @ v)).item()
-	M.shape[0] * M.quad(v)
+	## Ensure different batch sizes work with xtrace
+	rng = np.random.default_rng(1234)
+	A = rng.uniform(size=(50, 50))
+	for nb in [1, 2, 3, 5, 10, 20, 50]:
+		rng = np.random.default_rng(1234)
+		est = xtrace(A, batch=nb, seed=rng, verbose=1)
+		err = np.abs(A.trace() - est)
+		assert np.isclose(err, 0.0)

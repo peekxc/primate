@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator
 from primate.operators import matrix_function, MatrixFunction
-from primate.stochastic import symmetric
+from primate.random import symmetric
 from primate.lanczos import lanczos
 from primate.tridiag import eigh_tridiag
 from primate.special import param_callable, _builtin_matrix_functions

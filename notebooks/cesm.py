@@ -5,7 +5,7 @@ from bokeh.plotting import figure, show
 from landmark import landmarks
 from primate.lanczos import OrthogonalPolynomialBasis, lanczos
 from primate.quadrature import lanczos_quadrature, spectral_density
-from primate.stochastic import symmetric
+from primate.random import symmetric
 
 output_notebook()
 

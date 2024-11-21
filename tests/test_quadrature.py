@@ -1,6 +1,6 @@
 import numpy as np
 from primate.lanczos import lanczos
-from primate.stochastic import symmetric
+from primate.random import symmetric
 from primate.quadrature import lanczos_quadrature
 
 

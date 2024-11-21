@@ -4,7 +4,7 @@ import numpy as np
 from numpy.random import default_rng
 from primate.lanczos import lanczos
 from primate.tridiag import eigvalsh_tridiag, eigh_tridiag
-from primate.stochastic import symmetric
+from primate.random import symmetric
 from primate.tqli import tqli
 
 

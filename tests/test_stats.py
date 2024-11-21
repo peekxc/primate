@@ -1,17 +1,27 @@
 import numpy as np
-from primate.stats import CentralLimitEstimator, Covariance, confidence_interval, MeanEstimator
+from primate.estimators import ConfidenceEstimator, ToleranceEstimator
+from primate.stats import Covariance, confidence_interval
 
 
 def test_MeanEstimator():
 	rng = np.random.default_rng()
-	mu = MeanEstimator()
+	mu = ToleranceEstimator(atol=0.0, rtol=0.0)
 	samples = []
 	for _ in range(25):
 		samples.extend(rng.normal(size=10))
 		mu.update(samples[-10:])
-		assert not mu.converged()
 	assert np.allclose(np.mean(samples), mu.mean)
 	assert isinstance(mu.estimate, float)
+
+
+def test_MeanToleranceEstimator():
+	rng = np.random.default_rng()
+	est = ToleranceEstimator(atol=0, rtol=0.10, ord=1)
+	while not est.converged():
+		x = rng.uniform(size=(1, 15), low=-1, high=+1)
+		est.update(x)
+	assert est.error < (np.linalg.norm(est.estimate, ord=1) * 0.10)
+	assert (np.linalg.norm(est.estimate, ord=1) * 0.10) <= 0.20
 
 
 def test_Covariance():
@@ -38,7 +48,7 @@ def test_Covariance():
 def test_CLT():
 	rng = np.random.default_rng(1234)
 	mu = 5.0
-	sc = CentralLimitEstimator(confidence=0.95)
+	sc = ConfidenceEstimator(confidence=0.95)
 	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
 	sc.update(samples)
 	assert sc.n_samples == len(samples)
@@ -49,7 +59,7 @@ def test_CLT():
 	## TODO: test the statistcial difference between many trials
 	containing_intervals = 0
 	for _ in range(1500):
-		sc = CentralLimitEstimator(confidence=0.95)
+		sc = ConfidenceEstimator(confidence=0.95)
 		intervals = []
 		while not sc.converged():
 			sc.update(rng.normal(size=30, loc=mu, scale=1 / 2))

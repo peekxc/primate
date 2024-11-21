@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import normaltest
-from primate.stochastic import isotropic
+from primate.random import isotropic
 
 
 def test_isotropic():

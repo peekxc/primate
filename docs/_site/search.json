@@ -197,7 +197,7 @@
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\n\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\nlanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.ConvergenceEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nstats.MeanEstimator\n\n\n\nstats.CentralLimitEstimator\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nstats.ControlVariableEstimator",
+    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\nlanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.ConvergenceEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nstats.MeanEstimator\n\n\n\nstats.CentralLimitEstimator\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nstats.ControlVariableEstimator",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -221,7 +221,7 @@
     "href": "reference/index.html#operators",
     "title": "Function reference",
     "section": "",
-    "text": "MatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\n\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].",
+    "text": "MatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -440,21 +440,39 @@
     "href": "reference/stats.Covariance.html",
     "title": "stats.Covariance",
     "section": "",
-    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s online algorithm to update the sample mean and covariance estimates in a numerically stable way.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired"
+    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s online algorithm to update the sample mean and covariance estimates in a numerically stable way.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.Covariance"
+    ]
   },
   {
     "objectID": "reference/stats.Covariance.html#methods",
     "href": "reference/stats.Covariance.html#methods",
     "title": "stats.Covariance",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired"
+    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.Covariance"
+    ]
   },
   {
     "objectID": "reference/stats.MeanEstimator.html",
     "href": "reference/stats.MeanEstimator.html",
     "title": "stats.MeanEstimator",
     "section": "",
-    "text": "stats.MeanEstimator\nMeanEstimator(self, dim=1)"
+    "text": "stats.MeanEstimator\nMeanEstimator(self, dim=1)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.MeanEstimator"
+    ]
   },
   {
     "objectID": "reference/quadrature.spectral_density.html",
@@ -475,28 +493,52 @@
     "href": "reference/stats.ControlVariableEstimator.html",
     "title": "stats.ControlVariableEstimator",
     "section": "",
-    "text": "stats.ControlVariableEstimator\nControlVariableEstimator(self, ecv, alpha=None, **kwargs)"
+    "text": "stats.ControlVariableEstimator\nControlVariableEstimator(self, ecv, alpha=None, **kwargs)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.ControlVariableEstimator"
+    ]
   },
   {
     "objectID": "reference/stats.ConvergenceEstimator.html",
     "href": "reference/stats.ConvergenceEstimator.html",
     "title": "stats.ConvergenceEstimator",
     "section": "",
-    "text": "stats.ConvergenceEstimator\nConvergenceEstimator()\nProtocol for generic stopping criteria for sequences."
+    "text": "stats.ConvergenceEstimator\nConvergenceEstimator()\nProtocol for generic stopping criteria for sequences.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.ConvergenceEstimator"
+    ]
   },
   {
     "objectID": "reference/stats.CentralLimitEstimator.html",
     "href": "reference/stats.CentralLimitEstimator.html",
     "title": "stats.CentralLimitEstimator",
     "section": "",
-    "text": "CentralLimitEstimator(self, confidence=0.95, atol=0.05, rtol=0.01)\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\n\ncall = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's"
+    "text": "CentralLimitEstimator(self, confidence=0.95, atol=0.05, rtol=0.01)\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\n\ncall = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.CentralLimitEstimator"
+    ]
   },
   {
     "objectID": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
     "href": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
     "title": "stats.CentralLimitEstimator",
     "section": "",
-    "text": "call = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's"
+    "text": "call = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.CentralLimitEstimator"
+    ]
   },
   {
     "objectID": "reference/estimators.html",
@@ -529,11 +571,11 @@
     "href": "reference/hutch.html",
     "title": "hutch",
     "section": "",
-    "text": "hutch(\n    A,\n    maxiter=200,\n    pdf='rademacher',\n    estimator='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.",
+    "text": "trace.hutch(\n    A,\n    maxiter=200,\n    pdf='rademacher',\n    estimator='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -546,7 +588,7 @@
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -559,7 +601,7 @@
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -572,7 +614,7 @@
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -585,7 +627,7 @@
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -594,11 +636,11 @@
     "href": "reference/hutch.html#examples",
     "title": "hutch",
     "section": "Examples",
-    "text": "Examples\n\nfrom primate.estimators import hutch",
+    "text": "Examples\n\nfrom primate.trace import hutch",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Estimators",
+      "Trace",
       "hutch"
     ]
   },
@@ -789,7 +831,7 @@
     "href": "reference/Toeplitz.html",
     "title": "Toeplitz",
     "section": "",
-    "text": "Toeplitz\nToeplitz(self, c, r=None, dtype=None)",
+    "text": "Toeplitz\nToeplitz(self, c, r=None, dtype=None)\nMatrix-free operator for representing Toeplitz or circulant matrices.",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -883,6 +925,18 @@
       "Reference",
       "Basics",
       "Comparison to *imate*"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#trace",
+    "href": "reference/index.html#trace",
+    "title": "Function reference",
+    "section": "",
+    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
     ]
   }
 ]

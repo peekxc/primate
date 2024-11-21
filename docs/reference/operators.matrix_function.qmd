@@ -1,6 +1,0 @@
-# operators.matrix_function { #operators.matrix_function }
-
-```python
-matrix_function(A, fun=None, v=None, deg=20)
-```
-

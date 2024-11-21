@@ -19,7 +19,7 @@ from primate.lanczos import lanczos
 from primate.estimators import hutch
 from primate.operators import MatrixFunction, Toeplitz, normalize_unit
 from primate.special import param_callable
-from primate.stochastic import symmetric
+from primate.random import symmetric
 from primate.quadrature import lanczos_quadrature
 from scipy.linalg import toeplitz
 from scipy.sparse import diags, sparray

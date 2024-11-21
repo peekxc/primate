@@ -1,37 +1,32 @@
 """Estimators involving matrix function, trace, and diagonal estimation."""
 
 from collections import namedtuple
-from dataclasses import dataclass, field
 from functools import partial
-from numbers import Integral, Real
-from typing import Any, Callable, Optional, Union
+from itertools import islice
+from typing import Any, Callable, Generator, Iterable, Optional, Union
 
 import numpy as np
 from scipy.sparse import sparray
 from scipy.sparse.linalg import LinearOperator
 
-from .lanczos import _lanczos, _validate_lanczos, lanczos
-from .quadrature import lanczos_quadrature
-from .special import param_callable
-from .stats import CentralLimitEstimator, ConvergenceEstimator, MeanEstimator
-from .stochastic import isotropic
+from .estimators import ConfidenceEstimator, ConvergenceEstimator, EstimatorResult, ToleranceEstimator
+from .linalg import update_trinv
+from .operators import _operator_checks
+from .random import isotropic
+
+FLOAT_MIN = 2.2250738585072014e-308
 
 
-# MonteCarloResult = namedtuple("MonteCarloResult", ["estimate", "converged", "status", "nit", "samples"])
-@dataclass
-class MonteCarloResult:
-	estimate: float = 0.0
-	converged: bool = False
-	status: str = ""
-	nit: int = 0
-	samples: list = field(default_factory=list)
-
-	def update(self, est: ConvergenceEstimator, sample: float):
-		self.estimate = est.estimate
-		self.converged = est.converged()
-		self.status = est.__repr__()
-		self.nit = est.__len__()
-		self.samples.append(sample)
+## TODO: should return views when possible
+def chunk(iterable: Iterable, n: int) -> Generator:
+	"""Numpy-aware chunking, which yield successive n-sized chunks as either views or tuples from an iterable  or ndarray."""
+	assert n >= 1, "n must be at least one"
+	if isinstance(iterable, np.ndarray):
+		yield from np.array_split(iterable, 3)
+	else:
+		iterator = iter(iterable)
+		while batch := tuple(islice(iterator, n)):
+			yield batch
 
 
 ## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
@@ -43,17 +38,6 @@ def _suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "ra
 		return int(np.round((6 / eps**2) * np.log(2 / eta)))
 	else:
 		raise NotImplementedError("TODO")
-
-
-def _operator_checks(A: Union[sparray, np.ndarray, LinearOperator]) -> np.dtype:
-	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
-	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
-	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
-	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
-	assert hasattr(A, "shape"), "Operator 'A' must have a valid 'shape' attribute!"
-	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
-	assert f_dtype.type in {np.float32, np.float64}, "Only 32- or 64-bit floats are supported."
-	return f_dtype
 
 
 def _estimator_msg(info: dict) -> str:
@@ -114,7 +98,7 @@ def hutch(
 
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
-		- [CentralLimitEstimator](/reference/CentralLimitEstimator.md): Standard estimator of the mean from iid samples.
+		- [ConfidenceEstimator](/reference/ConfidenceEstimator.md): Standard estimator of the mean from iid samples.
 
 	Reference:
 		1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
@@ -129,19 +113,15 @@ def hutch(
 	N: int = A.shape[0]
 
 	## Parameterize the random vector generation
-	if isinstance(pdf, str):
-		_isotropic = {"rademacher", "normal", "sphere"}
-		assert pdf in _isotropic, f"Invalid distribution '{pdf}'; Must be one of {','.join(_isotropic)}."
-		pdf = partial(isotropic, pdf=pdf)
-	assert isinstance(pdf, Callable), "`pdf` must be a Callable."
 	rng = np.random.default_rng(seed)
+	pdf = isotropic(pdf=pdf, seed=rng)
 
 	## Parameterize the convergence checking
 	if isinstance(estimator, str):
 		assert estimator in {"confidence"}, "Only confidence estimator is supported for now."
-		estimator = CentralLimitEstimator(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
+		estimator = ConfidenceEstimator(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
 	elif estimator is None:
-		estimator = MeanEstimator(dim=1)
+		estimator = ToleranceEstimator(**{k: v for k, v in kwargs.items() if k in {"atol", "rtol", "ord"}})
 	assert isinstance(estimator, ConvergenceEstimator), "`estimator` must satisfy the ConvergenceEstimator protocol."
 
 	## Prepare quadratic form evaluator
@@ -149,14 +129,14 @@ def hutch(
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
-		return 0.0 if not full else (0.0, MonteCarloResult(0.0, False, "", 0, []))
+		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
 
 	## Commence the monte-carlo iterations
 	converged = False
 	if full or callback is not None:
-		result = MonteCarloResult(0.0, False, "", 0, [])
+		result = EstimatorResult(0.0, False, "", 0, [])
 		while not converged:
-			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
+			v = pdf(size=(N, 1)).astype(f_dtype)
 			sample = quad_form(v)
 			estimator.update(sample)
 			converged = estimator.converged() or len(estimator) >= maxiter
@@ -166,91 +146,171 @@ def hutch(
 		return (estimator.estimate, result)
 	else:
 		while not converged:
-			estimator.update(quad_form(pdf(size=(N, 1), seed=rng).astype(f_dtype)))
+			estimator.update(quad_form(pdf(size=(N, 1)).astype(f_dtype)))
 			converged = estimator.converged() or len(estimator) >= maxiter
 		return estimator.estimate
 
 
-# def diag_hutch():
-# 	while not converged:
-# 		v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
-# 		estimator.update(v * (A @ v))
-# 		converged = estimator.converged() or len(estimator) >= maxiter
-# 	return estimator.estimate
+def hutchpp(
+	A: Union[LinearOperator, np.ndarray],
+	m: Optional[int] = None,
+	batch: int = 32,
+	mode: str = "reduced",
+	pdf: Union[str, Callable] = "rademacher",
+	seed: Union[int, np.random.Generator, None] = None,
+	full: bool = False,
+) -> Union[float, dict]:
+	"""Hutch++ estimator.
+
+	Parameters:
+		A: Matrix or LinearOperator to estimate the trace of.
+		m: number of matvecs to use. If not given, defaults to `n // 3`.
+		batch: currently unused.
+		mode:
+	"""
+	f_dtype = _operator_checks(A)
+	N: int = A.shape[0]
+
+	## Parameterize the random vector generation
+	rng = np.random.default_rng(seed)
+	pdf = isotropic(pdf=pdf, seed=rng)
+
+	## Prepare quadratic form evaluator
+	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+
+	## Catch degenerate case
+	if np.prod(A.shape) == 0:
+		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
+
+	## Setup constants
+	nb = (N // 3) if m is None else m  # number of samples to dedicate to deflation
+	nb += nb % 3  # ensure nb divides by 3
+	# maxiter: int = (N // 3) if maxiter == "auto" else int(maxiter)  # residual samples; default rule uses Hutch++ result
+	# assert nb % 3 == 0, "Number of samples must be divisible by 3"
+
+	## Sketch Y / Q - use numpy for now, but consider parallelizing MGS later
+	WB = pdf(size=(N, nb)).astype(f_dtype)
+	Q = np.linalg.qr(A @ WB, mode="reduced")[0]
+
+	## Estimate trace of the low-rank sketch
+	## Full mode may not be space efficient, but is potentially vectorized, so suitable for relatively small output dimen.
+	## Uses at most O(n) memory, but potentially slower
+	## https://stackoverflow.com/questions/18541851/calculate-vt-a-v-for-a-matrix-of-vectors-v
+	rng_ests = np.einsum("...i,...i->...", A @ Q, Q) if mode == "full" else np.array([quad_form(q) for q in Q.T])
+	tr_rng = np.sum(rng_ests)
+
+	## Estimate trace of the residual on the deflated subspaces
+	G = pdf(size=(N, nb), seed=rng).astype(f_dtype)
+	G -= Q @ (Q.T @ G)
+	defl_ests = np.einsum("...i,...i->...", A @ G, G)  # [(g @ A @ g) for g in G[g_1, g_2, ..., g_nb]]
+	tr_defl = (1 / nb) * np.sum(defl_ests)
+
+	if not full:
+		return tr_rng + tr_defl
+	else:
+		result = EstimatorResult(0.0, False, "", 0, [])
+		result.estimate = tr_rng + tr_defl
+		result.nit = 2 * nb
+		result.samples = np.concatenate([rng_ests, defl_ests])
+		return result.estimate, result
 
 
-# else:
-# 	## Reduce function should ufunc-like that accepts
-# 	reduce = _reduce if reduce is None else reduce
-# 	N, ncv, deg, orth, atol, rtol = _validate_lanczos(N=A.shape[0], ncv=ncv, deg=deg, orth=orth, atol=atol, rtol=rtol)
+def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: np.ndarray, pdf: str):
+	"""Helper for xtrace function.
 
-# 	## Allocate the tridiagonal elements + lanczos vectors in column-major storage
-# 	alpha, beta = np.zeros(deg + 1, dtype=f_dtype), np.zeros(deg + 1, dtype=f_dtype)
-# 	Q = np.zeros((N, ncv), dtype=f_dtype, order="F")
+	Parameters:
+		W: all isotropic random vectors sampled thus far.
+		Z: the image A @ Q.
+		Q: orthogonal component of qr(A @ W)
+		R: upper-triangular component of qr(A @ W)
+		R_inv: inverse matrix of R.
+		pdf: the distribution with which `W` was sampled from.
 
-# 	## Parameterize the matrix function
-# 	fun = param_callable(fun, **kwargs) if not isinstance(fun, Callable) else fun
-# 	q_samples = []  # quadrature nodes and weights
-# 	while not converged:
-# 		v = isotropic(size=(N, 1), seed=rng, method=pdf)
-# 		_lanczos.lanczos(A, v, deg, rtol, orth, alpha, beta, Q)
-# 		## Todo: replace this with stemr calls to scipy Lapack
-# 		nodes, weights = lanczos_quadrature(alpha, beta, deg=deg, quad="gw")
-# 		# assert np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights))
-# 		# if np.all(~np.isnan(nodes)) and np.all(~np.isnan(weights)):
-# 		nodes = fun(nodes)
-# 		if info:
-# 			q_samples += [(nodes, weights)]
-# 		estimates += [N * np.sum(reduce(nodes, weights))]
-# 		converged = est(estimates[-1]) or len(estimates) >= maxiter
-# 	return np.fromiter(estimates, f_dtype) if not info else (np.fromiter(estimates, f_dtype), q_samples)
+	Returns:
+		tuple (t, est, err) representing the average trace estimate,
+	"""
+	diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
 
-# # hutch_args = (nv, distr_id, engine_id, seed, deg, 0.0, orth, ncv, quad_id, atol, rtol, num_threads, use_clt, t_values, z) # fmt: skip
+	n, m = W.shape
+	W_proj = Q.T @ W
+	# R_inv = solve_triangular(R, np.identity(m)).T  # todo: replace with dtrtri?
+	S = R_inv / np.linalg.norm(R_inv, axis=0)  # S == 'spherical', makes columns unit norm
 
-# ## Make the actual call
-# # info_dict = _trace.hutch(A, *hutch_args, **kwargs)
-# info_dict =
+	## Handle the scale
+	if not pdf == "sphere":
+		scale = np.ones(m)[:, np.newaxis]  # this is a column vector
+	else:
+		col_norm = lambda X: np.linalg.norm(X, axis=0)
+		c = n - m + 1
+		scale = c / (n - (col_norm(W_proj)[:, np.newaxis]) ** 2 + (diag_prod(S, W_proj) * col_norm(S)[:, np.newaxis]) ** 2)
 
-# ## Return as early as possible if no additional info requested for speed
-# if not verbose and not info and not plot:
-# 	return info_dict["estimate"]
+	## Intermediate quantities
+	H = Q.T @ Z
+	HW = H @ W_proj
+	T = Z.T @ W
+	dSW, dSHS = diag_prod(S, W_proj), diag_prod(S, H @ S)
+	dTW, dWHW = diag_prod(T, W_proj), diag_prod(W_proj, HW)
+	dSRmHW, dTmHRS = diag_prod(S, R - HW), diag_prod(T - H.T @ W_proj, S)
 
-# ## Post-process info dict
-# # std_err =
-# info_dict["estimator"] = "Girard-Hutchinson"
-# info_dict["valid"] = info_dict["samples"] != 0
-# info_dict["n_samples"] = np.sum(info_dict["valid"])
-# info_dict["n_matvecs"] = info_dict["n_samples"] * deg
-# info_dict["std_error"] = np.std(info_dict["samples"][info_dict["valid"]], ddof=1) / np.sqrt(info_dict["n_samples"])
-# info_dict["coeff_var"] = np.abs(info_dict["std_error"] / info_dict["estimate"])
-# info_dict["margin_of_error"] = (t_values[info_dict["n_samples"]] if info_dict["n_samples"] < 30 else z) * info_dict[
-# 	"std_error"
-# ]
-# info_dict["confidence"] = confidence
-# info_dict["stop"] = stop
-# info_dict["pdf"] = pdf
-# info_dict["rng"] = _engines[engine_id]
-# info_dict["seed"] = seed
-# info_dict["function"] = kwargs["function"]
-# info_dict["lanczos_kwargs"] = dict(orth=orth, ncv=ncv, deg=deg)
-# info_dict["quad"] = quad
-# info_dict["rtol"] = rtol
-# info_dict["atol"] = atol
-# info_dict["num_threads"] = "auto" if num_threads == 0 else num_threads
-# info_dict["maxiter"] = nv
+	## Trace estimate
+	tr_ests = np.trace(H) * np.ones(shape=(m, 1)) - dSHS
+	tr_ests += (-dTW + dWHW + dSW * dSRmHW + abs(dSW) ** 2 * dSHS + dTmHRS * dSW) * scale
+	t = tr_ests.mean()
+	err = np.std(tr_ests) / np.sqrt(m)
+	return t, tr_ests, err
 
-# ## Print the status if requested
-# if verbose:
-# 	print(_estimator_msg(info_dict))
 
-## Plot samples if requested
-# if plot:
-# 	from bokeh.plotting import show
-# 	from .plotting import figure_trace
+def xtrace(
+	A: Union[LinearOperator, np.ndarray],
+	batch: int = 32,
+	pdf: Union[str, Callable] = "sphere",
+	seed: Union[int, np.random.Generator, None] = None,
+	full: bool = False,
+	verbose: int = 0,
+) -> Union[float, tuple]:
+	from scipy.linalg import qr_insert
 
-# 	p = figure_trace(info_dict["samples"])
-# 	show(p)
-# 	info_dict["figure"] = figure_trace(info_dict["samples"])
+	assert batch >= 1, "Batch size must be positive."
+	# assert atol >= 0.0 and rtol >= 0.0, "Error tolerances must be positive"
+	# assert cond_tol >= 0.0, "Condition number must be non-negative"
+	n = A.shape[0]
 
-## Final return
-# return (info_dict["estimate"], info_dict) if info else info_dict["estimate"]
+	## Setup outputs. TODO: these should really be resizable arrays
+	W = np.zeros(shape=(n, 0))  # Isotropic vectors
+	Y = np.zeros(shape=(n, 0))  # Im(A @ W)
+	Z = np.zeros(shape=(n, 0))  # Im(A @ orth(Y))
+	Q, R = np.linalg.qr(Y, mode="reduced")
+	R_inv = np.zeros(shape=(0, 0))
+
+	## Commence the batched-iteration
+	estimate = np.inf
+	it = 0
+	result = EstimatorResult(0.0, False, "", 0, [])
+	rng = np.random.default_rng(seed)
+	while (it * batch) < A.shape[1]:  # err >= (error_atol + error_rtol * abs(t)):
+		## Determine number of new sample vectors to generate
+		ns = min(A.shape[1] - W.shape[1], int(batch))
+
+		## Sample a batch of random isotropic vectors
+		## TODO: replace with proper batch updates
+		N = isotropic(size=(ns, n), pdf=pdf, seed=rng)  # 'new' vectors
+		for eta in N:
+			y = A @ eta.T
+			Q, R = qr_insert(Q, R, u=y, k=Q.shape[1], which="col")  # rcond=FLOAT_MIN
+			R_inv = update_trinv(R_inv, R[:, -1])
+
+		W = np.c_[W, N.T]
+		Z = np.c_[Z, A @ Q[:, -ns:]]
+
+		## Expand the subspace
+		estimate, t_samples, err = __xtrace(W, Z, Q, R, R_inv, pdf)
+		result.samples.extend(t_samples)
+		it += 1
+
+	if full:
+		# result.converged = err <= atol
+		result.nit = it
+		result.estimate = estimate
+		result.status = "ok"
+		return (result.estimate, result)
+	return estimate

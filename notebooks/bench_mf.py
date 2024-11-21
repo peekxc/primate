@@ -16,7 +16,7 @@ from geomcover.csgraph import cycle_graph
 from map2color import map2hex
 from memray import Tracker
 from primate.operators import MatrixFunction, Toeplitz
-from primate.stochastic import symmetric
+from primate.random import symmetric
 from primate.special import param_callable
 from scipy.linalg import toeplitz
 from scipy.sparse import diags, sparray

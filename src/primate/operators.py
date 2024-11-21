@@ -9,6 +9,17 @@ from .quadrature import lanczos_quadrature
 from .tridiag import eigh_tridiag
 
 
+def _operator_checks(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
+	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
+	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
+	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
+	assert A.shape[0] == A.shape[1], "This function only works with square, symmetric matrices!"
+	assert hasattr(A, "shape"), "Operator 'A' must have a valid 'shape' attribute!"
+	f_dtype = (A @ np.zeros(A.shape[1])).dtype if not hasattr(A, "dtype") else A.dtype
+	assert f_dtype.type in {np.float32, np.float64}, "Only 32- or 64-bit floats are supported."
+	return f_dtype
+
+
 def _is_linear_op(A: Any) -> bool:
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	is_valid_op = True

@@ -61,13 +61,15 @@ python_sources = [
 	'tqli.py', 
 	'tridiag.py',
 	'quadrature.py',
-	'stochastic.py',
+	'random.py',
 	'trace.py',
 	'diagonal.py',
 	'stats.py',
+	'estimators.py',
 	'operators.py',
 	'special.py',
 	'plotting.py',
+	'linalg.py',
   '__init__.py'
 ]
 message('Source install dir = '+py.get_install_dir())

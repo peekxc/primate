@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 from typing import Optional
 
-from .estimators import MonteCarloResult
+from .estimators import EstimatorResult
 
 
 def figure_csm(values: np.ndarray, **kwargs):
@@ -34,42 +34,76 @@ def figure_orth_poly():
 	pass
 
 
-def figure_sequence(self, samples: np.ndarray, mu: Optional[float] = None, **kwargs: dict):
+def figure_jacobi(deg: int = 4, alpha: float = 0, beta: float = 0):
+	assert deg <= 10
+	from bokeh.plotting import figure
+	from bokeh.palettes import Category10
+
+	colors = Category10[deg]
+	title = "\\text{Jacobi polynomials }"
+	title += f"(\\alpha={alpha:.1f}, \\beta={beta:.1f})"
+	p = figure(width=350, height=300, title="$$" + title + "$$")
+	p.title.text_font_style = "normal"
+	p.title.align = "center"
+	dom = np.linspace(-1, 1, 1500)
+	for d, col in zip(range(deg), colors):
+		y = sp.special.eval_jacobi(d, alpha, beta, dom)
+		p.line(dom, y, line_color=col, line_width=1.5, legend_label=f"d={d}")
+	p.legend.location = "bottom_right"
+	# p.legend.title = "Degree"
+	p.legend.padding = 4
+	p.legend.spacing = -10
+	p.legend.margin = 4
+	p.legend.title_text_font_size = "10px"
+	p.legend.label_text_font_size = "10px"
+	p.legend.label_height = 0
+	# p.legend.orientation = "horizontal"
+	return p
+
+
+def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: dict):
 	"""Generates figures showing the convergence of sample estimates."""
 	from bokeh.layouts import column, row
 	from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
 	from bokeh.plotting import figure
 
-	## Extract samples and take averages
+	# ## Extract samples and take averages
 	sample_vals = np.ravel(samples)
 	valid_samples = sample_vals != 0
-	n_samples = sum(valid_samples)
+	n_samples = np.sum(valid_samples)
 	sample_index = np.arange(1, n_samples + 1)
 	sample_avgs = np.cumsum(sample_vals[valid_samples]) / sample_index
 
-	## Uncertainty estimation
-	quantile = np.sqrt(2.0) * sp.special.erfinv(self.confidence)
-	std_dev = np.std(sample_vals[valid_samples], ddof=1)
-	std_error = std_dev / np.sqrt(sample_index)
-	cum_abs_error = quantile * std_error  # CI margin of error
-	cum_rel_error = np.abs(std_error / sample_avgs)  # coefficient of variation
-
 	## Build the figure
-	fig_title = "Sample variates"
+	fig_title = "Monte Carlo sample variates"
 	p = figure(width=400, height=300, title=fig_title, **kwargs)
 	p.toolbar_location = None
 	p.scatter(sample_index, sample_vals, size=4.0, color="gray", legend_label="samples")
+	p.title.align = "center"
 	p.legend.location = "top_left"
-	p.yaxis.axis_label = f"Estimates ({(self.confidence*100):.0f}% CI band)"
+	p.yaxis.axis_label = "Estimates"
 	p.xaxis.axis_label = "Sample index"
 	if mu is not None:
 		true_sp = Span(location=mu, dimension="width", line_dash="solid", line_color="red", line_width=1.0)
 		p.add_layout(true_sp)
-	p.line(sample_index, sample_avgs, line_color="black", line_width=2.0, legend_label="mean estimate")
+	p.line(sample_index, sample_avgs, line_color="black", line_width=1.5, legend_label="estimator")  # line_dash="dotted"
+
+	p.legend.padding = 4
+	p.legend.spacing = 2
+	p.legend.margin = 4
+	p.legend.title_text_font_size = "11px"
+	p.legend.label_text_font_size = "11px"
+	return p
 
 
 def add_confidence_band(p):
 	from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
+	# ## Uncertainty estimation
+	# quantile = np.sqrt(2.0) * sp.special.erfinv(self.confidence)
+	# std_dev = np.std(sample_vals[valid_samples], ddof=1)
+	# std_error = std_dev / np.sqrt(sample_index)
+	# cum_abs_error = quantile * std_error  # CI margin of error
+	# cum_rel_error = np.abs(std_error / sample_avgs)  # coefficient of variation
 
 	## Add confidence band
 	band_source = ColumnDataSource(
@@ -81,7 +115,7 @@ def add_confidence_band(p):
 	p.add_layout(conf_band)
 
 
-def figure_est_error(results: MonteCarloResult, absolute: bool = True, title: str = "Estimator accuracy"):
+def figure_est_error(results: EstimatorResult, absolute: bool = True, title: str = "Estimator accuracy"):
 	if absolute:
 		q2 = figure(width=300, height=150, y_axis_location="left")
 		q2.toolbar_location = None

@@ -30,8 +30,8 @@ website:
   page-footer: "Copyright 2024, Matt Piekenbrock" 
 
 quartodoc:
-  package: null
   # package: primate
+  package: null
   source_dir: ../src/primate
   # sidebar: _sidebar.yml
   out_index: index.qmd
@@ -39,26 +39,6 @@ quartodoc:
   style: pkgdown # pkgdown, single-page
   # dynamic: true
   sections:
-    - title: Estimators
-      contents:
-        - name: hutch
-          package: estimators
-          signature_name: short
-    - title: Operators
-      contents:
-        - name: MatrixFunction
-          package: operators
-        - name: Toeplitz
-          package: operators
-        - name: normalize_unit
-          package: operators
-    - title: Stochastic
-      contents:
-        - name: isotropic
-          package: stochastic
-          signature_name: full
-        - name: symmetric
-          package: stochastic
     - title: Lanczos
       contents: 
         - name: lanczos
@@ -67,6 +47,26 @@ quartodoc:
           package: lanczos
         - name: lanczos_quadrature
           package: quadrature
+    - title: Trace
+      contents:
+        - name: hutch
+          package: trace
+          signature_name: full
+    - title: Operators
+      contents:
+        - name: MatrixFunction
+          package: operators
+        - name: Toeplitz
+          package: operators
+        - name: normalize_unit
+          package: operators
+    - title: Random
+      contents:
+        - name: isotropic
+          package: random
+          signature_name: full
+        - name: symmetric
+          package: random
         # - quadrature.spectral_density
     - title: Stats
       contents: 
@@ -80,6 +80,7 @@ quartodoc:
     search: true
     style: floating
     border: false
+    collapse-level: 3
     contents:
       - href: index.qmd
         text: Overview
