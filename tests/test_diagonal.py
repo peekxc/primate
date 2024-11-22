@@ -31,9 +31,9 @@ def test_xdiag():
 	errors = []
 	budget = np.linspace(2, A.shape[0], 10).astype(int)
 	for m in budget:
-		d = xdiag(A, m, pdf="signs", seed=rng)
+		d = xdiag(A, m, pdf="sphere", seed=rng)
 		errors.append(np.linalg.norm(np.diag(A) - d))
-		print(f"Error: {np.linalg.norm(np.diag(A) - d)}")
+		# print(f"Error: {np.linalg.norm(np.diag(A) - d)}")
 
 	y = np.array(errors)
 	B = np.c_[budget, np.ones(len(budget))]

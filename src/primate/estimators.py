@@ -129,9 +129,8 @@ class ControlVariableEstimator(Estimator):
 		return self.margin_of_error <= self.atol or rel_error <= self.rtol
 
 
-@runtime_checkable
-class ConvergenceCriterion(Protocol):
-	"""Protocol for generic stopping criteria for sequences."""
+class ConvergenceCriterion(Callable):
+	"""Generic stopping criteria for sequences."""
 
 	def __init__(self, operation: Callable):
 		assert callable(operation)

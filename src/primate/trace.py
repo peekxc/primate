@@ -270,15 +270,17 @@ def xtrace(
 	"""Estimates the trace of `A` using the XTrace trace estimator.
 
 	Parameters:
-		A: all isotropic random vectors sampled thus far.
-		batch: the image A @ Q.
-		Q: orthogonal component of qr(A @ W)
-		R: upper-triangular component of qr(A @ W)
-		R_inv: inverse matrix of R.
-		pdf: the distribution with which `W` was sampled from.
+		A: real symmetric matrix or linear operator.
+		batch: Number of random vectors to sample at a time for batched matrix multiplication.
+		pdf: Choice of zero-centered distribution to sample random vectors from.
+		converge: Convergence criterion to test for estimator convergence. See details.
+		seed: Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
+		full: Whether to return additional information about the computation.
+		callback: Optional callable to execute after each batch of samples.
+		**kwargs: Additional keyword arguments to parameterize the convergence criterion.
 
 	Returns:
-		tuple (t, est, err) representing the average trace estimate.
+		Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
 	"""
 
 	from scipy.linalg import qr_insert
@@ -312,7 +314,6 @@ def xtrace(
 			y = A @ eta.T
 			Q, R = qr_insert(Q, R, u=y, k=Q.shape[1], which="col")  # rcond=FLOAT_MIN
 			R_inv = update_trinv(R_inv, R[:, -1])
-
 		W = np.c_[W, N.T]
 		Z = np.c_[Z, A @ Q[:, -ns:]]
 
