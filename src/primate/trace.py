@@ -9,14 +9,7 @@ import numpy as np
 from scipy.sparse import sparray
 from scipy.sparse.linalg import LinearOperator
 
-from .estimators import (
-	ConfidenceCriterion,
-	ConvergenceCriterion,
-	EstimatorResult,
-	MeanEstimator,
-	ToleranceCriterion,
-	convergence_criterion,
-)
+from .estimators import ConvergenceCriterion, EstimatorResult, MeanEstimator, convergence_criterion
 from .linalg import update_trinv
 from .operators import _operator_checks
 from .random import isotropic
@@ -132,11 +125,11 @@ def hutch(
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
-		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
+		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, converge, 0, {}))
 
 	## Commence the Monte-Carlo iterations
 	if full or callback is not None:
-		result = EstimatorResult(0.0, False, "", 0, [])
+		result = EstimatorResult(0.0, False, converge, 0, {})
 		callback = lambda x: x if callback is None else callback
 		while not converge(estimator):
 			v = pdf(size=(N, batch)).astype(f_dtype)
@@ -165,7 +158,6 @@ def hutchpp(
 		A: Matrix or LinearOperator to estimate the trace of.
 		m: number of matvecs to use. If not given, defaults to `n // 3`.
 		batch: currently unused.
-		mode:
 	"""
 	f_dtype = _operator_checks(A)
 	N: int = A.shape[0]
@@ -207,14 +199,14 @@ def hutchpp(
 	if not full:
 		return tr_rng + tr_defl
 	else:
-		result = EstimatorResult(0.0, False, "", 0, [])
+		result = EstimatorResult(0.0, False, None, 0, {})
 		result.estimate = tr_rng + tr_defl
 		result.nit = 2 * nb
 		result.samples = np.concatenate([rng_ests, defl_ests])
 		return result.estimate, result
 
 
-def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: np.ndarray, pdf: str):
+def _xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: np.ndarray, pdf: str):
 	"""Helper for xtrace function.
 
 	Parameters:
@@ -280,7 +272,7 @@ def xtrace(
 		**kwargs: Additional keyword arguments to parameterize the convergence criterion.
 
 	Returns:
-		Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
+		Estimate the trace of `A`. If `info = True`, additional information about the computation is also returned.
 	"""
 
 	from scipy.linalg import qr_insert
@@ -300,7 +292,7 @@ def xtrace(
 	## Commence the batched-iteration
 	estimate = np.inf
 	it = 0
-	result = EstimatorResult(0.0, False, "", 0, [])
+	result = EstimatorResult(0.0, False, None, 0, {})
 	rng = np.random.default_rng(seed)
 	while (it * batch) < A.shape[1]:  # err >= (error_atol + error_rtol * abs(t)):
 		## Determine number of new sample vectors to generate
@@ -318,7 +310,7 @@ def xtrace(
 		Z = np.c_[Z, A @ Q[:, -ns:]]
 
 		## Expand the subspace
-		estimate, t_samples, err = __xtrace(W, Z, Q, R, R_inv, pdf)
+		estimate, t_samples, err = _xtrace(W, Z, Q, R, R_inv, pdf)
 		it += 1
 
 	if full:

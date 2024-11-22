@@ -3,7 +3,7 @@
 [![build_windows](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_windows.yml?logo=windows&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml) 
 [![build_linux](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_linux.yml?logo=linux&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml)
 
-[![Tests](https://badgen.net/github/checks/peekxc/primate/pythran_overhaul?label=tests)]
+[![Tests](https://badgen.net/github/checks/peekxc/primate/pythran_overhaul?label=tests)](https://cirrus-ci.com/github/peekxc/primate/pythran_overhaul)
 [![Python versions](https://badgen.net/badge/python/3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13/blue)](https://github.com/peekxc/primate/actions)
 [![PyPI Version](https://badgen.net/pypi/v/scikit-primate)](https://pypi.org/project/scikit-primate/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)

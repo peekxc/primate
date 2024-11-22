@@ -5,18 +5,11 @@ from primate.diagonal import diag, xdiag
 def test_hutch():
 	rng = np.random.default_rng(1234)
 	A = rng.normal(size=(50, 50))
-	A.diagonal()
-	# hutch(A, maxiter=1500, atol=0.0, rtol=0.0)
-
-	numer = np.zeros(A.shape[0])
-	denom = np.zeros(A.shape[0])
-	for i in range(1500):
-		v = rng.choice([-1.0, +1.0], size=A.shape[0])
-		numer += v * (A @ v)
-		denom += np.square(v)
-		# if (i % 50) == 0:
-		# 	print(f"Error: {np.linalg.norm(A.diagonal() - (numer/denom)):.5f}")
-	assert np.linalg.norm(A.diagonal() - (numer / denom)) < 1.30
+	d, info = diag(A, converge="tolerance", atol=0.10, rtol=0.0, full=True)
+	assert info.criterion(info.estimator)
+	assert np.linalg.norm(info.estimator.delta, 2) <= 0.10
+	d = diag(A, converge="tolerance", atol=0.0, rtol=0.001)
+	assert np.linalg.norm(A.diagonal() - d, 2) < 10.0
 
 
 def test_xdiag():

@@ -21,11 +21,30 @@ class Estimator(Sized, Protocol):
 	def estimate(self) -> Union[float, np.ndarray]: ...
 
 
+class ConvergenceCriterion(Callable):
+	"""Generic stopping criteria for sequences."""
+
+	def __init__(self, operation: Callable):
+		assert callable(operation)
+		self._operation = operation
+
+	def __or__(self, other: "ConvergenceCriterion"):
+		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
+		return ConvergenceCriterion(lambda est: or_(self(est), other(est)))
+
+	def __and__(self, other: "ConvergenceCriterion"):
+		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
+		return ConvergenceCriterion(lambda est: and_(self(est), other(est)))
+
+	def __call__(self, est: Estimator) -> bool:
+		return self._operation(est)
+
+
 @dataclass
 class EstimatorResult:
 	estimate: Union[float, np.ndarray]
 	estimator: Estimator
-	converged: bool = False
+	criterion: Union[ConvergenceCriterion, str, None] = None
 	status: str = ""
 	nit: int = 0
 	info: dict = field(default_factory=dict)
@@ -127,25 +146,6 @@ class ControlVariableEstimator(Estimator):
 		SE = self.margin_of_error / score
 		rel_error = abs(SE / self.estimate)
 		return self.margin_of_error <= self.atol or rel_error <= self.rtol
-
-
-class ConvergenceCriterion(Callable):
-	"""Generic stopping criteria for sequences."""
-
-	def __init__(self, operation: Callable):
-		assert callable(operation)
-		self._operation = operation
-
-	def __or__(self, other: "ConvergenceCriterion"):
-		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
-		return ConvergenceCriterion(lambda est: or_(self(est), other(est)))
-
-	def __and__(self, other: "ConvergenceCriterion"):
-		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
-		return ConvergenceCriterion(lambda est: and_(self(est), other(est)))
-
-	def __call__(self, est: Estimator) -> bool:
-		return self._operation(est)
 
 
 class CountCriterion(ConvergenceCriterion):
@@ -270,9 +270,9 @@ def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs)
 		return criterion
 	criterion = criterion.lower()
 	if criterion == "count":
-		cc = CountCriterion(**{k: v for k, v in kwargs.items() if k in {"ord", "atol", "rtol"}})
+		cc = CountCriterion(**{k: v for k, v in kwargs.items() if k in {"count"}})
 	elif criterion == "tolerance":
-		cc = ToleranceCriterion(**{k: v for k, v in kwargs.items() if k in {"count"}})
+		cc = ToleranceCriterion(**{k: v for k, v in kwargs.items() if k in {"ord", "atol", "rtol"}})
 	elif criterion == "confidence":
 		cc = ConfidenceCriterion(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
 	elif criterion == "knee":

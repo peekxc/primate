@@ -1,5 +1,5 @@
 import numpy as np
-from primate.trace import hutch
+from primate.trace import hutch, hutchpp, xtrace
 from primate.operators import MatrixFunction
 from primate.random import symmetric, isotropic
 
@@ -9,11 +9,20 @@ def test_hutch():
 	n = 54
 	ew = rng.uniform(size=n, low=1 / n, high=1.0)
 	A = symmetric(n, pd=True, ew=ew, seed=rng)
-	est = hutch(A, maxiter=n, seed=rng)
+	est = hutch(A, seed=rng)
 	assert np.abs(A.trace() - est) <= 10 * (1 / np.sqrt(n))
 
 	# est, info = hutch(A, maxiter=n, seed=rng, full=True)
 	# assert isinstance(info.samples, list) and len(info.samples) == n
+
+
+def test_hutchpp():
+	rng = np.random.default_rng(1234)
+	n = 54
+	ew = rng.uniform(size=n, low=1 / n, high=1.0)
+	A = symmetric(n, pd=True, ew=ew, seed=rng)
+	est = hutchpp(A, m=n, seed=rng)
+	assert np.abs(A.trace() - est) <= 1 * (1 / np.sqrt(n))
 
 
 def test_hutch_mf_identity():

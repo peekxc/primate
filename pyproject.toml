@@ -35,7 +35,7 @@ license = {file = "LICENSE"}
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov", "pytest-benchmark"] # "bokeh"
 doc = ["quartodoc"]
-dev = ['meson-python', 'wheel', 'ninja', 'pybind11', 'numpy']
+dev = ['meson-python', 'pybind11', 'numpy']
 
 [tool.meson-python.args]
 setup = ['--python.bytecompile=2']
@@ -48,6 +48,17 @@ addopts = "-rA"
 testpaths = ["tests"]
 norecursedirs = ["docs", "*.egg-info", ".git", "build", "dist"]
 
+[tool.coverage.report]
+omit = [
+	"src/**/__init__.py",
+	"src/**/fttr.py",
+	"src/**/tqli.py",
+	"src/**/plotting.py",
+]
+exclude_also = [
+  "def __repr__",
+	"def _.*"
+]
 ## NOTE: https://github.com/pypi/warehouse/blob/8060bfa3cb00c7f68bb4b10021b5361e92a04017/warehouse/forklift/legacy.py#L70-L72
 ## PyPI limits file sizes to 100 MB and project sizes to 10 GB
 [tool.cibuildwheel]

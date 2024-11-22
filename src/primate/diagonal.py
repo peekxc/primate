@@ -11,7 +11,6 @@ from .operators import _operator_checks
 
 def diag(
 	A: Union[sp.sparse.linalg.LinearOperator, np.ndarray],
-	maxiter: int = 200,
 	pdf: Union[str, Callable] = "rademacher",
 	converge: Union[str, ConvergenceCriterion] = "tolerance",
 	seed: Union[int, np.random.Generator, None] = None,
@@ -21,7 +20,7 @@ def diag(
 ) -> Union[float, tuple]:
 	r"""Estimates the diagonal of a symmetric `A` via the Girard-Hutchinson estimator.
 
-	This function uses up to `maxiter` random vectors to estimate of the diagonal of $A$ via the approximation:
+	This function random vectors to estimate of the diagonal of $A$ via the approximation:
 	$$ \mathrm{diag}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v $$
 	When $v$ are isotropic, this approximation forms an unbiased estimator of the diagonal of $A$.
 
@@ -32,7 +31,6 @@ def diag(
 
 	Parameters:
 		A: real symmetric matrix or linear operator.
-		maxiter: Maximum number of random vectors to sample for the trace estimate.
 		pdf: Choice of zero-centered distribution to sample random vectors from.
 		estimator: Type of estimator to use for convergence testing. See details.
 		seed: Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
@@ -68,30 +66,27 @@ def diag(
 		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
 
 	## Commence the Monte-Carlo iterations
-	converged = False
 	if full or callback is not None:
 		numer, denom = np.zeros(N, dtype=f_dtype), np.zeros(N, dtype=f_dtype)
-		result = EstimatorResult(numer, False, "", 0, [])
-		while not converged:
+		result = EstimatorResult(numer, False, converge, 0, {})
+		while not converge(estimator):
 			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
 			u = (A @ v).ravel()
 			numer += u * v.ravel()
 			denom += np.square(v.ravel())
 			estimator.update(np.atleast_2d(numer / denom))
-			converged = estimator.converged() or len(estimator) >= maxiter
 			result.update(estimator)
 			if callback is not None:
 				callback(result)
 		return (estimator.estimate, result)
 	else:
 		numer, denom = np.zeros(N, dtype=f_dtype), np.zeros(N, dtype=f_dtype)
-		while not converged:
+		while not converge(estimator):
 			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
 			u = (A @ v).ravel()
 			numer += u * v.ravel()
 			denom += np.square(v.ravel())
 			estimator.update(np.atleast_2d(numer / denom))
-			converged = estimator.converged() or len(estimator) >= maxiter
 		return estimator.estimate
 
 

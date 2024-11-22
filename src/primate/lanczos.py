@@ -143,7 +143,7 @@ def rayleigh_ritz(A, deg: Optional[int] = None, return_eigenvectors: bool = Fals
 ## Also: Chen's Krylov-aware method
 
 
-def _lanczos_py(A: np.ndarray, v0: np.ndarray, k: int, tol: float) -> int:
+def _lanczos_py(A: np.ndarray, v0: np.ndarray, k: int, tol: float) -> int:  # pragma: no cover
 	"""Base lanczos algorithm, for establishing a baseline"""
 	n = A.shape[0]
 	assert k <= n, "Can perform at most k = n iterations"
@@ -165,7 +165,7 @@ def _lanczos_py(A: np.ndarray, v0: np.ndarray, k: int, tol: float) -> int:
 	return alpha, beta
 
 
-def _orth_vector(v, U, start_idx, p, reverse=False):
+def _orth_vector(v, U, start_idx, p, reverse=False):  # pragma: no cover
 	n = U.shape[0]
 	m = U.shape[1]
 	tol = 2 * np.finfo(U.dtype).eps * np.sqrt(n)
@@ -179,7 +179,7 @@ def _orth_vector(v, U, start_idx, p, reverse=False):
 			v -= (s_proj / u_norm) * U[:, i]
 
 
-def _lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):
+def _lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):  # pragma: no cover
 	n, m = A.shape
 	residual_tol = np.sqrt(n) * rtol
 
