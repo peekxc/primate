@@ -118,7 +118,7 @@ def xdiag(A: np.ndarray, m: int, pdf: str = "sphere", seed: Union[int, np.random
 	Y = A @ N
 	Q, R = np.linalg.qr(Y, mode="reduced")
 	dNY = diag_prod(N.T, Y.T)
-	# del Y
+	del Y
 
 	## Matrix quantities
 	## TODO: see if dtrtri compiles on all platforms, https://stackoverflow.com/questions/6042308/numpy-inverting-an-upper-triangular-matrix
@@ -132,8 +132,8 @@ def xdiag(A: np.ndarray, m: int, pdf: str = "sphere", seed: Union[int, np.random
 	dQZ = diag_prod(Q.T, Z.T)
 	dQSSZ = diag_prod(QS.T, (Z @ S).T)
 	dNTQ = diag_prod(N.T, (Q @ T).T)
-	# dNQSST = diag_prod(N.T, (diag_prod(S, T) * QS.T))
-	dNQSST = diag_prod(N.T, (Q @ S @ np.diag(diag_prod(S, T).ravel())).T)
+	dNQSST = diag_prod(N.T, (diag_prod(S, T) * QS.T))
+	# dNQSST = diag_prod(N.T, (Q @ S @ np.diag(diag_prod(S, T).ravel())).T)
 
 	## Diagonal estimate
 	d = dQZ + (-dQSSZ + dNY - dNTQ + dNQSST) / m
