@@ -88,15 +88,23 @@ class MatrixFunction(LinearOperator):
 		Note this method is mathematically equivalent though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
 		which first applies $x \mapsto f(A)x$ and then performs a dot product. In particular, the
 		"""
-		assert self._Q.shape[1] >= self._orth, "Auxiliary memory `Q` is not large enough for reorthogonalization."
-		x = x.astype(self.dtype).reshape(-1)
-		x_norm_sq = np.linalg.norm(x) ** 2
-		_lanczos.lanczos(self._A, x, self._deg, self._rtol, self._orth, self._alpha, self._beta, self._Q)
-		lanczos_quadrature(self._alpha, self._beta, deg=self._deg, quad="gw", nodes=self._nodes, weights=self._weights)
-		return np.sum(self._fun(self._nodes) * self._weights, axis=-1) * x_norm_sq
+		if self._orth < self._Q.shape[1]:
+			self._Q.resize((self.shape[0], self._deg))
+		x = x.astype(self.dtype)
+		x = np.atleast_2d(x).T if x.ndim == 1 else x
+		x = np.array(x, order="F", copy=None)
+		x_norm_sq = np.square(np.linalg.norm(x, axis=0))
+		y = np.zeros(x.shape[1])
+		for j in range(x.shape[1]):
+			xc = x[:, j]
+			x_norm_sq = np.linalg.norm(xc) ** 2
+			_lanczos.lanczos(self._A, xc, self._deg, self._rtol, self._orth, self._alpha, self._beta, self._Q)
+			lanczos_quadrature(self._alpha, self._beta, deg=self._deg, quad="gw", nodes=self._nodes, weights=self._weights)
+			y[j] = np.sum(self._fun(self._nodes) * self._weights, axis=-1) * x_norm_sq
+		return y
 
 
-## NOTE: this could act as a nice way of handling keyword argumetns in kwargs to generate a MF
+## NOTE: this could act as a nice way of handling keyword arguments in kwargs to generate a MF
 def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.ndarray = None, deg: int = 20):
 	# (a, b), Q = lanczos(A, v0=v, deg=deg, return_basis=True)  # O(nd)  space
 	# rw, Y = eigh_tridiag(a, b)  # O(d^2) space

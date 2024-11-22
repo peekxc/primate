@@ -27,6 +27,7 @@ def symmetric(
 		dist: Distribution of individual matrix entries.
 		pd: Whether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.
 		ew: Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1].
+		seed: seed for the random number generator.
 
 	Returns:
 		A random symmetric matrix with the presribed eigenvalues.
@@ -52,6 +53,16 @@ def symmetric(
 
 
 def haar(n: int, ew: np.ndarray = None, seed: Union[int, np.random.Generator, None] = None) -> np.ndarray:
+	"""Generates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).
+
+	Parameters:
+		n: The size of the matrix.
+		ew: Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1].
+		seed: seed for the random number generator.
+
+	Returns:
+		A random matrix with the presribed eigenvalues.
+	"""
 	rng = np.random.default_rng() if seed is None else np.random.default_rng(seed)
 	OG = sp.stats.ortho_group(n, seed=rng)
 	ew = rng.uniform(size=n, low=-1.0, high=1.0) if ew is None else np.atleast_1d(ew)

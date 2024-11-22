@@ -5,7 +5,7 @@ import scipy as sp
 from functools import partial
 
 from .random import isotropic
-from .estimators import ConvergenceEstimator, KneeEstimator, ToleranceEstimator, EstimatorResult
+from .estimators import ConvergenceCriterion, convergence_criterion, MeanEstimator, EstimatorResult
 from .operators import _operator_checks
 
 
@@ -13,7 +13,7 @@ def diag(
 	A: Union[sp.sparse.linalg.LinearOperator, np.ndarray],
 	maxiter: int = 200,
 	pdf: Union[str, Callable] = "rademacher",
-	estimator: Union[str, ConvergenceEstimator] = "tolerance",
+	converge: Union[str, ConvergenceCriterion] = "tolerance",
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
@@ -43,7 +43,7 @@ def diag(
 
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
-		- [ConfidenceEstimator](/reference/ConfidenceEstimator.md): Standard estimator of the mean from iid samples.
+		- [ConfidenceCriterion](/reference/ConfidenceCriterion.md): Standard estimator of the mean from iid samples.
 
 	Reference:
 		1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
@@ -60,16 +60,8 @@ def diag(
 	## Parameterize the random vector generation
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-
-	## Parameterize the convergence checking
-	if isinstance(estimator, str):
-		assert estimator in {"tolerance", "knee"}, "Only tolerance estimator is supported for now."
-		if estimator == "tolerance":
-			estimator = ToleranceEstimator(**{k: v for k, v in kwargs.items() if k in {"ord", "atol", "rtol"}})
-		# elif estimator == "knee":
-		# estimator = KneeEstimator(, transform=lambda x: )
-
-	assert isinstance(estimator, ConvergenceEstimator), "`estimator` must satisfy the ConvergenceEstimator protocol."
+	converge = convergence_criterion(converge, **kwargs)
+	estimator = MeanEstimator()
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
@@ -108,31 +100,41 @@ def diag(
 
 
 def xdiag(A: np.ndarray, m: int, pdf: str = "sphere", seed: Union[int, np.random.Generator, None] = None):
-	"""Based on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly."""
-	assert m >= 2, f"Number of matvecs must be at least 2."
+	"""Estimates the diagonal of `A` using `m / 2` matrix-vector multiplications.
+
+	Based originally on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly.
+	"""
+	# assert m >= 2, f"Number of matvecs must be at least 2."
+	m = min(m + (m % 2), 2 * A.shape[0])
 	n, m = A.shape[0], m // 2
-	# diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
-	diag_prod = lambda A, B: np.einsum("ij,ji->i", A.T, B)[:, np.newaxis]  # about 120-140% faster than above
-	col_norm = lambda X: np.linalg.norm(X, axis=0)
+
+	## Configure
+	diag_prod = lambda A, B: np.einsum("ij,ji->i", A.T, B)[:, np.newaxis]  # about 120-140% faster than np.diag(A.T @ B)
 	rng = np.random.default_rng(seed=seed)
-	pdf = isotropic(pdf="sphere", seed=rng)
+	pdf = isotropic(pdf=pdf, seed=rng)
 
 	## Sketching idea
 	N = pdf(size=(n, m))
 	Y = A @ N
 	Q, R = np.linalg.qr(Y, mode="reduced")
+	dNY = diag_prod(N.T, Y.T)
+	# del Y
 
-	## Other quantities
+	## Matrix quantities
+	## TODO: see if dtrtri compiles on all platforms, https://stackoverflow.com/questions/6042308/numpy-inverting-an-upper-triangular-matrix
 	Z = A.T @ Q
 	T = Z.T @ N
 	R_inv = np.linalg.inv(R)
-	S = R_inv / col_norm(R_inv)
+	S = R_inv / np.linalg.norm(R_inv, axis=0)
+	QS = Q @ S
 
 	## Vector quantities
-	dQZ, dQSSZ = diag_prod(Q.T, Z.T), diag_prod((Q @ S).T, (Z @ S).T)
-	dNQT, dNY = diag_prod(N.T, (Q @ T).T), diag_prod(N.T, Y.T)
+	dQZ = diag_prod(Q.T, Z.T)
+	dQSSZ = diag_prod(QS.T, (Z @ S).T)
+	dNTQ = diag_prod(N.T, (Q @ T).T)
+	# dNQSST = diag_prod(N.T, (diag_prod(S, T) * QS.T))
 	dNQSST = diag_prod(N.T, (Q @ S @ np.diag(diag_prod(S, T).ravel())).T)
 
 	## Diagonal estimate
-	d = dQZ + (-dQSSZ + dNY - dNQT + dNQSST) / m
+	d = dQZ + (-dQSSZ + dNY - dNTQ + dNQSST) / m
 	return d.ravel()

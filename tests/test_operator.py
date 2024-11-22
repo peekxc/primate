@@ -32,6 +32,20 @@ def test_operator_logic():
 	assert np.allclose(z, y.ravel())
 
 
+def test_quad_form():
+	rng = np.random.default_rng(1234)
+	n = 100
+	A = symmetric(n)
+	M = MatrixFunction(A, deg=n, orth=n, dtype=np.float64)
+	v = rng.uniform(size=n)
+	assert len(M.quad(v)) == 1
+	V = rng.uniform(size=(n, 10))
+	assert len(M.quad(V)) == V.shape[1]
+	y1 = M.quad(V)
+	y2 = np.diag(V.T @ A @ V)
+	assert np.allclose(y1, y2)
+
+
 def test_operator_interface():
 	rng = np.random.default_rng(1234)
 	n = 100

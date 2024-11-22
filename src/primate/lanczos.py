@@ -1,4 +1,3 @@
-from numbers import Number
 from typing import Callable, Optional, Union
 
 import numpy as np
@@ -6,7 +5,7 @@ from scipy.sparse import sparray, spdiags
 from scipy.sparse.linalg import LinearOperator, eigsh
 
 from . import _lanczos
-from .fttr import fttr, ortho_poly
+from .fttr import ortho_poly
 from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 

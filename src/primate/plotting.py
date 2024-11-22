@@ -20,7 +20,7 @@ def figure_csm(values: np.ndarray, **kwargs):
 	)
 	p.title.align = "center"
 	x = np.linspace(np.min(values), np.max(values), 5000)
-	p.line(x, csm(x))
+	# p.line(x, csm(x))
 	p.scatter(values, 0, size=7.5, color="red", marker="x", legend_label="Eigenvalues")
 	p.varea_step(x=np.append(values, 1.0), y1=np.zeros(len(values) + 1), y2=np.append(csm(values), 1.0), fill_alpha=0.15)
 	p.legend.location = "top_left"
@@ -96,53 +96,53 @@ def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: d
 	return p
 
 
-def add_confidence_band(p):
-	from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
-	# ## Uncertainty estimation
-	# quantile = np.sqrt(2.0) * sp.special.erfinv(self.confidence)
-	# std_dev = np.std(sample_vals[valid_samples], ddof=1)
-	# std_error = std_dev / np.sqrt(sample_index)
-	# cum_abs_error = quantile * std_error  # CI margin of error
-	# cum_rel_error = np.abs(std_error / sample_avgs)  # coefficient of variation
+# def add_confidence_band(p):
+# 	from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
+# 	# ## Uncertainty estimation
+# 	# quantile = np.sqrt(2.0) * sp.special.erfinv(self.confidence)
+# 	# std_dev = np.std(sample_vals[valid_samples], ddof=1)
+# 	# std_error = std_dev / np.sqrt(sample_index)
+# 	# cum_abs_error = quantile * std_error  # CI margin of error
+# 	# cum_rel_error = np.abs(std_error / sample_avgs)  # coefficient of variation
 
-	## Add confidence band
-	band_source = ColumnDataSource(
-		dict(x=sample_index, lower=sample_avgs - cum_abs_error, upper=sample_avgs + cum_abs_error)
-	)
-	conf_band = Band(
-		base="x", lower="lower", upper="upper", source=band_source, fill_alpha=0.3, fill_color="yellow", line_color="black"
-	)
-	p.add_layout(conf_band)
+# 	## Add confidence band
+# 	band_source = ColumnDataSource(
+# 		dict(x=sample_index, lower=sample_avgs - cum_abs_error, upper=sample_avgs + cum_abs_error)
+# 	)
+# 	conf_band = Band(
+# 		base="x", lower="lower", upper="upper", source=band_source, fill_alpha=0.3, fill_color="yellow", line_color="black"
+# 	)
+# 	p.add_layout(conf_band)
 
 
-def figure_est_error(results: EstimatorResult, absolute: bool = True, title: str = "Estimator accuracy"):
-	if absolute:
-		q2 = figure(width=300, height=150, y_axis_location="left")
-		q2.toolbar_location = None
-		q2.yaxis.axis_label = f"Abs. error ({(self.confidence*100):.0f}% CI)"
-		q2.xaxis.axis_label = "Sample index"
-		q2.x_range = Range1d(0, len(sample_index))
+# def figure_est_error(results: EstimatorResult, absolute: bool = True, title: str = "Estimator accuracy"):
+# 	if absolute:
+# 		q2 = figure(width=300, height=150, y_axis_location="left")
+# 		q2.toolbar_location = None
+# 		q2.yaxis.axis_label = f"Abs. error ({(self.confidence*100):.0f}% CI)"
+# 		q2.xaxis.axis_label = "Sample index"
+# 		q2.x_range = Range1d(0, len(sample_index))
 
-		## Plot the absolute error + thresholds for convergence
-		abs_error_line = q2.line(sample_index, cum_abs_error, line_color="black")
-		abs_error_threshold = q2.line(
-			x=[0, sample_index[-1]], y=[self.atol, self.atol], line_dash="dashed", line_color="darkgray", line_width=1.0
-		)
-		return q2
-	else:
-		q1 = figure(width=300, height=150, y_axis_location="left", title=title)
-		q1.toolbar_location = None
-		q1.yaxis.axis_label = "Rel. std-dev (CV)"
-		q1.yaxis.formatter = NumeralTickFormatter(format="0.00%")
-		q2.x_range = Range1d(0, len(sample_index))
-		q1.y_range = Range1d(0, np.ceil(max(cum_rel_error) * 100) / 100, bounds=(0, 1))
+# 		## Plot the absolute error + thresholds for convergence
+# 		abs_error_line = q2.line(sample_index, cum_abs_error, line_color="black")
+# 		abs_error_threshold = q2.line(
+# 			x=[0, sample_index[-1]], y=[self.atol, self.atol], line_dash="dashed", line_color="darkgray", line_width=1.0
+# 		)
+# 		return q2
+# 	else:
+# 		q1 = figure(width=300, height=150, y_axis_location="left", title=title)
+# 		q1.toolbar_location = None
+# 		q1.yaxis.axis_label = "Rel. std-dev (CV)"
+# 		q1.yaxis.formatter = NumeralTickFormatter(format="0.00%")
+# 		q2.x_range = Range1d(0, len(sample_index))
+# 		q1.y_range = Range1d(0, np.ceil(max(cum_rel_error) * 100) / 100, bounds=(0, 1))
 
-		## Plot the relative error + thresholds for convergence
-		rel_error_line = q1.line(sample_index, cum_rel_error, line_width=1.5, line_color="gray")
-		rel_error_threshold = q1.line(
-			x=[0, sample_index[-1]], y=[self.rtol, self.rtol], line_dash="dotted", line_color="gray", line_width=1.0
-		)
-		return q1
+# 		## Plot the relative error + thresholds for convergence
+# 		rel_error_line = q1.line(sample_index, cum_rel_error, line_width=1.5, line_color="gray")
+# 		rel_error_threshold = q1.line(
+# 			x=[0, sample_index[-1]], y=[self.rtol, self.rtol], line_dash="dotted", line_color="gray", line_width=1.0
+# 		)
+# 		return q1
 
 
 # ## Add the legend

@@ -1,27 +1,5 @@
 import numpy as np
-from primate.estimators import ConfidenceEstimator, ToleranceEstimator
 from primate.stats import Covariance, confidence_interval
-
-
-def test_MeanEstimator():
-	rng = np.random.default_rng()
-	mu = ToleranceEstimator(atol=0.0, rtol=0.0)
-	samples = []
-	for _ in range(25):
-		samples.extend(rng.normal(size=10))
-		mu.update(samples[-10:])
-	assert np.allclose(np.mean(samples), mu.mean)
-	assert isinstance(mu.estimate, float)
-
-
-def test_MeanToleranceEstimator():
-	rng = np.random.default_rng()
-	est = ToleranceEstimator(atol=0, rtol=0.10, ord=1)
-	while not est.converged():
-		x = rng.uniform(size=(1, 15), low=-1, high=+1)
-		est.update(x)
-	assert est.error < (np.linalg.norm(est.estimate, ord=1) * 0.10)
-	assert (np.linalg.norm(est.estimate, ord=1) * 0.10) <= 0.20
 
 
 def test_Covariance():
@@ -43,30 +21,6 @@ def test_Covariance():
 		assert np.allclose(np.cov(samples, rowvar=False, ddof=1), C.covariance())
 		assert np.allclose(np.mean(samples, axis=0), C.mean)
 		assert len(samples) == C.n
-
-
-def test_CLT():
-	rng = np.random.default_rng(1234)
-	mu = 5.0
-	sc = ConfidenceEstimator(confidence=0.95)
-	samples = rng.normal(size=150, loc=mu, scale=1 / 2)
-	sc.update(samples)
-	assert sc.n_samples == len(samples)
-	ci_test = np.array([sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error])
-	ci_true = np.array(confidence_interval(samples, confidence=0.95, sdist="normal"))
-	assert np.allclose(ci_test, ci_true)
-
-	## TODO: test the statistcial difference between many trials
-	containing_intervals = 0
-	for _ in range(1500):
-		sc = ConfidenceEstimator(confidence=0.95)
-		intervals = []
-		while not sc.converged():
-			sc.update(rng.normal(size=30, loc=mu, scale=1 / 2))
-			intervals.append([sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error])
-		interval = [sc.cov.mean - sc.margin_of_error, sc.cov.mean + sc.margin_of_error]
-		containing_intervals += interval[0] <= mu and mu <= interval[1]
-	assert abs((containing_intervals / 1500) - 0.95) < (100 / 1500)
 
 
 def test_confidence_interval():

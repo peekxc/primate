@@ -9,7 +9,14 @@ import numpy as np
 from scipy.sparse import sparray
 from scipy.sparse.linalg import LinearOperator
 
-from .estimators import ConfidenceEstimator, ConvergenceEstimator, EstimatorResult, ToleranceEstimator
+from .estimators import (
+	ConfidenceCriterion,
+	ConvergenceCriterion,
+	EstimatorResult,
+	MeanEstimator,
+	ToleranceCriterion,
+	convergence_criterion,
+)
 from .linalg import update_trinv
 from .operators import _operator_checks
 from .random import isotropic
@@ -66,9 +73,9 @@ def _reduce(nodes: np.ndarray, weights: np.ndarray) -> np.ndarray:
 
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
-	maxiter: int = 200,
+	batch: int = 32,
 	pdf: Union[str, Callable] = "rademacher",
-	estimator: Union[str, ConvergenceEstimator] = "confidence",
+	converge: Union[str, ConvergenceCriterion] = "confidence",
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
@@ -87,18 +94,21 @@ def hutch(
 
 	Parameters:
 		A: real symmetric matrix or linear operator.
-		maxiter: Maximum number of random vectors to sample for the trace estimate.
+		batch: Number of random vectors to sample at a time for batched matrix multiplication.
 		pdf: Choice of zero-centered distribution to sample random vectors from.
-		estimator: Type of estimator to use for convergence testing. See details.
+		converge: Convergence criterion to test for estimator convergence. See details.
 		seed: Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
 		full: Whether to return additional information about the computation.
+		callback: Optional callable to execute after each batch of samples.
+		**kwargs: Additional keyword arguments to parameterize the convergence criterion.
 
 	Returns:
 		Estimate the trace of $f(A)$. If `info = True`, additional information about the computation is also returned.
 
 	See Also:
 		- [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
-		- [ConfidenceEstimator](/reference/ConfidenceEstimator.md): Standard estimator of the mean from iid samples.
+		- [MeanEstimator](/reference/MeanEstimator.md): Standard estimator of the mean from iid samples.
+		- [ConfidenceCriterion](/reference/ConfidenceCriterion.md): Criterion for convergence that uses the central limit theorem.
 
 	Reference:
 		1. Ubaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.
@@ -112,42 +122,31 @@ def hutch(
 	f_dtype = _operator_checks(A)
 	N: int = A.shape[0]
 
-	## Parameterize the random vector generation
+	## Parameterize the various quantities
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-
-	## Parameterize the convergence checking
-	if isinstance(estimator, str):
-		assert estimator in {"confidence"}, "Only confidence estimator is supported for now."
-		estimator = ConfidenceEstimator(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
-	elif estimator is None:
-		estimator = ToleranceEstimator(**{k: v for k, v in kwargs.items() if k in {"atol", "rtol", "ord"}})
-	assert isinstance(estimator, ConvergenceEstimator), "`estimator` must satisfy the ConvergenceEstimator protocol."
-
-	## Prepare quadratic form evaluator
-	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+	converge = convergence_criterion(converge, **kwargs)
+	estimator = MeanEstimator()
+	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
 		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
 
-	## Commence the monte-carlo iterations
-	converged = False
+	## Commence the Monte-Carlo iterations
 	if full or callback is not None:
 		result = EstimatorResult(0.0, False, "", 0, [])
-		while not converged:
-			v = pdf(size=(N, 1)).astype(f_dtype)
-			sample = quad_form(v)
-			estimator.update(sample)
-			converged = estimator.converged() or len(estimator) >= maxiter
-			result.update(estimator, sample)
-			if callback is not None:
-				callback(result)
+		callback = lambda x: x if callback is None else callback
+		while not converge(estimator):
+			v = pdf(size=(N, batch)).astype(f_dtype)
+			estimator.update(quad_form(v))
+			result.update(estimator)
+			callback(result)
 		return (estimator.estimate, result)
 	else:
-		while not converged:
+		while not converge(estimator):
 			estimator.update(quad_form(pdf(size=(N, 1)).astype(f_dtype)))
-			converged = estimator.converged() or len(estimator) >= maxiter
 		return estimator.estimate
 
 
@@ -227,7 +226,7 @@ def __xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: 
 		pdf: the distribution with which `W` was sampled from.
 
 	Returns:
-		tuple (t, est, err) representing the average trace estimate,
+		tuple (t, est, err) representing the averaged leave-one-out trace estimate
 	"""
 	diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
 
@@ -268,6 +267,20 @@ def xtrace(
 	full: bool = False,
 	verbose: int = 0,
 ) -> Union[float, tuple]:
+	"""Estimates the trace of `A` using the XTrace trace estimator.
+
+	Parameters:
+		A: all isotropic random vectors sampled thus far.
+		batch: the image A @ Q.
+		Q: orthogonal component of qr(A @ W)
+		R: upper-triangular component of qr(A @ W)
+		R_inv: inverse matrix of R.
+		pdf: the distribution with which `W` was sampled from.
+
+	Returns:
+		tuple (t, est, err) representing the average trace estimate.
+	"""
+
 	from scipy.linalg import qr_insert
 
 	assert batch >= 1, "Batch size must be positive."
@@ -293,6 +306,7 @@ def xtrace(
 
 		## Sample a batch of random isotropic vectors
 		## TODO: replace with proper batch updates
+		## TODO: https://stackoverflow.com/questions/6042308/numpy-inverting-an-upper-triangular-matrix
 		N = isotropic(size=(ns, n), pdf=pdf, seed=rng)  # 'new' vectors
 		for eta in N:
 			y = A @ eta.T
@@ -304,7 +318,6 @@ def xtrace(
 
 		## Expand the subspace
 		estimate, t_samples, err = __xtrace(W, Z, Q, R, R_inv, pdf)
-		result.samples.extend(t_samples)
 		it += 1
 
 	if full:
