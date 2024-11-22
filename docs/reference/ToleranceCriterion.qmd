@@ -1,0 +1,6 @@
+# ToleranceCriterion { #estimators.ToleranceCriterion }
+
+```python
+ToleranceCriterion(self, rtol=0.01, atol=1.49e-08, ord=2)
+```
+

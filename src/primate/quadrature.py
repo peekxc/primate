@@ -21,31 +21,34 @@ def lanczos_quadrature(
 ):
 	r"""Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.
 
-	This function computes the degree-$d$ (`deg`) Gaussian quadrature rule for a symmetric Jacobi matrix $J$,
-	which associates `nodes` to the eigenvalues of $J$ and `weights` to the squares of the first components
-	of the eigenvectors of $J$. The resulting rule is a weighted sum approximating the definite integral:
+	This function computes the fixed degree Gaussian quadrature rule for a symmetric Jacobi matrix $J$,
+	which associates `nodes` $x_i$ to the eigenvalues of $J$ and `weights` $w_i$ to the squares of the first components
+	of their corresponding normalized eigenvectors. The resulting rule is a weighted sum approximating the definite integral:
 
-	$$ \int_{a}^{b} f(x) \omega(x) dx \approx \sum\limits_{i=1}^d f(x_i) w_i $$
+	$$ \int_{a}^{b} f(x) \omega(x) dx \approx \sum\limits_{i=1}^d f(x_i) \cdot w_i $$
 
 	where $\omega(x)$ denotes the weight function and $f(x)$ represents the function being approximated.
-	The limits $a,b$ and weight function $\omega(x)$ depend on how `J` was constructed. When $J$ arises from the Lanczos
-	method on a symmetric matrix $A \in \mathbb{R}^{n \times n}$, the estimated quantity corresponds to a spectral sum:
+	When `J` is constructed by the Lanczos method on a symmetric matrix $A \in \mathbb{R}^{n \times n}$, the
+	rule can be used to approximate the weighted integral:
 
-	$$ \int_{a}^{b} f(x) \psi(x; A, v) dx $$
+	$$ \int_{a}^{b} f(x) \psi(x; A, v) dx \approx \sum\limits_{i=1}^n f(\lambda_i)$$
 
-	where $psi(x)$ is the eigenvector spectral density associated to the pair $(A,v)$:
+	where $\psi(x)$ is the eigenvector spectral density associated to the pair $(A,v)$:
 
 	$$ \psi(x; A, v) = \sum\limits_{i=1}^n \lvert u_i^T v \rvert^2 \delta(x - \lambda_i), \quad A = U \Lambda U^T $$
 
-	In this sense, by applying $f$ to the nodes $x_i$, the corresponding quadrature rule can approximate any spectral sum.
+	For more details on this, see the references.
 
 	Parameters:
 		d: array of `n` diagonal elements.
 		e: array of `n` or `n-1` off-diagonal elements. See details.
 		deg: degree of the quadrature rule to compute.
 		quad: method used to compute the rule. Either Golub Welsch or FTTR is supported.
-		nodes: output array to store the `n` nodes of the quadrature (optional).
-		weights: output array to store the `n` weights of the quadrature (optional).
+		nodes: output array to store the `deg` nodes of the quadrature (optional).
+		weights: output array to store the `deg` weights of the quadrature (optional).
+
+	Returns:
+		tuple (nodes, weights) of the degree-`deg` Gaussian quadrature rule.
 
 	Notes:
 		To compute the weights of the quadrature, `quad` can be set to either 'golub_welsch' or 'fttr'. The former uses a LAPACK call to

@@ -1,4 +1,5 @@
 import numpy as np
+from primate.estimators import EstimatorResult
 from primate.trace import hutch, hutchpp, xtrace
 from primate.operators import MatrixFunction
 from primate.random import symmetric, isotropic
@@ -12,7 +13,8 @@ def test_hutch():
 	est = hutch(A, seed=rng)
 	assert np.abs(A.trace() - est) <= 10 * (1 / np.sqrt(n))
 
-	# est, info = hutch(A, maxiter=n, seed=rng, full=True)
+	est, info = hutch(A, maxiter=n, seed=rng, full=True)
+	assert isinstance(info, EstimatorResult)
 	# assert isinstance(info.samples, list) and len(info.samples) == n
 
 
@@ -23,6 +25,9 @@ def test_hutchpp():
 	A = symmetric(n, pd=True, ew=ew, seed=rng)
 	est = hutchpp(A, m=n, seed=rng)
 	assert np.abs(A.trace() - est) <= 1 * (1 / np.sqrt(n))
+
+	est, info = hutchpp(A, m=n, seed=rng, full=True)
+	assert isinstance(info, EstimatorResult)
 
 
 def test_hutch_mf_identity():
@@ -38,8 +43,6 @@ def test_hutch_mf_identity():
 
 
 def test_xtrace():
-	from primate.trace import xtrace
-
 	## Ensure different batch sizes work with xtrace
 	rng = np.random.default_rng(1234)
 	A = rng.uniform(size=(50, 50))

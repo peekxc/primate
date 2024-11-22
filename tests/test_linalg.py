@@ -25,15 +25,3 @@ def test_update_inv():
 		B_new = np.c_[np.vstack((B, np.zeros(B.shape[1]))), b]
 		B_ast = update_trinv(np.linalg.inv(B), b)
 		assert np.allclose(np.linalg.inv(B_new), B_ast, atol=1e-8)
-
-
-def test_qr_insert():
-	from scipy.linalg import qr_insert
-
-	rng = np.random.default_rng(1234)
-	Y = rng.uniform(size=(5, 2))
-	Q, R = np.linalg.qr(Y)
-	y = rng.uniform(size=(Y.shape[0], 1))
-	Q_hat, R_hat = qr_insert(Q, R, u=y, k=-1, which="col", rcond=None, overwrite_qru=False, check_finite=True)
-
-	# QR update on row or column insertions

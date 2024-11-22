@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>operators.normalize_unit</title>
+<title>countcriterion</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/stochastic.isotropic.html" rel="next">
-<link href="../reference/operators.Toeplitz.html" rel="prev">
+<link href="../reference/ToleranceCriterion.html" rel="next">
+<link href="../reference/ConvergenceCriterion.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -154,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/operators.MatrixFunction.html">Operators</a></li><li class="breadcrumb-item"><a href="../reference/operators.normalize_unit.html">operators.normalize_unit</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/Estimator.html">Estimators</a></li><li class="breadcrumb-item"><a href="../reference/CountCriterion.html">CountCriterion</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -191,7 +191,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="../basic/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -199,26 +205,44 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
  <span class="menu-text">API Reference</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Estimators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lanczos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/estimators.hutch.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">estimators.hutch</span></a>
+  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">lanczos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">rayleigh_ritz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">lanczos_quadrature</span></a>
   </div>
 </li>
       </ul>
@@ -226,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
- <span class="menu-text">Operators</span></a>
+ <span class="menu-text">Trace</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -234,84 +258,160 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.MatrixFunction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">operators.MatrixFunction</span></a>
+  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.Toeplitz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">operators.Toeplitz</span></a>
+  <a href="../reference/hutchpp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hutchpp</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.normalize_unit.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">operators.normalize_unit</span></a>
+  <a href="../reference/xtrace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">xtrace</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">Stochastic</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Operators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stochastic.isotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stochastic.isotropic</span></a>
+  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stochastic.symmetric.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stochastic.symmetric</span></a>
+  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Toeplitz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">normalize_unit</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Random</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">isotropic</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">symmetric</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/haar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">haar</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MeanEstimator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ControlVariableEstimator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConvergenceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/CountCriterion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">CountCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ToleranceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConfidenceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/KneeCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KneeCriterion</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Stats</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">stats.Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/stats.confidence_interval.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">stats.confidence_interval</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/stats.MeanEstimatorCLT.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.MeanEstimatorCLT</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-          <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
- <span class="menu-text">Lanczos</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">lanczos.lanczos</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">lanczos.rayleigh_ritz</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/quadrature.lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">quadrature.lanczos_quadrature</span></a>
   </div>
 </li>
       </ul>
@@ -328,7 +428,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#operators.normalize_unit" id="toc-operators.normalize_unit" class="nav-link active" data-scroll-target="#operators.normalize_unit">operators.normalize_unit</a></li>
+  <li><a href="#estimators.CountCriterion" id="toc-estimators.CountCriterion" class="nav-link active" data-scroll-target="#estimators.CountCriterion">CountCriterion</a></li>
   </ul>
 </nav>
     </div>
@@ -338,10 +438,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="operators.normalize_unit" class="level1">
-<h1>operators.normalize_unit</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>normalize_unit(A, interval<span class="op">=</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Normalizes a linear operator to have its spectra contained in the interval [-1,1].</p>
+<section id="estimators.CountCriterion" class="level1">
+<h1>CountCriterion</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>CountCriterion(<span class="va">self</span>, count)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Convergence criterion that returns TRUE when above a given count.</p>
 
 
 </section>
@@ -913,13 +1013,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/operators.Toeplitz.html" class="pagination-link" aria-label="operators.Toeplitz">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">operators.Toeplitz</span>
+      <a href="../reference/ConvergenceCriterion.html" class="pagination-link" aria-label="ConvergenceCriterion">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">ConvergenceCriterion</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/stochastic.isotropic.html" class="pagination-link" aria-label="stochastic.isotropic">
-        <span class="nav-page-text">stochastic.isotropic</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/ToleranceCriterion.html" class="pagination-link" aria-label="ToleranceCriterion">
+        <span class="nav-page-text">ToleranceCriterion</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

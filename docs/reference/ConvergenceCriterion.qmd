@@ -1,0 +1,7 @@
+# ConvergenceCriterion { #estimators.ConvergenceCriterion }
+
+```python
+ConvergenceCriterion(self, operation)
+```
+
+Generic stopping criteria for sequences.

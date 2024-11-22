@@ -1,10 +1,20 @@
 # Function reference {.doc .doc-index}
 
+## Lanczos
+
+| | |
+| --- | --- |
+| [lanczos](lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
+| [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
+| [lanczos_quadrature](lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
+
 ## Trace
 
 | | |
 | --- | --- |
 | [hutch](hutch.qmd#trace.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
+| [hutchpp](hutchpp.qmd#trace.hutchpp) | Hutch++ estimator. |
+| [xtrace](xtrace.qmd#trace.xtrace) | Estimates the trace of `A` using the XTrace trace estimator. |
 
 ## Operators
 
@@ -14,27 +24,30 @@
 | [Toeplitz](Toeplitz.qmd#operators.Toeplitz) | Matrix-free operator for representing Toeplitz or circulant matrices. |
 | [normalize_unit](normalize_unit.qmd#operators.normalize_unit) | Normalizes a linear operator to have its spectra contained in the interval [-1,1]. |
 
-## Stochastic
+## Random
 
 | | |
 | --- | --- |
-| [isotropic](isotropic.qmd#stochastic.isotropic) | Generates random vectors from a specified isotropic distribution. |
-| [symmetric](symmetric.qmd#stochastic.symmetric) | Generates a random symmetric matrix of size `n` with eigenvalues `ew`. |
+| [isotropic](isotropic.qmd#random.isotropic) | Generates random vectors from a specified isotropic distribution. |
+| [symmetric](symmetric.qmd#random.symmetric) | Generates a random symmetric matrix of size `n` with eigenvalues `ew`. |
+| [haar](haar.qmd#random.haar) | Generates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n). |
 
-## Lanczos
+## Estimators
 
 | | |
 | --- | --- |
-| [lanczos](lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
-| [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
-| [lanczos_quadrature](lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
+| [Estimator](Estimator.qmd#estimators.Estimator) | Protocol for generic stopping criteria for sequences. |
+| [MeanEstimator](MeanEstimator.qmd#estimators.MeanEstimator) | Sample mean estimator with stable covariance updating. |
+| [ControlVariableEstimator](ControlVariableEstimator.qmd#estimators.ControlVariableEstimator) |  |
+| [ConvergenceCriterion](ConvergenceCriterion.qmd#estimators.ConvergenceCriterion) | Generic stopping criteria for sequences. |
+| [CountCriterion](CountCriterion.qmd#estimators.CountCriterion) | Convergence criterion that returns TRUE when above a given count. |
+| [ToleranceCriterion](ToleranceCriterion.qmd#estimators.ToleranceCriterion) |  |
+| [ConfidenceCriterion](ConfidenceCriterion.qmd#estimators.ConfidenceCriterion) | Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT. |
+| [KneeCriterion](KneeCriterion.qmd#estimators.KneeCriterion) |  |
 
 ## Stats
 
 | | |
 | --- | --- |
 | [stats.Covariance](stats.Covariance.qmd#stats.Covariance) | Updateable covariance matrix. |
-| [stats.ConvergenceEstimator](stats.ConvergenceEstimator.qmd#stats.ConvergenceEstimator) | Protocol for generic stopping criteria for sequences. |
-| [stats.MeanEstimator](stats.MeanEstimator.qmd#stats.MeanEstimator) |  |
-| [stats.CentralLimitEstimator](stats.CentralLimitEstimator.qmd#stats.CentralLimitEstimator) | Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT. |
-| [stats.ControlVariableEstimator](stats.ControlVariableEstimator.qmd#stats.ControlVariableEstimator) |  |
+| [stats.confidence_interval](stats.confidence_interval.qmd#stats.confidence_interval) | Confidence intervals for the sample mean of a set of measurements. |

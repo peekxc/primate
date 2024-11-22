@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>estimators</title>
+<title>kneecriterion</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/operators.MatrixFunction.html" rel="next">
-<link href="../reference/index.html" rel="prev">
+<link href="../reference/stats.Covariance.html" rel="next">
+<link href="../reference/ConfidenceCriterion.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -105,49 +105,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../custom.css">
 </head>
@@ -197,7 +154,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/estimators.html">Estimators</a></li><li class="breadcrumb-item"><a href="../reference/estimators.html">estimators</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/Estimator.html">Estimators</a></li><li class="breadcrumb-item"><a href="../reference/KneeCriterion.html">KneeCriterion</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -234,7 +191,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="../basic/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Installing</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -258,7 +221,7 @@ window.Quarto = {
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">Estimators</span></a>
+ <span class="menu-text">Lanczos</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -266,102 +229,179 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/estimators.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">estimators</span></a>
+  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">lanczos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">rayleigh_ritz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">lanczos_quadrature</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Trace</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hutch</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/hutchpp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">hutchpp</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/xtrace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">xtrace</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
  <span class="menu-text">Operators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.MatrixFunction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">operators.MatrixFunction</span></a>
+  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.Toeplitz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">operators.Toeplitz</span></a>
+  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Toeplitz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/operators.normalize_unit.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">operators.normalize_unit</span></a>
+  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">normalize_unit</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
- <span class="menu-text">Stochastic</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Random</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stochastic.isotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stochastic.isotropic</span></a>
+  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">isotropic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stochastic.symmetric.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stochastic.symmetric</span></a>
+  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">symmetric</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/haar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">haar</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
- <span class="menu-text">Lanczos</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Estimators</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.lanczos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">lanczos.lanczos</span></a>
+  <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">lanczos.rayleigh_ritz</span></a>
+  <a href="../reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MeanEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/quadrature.lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">quadrature.lanczos_quadrature</span></a>
+  <a href="../reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ControlVariableEstimator</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConvergenceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/CountCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CountCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ToleranceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">ConfidenceCriterion</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../reference/KneeCriterion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">KneeCriterion</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
  <span class="menu-text">Stats</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
@@ -370,26 +410,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stats.ConvergenceEstimator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.ConvergenceEstimator</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/stats.MeanEstimator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.MeanEstimator</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/stats.CentralLimitEstimator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.CentralLimitEstimator</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../reference/stats.ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.ControlVariableEstimator</span></a>
+  <a href="../reference/stats.confidence_interval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">stats.confidence_interval</span></a>
   </div>
 </li>
       </ul>
@@ -406,184 +428,21 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#functions" id="toc-functions" class="nav-link active" data-scroll-target="#functions">Functions</a>
-  <ul class="collapse">
-  <li><a href="#estimators.hutch" id="toc-estimators.hutch" class="nav-link" data-scroll-target="#estimators.hutch">hutch</a></li>
-  </ul></li>
+  <li><a href="#estimators.KneeCriterion" id="toc-estimators.KneeCriterion" class="nav-link active" data-scroll-target="#estimators.KneeCriterion">KneeCriterion</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/estimators.html">Estimators</a></li><li class="breadcrumb-item"><a href="../reference/estimators.html">estimators</a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title">estimators</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
+<section id="estimators.KneeCriterion" class="level1">
+<h1>KneeCriterion</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>KneeCriterion(<span class="va">self</span>, S<span class="op">=</span><span class="fl">1.0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
-</header>
-
-
-<p>``</p>
-<p>Estimators involving matrix function, trace, and diagonal estimation.</p>
-<section id="functions" class="level2">
-<h2 class="anchored" data-anchor-id="functions">Functions</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="#estimators.hutch">hutch</a></td>
-<td>Estimates the trace of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</td>
-</tr>
-</tbody>
-</table>
-<section id="estimators.hutch" class="level3">
-<h3 class="anchored" data-anchor-id="estimators.hutch">hutch</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>hutch(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    maxiter<span class="op">=</span><span class="dv">200</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pdf<span class="op">=</span><span class="st">'rademacher'</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    estimator<span class="op">=</span><span class="st">'confidence'</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    full<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Estimates the trace of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</p>
-<p>This function uses up to <code>maxiter</code> random vectors to estimate of the trace of <span class="math inline">A</span> via the approximation: <span class="math display"> \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v </span> When <span class="math inline">v</span> are isotropic, this approximation forms an unbiased estimator of the trace.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Convergence behavior is controlled by the <code>estimator</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation.</p>
-</div>
-</div>
-<section id="parameters" class="level4 doc-section doc-section-parameters">
-<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 7%">
-<col style="width: 27%">
-<col style="width: 54%">
-<col style="width: 10%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A</td>
-<td>Union[LinearOperator, np.ndarray]</td>
-<td>real symmetric matrix or linear operator.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td>maxiter</td>
-<td>int</td>
-<td>Maximum number of random vectors to sample for the trace estimate.</td>
-<td><code>200</code></td>
-</tr>
-<tr class="odd">
-<td>pdf</td>
-<td>Union[str, Callable]</td>
-<td>Choice of zero-centered distribution to sample random vectors from.</td>
-<td><code>'rademacher'</code></td>
-</tr>
-<tr class="even">
-<td>estimator</td>
-<td>Union[str, ConvergenceEstimator]</td>
-<td>Type of estimator to use for convergence testing. See details.</td>
-<td><code>'confidence'</code></td>
-</tr>
-<tr class="odd">
-<td>seed</td>
-<td>Union[int, np.random.Generator, None]</td>
-<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>full</td>
-<td>bool</td>
-<td>Whether to return additional information about the computation.</td>
-<td><code>False</code></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="returns" class="level4 doc-section doc-section-returns">
-<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 5%">
-<col style="width: 16%">
-<col style="width: 78%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>Union[float, tuple]</td>
-<td>Estimate the trace of <span class="math inline">f(A)</span>. If <code>info = True</code>, additional information about the computation is also returned.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="see-also" class="level4 doc-section doc-section-see-also">
-<h4 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h4>
-<ul>
-<li><a href="../reference/lanczos.lanczos.md">lanczos</a>: the lanczos tridiagonalization algorithm.</li>
-<li><a href="../reference/CentralLimitEstimator.md">CentralLimitEstimator</a>: Standard estimator of the mean from iid samples.</li>
-</ul>
-</section>
-<section id="reference" class="level4 doc-section doc-section-reference">
-<h4 class="doc-section doc-section-reference anchored" data-anchor-id="reference">Reference</h4>
-<ol type="1">
-<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
-<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
-</ol>
-</section>
-<section id="examples" class="level4 doc-section doc-section-examples">
-<h4 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h4>
-<div id="92d8296a" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.estimators <span class="im">import</span> hutch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-
-
-</section>
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1153,13 +1012,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/index.html" class="pagination-link" aria-label="Function reference">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Function reference</span>
+      <a href="../reference/ConfidenceCriterion.html" class="pagination-link" aria-label="ConfidenceCriterion">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">ConfidenceCriterion</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/operators.MatrixFunction.html" class="pagination-link" aria-label="operators.MatrixFunction">
-        <span class="nav-page-text">operators.MatrixFunction</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/stats.Covariance.html" class="pagination-link" aria-label="stats.Covariance">
+        <span class="nav-page-text">stats.Covariance</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

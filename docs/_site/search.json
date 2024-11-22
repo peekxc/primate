@@ -1,650 +1,5 @@
 [
   {
-    "objectID": "reference/quadrature.lanczos_quadrature.html",
-    "href": "reference/quadrature.lanczos_quadrature.html",
-    "title": "quadrature.lanczos_quadrature",
-    "section": "",
-    "text": "lanczos_quadrature(\n    d,\n    e,\n    deg=None,\n    quad='gw',\n    nodes=None,\n    weights=None,\n    **kwargs,\n)\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\nThis function computes the degree-d (deg) Gaussian quadrature rule for a symmetric Jacobi matrix J, which associates nodes to the eigenvalues of J and weights to the squares of the first components of the eigenvectors of J. The resulting rule is a weighted sum approximating the definite integral:\n \\int_{a}^{b} f(x) d \\mu(x) \\approx \\sum\\limits_{i=1}^d f(x_i) w_i \nwhere d \\mu(x) = w(x) dx denotes the appropriate measure and f(x) represents the function being approximated. The limits a,b and weight function w(x) depend on how J was constructed. When J arises from the Lanczos method on a symmetric matrix A \\in \\mathbb{R}^{n \\times n}, the estimated quantity corresponds to a spectral sum:\n \\int_{a}^{b} f(x) \\psi(x; A, v) dx \\approx \\sum\\limits_{i=1}^d f(\\lamba_i) w_i \nwhere psi(x) is the eigenvector spectral density associated to the pair (A,v):\n \\psi(x; A, v) = \\sum\\limits_{i=1}^n \\lvert u_i^T v \\rvert^2 \\delta(x - \\lambda_i) \nIn this sense, the nodes \\lambda_i and weights \\w_i constructed by this function can approximate any spectral sum by post-processing with some f.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone\n\n\n\n\n\n\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation."
-  },
-  {
-    "objectID": "reference/operators.MatrixFunction.html",
-    "href": "reference/operators.MatrixFunction.html",
-    "title": "operators.MatrixFunction",
-    "section": "",
-    "text": "MatrixFunction(self, A, fun=None, deg=20, dtype=np.float64, **kwargs)\nLinear operator class for matrix functions.\n\n\n\n\n\nName\nDescription\n\n\n\n\nquad\nEstimates the quadratic form of the matrix function using Lanczos quadrature.\n\n\n\n\n\nMatrixFunction.quad(x)\nEstimates the quadratic form of the matrix function using Lanczos quadrature.\nThis function uses the Lanczos method to estimate the quadratic form:  x \\mapsto x^T f(A) x  The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of f(A).\nNote this method is mathematically equivalent though computationally distinct from the operation x @ (A @ x), i.e. the operation which first applies x \\mapsto f(A)x and then performs a dot product. In particular, the"
-  },
-  {
-    "objectID": "reference/lanczos.lanczos.html",
-    "href": "reference/lanczos.lanczos.html",
-    "title": "lanczos.lanczos",
-    "section": "",
-    "text": "lanczos(\n    A,\n    v0=None,\n    deg=None,\n    rtol=1e-08,\n    orth=0,\n    sparse_mat=False,\n    return_basis=False,\n    seed=None,\n    dtype=None,\n    **kwargs,\n)\nLanczos method for symmetric tridiagonalization.\nThis function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, orth=0 corresponds to no re-orthogonalization, orth &lt; deg corresponds to partial re-orthogonalization, and orth &gt;= deg corresponds to full re-orthogonalization.\nThe Lanczos method builds a tridiagonal T from a symmetric A via an orthogonal change-of-basis Q:  Q^T A Q  = T  Unlike other Lanczos implementations (e.g. SciPy’s eigsh), which includes e.g. sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes deg steps of the Lanczos method with the supplied v0 and returns the diagonals of the resulting tridiagonal matrix T.\nRayleigh-Ritz approximations of the eigenvalues of A can be further obtained by diagonalizing T via any symmetric tridiagonal eigenvalue solver, scipy.linalg.eigh_tridiagonal though note unlike eigsh no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing orth and deg. Supplying either negative values or values larger than deg for orth will result in full re-orthogonalization, though note the number of matvecs scales linearly with deg and the number of inner-products scales quadratically with orth.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[np.ndarray, sparray, LinearOperator]\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nOptional[np.ndarray]\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nOptional[int]\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-08\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nIf True, returns the Krylov basis vectors Q.\nFalse\n\n\ndtype\nOptional[np.dtype]\nThe precision dtype to specialize the computation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\ntuple\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If return_basis=True,\n\n\n\ntuple\nthe tuple (a,b), Q is returned, where Q represents an orthogonal basis for the degree-deg Krylov subspace.\n\n\n\n\n\n\n\nscipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.\noperator.matrix_function : Approximates the action of a matrix function via the Lanczos method.\n\n\n\n\n\nPaige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381."
-  },
-  {
-    "objectID": "reference/lanczos.lanczos.html#parameters",
-    "href": "reference/lanczos.lanczos.html#parameters",
-    "title": "lanczos.lanczos",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[np.ndarray, sparray, LinearOperator]\nSymmetric operator to tridiagonalize.\nrequired\n\n\nv0\nOptional[np.ndarray]\nInitial vector to orthogonalize against.\nNone\n\n\ndeg\nOptional[int]\nSize of the Krylov subspace to expand.\nNone\n\n\nrtol\nfloat\nRelative tolerance to consider the invariant subspace as converged.\n1e-08\n\n\north\nint\nNumber of additional Lanczos vectors to orthogonalize against.\n0\n\n\nsparse_mat\nbool\nWhether to output the tridiagonal matrix as a sparse matrix.\nFalse\n\n\nreturn_basis\nbool\nIf True, returns the Krylov basis vectors Q.\nFalse\n\n\ndtype\nOptional[np.dtype]\nThe precision dtype to specialize the computation.\nNone"
-  },
-  {
-    "objectID": "reference/lanczos.lanczos.html#returns",
-    "href": "reference/lanczos.lanczos.html#returns",
-    "title": "lanczos.lanczos",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\ntuple\nA tuple (a,b) parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If return_basis=True,\n\n\n\ntuple\nthe tuple (a,b), Q is returned, where Q represents an orthogonal basis for the degree-deg Krylov subspace."
-  },
-  {
-    "objectID": "reference/lanczos.lanczos.html#see-also",
-    "href": "reference/lanczos.lanczos.html#see-also",
-    "title": "lanczos.lanczos",
-    "section": "",
-    "text": "scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.\noperator.matrix_function : Approximates the action of a matrix function via the Lanczos method."
-  },
-  {
-    "objectID": "reference/lanczos.lanczos.html#references",
-    "href": "reference/lanczos.lanczos.html#references",
-    "title": "lanczos.lanczos",
-    "section": "",
-    "text": "Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381."
-  },
-  {
-    "objectID": "reference/stochastic.symmetric.html",
-    "href": "reference/stochastic.symmetric.html",
-    "title": "stochastic.symmetric",
-    "section": "",
-    "text": "symmetric(n, dist='normal', pd=True, ew=None, seed=None)\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random symmetric matrix with the presribed eigenvalues.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.symmetric"
-    ]
-  },
-  {
-    "objectID": "reference/stochastic.symmetric.html#parameters",
-    "href": "reference/stochastic.symmetric.html#parameters",
-    "title": "stochastic.symmetric",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.symmetric"
-    ]
-  },
-  {
-    "objectID": "reference/stochastic.symmetric.html#returns",
-    "href": "reference/stochastic.symmetric.html#returns",
-    "title": "stochastic.symmetric",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random symmetric matrix with the presribed eigenvalues.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.symmetric"
-    ]
-  },
-  {
-    "objectID": "reference/stats.confidence_interval.html",
-    "href": "reference/stats.confidence_interval.html",
-    "title": "stats.confidence_interval",
-    "section": "",
-    "text": "stats.confidence_interval\nconfidence_interval(a, confidence=0.95, sdist='t')\nConfidence intervals for the sample mean of a set of measurements.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stats.confidence_interval"
-    ]
-  },
-  {
-    "objectID": "reference/operators.normalize_unit.html",
-    "href": "reference/operators.normalize_unit.html",
-    "title": "operators.normalize_unit",
-    "section": "",
-    "text": "operators.normalize_unit\nnormalize_unit(A, interval=(-1, 1))\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Operators",
-      "operators.normalize_unit"
-    ]
-  },
-  {
-    "objectID": "reference/operators.Toeplitz.html",
-    "href": "reference/operators.Toeplitz.html",
-    "title": "operators.Toeplitz",
-    "section": "",
-    "text": "operators.Toeplitz\nToeplitz(self, c, r=None, dtype=None)"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Package overview",
-    "section": "",
-    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions—that is, matrices parameterized by functions:\n\\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\nMuch of primate’s computational code was directly ported from the (excellent) imate package—for a comparison of the two, see here.",
-    "crumbs": [
-      "Reference",
-      "Overview"
-    ]
-  },
-  {
-    "objectID": "index.html#footnotes",
-    "href": "index.html#footnotes",
-    "title": "Package overview",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
-    "crumbs": [
-      "Reference",
-      "Overview"
-    ]
-  },
-  {
-    "objectID": "imate_compare.html",
-    "href": "imate_compare.html",
-    "title": "Comparison to imate",
-    "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access from user (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the LinearOperator concept. For more details on this, see the integration guides.",
-    "crumbs": [
-      "Reference",
-      "Basics",
-      "Comparison to *imate*"
-    ]
-  },
-  {
-    "objectID": "imate_compare.html#footnotes",
-    "href": "imate_compare.html#footnotes",
-    "title": "Comparison to imate",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nprimate does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface.↩︎\nSee imates documentation for the list of supported functions.↩︎",
-    "crumbs": [
-      "Reference",
-      "Basics",
-      "Comparison to *imate*"
-    ]
-  },
-  {
-    "objectID": "reference/stats.MeanEstimatorCLT.html",
-    "href": "reference/stats.MeanEstimatorCLT.html",
-    "title": "stats.MeanEstimatorCLT",
-    "section": "",
-    "text": "MeanEstimatorCLT(self, confidence=0.95, atol=0.05, rtol=0.01, cvs=None)\n\n\n\n\n\nName\nDescription\n\n\n\n\nplot\nGenerates figures showing the convergence of sample trace estimates.\n\n\n\n\n\nMeanEstimatorCLT.plot(samples, real_trace=None, **kwargs)\nGenerates figures showing the convergence of sample trace estimates.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stats.MeanEstimatorCLT"
-    ]
-  },
-  {
-    "objectID": "reference/stats.MeanEstimatorCLT.html#methods",
-    "href": "reference/stats.MeanEstimatorCLT.html#methods",
-    "title": "stats.MeanEstimatorCLT",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nplot\nGenerates figures showing the convergence of sample trace estimates.\n\n\n\n\n\nMeanEstimatorCLT.plot(samples, real_trace=None, **kwargs)\nGenerates figures showing the convergence of sample trace estimates.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stats.MeanEstimatorCLT"
-    ]
-  },
-  {
-    "objectID": "reference/index.html",
-    "href": "reference/index.html",
-    "title": "Function reference",
-    "section": "",
-    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\nlanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.ConvergenceEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nstats.MeanEstimator\n\n\n\nstats.CentralLimitEstimator\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nstats.ControlVariableEstimator",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#estimators",
-    "href": "reference/index.html#estimators",
-    "title": "Function reference",
-    "section": "",
-    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#operators",
-    "href": "reference/index.html#operators",
-    "title": "Function reference",
-    "section": "",
-    "text": "MatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#stochastic",
-    "href": "reference/index.html#stochastic",
-    "title": "Function reference",
-    "section": "",
-    "text": "isotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/index.html#lanczos",
-    "href": "reference/index.html#lanczos",
-    "title": "Function reference",
-    "section": "",
-    "text": "lanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/lanczos.rayleigh_ritz.html",
-    "href": "reference/lanczos.rayleigh_ritz.html",
-    "title": "lanczos.rayleigh_ritz",
-    "section": "",
-    "text": "lanczos.rayleigh_ritz\nrayleigh_ritz(A, deg=None, return_eigenvectors=False, method='RRR', **kwargs)",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Lanczos",
-      "lanczos.rayleigh_ritz"
-    ]
-  },
-  {
-    "objectID": "reference/operators.matrix_function.html",
-    "href": "reference/operators.matrix_function.html",
-    "title": "operators.matrix_function",
-    "section": "",
-    "text": "operators.matrix_function\nmatrix_function(A, fun=None, v=None, deg=20)"
-  },
-  {
-    "objectID": "reference/stochastic.isotropic.html",
-    "href": "reference/stochastic.isotropic.html",
-    "title": "stochastic.isotropic",
-    "section": "",
-    "text": "isotropic(size, pdf='rademacher', seed=None)\nGenerates random vectors from a specified isotropic distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple]\nOutput shape to generate.\nrequired\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with entries distributed according to pdf.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.isotropic"
-    ]
-  },
-  {
-    "objectID": "reference/stochastic.isotropic.html#parameters",
-    "href": "reference/stochastic.isotropic.html#parameters",
-    "title": "stochastic.isotropic",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple]\nOutput shape to generate.\nrequired\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.isotropic"
-    ]
-  },
-  {
-    "objectID": "reference/stochastic.isotropic.html#returns",
-    "href": "reference/stochastic.isotropic.html#returns",
-    "title": "stochastic.isotropic",
-    "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with entries distributed according to pdf.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stochastic",
-      "stochastic.isotropic"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html",
-    "href": "reference/estimators.hutch.html",
-    "title": "estimators.hutch",
-    "section": "",
-    "text": "hutch(\n    A,\n    maxiter=200,\n    pdf='rademacher',\n    estimator='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#parameters",
-    "href": "reference/estimators.hutch.html#parameters",
-    "title": "estimators.hutch",
-    "section": "Parameters",
-    "text": "Parameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n200\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nestimator\nUnion[str, ConvergenceEstimator]\nType of estimator to use for convergence testing. See details.\n'confidence'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#returns",
-    "href": "reference/estimators.hutch.html#returns",
-    "title": "estimators.hutch",
-    "section": "Returns",
-    "text": "Returns\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of f(A). If info = True, additional information about the computation is also returned.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#see-also",
-    "href": "reference/estimators.hutch.html#see-also",
-    "title": "estimators.hutch",
-    "section": "See Also",
-    "text": "See Also\n\nlanczos: the lanczos tridiagonalization algorithm.\nCentralLimitEstimator: Standard estimator of the mean from iid samples.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#notes",
-    "href": "reference/estimators.hutch.html#notes",
-    "title": "estimators.hutch",
-    "section": "Notes",
-    "text": "Notes\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses implicit symmetric QR steps with Wilkinson shifts, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. While both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#reference",
-    "href": "reference/estimators.hutch.html#reference",
-    "title": "estimators.hutch",
-    "section": "Reference",
-    "text": "Reference\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.\nHutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.hutch.html#examples",
-    "href": "reference/estimators.hutch.html#examples",
-    "title": "estimators.hutch",
-    "section": "Examples",
-    "text": "Examples\n\nfrom primate.estimators import hutch",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators.hutch"
-    ]
-  },
-  {
-    "objectID": "reference/quadrature.lanczos_quadrature.html#parameters",
-    "href": "reference/quadrature.lanczos_quadrature.html#parameters",
-    "title": "quadrature.lanczos_quadrature",
-    "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone"
-  },
-  {
-    "objectID": "reference/quadrature.lanczos_quadrature.html#notes",
-    "href": "reference/quadrature.lanczos_quadrature.html#notes",
-    "title": "quadrature.lanczos_quadrature",
-    "section": "",
-    "text": "To compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation."
-  },
-  {
-    "objectID": "reference/operators.MatrixFunction.html#methods",
-    "href": "reference/operators.MatrixFunction.html#methods",
-    "title": "operators.MatrixFunction",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\nquad\nEstimates the quadratic form of the matrix function using Lanczos quadrature.\n\n\n\n\n\nMatrixFunction.quad(x)\nEstimates the quadratic form of the matrix function using Lanczos quadrature.\nThis function uses the Lanczos method to estimate the quadratic form:  x \\mapsto x^T f(A) x  The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of f(A).\nNote this method is mathematically equivalent though computationally distinct from the operation x @ (A @ x), i.e. the operation which first applies x \\mapsto f(A)x and then performs a dot product. In particular, the"
-  },
-  {
-    "objectID": "reference/index.html#stats",
-    "href": "reference/index.html#stats",
-    "title": "Function reference",
-    "section": "",
-    "text": "stats.Covariance\nUpdateable covariance matrix.\n\n\nstats.ConvergenceEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nstats.MeanEstimator\n\n\n\nstats.CentralLimitEstimator\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nstats.ControlVariableEstimator",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Function reference"
-    ]
-  },
-  {
-    "objectID": "reference/stats.Covariance.html",
-    "href": "reference/stats.Covariance.html",
-    "title": "stats.Covariance",
-    "section": "",
-    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s online algorithm to update the sample mean and covariance estimates in a numerically stable way.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.Covariance"
-    ]
-  },
-  {
-    "objectID": "reference/stats.Covariance.html#methods",
-    "href": "reference/stats.Covariance.html#methods",
-    "title": "stats.Covariance",
-    "section": "",
-    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.Covariance"
-    ]
-  },
-  {
-    "objectID": "reference/stats.MeanEstimator.html",
-    "href": "reference/stats.MeanEstimator.html",
-    "title": "stats.MeanEstimator",
-    "section": "",
-    "text": "stats.MeanEstimator\nMeanEstimator(self, dim=1)",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.MeanEstimator"
-    ]
-  },
-  {
-    "objectID": "reference/quadrature.spectral_density.html",
-    "href": "reference/quadrature.spectral_density.html",
-    "title": "quadrature.spectral_density",
-    "section": "",
-    "text": "spectral_density(\n    A\n    bins=100\n    bw='scott'\n    deg=20\n    rtol=0.01\n    verbose=False\n    info=False\n    plot=False\n    **kwargs\n)\nEstimates the spectral density of an operator via stochastic Lanczos quadrature.\n\n\n(density, bins) = Estimate of the spectral density at domain points ‘bins’"
-  },
-  {
-    "objectID": "reference/quadrature.spectral_density.html#return",
-    "href": "reference/quadrature.spectral_density.html#return",
-    "title": "quadrature.spectral_density",
-    "section": "",
-    "text": "(density, bins) = Estimate of the spectral density at domain points ‘bins’"
-  },
-  {
-    "objectID": "reference/stats.ControlVariableEstimator.html",
-    "href": "reference/stats.ControlVariableEstimator.html",
-    "title": "stats.ControlVariableEstimator",
-    "section": "",
-    "text": "stats.ControlVariableEstimator\nControlVariableEstimator(self, ecv, alpha=None, **kwargs)",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.ControlVariableEstimator"
-    ]
-  },
-  {
-    "objectID": "reference/stats.ConvergenceEstimator.html",
-    "href": "reference/stats.ConvergenceEstimator.html",
-    "title": "stats.ConvergenceEstimator",
-    "section": "",
-    "text": "stats.ConvergenceEstimator\nConvergenceEstimator()\nProtocol for generic stopping criteria for sequences.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.ConvergenceEstimator"
-    ]
-  },
-  {
-    "objectID": "reference/stats.CentralLimitEstimator.html",
-    "href": "reference/stats.CentralLimitEstimator.html",
-    "title": "stats.CentralLimitEstimator",
-    "section": "",
-    "text": "CentralLimitEstimator(self, confidence=0.95, atol=0.05, rtol=0.01)\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\n\ncall = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.CentralLimitEstimator"
-    ]
-  },
-  {
-    "objectID": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
-    "href": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
-    "title": "stats.CentralLimitEstimator",
-    "section": "",
-    "text": "call = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Stats",
-      "stats.CentralLimitEstimator"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.html",
-    "href": "reference/estimators.html",
-    "title": "estimators",
-    "section": "",
-    "text": "``\nEstimators involving matrix function, trace, and diagonal estimation.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators"
-    ]
-  },
-  {
-    "objectID": "reference/estimators.html#functions",
-    "href": "reference/estimators.html#functions",
-    "title": "estimators",
-    "section": "Functions",
-    "text": "Functions\n\n\n\nName\nDescription\n\n\n\n\nhutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\n\n\nhutch\nhutch(\n    A,\n    maxiter=200,\n    pdf='rademacher',\n    estimator='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.\n\n\n\n\n\n\nNote\n\n\n\nConvergence behavior is controlled by the estimator parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with atol and rtol to upper-bound the error of the approximation.\n\n\n\nParameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n200\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nestimator\nUnion[str, ConvergenceEstimator]\nType of estimator to use for convergence testing. See details.\n'confidence'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse\n\n\n\n\n\nReturns\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of f(A). If info = True, additional information about the computation is also returned.\n\n\n\n\n\nSee Also\n\nlanczos: the lanczos tridiagonalization algorithm.\nCentralLimitEstimator: Standard estimator of the mean from iid samples.\n\n\n\nReference\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.\nHutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.\n\n\n\nExamples\n\nfrom primate.estimators import hutch",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Estimators",
-      "estimators"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html",
-    "href": "reference/hutch.html",
-    "title": "hutch",
-    "section": "",
-    "text": "trace.hutch(\n    A,\n    maxiter=200,\n    pdf='rademacher',\n    estimator='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html#parameters",
-    "href": "reference/hutch.html#parameters",
-    "title": "hutch",
-    "section": "Parameters",
-    "text": "Parameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nmaxiter\nint\nMaximum number of random vectors to sample for the trace estimate.\n200\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nestimator\nUnion[str, ConvergenceEstimator]\nType of estimator to use for convergence testing. See details.\n'confidence'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html#returns",
-    "href": "reference/hutch.html#returns",
-    "title": "hutch",
-    "section": "Returns",
-    "text": "Returns\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of f(A). If info = True, additional information about the computation is also returned.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html#see-also",
-    "href": "reference/hutch.html#see-also",
-    "title": "hutch",
-    "section": "See Also",
-    "text": "See Also\n\nlanczos: the lanczos tridiagonalization algorithm.\nCentralLimitEstimator: Standard estimator of the mean from iid samples.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html#reference",
-    "href": "reference/hutch.html#reference",
-    "title": "hutch",
-    "section": "Reference",
-    "text": "Reference\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.\nHutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
-    "objectID": "reference/hutch.html#examples",
-    "href": "reference/hutch.html#examples",
-    "title": "hutch",
-    "section": "Examples",
-    "text": "Examples\n\nfrom primate.trace import hutch",
-    "crumbs": [
-      "Reference",
-      "API Reference",
-      "Trace",
-      "hutch"
-    ]
-  },
-  {
     "objectID": "reference/lanczos.html",
     "href": "reference/lanczos.html",
     "title": "lanczos",
@@ -714,11 +69,11 @@
     "href": "reference/symmetric.html",
     "title": "symmetric",
     "section": "",
-    "text": "symmetric(n, dist='normal', pd=True, ew=None, seed=None)\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random symmetric matrix with the presribed eigenvalues.",
+    "text": "symmetric(n, dist='normal', pd=True, ew=None, seed=None)\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\nseed\nUnion[int, np.random.Generator, None]\nseed for the random number generator.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random symmetric matrix with the presribed eigenvalues.",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
+      "Random",
       "symmetric"
     ]
   },
@@ -727,11 +82,11 @@
     "href": "reference/symmetric.html#parameters",
     "title": "symmetric",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\ndist\nstr\nDistribution of individual matrix entries.\n'normal'\n\n\npd\nbool\nWhether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.\nTrue\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\nseed\nUnion[int, np.random.Generator, None]\nseed for the random number generator.\nNone",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
+      "Random",
       "symmetric"
     ]
   },
@@ -744,60 +99,307 @@
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
+      "Random",
       "symmetric"
     ]
   },
   {
-    "objectID": "reference/isotropic.html",
-    "href": "reference/isotropic.html",
-    "title": "isotropic",
+    "objectID": "reference/stats.CentralLimitEstimator.html",
+    "href": "reference/stats.CentralLimitEstimator.html",
+    "title": "stats.CentralLimitEstimator",
     "section": "",
-    "text": "stochastic.isotropic(size, pdf='rademacher', seed=None)\nGenerates random vectors from a specified isotropic distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple]\nOutput shape to generate.\nrequired\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with entries distributed according to pdf.",
+    "text": "CentralLimitEstimator(self, confidence=0.95, atol=0.05, rtol=0.01)\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\n\ncall = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
-      "isotropic"
+      "Stats",
+      "stats.CentralLimitEstimator"
     ]
   },
   {
-    "objectID": "reference/isotropic.html#parameters",
-    "href": "reference/isotropic.html#parameters",
-    "title": "isotropic",
+    "objectID": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
+    "href": "reference/stats.CentralLimitEstimator.html#provides-the-following-methods",
+    "title": "stats.CentralLimitEstimator",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple]\nOutput shape to generate.\nrequired\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone",
+    "text": "call = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
-      "isotropic"
+      "Stats",
+      "stats.CentralLimitEstimator"
     ]
   },
   {
-    "objectID": "reference/isotropic.html#returns",
-    "href": "reference/isotropic.html#returns",
-    "title": "isotropic",
+    "objectID": "reference/index.html",
+    "href": "reference/index.html",
+    "title": "Function reference",
     "section": "",
-    "text": "Name\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with entries distributed according to pdf.",
+    "text": "lanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nhutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\nhutchpp\nHutch++ estimator.\n\n\nxtrace\nEstimates the trace of A using the XTrace trace estimator.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\nhaar\nGenerates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).\n\n\n\n\n\n\n\n\n\nEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nMeanEstimator\nSample mean estimator with stable covariance updating.\n\n\nControlVariableEstimator\n\n\n\nConvergenceCriterion\nGeneric stopping criteria for sequences.\n\n\nCountCriterion\nConvergence criterion that returns TRUE when above a given count.\n\n\nToleranceCriterion\n\n\n\nConfidenceCriterion\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nKneeCriterion\n\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.confidence_interval\nConfidence intervals for the sample mean of a set of measurements.",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Stochastic",
-      "isotropic"
+      "Function reference"
     ]
   },
   {
-    "objectID": "reference/rayleigh_ritz.html",
-    "href": "reference/rayleigh_ritz.html",
-    "title": "rayleigh_ritz",
+    "objectID": "reference/index.html#trace",
+    "href": "reference/index.html#trace",
+    "title": "Function reference",
     "section": "",
-    "text": "rayleigh_ritz\nrayleigh_ritz(A, deg=None, return_eigenvectors=False, method='RRR', **kwargs)",
+    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\nhutchpp\nHutch++ estimator.\n\n\nxtrace\nEstimates the trace of A using the XTrace trace estimator.",
     "crumbs": [
       "Reference",
       "API Reference",
-      "Lanczos",
-      "rayleigh_ritz"
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#operators",
+    "href": "reference/index.html#operators",
+    "title": "Function reference",
+    "section": "",
+    "text": "MatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#stochastic",
+    "href": "reference/index.html#stochastic",
+    "title": "Function reference",
+    "section": "",
+    "text": "isotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#lanczos",
+    "href": "reference/index.html#lanczos",
+    "title": "Function reference",
+    "section": "",
+    "text": "lanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#stats",
+    "href": "reference/index.html#stats",
+    "title": "Function reference",
+    "section": "",
+    "text": "stats.Covariance\nUpdateable covariance matrix.\n\n\nstats.confidence_interval\nConfidence intervals for the sample mean of a set of measurements.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/stats.ConvergenceEstimator.html",
+    "href": "reference/stats.ConvergenceEstimator.html",
+    "title": "stats.ConvergenceEstimator",
+    "section": "",
+    "text": "stats.ConvergenceEstimator\nConvergenceEstimator()\nProtocol for generic stopping criteria for sequences.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.ConvergenceEstimator"
+    ]
+  },
+  {
+    "objectID": "reference/stats.Covariance.html",
+    "href": "reference/stats.Covariance.html",
+    "title": "stats.Covariance",
+    "section": "",
+    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s online algorithm to update the sample mean and covariance estimates in a numerically stable way.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.Covariance"
+    ]
+  },
+  {
+    "objectID": "reference/stats.Covariance.html#methods",
+    "href": "reference/stats.Covariance.html#methods",
+    "title": "stats.Covariance",
+    "section": "",
+    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.Covariance"
+    ]
+  },
+  {
+    "objectID": "reference/stats.ControlVariableEstimator.html",
+    "href": "reference/stats.ControlVariableEstimator.html",
+    "title": "stats.ControlVariableEstimator",
+    "section": "",
+    "text": "stats.ControlVariableEstimator\nControlVariableEstimator(self, ecv, alpha=None, **kwargs)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.ControlVariableEstimator"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html",
+    "href": "reference/hutch.html",
+    "title": "hutch",
+    "section": "",
+    "text": "trace.hutch(\n    A,\n    batch=32,\n    pdf='rademacher',\n    converge='confidence',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\nThis function uses up to maxiter random vectors to estimate of the trace of A via the approximation:  \\mathrm{tr}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the trace.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html#parameters",
+    "href": "reference/hutch.html#parameters",
+    "title": "hutch",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nbatch\nint\nNumber of random vectors to sample at a time for batched matrix multiplication.\n32\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nconverge\nUnion[str, ConvergenceCriterion]\nConvergence criterion to test for estimator convergence. See details.\n'confidence'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse\n\n\ncallback\nOptional[Callable]\nOptional callable to execute after each batch of samples.\nNone\n\n\n**kwargs\ndict\nAdditional keyword arguments to parameterize the convergence criterion.\n{}",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html#returns",
+    "href": "reference/hutch.html#returns",
+    "title": "hutch",
+    "section": "Returns",
+    "text": "Returns\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of f(A). If info = True, additional information about the computation is also returned.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html#see-also",
+    "href": "reference/hutch.html#see-also",
+    "title": "hutch",
+    "section": "See Also",
+    "text": "See Also\n\nlanczos: the lanczos tridiagonalization algorithm.\nMeanEstimator: Standard estimator of the mean from iid samples.\nConfidenceCriterion: Criterion for convergence that uses the central limit theorem.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html#reference",
+    "href": "reference/hutch.html#reference",
+    "title": "hutch",
+    "section": "Reference",
+    "text": "Reference\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.\nHutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "reference/hutch.html#examples",
+    "href": "reference/hutch.html#examples",
+    "title": "hutch",
+    "section": "Examples",
+    "text": "Examples\n\nfrom primate.trace import hutch",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutch"
+    ]
+  },
+  {
+    "objectID": "basic/imate_compare.html",
+    "href": "basic/imate_compare.html",
+    "title": "Comparison to imate",
+    "section": "",
+    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access from user (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the LinearOperator concept. For more details on this, see the integration guides.",
+    "crumbs": [
+      "Reference",
+      "Basics",
+      "Comparison to *imate*"
+    ]
+  },
+  {
+    "objectID": "basic/imate_compare.html#footnotes",
+    "href": "basic/imate_compare.html#footnotes",
+    "title": "Comparison to imate",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nprimate does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface.↩︎\nSee imates documentation for the list of supported functions.↩︎",
+    "crumbs": [
+      "Reference",
+      "Basics",
+      "Comparison to *imate*"
+    ]
+  },
+  {
+    "objectID": "basic/install.html",
+    "href": "basic/install.html",
+    "title": "Installation",
+    "section": "",
+    "text": "primate is a standard PEP-517 package that can be installed via pip:\npython -m pip install scikit-primate  \nAssuming your platform is supported, no compilation is needed—see platform support for details.\n\n\n\n\n\n\nNote\n\n\n\nLike many packages registered on PyPI (e.g. sklearn), the distribution package (scikit-primate) differs from the import package (primate) (see here). Thus, to install, use the scikit- prefix, but to import no prefix is needed. primate does not rely on organizational prefixes use by some scikits (e.g. scikit-learn -&gt; sklearn).\n\n\n\nPlatform support\nFor most platforms, primate can be installed from PyPI without compilation. In particular, native wheels are currently built with cibuildwheel on the following platforms:\n\n\n\nPlatform\n3.9\n3.10\n3.11\n3.12\n3.13\n\n\n\n\nLinux (manylinux x86_64)\n✅\n✅\n✅\n✅\n✅\n\n\nMacOS (x86_64)\n✅\n✅\n✅\n✅\n✅\n\n\nMacOS ARM (arm64)\n✅\n✅\n✅\n✅\n✅\n\n\nWindows (AMD64)\n✅\n✅\n✅\n✅\n✅\n\n\n\nCurrently, there is no support for PyPy, 32-bit systems, or unsupported versions of CPython.\nIf your platform isn’t on this table but you would like it to be supported, feel free to make an issue.\n\n\nCompiling from source\nA C++20 compiler is required to compile the package from its source distribution. Current builds all compile with some variant of clang (version 15.0+) or gcc. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.\n\n\nC++ Installation\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.",
+    "crumbs": [
+      "Reference",
+      "Basics",
+      "Installing"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Package overview",
+    "section": "",
+    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions—that is, matrices parameterized by functions:\n\\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\nMuch of primate’s computational code was directly ported from the (excellent) imate package—for a comparison of the two, see here.",
+    "crumbs": [
+      "Reference",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "index.html#footnotes",
+    "href": "index.html#footnotes",
+    "title": "Package overview",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
+    "crumbs": [
+      "Reference",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "reference/stats.MeanEstimator.html",
+    "href": "reference/stats.MeanEstimator.html",
+    "title": "stats.MeanEstimator",
+    "section": "",
+    "text": "stats.MeanEstimator\nMeanEstimator(self, dim=1)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.MeanEstimator"
     ]
   },
   {
@@ -840,11 +442,63 @@
     ]
   },
   {
+    "objectID": "reference/rayleigh_ritz.html",
+    "href": "reference/rayleigh_ritz.html",
+    "title": "rayleigh_ritz",
+    "section": "",
+    "text": "rayleigh_ritz\nrayleigh_ritz(A, deg=None, return_eigenvectors=False, method='RRR', **kwargs)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Lanczos",
+      "rayleigh_ritz"
+    ]
+  },
+  {
+    "objectID": "reference/isotropic.html",
+    "href": "reference/isotropic.html",
+    "title": "isotropic",
+    "section": "",
+    "text": "random.isotropic(size=None, pdf='rademacher', seed=None)\nGenerates random vectors from a specified isotropic distribution.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple, None]\nOutput shape to generate.\nNone\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with rows distributed according to pdf.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Random",
+      "isotropic"
+    ]
+  },
+  {
+    "objectID": "reference/isotropic.html#parameters",
+    "href": "reference/isotropic.html#parameters",
+    "title": "isotropic",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nsize\nUnion[int, tuple, None]\nOutput shape to generate.\nNone\n\n\npdf\nstr\nIsotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.\n'rademacher'\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed or generator for pseudorandom number generation.\nNone",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Random",
+      "isotropic"
+    ]
+  },
+  {
+    "objectID": "reference/isotropic.html#returns",
+    "href": "reference/isotropic.html#returns",
+    "title": "isotropic",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n\nnp.ndarray\nArray of shape size with rows distributed according to pdf.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Random",
+      "isotropic"
+    ]
+  },
+  {
     "objectID": "reference/lanczos_quadrature.html",
     "href": "reference/lanczos_quadrature.html",
     "title": "lanczos_quadrature",
     "section": "",
-    "text": "lanczos_quadrature(\n    d,\n    e,\n    deg=None,\n    quad='gw',\n    nodes=None,\n    weights=None,\n    **kwargs,\n)\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\nThis function computes the degree-d (deg) Gaussian quadrature rule for a symmetric Jacobi matrix J, which associates nodes to the eigenvalues of J and weights to the squares of the first components of the eigenvectors of J. The resulting rule is a weighted sum approximating the definite integral:\n \\int_{a}^{b} f(x) d \\mu(x) \\approx \\sum\\limits_{i=1}^d f(x_i) w_i \nwhere d \\mu(x) = w(x) dx denotes the appropriate measure and f(x) represents the function being approximated. The limits a,b and weight function w(x) depend on how J was constructed. When J arises from the Lanczos method on a symmetric matrix A \\in \\mathbb{R}^{n \\times n}, the estimated quantity corresponds to a spectral sum:\n \\int_{a}^{b} f(x) \\psi(x; A, v) dx \\approx \\sum\\limits_{i=1}^d f(\\lamba_i) w_i \nwhere psi(x) is the eigenvector spectral density associated to the pair (A,v):\n \\psi(x; A, v) = \\sum\\limits_{i=1}^n \\lvert u_i^T v \\rvert^2 \\delta(x - \\lambda_i) \nIn this sense, the nodes \\lambda_i and weights \\w_i constructed by this function can approximate any spectral sum by post-processing with some f.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone\n\n\n\n\n\n\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.",
+    "text": "lanczos_quadrature(\n    d,\n    e,\n    deg=None,\n    quad='gw',\n    nodes=None,\n    weights=None,\n    **kwargs,\n)\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\nThis function computes the degree-d (deg) Gaussian quadrature rule for a symmetric Jacobi matrix J, which associates nodes to the eigenvalues of J and weights to the squares of the first components of the eigenvectors of J. The resulting rule is a weighted sum approximating the definite integral:\n \\int_{a}^{b} f(x) \\omega(x) dx \\approx \\sum\\limits_{i=1}^d f(x_i) w_i \nwhere \\omega(x) denotes the weight function and f(x) represents the function being approximated. The limits a,b and weight function \\omega(x) depend on how J was constructed. When J arises from the Lanczos method on a symmetric matrix A \\in \\mathbb{R}^{n \\times n}, the estimated quantity corresponds to a spectral sum:\n \\int_{a}^{b} f(x) \\psi(x; A, v) dx \nwhere psi(x) is the eigenvector spectral density associated to the pair (A,v):\n \\psi(x; A, v) = \\sum\\limits_{i=1}^n \\lvert u_i^T v \\rvert^2 \\delta(x - \\lambda_i), \\quad A = U \\Lambda U^T \nIn this sense, by applying f to the nodes x_i, the corresponding quadrature rule can approximate any spectral sum.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone\n\n\n\n\n\n\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -892,51 +546,261 @@
     ]
   },
   {
-    "objectID": "basic/install.html",
-    "href": "basic/install.html",
-    "title": "Installation",
+    "objectID": "reference/CountCriterion.html",
+    "href": "reference/CountCriterion.html",
+    "title": "CountCriterion",
     "section": "",
-    "text": "primate is a standard PEP-517 package that can be installed via pip:\npython -m pip install scikit-primate  \nAssuming your platform is supported, no compilation is needed—see platform support for details.\n\n\n\n\n\n\nNote\n\n\n\nLike many packages registered on PyPI (e.g. sklearn), the distribution package (scikit-primate) differs from the import package (primate) (see here). Thus, to install, use the scikit- prefix, but to import no prefix is needed. primate does not rely on organizational prefixes use by some scikits (e.g. scikit-learn -&gt; sklearn).\n\n\n\nPlatform support\nFor most platforms, primate can be installed from PyPI without compilation. In particular, native wheels are currently built with cibuildwheel on the following platforms:\n\n\n\nPlatform\n3.9\n3.10\n3.11\n3.12\n3.13\n\n\n\n\nLinux (manylinux x86_64)\n✅\n✅\n✅\n✅\n✅\n\n\nMacOS (x86_64)\n✅\n✅\n✅\n✅\n✅\n\n\nMacOS ARM (arm64)\n✅\n✅\n✅\n✅\n✅\n\n\nWindows (AMD64)\n✅\n✅\n✅\n✅\n✅\n\n\n\nCurrently, there is no support for PyPy, 32-bit systems, or unsupported versions of CPython.\nIf your platform isn’t on this table but you would like it to be supported, feel free to make an issue.\n\n\nCompiling from source\nA C++20 compiler is required to compile the package from its source distribution. Current builds all compile with some variant of clang (version 15.0+) or gcc. For platform- and compiler-specific settings, consult the build scripts and CI configuration files.\n\n\nC++ Installation\nprimate’s C++ interface is header-only, making it easy to compile your own extension modules. The simplest way to link these headers is to add primate as a dependency to your package and use the get_include() function to find the appropriate directory.\n\nsetuptoolsmeson-pythongit submodule\n\n\n# setup.py\nimport primate as pm\n...\nExtension('extension_name', ..., include_dirs=[pm.get_include()])\n...\n\n\n# meson.build\n...\nprimate_include_dirs = run_command(py, \n  ['-c', 'import primate as pm; print(pm.get_include())']\n).stdout().strip()\n...\n\n\nAssuming your headers are located in extern, from your git repository, you can use:\ngit submodule add https://github.com/peekxc/primate extern/primate\ngit submodule update --init\nFrom here, you can now include extern/primate/include into your C++ source files, or you can add this directory to the search path used other various build tools, such as CMake or Meson.",
+    "text": "CountCriterion\nCountCriterion(self, count)\nConvergence criterion that returns TRUE when above a given count.",
     "crumbs": [
       "Reference",
-      "Basics",
-      "Installing"
+      "API Reference",
+      "Estimators",
+      "CountCriterion"
     ]
   },
   {
-    "objectID": "basic/imate_compare.html",
-    "href": "basic/imate_compare.html",
-    "title": "Comparison to imate",
+    "objectID": "reference/haar.html",
+    "href": "reference/haar.html",
+    "title": "haar",
     "section": "",
-    "text": "primate’s namesake (and some of the original code1) was inspired from the (excellent) imate package, prompting questions about their differences. In general, primate was developed with slightly different goals in mind than imate, most of which have to do with things like integrability, extensibility, and choice of FFI / build system.\nNotable differences between the two packages include:\nOne motivation for developing primate was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like function templates, type erasure, and header-only definitions. These modifications not only simplify access from user (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the LinearOperator concept. For more details on this, see the integration guides.",
+    "text": "haar(n, ew=None, seed=None)\nGenerates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\nseed\nUnion[int, np.random.Generator, None]\nseed for the random number generator.\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random matrix with the presribed eigenvalues.",
     "crumbs": [
       "Reference",
-      "Basics",
-      "Comparison to *imate*"
+      "API Reference",
+      "Random",
+      "haar"
     ]
   },
   {
-    "objectID": "basic/imate_compare.html#footnotes",
-    "href": "basic/imate_compare.html#footnotes",
-    "title": "Comparison to imate",
-    "section": "Footnotes",
-    "text": "Footnotes\n\n\nBefore v0.2, much of primate’s code was essentially ported and refactored from imate. The code for v0.2+ has been re-written using the Eigen template C++ library.↩︎\nprimate does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, primate was designed to work with essentially any operator matching the interface.↩︎\nSee imates documentation for the list of supported functions.↩︎",
+    "objectID": "reference/haar.html#parameters",
+    "href": "reference/haar.html#parameters",
+    "title": "haar",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nn\nint\nThe size of the matrix.\nrequired\n\n\new\nnp.ndarray\nDesired eigenvalues of A. If not provided, generates random values in the range [0, 1].\nNone\n\n\nseed\nUnion[int, np.random.Generator, None]\nseed for the random number generator.\nNone",
     "crumbs": [
       "Reference",
-      "Basics",
-      "Comparison to *imate*"
+      "API Reference",
+      "Random",
+      "haar"
     ]
   },
   {
-    "objectID": "reference/index.html#trace",
-    "href": "reference/index.html#trace",
+    "objectID": "reference/haar.html#returns",
+    "href": "reference/haar.html#returns",
+    "title": "haar",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n\nnp.ndarray\nA random matrix with the presribed eigenvalues.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Random",
+      "haar"
+    ]
+  },
+  {
+    "objectID": "reference/ToleranceCriterion.html",
+    "href": "reference/ToleranceCriterion.html",
+    "title": "ToleranceCriterion",
+    "section": "",
+    "text": "ToleranceCriterion\nToleranceCriterion(self, rtol=0.01, atol=1.49e-08, ord=2)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "ToleranceCriterion"
+    ]
+  },
+  {
+    "objectID": "reference/KneeCriterion.html",
+    "href": "reference/KneeCriterion.html",
+    "title": "KneeCriterion",
+    "section": "",
+    "text": "KneeCriterion\nKneeCriterion(self, S=1.0)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "KneeCriterion"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#random",
+    "href": "reference/index.html#random",
     "title": "Function reference",
     "section": "",
-    "text": "hutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.",
+    "text": "isotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\nhaar\nGenerates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).",
     "crumbs": [
       "Reference",
       "API Reference",
       "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#estimators",
+    "href": "reference/index.html#estimators",
+    "title": "Function reference",
+    "section": "",
+    "text": "Estimator\nProtocol for generic stopping criteria for sequences.\n\n\nMeanEstimator\nSample mean estimator with stable covariance updating.\n\n\nControlVariableEstimator\n\n\n\nConvergenceCriterion\nGeneric stopping criteria for sequences.\n\n\nCountCriterion\nConvergence criterion that returns TRUE when above a given count.\n\n\nToleranceCriterion\n\n\n\nConfidenceCriterion\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nKneeCriterion",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/ConfidenceCriterion.html",
+    "href": "reference/ConfidenceCriterion.html",
+    "title": "ConfidenceCriterion",
+    "section": "",
+    "text": "ConfidenceCriterion(self, confidence=0.95, atol=0.05, rtol=0.01)\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\n\ncall = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "ConfidenceCriterion"
+    ]
+  },
+  {
+    "objectID": "reference/ConfidenceCriterion.html#provides-the-following-methods",
+    "href": "reference/ConfidenceCriterion.html#provides-the-following-methods",
+    "title": "ConfidenceCriterion",
+    "section": "",
+    "text": "call = Updates the estimator with newly measured samples\nconverged = Checks convergence of the estimator within an interval\n  plot = Plots the samples and their sample distribution CI's",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "ConfidenceCriterion"
+    ]
+  },
+  {
+    "objectID": "reference/hutchpp.html",
+    "href": "reference/hutchpp.html",
+    "title": "hutchpp",
+    "section": "",
+    "text": "trace.hutchpp(\n    A,\n    m=None,\n    batch=32,\n    mode='reduced',\n    pdf='rademacher',\n    seed=None,\n    full=False,\n)\nHutch++ estimator.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nMatrix or LinearOperator to estimate the trace of.\nrequired\n\n\nm\nOptional[int]\nnumber of matvecs to use. If not given, defaults to n // 3.\nNone\n\n\nbatch\nint\ncurrently unused.\n32",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutchpp"
+    ]
+  },
+  {
+    "objectID": "reference/hutchpp.html#parameters",
+    "href": "reference/hutchpp.html#parameters",
+    "title": "hutchpp",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nMatrix or LinearOperator to estimate the trace of.\nrequired\n\n\nm\nOptional[int]\nnumber of matvecs to use. If not given, defaults to n // 3.\nNone\n\n\nbatch\nint\ncurrently unused.\n32",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "hutchpp"
+    ]
+  },
+  {
+    "objectID": "reference/xtrace.html",
+    "href": "reference/xtrace.html",
+    "title": "xtrace",
+    "section": "",
+    "text": "trace.xtrace(A, batch=32, pdf='sphere', seed=None, full=False, verbose=0)\nEstimates the trace of A using the XTrace trace estimator.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nbatch\nint\nNumber of random vectors to sample at a time for batched matrix multiplication.\n32\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'sphere'\n\n\nconverge\n\nConvergence criterion to test for estimator convergence. See details.\nrequired\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse\n\n\ncallback\n\nOptional callable to execute after each batch of samples.\nrequired\n\n\n**kwargs\n\nAdditional keyword arguments to parameterize the convergence criterion.\nrequired\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of A. If info = True, additional information about the computation is also returned.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "xtrace"
+    ]
+  },
+  {
+    "objectID": "reference/xtrace.html#parameters",
+    "href": "reference/xtrace.html#parameters",
+    "title": "xtrace",
+    "section": "",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\nbatch\nint\nNumber of random vectors to sample at a time for batched matrix multiplication.\n32\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'sphere'\n\n\nconverge\n\nConvergence criterion to test for estimator convergence. See details.\nrequired\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse\n\n\ncallback\n\nOptional callable to execute after each batch of samples.\nrequired\n\n\n**kwargs\n\nAdditional keyword arguments to parameterize the convergence criterion.\nrequired",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "xtrace"
+    ]
+  },
+  {
+    "objectID": "reference/xtrace.html#returns",
+    "href": "reference/xtrace.html#returns",
+    "title": "xtrace",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the trace of A. If info = True, additional information about the computation is also returned.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Trace",
+      "xtrace"
+    ]
+  },
+  {
+    "objectID": "reference/ConvergenceCriterion.html",
+    "href": "reference/ConvergenceCriterion.html",
+    "title": "ConvergenceCriterion",
+    "section": "",
+    "text": "ConvergenceCriterion\nConvergenceCriterion(self, operation)\nGeneric stopping criteria for sequences.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "ConvergenceCriterion"
+    ]
+  },
+  {
+    "objectID": "reference/MeanEstimator.html",
+    "href": "reference/MeanEstimator.html",
+    "title": "MeanEstimator",
+    "section": "",
+    "text": "MeanEstimator\nMeanEstimator(self, record=False)\nSample mean estimator with stable covariance updating.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "MeanEstimator"
+    ]
+  },
+  {
+    "objectID": "reference/stats.confidence_interval.html",
+    "href": "reference/stats.confidence_interval.html",
+    "title": "stats.confidence_interval",
+    "section": "",
+    "text": "stats.confidence_interval\nconfidence_interval(a, confidence=0.95, sdist='t')\nConfidence intervals for the sample mean of a set of measurements.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Stats",
+      "stats.confidence_interval"
+    ]
+  },
+  {
+    "objectID": "reference/ControlVariableEstimator.html",
+    "href": "reference/ControlVariableEstimator.html",
+    "title": "ControlVariableEstimator",
+    "section": "",
+    "text": "ControlVariableEstimator\nControlVariableEstimator(self, ecv, alpha=None, **kwargs)",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "ControlVariableEstimator"
+    ]
+  },
+  {
+    "objectID": "reference/Estimator.html",
+    "href": "reference/Estimator.html",
+    "title": "Estimator",
+    "section": "",
+    "text": "Estimator\nEstimator()\nProtocol for generic stopping criteria for sequences.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Estimators",
+      "Estimator"
     ]
   }
 ]

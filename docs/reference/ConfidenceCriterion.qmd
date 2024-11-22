@@ -1,0 +1,13 @@
+# ConfidenceCriterion { #estimators.ConfidenceCriterion }
+
+```python
+ConfidenceCriterion(self, confidence=0.95, atol=0.05, rtol=0.01)
+```
+
+Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.
+
+## Provides the following methods {.doc-section .doc-section-provides-the-following-methods}
+
+- __call__ = Updates the estimator with newly measured samples
+- converged = Checks convergence of the estimator within an interval
+-       plot = Plots the samples and their sample distribution CI's

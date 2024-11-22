@@ -6,7 +6,7 @@ import scipy as sp
 class Covariance:
 	"""Updateable covariance matrix.
 
-	Uses Welford's online algorithm to update the sample mean and covariance estimates in a numerically stable way.
+	Uses Welford's algorithm to stably update the sample mean and (co)variance estimates.
 	"""
 
 	def __init__(self, dim: int = 1):
@@ -23,7 +23,7 @@ class Covariance:
 		"""Update mean and (co)variance estimates based on new observations.
 
 		Parameters:
-			X: (batch_size, dim)-ndarray representing new observations
+			X: (batch_size, dim)-array representing new observations
 		"""
 		X = np.atleast_1d(X)
 		X = X[:, None] if X.ndim == 1 else X

@@ -14,11 +14,9 @@ from .linalg import update_trinv
 from .operators import _operator_checks
 from .random import isotropic
 
-FLOAT_MIN = 2.2250738585072014e-308
-
 
 ## TODO: should return views when possible
-def chunk(iterable: Iterable, n: int) -> Generator:
+def _chunk(iterable: Iterable, n: int) -> Generator:
 	"""Numpy-aware chunking, which yield successive n-sized chunks as either views or tuples from an iterable  or ndarray."""
 	assert n >= 1, "n must be at least one"
 	if isinstance(iterable, np.ndarray):

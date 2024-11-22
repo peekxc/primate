@@ -1,6 +1,13 @@
 from typing import Callable
 import numpy as np
-from primate.estimators import KneeCriterion, MeanEstimator, CountCriterion, ToleranceCriterion, ConfidenceCriterion
+from primate.estimators import (
+	KneeCriterion,
+	MeanEstimator,
+	CountCriterion,
+	ToleranceCriterion,
+	ConfidenceCriterion,
+	ControlVariableEstimator,
+)
 from primate.stats import confidence_interval
 
 
@@ -13,6 +20,32 @@ def test_MeanEstimator():
 		mu.update(samples[-10:])
 	assert np.allclose(np.mean(samples), mu.mean)
 	assert isinstance(mu.estimate, float)
+
+
+## From Variance reduction book
+def test_ControlVariableEstimator():
+	rng = np.random.default_rng(1235)
+	a = np.array([1, 2, 3, 1, 2])
+	h = lambda x: np.min([x[0] + x[3], x[0] + x[2] + x[4], x[1] + x[2] + x[3], x[1] + x[4]])
+
+	## Ground truth
+	mu = 1339 / 1440
+
+	## Control variable
+	mu_cv = 15 / 16
+	h_cv = lambda x: np.min([x[0] + x[3], x[1] + x[4]])
+
+	## Compare estimators
+	n_efficient = 0
+	for _ in range(150):
+		U = rng.uniform(low=0, high=1, size=(250, 5))
+		y = np.apply_along_axis(h, 1, U * a)
+		y_cv = np.apply_along_axis(h_cv, 1, U * a)
+		est1, est2 = MeanEstimator(), ControlVariableEstimator(mu_cv)
+		est1.update(y)
+		est2.update(y, y_cv)
+		n_efficient += np.linalg.norm(est2.estimate - mu) <= np.linalg.norm(est1.estimate - mu)
+	assert n_efficient >= 120
 
 
 def test_CountCriterion():

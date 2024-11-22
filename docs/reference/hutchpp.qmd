@@ -1,0 +1,23 @@
+# hutchpp { #trace.hutchpp }
+
+```python
+trace.hutchpp(
+    A,
+    m=None,
+    batch=32,
+    mode='reduced',
+    pdf='rademacher',
+    seed=None,
+    full=False,
+)
+```
+
+Hutch++ estimator.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                                | Description                                                   | Default    |
+|--------|-------------------------------------|---------------------------------------------------------------|------------|
+| A      | Union\[LinearOperator, np.ndarray\] | Matrix or LinearOperator to estimate the trace of.            | _required_ |
+| m      | Optional\[int\]                     | number of matvecs to use. If not given, defaults to `n // 3`. | `None`     |
+| batch  | int                                 | currently unused.                                             | `32`       |

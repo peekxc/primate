@@ -3,9 +3,9 @@
 ```python
 trace.hutch(
     A,
-    maxiter=200,
+    batch=32,
     pdf='rademacher',
-    estimator='confidence',
+    converge='confidence',
     seed=None,
     full=False,
     callback=None,
@@ -26,14 +26,16 @@ intervals on the fly, which may be used in conjunction with `atol` and `rtol` to
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                    | Description                                                                       | Default        |
-|-----------|-----------------------------------------|-----------------------------------------------------------------------------------|----------------|
-| A         | Union\[LinearOperator, np.ndarray\]     | real symmetric matrix or linear operator.                                         | _required_     |
-| maxiter   | int                                     | Maximum number of random vectors to sample for the trace estimate.                | `200`          |
-| pdf       | Union\[str, Callable\]                  | Choice of zero-centered distribution to sample random vectors from.               | `'rademacher'` |
-| estimator | Union\[str, ConvergenceEstimator\]      | Type of estimator to use for convergence testing. See details.                    | `'confidence'` |
-| seed      | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
-| full      | bool                                    | Whether to return additional information about the computation.                   | `False`        |
+| Name     | Type                                    | Description                                                                       | Default        |
+|----------|-----------------------------------------|-----------------------------------------------------------------------------------|----------------|
+| A        | Union\[LinearOperator, np.ndarray\]     | real symmetric matrix or linear operator.                                         | _required_     |
+| batch    | int                                     | Number of random vectors to sample at a time for batched matrix multiplication.   | `32`           |
+| pdf      | Union\[str, Callable\]                  | Choice of zero-centered distribution to sample random vectors from.               | `'rademacher'` |
+| converge | Union\[str, ConvergenceCriterion\]      | Convergence criterion to test for estimator convergence. See details.             | `'confidence'` |
+| seed     | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
+| full     | bool                                    | Whether to return additional information about the computation.                   | `False`        |
+| callback | Optional\[Callable\]                    | Optional callable to execute after each batch of samples.                         | `None`         |
+| **kwargs | dict                                    | Additional keyword arguments to parameterize the convergence criterion.           | `{}`           |
 
 ## Returns {.doc-section .doc-section-returns}
 
@@ -44,7 +46,8 @@ intervals on the fly, which may be used in conjunction with `atol` and `rtol` to
 ## See Also {.doc-section .doc-section-see-also}
 
 - [lanczos](/reference/lanczos.lanczos.md): the lanczos tridiagonalization algorithm.
-- [CentralLimitEstimator](/reference/CentralLimitEstimator.md): Standard estimator of the mean from iid samples.
+- [MeanEstimator](/reference/MeanEstimator.md): Standard estimator of the mean from iid samples.
+- [ConfidenceCriterion](/reference/ConfidenceCriterion.md): Criterion for convergence that uses the central limit theorem.
 
 ## Reference {.doc-section .doc-section-reference}
 

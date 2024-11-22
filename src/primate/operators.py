@@ -20,7 +20,7 @@ def _operator_checks(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
 	return f_dtype
 
 
-def _is_linear_op(A: Any) -> bool:
+def is_linear_op(A: Any) -> bool:
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	is_valid_op = True
 	is_valid_op &= any(attr_checks)  # , "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
@@ -35,7 +35,7 @@ class MatrixFunction(LinearOperator):
 	def __init__(
 		self, A: np.ndarray, fun: np.ufunc = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
 	) -> None:
-		assert _is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
+		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
 		if fun is not None:
 			assert isinstance(fun, Callable), "Function must be numpy ufunc"

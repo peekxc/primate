@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.sparse.linalg import LinearOperator, aslinearoperator
-from primate.operators import matrix_function, MatrixFunction
+from scipy.sparse.linalg import eigsh, LinearOperator, aslinearoperator
+from primate.operators import is_linear_op, matrix_function, MatrixFunction, normalize_unit
 from primate.random import symmetric
 from primate.lanczos import lanczos
 from primate.tridiag import eigh_tridiag
@@ -81,3 +81,15 @@ def test_spectral():
 		y = ev @ np.diag(f(ew)) @ ev.T @ v
 		z = M @ v
 		assert np.allclose(y, z)
+	# matrix_function(A, fun=np.exp)
+
+
+def test_normalize():
+	rng = np.random.default_rng(1234)
+	n = 100
+	ew = rng.uniform(size=n, low=0, high=5)
+	A = symmetric(n, ew=ew)
+	A_scaled = normalize_unit(A)
+	assert is_linear_op(A_scaled)
+	top_ew = eigsh(A_scaled, k=1, return_eigenvectors=False)
+	assert np.isclose(top_ew, 1.0)

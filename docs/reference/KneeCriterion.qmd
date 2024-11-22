@@ -1,0 +1,6 @@
+# KneeCriterion { #estimators.KneeCriterion }
+
+```python
+KneeCriterion(self, S=1.0)
+```
+

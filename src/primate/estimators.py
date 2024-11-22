@@ -94,7 +94,7 @@ class MeanEstimator(Estimator):
 		return self.mean
 
 
-class ControlVariableEstimator(Estimator):
+class ControlVariableEstimator(MeanEstimator):
 	def __init__(self, ecv: Union[float, np.ndarray], alpha: Optional[Union[float, np.ndarray]] = None, **kwargs: dict):
 		super().__init__(**kwargs)
 		ecv = np.atleast_1d(ecv).ravel()
@@ -117,9 +117,9 @@ class ControlVariableEstimator(Estimator):
 		if self._estimate_cor:
 			C_01, C_11 = C[1:, 0], C[1:, 1:]
 			self.alpha = (C[0, 1] / C[1, 1]) if self.cov.dim == 2 else np.linalg.solve(C_11, C_01)
-		SE = np.sqrt((1.0 / self.n_samples) * C_inner)
-		score = self.t_scores[self.n_samples] if self.n_samples < 30 else self.z
-		self.margin_of_error = (SE * score).item()
+		# SE = np.sqrt((1.0 / self.n_samples) * C_inner)
+		# score = self.t_scores[self.n_samples] if self.n_samples < 30 else self.z
+		# self.margin_of_error = (SE * score).item()
 		# self.r_sq = np.dot(C_01, np.linalg.solve(C_11, C_01)).item() / C_00
 		return self
 		## build the estimator
@@ -139,13 +139,13 @@ class ControlVariableEstimator(Estimator):
 		# cv_est = self.cov.mean[0] - alpha * (self.cov.mean[1] - self.ev)
 		return cv_est.item()
 
-	def converged(self) -> bool:
-		if self.n_samples < 3:
-			return False
-		score = self.t_scores[self.n_samples] if self.n_samples < 30 else self.z
-		SE = self.margin_of_error / score
-		rel_error = abs(SE / self.estimate)
-		return self.margin_of_error <= self.atol or rel_error <= self.rtol
+	# def converged(self) -> bool:
+	# 	if self.n_samples < 3:
+	# 		return False
+	# 	score = self.t_scores[self.n_samples] if self.n_samples < 30 else self.z
+	# 	SE = self.margin_of_error / score
+	# 	rel_error = abs(SE / self.estimate)
+	# 	return self.margin_of_error <= self.atol or rel_error <= self.rtol
 
 
 class CountCriterion(ConvergenceCriterion):

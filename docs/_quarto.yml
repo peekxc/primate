@@ -52,6 +52,12 @@ quartodoc:
         - name: hutch
           package: trace
           signature_name: full
+        - name: hutchpp
+          package: trace
+          signature_name: full
+        - name: xtrace
+          package: trace
+          signature_name: full
     - title: Operators
       contents:
         - name: MatrixFunction
@@ -67,14 +73,31 @@ quartodoc:
           signature_name: full
         - name: symmetric
           package: random
+        - name: haar
+          package: random
         # - quadrature.spectral_density
+    - title: Estimators 
+      contents: 
+        - name: Estimator
+          package: estimators
+        - name: MeanEstimator
+          package: estimators
+        - name: ControlVariableEstimator
+          package: estimators
+        - name: ConvergenceCriterion
+          package: estimators
+        - name: CountCriterion
+          package: estimators
+        - name: ToleranceCriterion
+          package: estimators
+        - name: ConfidenceCriterion
+          package: estimators
+        - name: KneeCriterion
+          package: estimators
     - title: Stats
       contents: 
         - stats.Covariance
-        - stats.ConvergenceEstimator
-        - stats.MeanEstimator
-        - stats.CentralLimitEstimator
-        - stats.ControlVariableEstimator
+        - stats.confidence_interval
   sidebar:
     file: "_sidebar.yml"
     search: true

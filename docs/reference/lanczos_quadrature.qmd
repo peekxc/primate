@@ -18,20 +18,19 @@ This function computes the degree-$d$ (`deg`) Gaussian quadrature rule for a sym
 which associates `nodes` to the eigenvalues of $J$ and `weights` to the squares of the first components
 of the eigenvectors of $J$. The resulting rule is a weighted sum approximating the definite integral:
 
-$$ \int_{a}^{b} f(x) d \mu(x) \approx \sum\limits_{i=1}^d f(x_i) w_i $$
+$$ \int_{a}^{b} f(x) \omega(x) dx \approx \sum\limits_{i=1}^d f(x_i) w_i $$
 
-where $d \mu(x) = w(x) dx$ denotes the appropriate measure and $f(x)$ represents the function being approximated.
-The limits $a,b$ and weight function $w(x)$ depend on how `J` was constructed. When $J$ arises from the Lanczos
+where $\omega(x)$ denotes the weight function and $f(x)$ represents the function being approximated.
+The limits $a,b$ and weight function $\omega(x)$ depend on how `J` was constructed. When $J$ arises from the Lanczos
 method on a symmetric matrix $A \in \mathbb{R}^{n \times n}$, the estimated quantity corresponds to a spectral sum:
 
-$$ \int_{a}^{b} f(x) \psi(x; A, v) dx \approx \sum\limits_{i=1}^d f(\lamba_i) w_i $$
+$$ \int_{a}^{b} f(x) \psi(x; A, v) dx $$
 
 where $psi(x)$ is the eigenvector spectral density associated to the pair $(A,v)$:
 
-$$ \psi(x; A, v) = \sum\limits_{i=1}^n \lvert u_i^T v \rvert^2 \delta(x - \lambda_i) $$
+$$ \psi(x; A, v) = \sum\limits_{i=1}^n \lvert u_i^T v \rvert^2 \delta(x - \lambda_i), \quad A = U \Lambda U^T $$
 
-In this sense, the nodes $\lambda_i$ and weights $\w_i$ constructed by this function can approximate
-any spectral sum by post-processing with some $f$.
+In this sense, by applying $f$ to the nodes $x_i$, the corresponding quadrature rule can approximate any spectral sum.
 
 ## Parameters {.doc-section .doc-section-parameters}
 

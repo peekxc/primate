@@ -1,0 +1,7 @@
+# CountCriterion { #estimators.CountCriterion }
+
+```python
+CountCriterion(self, count)
+```
+
+Convergence criterion that returns TRUE when above a given count.

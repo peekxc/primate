@@ -207,32 +207,3 @@ def _lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):  # pragma: no cover
 		pos = [pos[1], pos[2], (pos[2] + 1) % ncv]
 
 	return alpha, beta[:-1], Q
-
-
-from numpy.polynomial import Polynomial
-
-
-class OrthogonalPolynomialBasis(Polynomial):
-	def __init__(self, A, deg: int) -> None:
-		self.a, self.b = lanczos(A, deg=deg)
-		self.theta, self.rv = eigh_tridiag(self.a, self.b)
-		self.tau = np.square(self.rv[0, :])
-		self.mu_0 = np.sum(np.abs(self.theta[:deg]))
-		self.mu_sqrt_rec = 1.0 / np.sqrt(self.mu_0)
-		self.dtype = A.dtype
-
-	def fit(self, x: Union[np.ndarray, int], y: np.ndarray):
-		deg = len(self.a)
-		self.Z_ = np.zeros((len(x), deg), dtype=self.dtype)
-		for i, xi in enumerate(x):
-			ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, self.Z_[i, :], deg)
-		self.coef = np.linalg.solve(self.Z_.T @ self.Z_, self.Z_.T @ y)
-		return self.Z_ @ self.coef
-
-	def __call__(self, x: np.ndarray):
-		x = np.atleast_1d(x)
-		deg = len(self.a)
-		Z = np.zeros((len(x), deg), dtype=self.dtype)
-		for i, xi in enumerate(x):
-			ortho_poly(xi, self.mu_sqrt_rec, self.a, self.b, Z[i, :], deg)
-		return Z @ self.coef

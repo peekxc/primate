@@ -14,7 +14,14 @@ website:
     - contents:
       - reference/index.qmd
       - contents:
+        - reference/lanczos.qmd
+        - reference/rayleigh_ritz.qmd
+        - reference/lanczos_quadrature.qmd
+        section: Lanczos
+      - contents:
         - reference/hutch.qmd
+        - reference/hutchpp.qmd
+        - reference/xtrace.qmd
         section: Trace
       - contents:
         - reference/MatrixFunction.qmd
@@ -24,18 +31,21 @@ website:
       - contents:
         - reference/isotropic.qmd
         - reference/symmetric.qmd
-        section: Stochastic
+        - reference/haar.qmd
+        section: Random
       - contents:
-        - reference/lanczos.qmd
-        - reference/rayleigh_ritz.qmd
-        - reference/lanczos_quadrature.qmd
-        section: Lanczos
+        - reference/Estimator.qmd
+        - reference/MeanEstimator.qmd
+        - reference/ControlVariableEstimator.qmd
+        - reference/ConvergenceCriterion.qmd
+        - reference/CountCriterion.qmd
+        - reference/ToleranceCriterion.qmd
+        - reference/ConfidenceCriterion.qmd
+        - reference/KneeCriterion.qmd
+        section: Estimators
       - contents:
         - reference/stats.Covariance.qmd
-        - reference/stats.ConvergenceEstimator.qmd
-        - reference/stats.MeanEstimator.qmd
-        - reference/stats.CentralLimitEstimator.qmd
-        - reference/stats.ControlVariableEstimator.qmd
+        - reference/stats.confidence_interval.qmd
         section: Stats
       section: API Reference
     id: reference

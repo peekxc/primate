@@ -1,0 +1,7 @@
+# Estimator { #estimators.Estimator }
+
+```python
+Estimator()
+```
+
+Protocol for generic stopping criteria for sequences.

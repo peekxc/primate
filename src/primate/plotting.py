@@ -156,3 +156,16 @@ def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: d
 
 # q1.add_layout(legend, "center")
 # return row([p, column([q1, q2])])
+
+
+# _builtin_matrix_functions = ["identity", "abs", "sqrt", "log", "inv", "exp", "smoothstep", "numrank", "gaussian"]
+# def figure_fun(fun: Union[str, Callable], bounds: tuple = (-1, 1), *args, **kwargs):
+# 	assert isinstance(fun, str) or isinstance(fun, Callable), "'fun' must be string or callable."
+# 	from bokeh.plotting import figure
+
+# 	dom = np.linspace(bounds[0], bounds[1], 250, endpoint=True)
+# 	p = figure(width=250, height=250, title=f"fun = {fun}")
+# 	fun = param_callable(fun, **kwargs) if isinstance(fun, str) else fun
+# 	out = fun(dom)
+# 	p.line(dom, out)
+# 	return p
