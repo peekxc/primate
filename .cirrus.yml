@@ -68,6 +68,7 @@ build_and_test_task:
     python -m pytest tests/ --cov=primate --benchmark-skip
     python -m coverage xml -o coverage.xml
   coverage_script: |
+    python -m pip install coveralls
     python -m coveralls --submit coverage.xml
     python -m coveralls --finish
     
