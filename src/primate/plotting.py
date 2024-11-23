@@ -2,8 +2,6 @@ import numpy as np
 import scipy as sp
 from typing import Optional
 
-from .estimators import EstimatorResult
-
 
 def figure_csm(values: np.ndarray, **kwargs):
 	from bokeh.plotting import figure
@@ -19,7 +17,7 @@ def figure_csm(values: np.ndarray, **kwargs):
 		**kwargs,
 	)
 	p.title.align = "center"
-	x = np.linspace(np.min(values), np.max(values), 5000)
+	# x = np.linspace(np.min(values), np.max(values), 5000)
 	# p.line(x, csm(x))
 	p.scatter(values, 0, size=7.5, color="red", marker="x", legend_label="Eigenvalues")
 	p.varea_step(x=np.append(values, 1.0), y1=np.zeros(len(values) + 1), y2=np.append(csm(values), 1.0), fill_alpha=0.15)
@@ -63,8 +61,7 @@ def figure_jacobi(deg: int = 4, alpha: float = 0, beta: float = 0):
 
 def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: dict):
 	"""Generates figures showing the convergence of sample estimates."""
-	from bokeh.layouts import column, row
-	from bokeh.models import Band, ColumnDataSource, Legend, NumeralTickFormatter, Range1d, Span
+	from bokeh.models import Span
 	from bokeh.plotting import figure
 
 	# ## Extract samples and take averages

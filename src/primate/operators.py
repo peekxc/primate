@@ -4,7 +4,7 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, eigsh
 from scipy.sparse.linalg._interface import IdentityOperator
 
-from .lanczos import _lanczos, _validate_lanczos
+from .lanczos import _lanczos
 from .quadrature import lanczos_quadrature
 from .tridiag import eigh_tridiag
 

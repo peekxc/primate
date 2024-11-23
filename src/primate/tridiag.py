@@ -1,6 +1,5 @@
 import numpy as np
 from .tqli import tqli
-from .fttr import fttr
 from scipy.linalg import eigvalsh_tridiagonal, eigh_tridiagonal
 
 

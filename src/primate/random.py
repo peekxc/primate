@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 import numpy as np
 import scipy as sp  # allows for lazy loading

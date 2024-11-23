@@ -1,12 +1,9 @@
 """Estimators involving matrix function, trace, and diagonal estimation."""
 
-from collections import namedtuple
-from functools import partial
 from itertools import islice
-from typing import Any, Callable, Generator, Iterable, Optional, Union
+from typing import Callable, Generator, Iterable, Optional, Union
 
 import numpy as np
-from scipy.sparse import sparray
 from scipy.sparse.linalg import LinearOperator
 
 from .estimators import ConvergenceCriterion, EstimatorResult, MeanEstimator, convergence_criterion

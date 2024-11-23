@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>lanczos</title>
+<title>diag</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/rayleigh_ritz.html" rel="next">
-<link href="../reference/index.html" rel="prev">
+<link href="../reference/xdiag.html" rel="next">
+<link href="../reference/xtrace.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -197,7 +197,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/lanczos.html">Lanczos</a></li><li class="breadcrumb-item"><a href="../reference/lanczos.html">lanczos</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/diag.html">Diagonal</a></li><li class="breadcrumb-item"><a href="../reference/diag.html">diag</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -272,7 +272,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos</span></a>
   </div>
 </li>
@@ -330,7 +330,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/diag.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/diag.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">diag</span></a>
   </div>
 </li>
@@ -494,48 +494,68 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#lanczos.lanczos" id="toc-lanczos.lanczos" class="nav-link active" data-scroll-target="#lanczos.lanczos">lanczos</a>
-  <ul class="collapse">
-  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
   <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  </ul></li>
+  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/diag.html">Diagonal</a></li><li class="breadcrumb-item"><a href="../reference/diag.html">diag</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">diag</h1>
+</div>
 
 
 
-<section id="lanczos.lanczos" class="level1">
-<h1>lanczos</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>lanczos(</span>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>diagonal.diag(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    v0<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    deg<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    rtol<span class="op">=</span><span class="fl">1e-08</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    orth<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    sparse_mat<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    return_basis<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    dtype<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Lanczos method for symmetric tridiagonalization.</p>
-<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization.</p>
-<p>The Lanczos method builds a tridiagonal <code>T</code> from a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the diagonals of the resulting tridiagonal matrix <code>T</code>.</p>
-<p>Rayleigh-Ritz approximations of the eigenvalues of <code>A</code> can be further obtained by diagonalizing <code>T</code> via any symmetric tridiagonal eigenvalue solver, <code>scipy.linalg.eigh_tridiagonal</code> though note unlike <code>eigsh</code> no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    pdf<span class="op">=</span><span class="st">'rademacher'</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    converge<span class="op">=</span><span class="st">'tolerance'</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    full<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Estimates the diagonal of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</p>
+<p>This function random vectors to estimate of the diagonal of <span class="math inline">A</span> via the approximation: <span class="math display"> \mathrm{diag}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v </span> When <span class="math inline">v</span> are isotropic, this approximation forms an unbiased estimator of the diagonal of <span class="math inline">A</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Convergence behavior is controlled by the <code>estimator</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation.</p>
+</div>
+</div>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 9%">
+<col style="width: 6%">
 <col style="width: 32%">
-<col style="width: 48%">
-<col style="width: 8%">
+<col style="width: 50%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -548,51 +568,33 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td>A</td>
-<td>Union[np.ndarray, sparray, LinearOperator]</td>
-<td>Symmetric operator to tridiagonalize.</td>
+<td>Union[sp.sparse.linalg.LinearOperator, np.ndarray]</td>
+<td>real symmetric matrix or linear operator.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td>v0</td>
-<td>Optional[np.ndarray]</td>
-<td>Initial vector to orthogonalize against.</td>
+<td>pdf</td>
+<td>Union[str, Callable]</td>
+<td>Choice of zero-centered distribution to sample random vectors from.</td>
+<td><code>'rademacher'</code></td>
+</tr>
+<tr class="odd">
+<td>estimator</td>
+<td></td>
+<td>Type of estimator to use for convergence testing. See details.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>seed</td>
+<td>Union[int, np.random.Generator, None]</td>
+<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">
-<td>deg</td>
-<td>Optional[int]</td>
-<td>Size of the Krylov subspace to expand.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>rtol</td>
-<td>float</td>
-<td>Relative tolerance to consider the invariant subspace as converged.</td>
-<td><code>1e-08</code></td>
-</tr>
-<tr class="odd">
-<td>orth</td>
-<td>int</td>
-<td>Number of additional Lanczos vectors to orthogonalize against.</td>
-<td><code>0</code></td>
-</tr>
-<tr class="even">
-<td>sparse_mat</td>
+<td>full</td>
 <td>bool</td>
-<td>Whether to output the tridiagonal matrix as a sparse matrix.</td>
+<td>Whether to return additional information about the computation.</td>
 <td><code>False</code></td>
-</tr>
-<tr class="odd">
-<td>return_basis</td>
-<td>bool</td>
-<td>If <code>True</code>, returns the Krylov basis vectors <code>Q</code>.</td>
-<td><code>False</code></td>
-</tr>
-<tr class="even">
-<td>dtype</td>
-<td>Optional[np.dtype]</td>
-<td>The precision dtype to specialize the computation.</td>
-<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
@@ -602,8 +604,8 @@ window.Quarto = {
 <table class="caption-top table">
 <colgroup>
 <col style="width: 5%">
-<col style="width: 5%">
-<col style="width: 88%">
+<col style="width: 16%">
+<col style="width: 78%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -615,13 +617,8 @@ window.Quarto = {
 <tbody>
 <tr class="odd">
 <td></td>
-<td>tuple</td>
-<td>A tuple <code>(a,b)</code> parameterizing the diagonal and off-diagonal of the tridiagonal Jacobi matrix. If <code>return_basis=True</code>,</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>tuple</td>
-<td>the tuple <code>(a,b), Q</code> is returned, where <code>Q</code> represents an orthogonal basis for the degree-<code>deg</code> Krylov subspace.</td>
+<td>Union[float, tuple]</td>
+<td>Estimate the diagonal of <span class="math inline">A</span>. If <code>full = True</code>, additional information about the computation is also returned.</td>
 </tr>
 </tbody>
 </table>
@@ -629,18 +626,24 @@ window.Quarto = {
 <section id="see-also" class="level2 doc-section doc-section-see-also">
 <h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
 <ul>
-<li>scipy.linalg.eigh_tridiagonal : Eigenvalue solver for real symmetric tridiagonal matrices.</li>
-<li>operator.matrix_function : Approximates the action of a matrix function via the Lanczos method.</li>
+<li><a href="../reference/lanczos.lanczos.md">lanczos</a>: the lanczos tridiagonalization algorithm.</li>
+<li><a href="../reference/ConfidenceCriterion.md">ConfidenceCriterion</a>: Standard estimator of the mean from iid samples.</li>
 </ul>
 </section>
-<section id="references" class="level2 doc-section doc-section-references">
-<h2 class="doc-section doc-section-references anchored" data-anchor-id="references">References</h2>
+<section id="reference" class="level2 doc-section doc-section-reference">
+<h2 class="doc-section doc-section-reference anchored" data-anchor-id="reference">Reference</h2>
 <ol type="1">
-<li>Paige, Christopher C. “Computational variants of the Lanczos method for the eigenproblem.” IMA Journal of Applied Mathematics 10.3 (1972): 373-381.</li>
+<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
+<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
 </ol>
-
-
 </section>
+<section id="examples" class="level2 doc-section doc-section-examples">
+<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
+<div id="5af6f841" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.diagonal <span class="im">import</span> diag</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -1210,13 +1213,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/index.html" class="pagination-link" aria-label="Function reference">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Function reference</span>
+      <a href="../reference/xtrace.html" class="pagination-link" aria-label="xtrace">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">xtrace</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/rayleigh_ritz.html" class="pagination-link" aria-label="rayleigh_ritz">
-        <span class="nav-page-text">rayleigh_ritz</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/xdiag.html" class="pagination-link" aria-label="xdiag">
+        <span class="nav-page-text">xdiag</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

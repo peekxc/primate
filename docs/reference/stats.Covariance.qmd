@@ -6,7 +6,7 @@ Covariance(self, dim=1)
 
 Updateable covariance matrix.
 
-Uses Welford's online algorithm to update the sample mean and covariance estimates in a numerically stable way.
+Uses Welford's algorithm to stably update the sample mean and (co)variance estimates.
 
 ## Methods
 
@@ -45,6 +45,6 @@ Update mean and (co)variance estimates based on new observations.
 
 #### Parameters {.doc-section .doc-section-parameters}
 
-| Name   | Type       | Description                                             | Default    |
-|--------|------------|---------------------------------------------------------|------------|
-| X      | np.ndarray | (batch_size, dim)-ndarray representing new observations | _required_ |
+| Name   | Type       | Description                                           | Default    |
+|--------|------------|-------------------------------------------------------|------------|
+| X      | np.ndarray | (batch_size, dim)-array representing new observations | _required_ |

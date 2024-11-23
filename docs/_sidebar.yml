@@ -24,6 +24,10 @@ website:
         - reference/xtrace.qmd
         section: Trace
       - contents:
+        - reference/diag.qmd
+        - reference/xdiag.qmd
+        section: Diagonal
+      - contents:
         - reference/MatrixFunction.qmd
         - reference/Toeplitz.qmd
         - reference/normalize_unit.qmd

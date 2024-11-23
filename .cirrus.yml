@@ -1,12 +1,20 @@
 env: 
   CIRRUS_CLONE_SUBMODULES: true
 
+  # Coveralls configuration
+  CI_NAME: cirrus-ci
+  CI_BRANCH: ${CIRRUS_BRANCH}
+  CI_PULL_REQUEST: ${CIRRUS_PR}
+  CI_BUILD_NUMBER: ${CIRRUS_BUILD_ID}
+  CI_BUILD_URL: https://cirrus-ci.com/build/${CIRRUS_BUILD_ID}
+  COVERALLS_PARALLEL: "true"
+  COVERALLS_FLAG_NAME: ${CIRRUS_TASK_NAME}
+
 # See: https://github.com/pypa/manylinux
 # 2_24_x86_64 is EOF / discontinued. 
 # quay.io/pypa/manylinux2014_x86_64  # CentOS 7  (use GCC 10)
 # quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
 # quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
-
 
 build_and_test_task:
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py}')
@@ -35,6 +43,9 @@ build_and_test_task:
     python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
+  submit_coverage: |
+    pipx run coverage xml -o coverage.xml
+    pipx run 'coveralls<4' --submit coverage.xml
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |

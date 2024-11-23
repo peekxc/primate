@@ -134,7 +134,7 @@
     "href": "reference/index.html",
     "title": "Function reference",
     "section": "",
-    "text": "lanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nhutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\nhutchpp\nHutch++ estimator.\n\n\nxtrace\nEstimates the trace of A using the XTrace trace estimator.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\nhaar\nGenerates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).\n\n\n\n\n\n\n\n\n\nEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nMeanEstimator\nSample mean estimator with stable covariance updating.\n\n\nControlVariableEstimator\n\n\n\nConvergenceCriterion\nGeneric stopping criteria for sequences.\n\n\nCountCriterion\nConvergence criterion that returns TRUE when above a given count.\n\n\nToleranceCriterion\n\n\n\nConfidenceCriterion\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nKneeCriterion\n\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.confidence_interval\nConfidence intervals for the sample mean of a set of measurements.",
+    "text": "lanczos\nLanczos method for symmetric tridiagonalization.\n\n\nrayleigh_ritz\n\n\n\nlanczos_quadrature\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\n\n\n\n\n\n\n\n\n\nhutch\nEstimates the trace of a symmetric A via the Girard-Hutchinson estimator.\n\n\nhutchpp\nHutch++ estimator.\n\n\nxtrace\nEstimates the trace of A using the XTrace trace estimator.\n\n\n\n\n\n\n\n\n\ndiag\nEstimates the diagonal of a symmetric A via the Girard-Hutchinson estimator.\n\n\nxdiag\nEstimates the diagonal of A using m / 2 matrix-vector multiplications.\n\n\n\n\n\n\n\n\n\nMatrixFunction\nLinear operator class for matrix functions.\n\n\nToeplitz\nMatrix-free operator for representing Toeplitz or circulant matrices.\n\n\nnormalize_unit\nNormalizes a linear operator to have its spectra contained in the interval [-1,1].\n\n\n\n\n\n\n\n\n\nisotropic\nGenerates random vectors from a specified isotropic distribution.\n\n\nsymmetric\nGenerates a random symmetric matrix of size n with eigenvalues ew.\n\n\nhaar\nGenerates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).\n\n\n\n\n\n\n\n\n\nEstimator\nProtocol for generic stopping criteria for sequences.\n\n\nMeanEstimator\nSample mean estimator with stable covariance updating.\n\n\nControlVariableEstimator\n\n\n\nConvergenceCriterion\nGeneric stopping criteria for sequences.\n\n\nCountCriterion\nConvergence criterion that returns TRUE when above a given count.\n\n\nToleranceCriterion\n\n\n\nConfidenceCriterion\nParameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.\n\n\nKneeCriterion\n\n\n\n\n\n\n\n\n\n\nstats.Covariance\nUpdateable covariance matrix.\n\n\nstats.confidence_interval\nConfidence intervals for the sample mean of a set of measurements.",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -219,7 +219,7 @@
     "href": "reference/stats.Covariance.html",
     "title": "stats.Covariance",
     "section": "",
-    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s online algorithm to update the sample mean and covariance estimates in a numerically stable way.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "text": "Covariance(self, dim=1)\nUpdateable covariance matrix.\nUses Welford’s algorithm to stably update the sample mean and (co)variance estimates.\n\n\n\n\n\nName\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-array representing new observations\nrequired",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -232,7 +232,7 @@
     "href": "reference/stats.Covariance.html#methods",
     "title": "stats.Covariance",
     "section": "",
-    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-ndarray representing new observations\nrequired",
+    "text": "Name\nDescription\n\n\n\n\ncovariance\nCovariance matrix of the observations.\n\n\nupdate\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\nCovariance.covariance(ddof=1)\nCovariance matrix of the observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nddof\nint\nDelta degrees of freedom (1 for sample covariance, 0 for population)\n1\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nnp.ndarray\nCurrent covariance matrix estimate of shape (dim, dim)\n\n\n\n\n\n\n\nCovariance.update(X)\nUpdate mean and (co)variance estimates based on new observations.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nX\nnp.ndarray\n(batch_size, dim)-array representing new observations\nrequired",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -498,7 +498,7 @@
     "href": "reference/lanczos_quadrature.html",
     "title": "lanczos_quadrature",
     "section": "",
-    "text": "lanczos_quadrature(\n    d,\n    e,\n    deg=None,\n    quad='gw',\n    nodes=None,\n    weights=None,\n    **kwargs,\n)\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\nThis function computes the degree-d (deg) Gaussian quadrature rule for a symmetric Jacobi matrix J, which associates nodes to the eigenvalues of J and weights to the squares of the first components of the eigenvectors of J. The resulting rule is a weighted sum approximating the definite integral:\n \\int_{a}^{b} f(x) \\omega(x) dx \\approx \\sum\\limits_{i=1}^d f(x_i) w_i \nwhere \\omega(x) denotes the weight function and f(x) represents the function being approximated. The limits a,b and weight function \\omega(x) depend on how J was constructed. When J arises from the Lanczos method on a symmetric matrix A \\in \\mathbb{R}^{n \\times n}, the estimated quantity corresponds to a spectral sum:\n \\int_{a}^{b} f(x) \\psi(x; A, v) dx \nwhere psi(x) is the eigenvector spectral density associated to the pair (A,v):\n \\psi(x; A, v) = \\sum\\limits_{i=1}^n \\lvert u_i^T v \\rvert^2 \\delta(x - \\lambda_i), \\quad A = U \\Lambda U^T \nIn this sense, by applying f to the nodes x_i, the corresponding quadrature rule can approximate any spectral sum.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone\n\n\n\n\n\n\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.",
+    "text": "lanczos_quadrature(\n    d,\n    e,\n    deg=None,\n    quad='gw',\n    nodes=None,\n    weights=None,\n    **kwargs,\n)\nCompute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.\nThis function computes the fixed degree Gaussian quadrature rule for a symmetric Jacobi matrix J, which associates nodes x_i to the eigenvalues of J and weights w_i to the squares of the first components of their corresponding normalized eigenvectors. The resulting rule is a weighted sum approximating the definite integral:\n \\int_{a}^{b} f(x) \\omega(x) dx \\approx \\sum\\limits_{i=1}^d f(x_i) \\cdot w_i \nwhere \\omega(x) denotes the weight function and f(x) represents the function being approximated. When J is constructed by the Lanczos method on a symmetric matrix A \\in \\mathbb{R}^{n \\times n}, the rule can be used to approximate the weighted integral:\n \\int_{a}^{b} f(x) \\psi(x; A, v) dx \\approx \\sum\\limits_{i=1}^n f(\\lambda_i)\nwhere \\psi(x) is the eigenvector spectral density associated to the pair (A,v):\n \\psi(x; A, v) = \\sum\\limits_{i=1}^n \\lvert u_i^T v \\rvert^2 \\delta(x - \\lambda_i), \\quad A = U \\Lambda U^T \nFor more details on this, see the references.\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the deg nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the deg weights of the quadrature (optional).\nNone\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\n\ntuple (nodes, weights) of the degree-deg Gaussian quadrature rule.\n\n\n\n\n\n\nTo compute the weights of the quadrature, quad can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require O(\\mathrm{deg}^2) time to execute, the former requires O(\\mathrm{deg}^2) space but is highly accurate, while the latter uses only O(1) space at the cost of backward stability. If deg is large, fttr is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -511,7 +511,7 @@
     "href": "reference/lanczos_quadrature.html#parameters",
     "title": "lanczos_quadrature",
     "section": "",
-    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the n nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the n weights of the quadrature (optional).\nNone",
+    "text": "Name\nType\nDescription\nDefault\n\n\n\n\nd\nnp.ndarray\narray of n diagonal elements.\nrequired\n\n\ne\nnp.ndarray\narray of n or n-1 off-diagonal elements. See details.\nrequired\n\n\ndeg\nOptional[int]\ndegree of the quadrature rule to compute.\nNone\n\n\nquad\nstr\nmethod used to compute the rule. Either Golub Welsch or FTTR is supported.\n'gw'\n\n\nnodes\nOptional[np.ndarray]\noutput array to store the deg nodes of the quadrature (optional).\nNone\n\n\nweights\nOptional[np.ndarray]\noutput array to store the deg weights of the quadrature (optional).\nNone",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -801,6 +801,122 @@
       "API Reference",
       "Estimators",
       "Estimator"
+    ]
+  },
+  {
+    "objectID": "reference/lanczos_quadrature.html#returns",
+    "href": "reference/lanczos_quadrature.html#returns",
+    "title": "lanczos_quadrature",
+    "section": "",
+    "text": "Name\nType\nDescription\n\n\n\n\n\n\ntuple (nodes, weights) of the degree-deg Gaussian quadrature rule.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Lanczos",
+      "lanczos_quadrature"
+    ]
+  },
+  {
+    "objectID": "reference/index.html#diagonal",
+    "href": "reference/index.html#diagonal",
+    "title": "Function reference",
+    "section": "",
+    "text": "diag\nEstimates the diagonal of a symmetric A via the Girard-Hutchinson estimator.\n\n\nxdiag\nEstimates the diagonal of A using m / 2 matrix-vector multiplications.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html",
+    "href": "reference/diag.html",
+    "title": "diag",
+    "section": "",
+    "text": "diagonal.diag(\n    A,\n    pdf='rademacher',\n    converge='tolerance',\n    seed=None,\n    full=False,\n    callback=None,\n    **kwargs,\n)\nEstimates the diagonal of a symmetric A via the Girard-Hutchinson estimator.\nThis function random vectors to estimate of the diagonal of A via the approximation:  \\mathrm{diag}(A) = \\sum_{i=1}^n e_i^T A e_i \\approx n^{-1}\\sum_{i=1}^n v^T A v  When v are isotropic, this approximation forms an unbiased estimator of the diagonal of A.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html#parameters",
+    "href": "reference/diag.html#parameters",
+    "title": "diag",
+    "section": "Parameters",
+    "text": "Parameters\n\n\n\n\n\n\n\n\n\nName\nType\nDescription\nDefault\n\n\n\n\nA\nUnion[sp.sparse.linalg.LinearOperator, np.ndarray]\nreal symmetric matrix or linear operator.\nrequired\n\n\npdf\nUnion[str, Callable]\nChoice of zero-centered distribution to sample random vectors from.\n'rademacher'\n\n\nestimator\n\nType of estimator to use for convergence testing. See details.\nrequired\n\n\nseed\nUnion[int, np.random.Generator, None]\nSeed to initialize the rng entropy source. Set seed &gt; -1 for reproducibility.\nNone\n\n\nfull\nbool\nWhether to return additional information about the computation.\nFalse",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html#returns",
+    "href": "reference/diag.html#returns",
+    "title": "diag",
+    "section": "Returns",
+    "text": "Returns\n\n\n\n\n\n\n\n\nName\nType\nDescription\n\n\n\n\n\nUnion[float, tuple]\nEstimate the diagonal of A. If full = True, additional information about the computation is also returned.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html#see-also",
+    "href": "reference/diag.html#see-also",
+    "title": "diag",
+    "section": "See Also",
+    "text": "See Also\n\nlanczos: the lanczos tridiagonalization algorithm.\nConfidenceCriterion: Standard estimator of the mean from iid samples.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html#reference",
+    "href": "reference/diag.html#reference",
+    "title": "diag",
+    "section": "Reference",
+    "text": "Reference\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.\nHutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/diag.html#examples",
+    "href": "reference/diag.html#examples",
+    "title": "diag",
+    "section": "Examples",
+    "text": "Examples\n\nfrom primate.diagonal import diag",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "diag"
+    ]
+  },
+  {
+    "objectID": "reference/xdiag.html",
+    "href": "reference/xdiag.html",
+    "title": "xdiag",
+    "section": "",
+    "text": "xdiag\ndiagonal.xdiag(A, m, pdf='sphere', seed=None)\nEstimates the diagonal of A using m / 2 matrix-vector multiplications.\nBased originally on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly.",
+    "crumbs": [
+      "Reference",
+      "API Reference",
+      "Diagonal",
+      "xdiag"
     ]
   }
 ]

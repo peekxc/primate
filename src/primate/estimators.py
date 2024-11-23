@@ -112,11 +112,11 @@ class ControlVariableEstimator(MeanEstimator):
 		self.cov.update(np.c_[samples, cvs])
 		self.n_samples = self.cov.n
 		C = self.cov.covariance(ddof=1)
-		C_00, C_01, C_11 = C[0, 0], C[1:, 0], C[1:, 1:]
-		C_inner = (C_00 - C_01**2 / C_11) if self.cov.dim == 2 else (C_00 - np.dot(C_01, np.linalg.solve(C_11, C_01)))
 		if self._estimate_cor:
 			C_01, C_11 = C[1:, 0], C[1:, 1:]
 			self.alpha = (C[0, 1] / C[1, 1]) if self.cov.dim == 2 else np.linalg.solve(C_11, C_01)
+		# C_00, C_01, C_11 = C[0, 0], C[1:, 0], C[1:, 1:]
+		# C_inner = (C_00 - C_01**2 / C_11) if self.cov.dim == 2 else (C_00 - np.dot(C_01, np.linalg.solve(C_11, C_01)))
 		# SE = np.sqrt((1.0 / self.n_samples) * C_inner)
 		# score = self.t_scores[self.n_samples] if self.n_samples < 30 else self.z
 		# self.margin_of_error = (SE * score).item()

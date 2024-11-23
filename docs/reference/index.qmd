@@ -16,6 +16,13 @@
 | [hutchpp](hutchpp.qmd#trace.hutchpp) | Hutch++ estimator. |
 | [xtrace](xtrace.qmd#trace.xtrace) | Estimates the trace of `A` using the XTrace trace estimator. |
 
+## Diagonal
+
+| | |
+| --- | --- |
+| [diag](diag.qmd#diagonal.diag) | Estimates the diagonal of a symmetric `A` via the Girard-Hutchinson estimator. |
+| [xdiag](xdiag.qmd#diagonal.xdiag) | Estimates the diagonal of `A` using `m / 2` matrix-vector multiplications. |
+
 ## Operators
 
 | | |

@@ -14,7 +14,7 @@ def softsign(x: np.ndarray = None, q: int = 1):
 	The soft-sign function is often used in principal component regression and norm estimation algorithms, see
 	equation (60) of "Stability of the Lanczos Method for Matrix Function Approximation"
 	"""
-	I = np.arange(q + 1)
+	I = np.arange(q + 1)  # noqa: E741
 	J = np.append([1], np.cumprod([(2 * j - 1) / (2 * j) for j in np.arange(1, q + 1)]))
 
 	def _sign(x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:

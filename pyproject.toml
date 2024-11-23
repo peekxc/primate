@@ -1,4 +1,3 @@
-# python -m build -Ccompile-args="-j6" . --no-isolation
 [build-system]
 build-backend = 'mesonpy'
 requires = ['meson-python', 'numpy', 'pythran', 'pybind11']
@@ -7,7 +6,7 @@ requires = ['meson-python', 'numpy', 'pythran', 'pybind11']
 
 [project]
 name = 'scikit-primate'
-version = '0.5.2'
+version = '0.5.3'
 description = 'Package for implicit matrix function, trace, and diagonal estimation.'
 readme = 'README.md'
 requires-python = '>=3.8'
@@ -38,9 +37,9 @@ doc = ["quartodoc"]
 dev = ['meson-python', 'pybind11', 'numpy']
 
 [tool.meson-python.args]
-setup = ['--python.bytecompile=2']
-compile = ['-j4']
-install = ['--tags=runtime,python-runtime', '-Dpython.bytecompile=2']
+setup = []
+compile = ['-j6']
+install = [] # '--tags=runtime,python-runtime'
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -50,10 +49,10 @@ norecursedirs = ["docs", "*.egg-info", ".git", "build", "dist"]
 
 [tool.coverage.report]
 omit = [
-	"src/**/__init__.py",
-	"src/**/fttr.py",
-	"src/**/tqli.py",
-	"src/**/plotting.py",
+	"*/**/__init__.py",
+	"*/**/fttr.py",
+	"*/**/tqli.py",
+	"*/**/plotting.py",
 ]
 exclude_also = [
   "def __repr__",
@@ -87,3 +86,6 @@ before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 # before-build = "bash {project}/tools/cibw_windows.sh"
 # environment = { PKG_CONFIG_PATH="C:/opt/64/lib/pkgconfig", CC="clang-cl", CXX="clang-cl"}
+
+[tool.ruff.lint]
+ignore = ["E731"]

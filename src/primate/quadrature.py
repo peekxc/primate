@@ -1,12 +1,8 @@
-from array import array
-from numbers import Number
-from typing import Callable, Optional, Union
+from typing import Optional
 
 import numpy as np
-from scipy.sparse.linalg import LinearOperator
 
 from .fttr import fttr
-from .lanczos import lanczos
 from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 

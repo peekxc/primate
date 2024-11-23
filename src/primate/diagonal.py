@@ -1,8 +1,7 @@
-from typing import Callable, Optional, Protocol, Sized, Union, runtime_checkable
+from typing import Callable, Optional, Union
 
 import numpy as np
 import scipy as sp
-from functools import partial
 
 from .random import isotropic
 from .estimators import ConvergenceCriterion, convergence_criterion, MeanEstimator, EstimatorResult
