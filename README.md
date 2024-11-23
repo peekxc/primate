@@ -10,8 +10,6 @@
 [![build_linux](https://img.shields.io/github/actions/workflow/status/peekxc/primate/build_linux.yml?logo=linux&logoColor=white)](https://github.com/peekxc/primate/actions/workflows/wheels.yml) -->
 <!-- [![coverage_badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/peekxc/ef42349965f40edf4232737026690c5f/raw/coverage_info.json)](https://coveralls.io/github/peekxc/simplextree-py)  -->
 <!-- [![PyPI Version](https://img.shields.io/pypi/v/simplextree)](https://pypi.org/project/simplextree) -->
-
-
 <!-- https://badgen.net/github/checks/peekxc/primate/pythran_overhaul?label=tests -->
 <!-- https://badgen.net/pypi/python/scikit-primate -->
 
@@ -19,19 +17,19 @@
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the inverse $A^{-1}$, the [matrix exponential](https://en.wikipedia.org/wiki/Matrix_exponential) $\mathrm{exp}(A)$, the [matrix logarithm](https://en.wikipedia.org/wiki/Logarithm_of_a_matrix) $\mathrm{log}(A)$, and so on. 
+This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the matrix inverse $A^{-1}$, the matrix exponential $\mathrm{exp}(A)$, the matrix logarithm $\mathrm{log}(A)$, and so on. 
 
-Composing these with _implicit trace_ and _implicit diagonal_ estimators yields approximation techniques for the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), the [Heat Kernel Signature](https://en.wikipedia.org/wiki/Heat_kernel_signature), and so on. 
+Composing these with _trace_ and _diagonal_ estimators yields approximations for the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), the [Heat Kernel Signature](https://en.wikipedia.org/wiki/Heat_kernel_signature), and so on. 
 
-`primate` also exports functionality for estimating the [spectral density](https://doi.org/10.1137/130934283) and for computing Gaussian quadrature rules from Jacobi matrices. 
+<!-- `primate` also exports functionality for estimating the [spectral density](https://doi.org/10.1137/130934283) and for computing Gaussian quadrature rules from Jacobi matrices.  -->
 
 Notable features of `primate` include:
 
-- Efficient methods for trace, diagonal, and matrix function approximation
-- Support for _arbitrary_ matrix types, e.g. NumPy arrays, sparse matrices, or [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator)'s (including [Pylops](https://pylops.readthedocs.io/en/stable/index.html) ops)
+- Efficient methods for _trace_, _diagonal_, and _matrix function_ approximation
+- Support for _arbitrary_ matrix types, e.g. NumPy arrays, sparse matrices, or [LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#scipy-sparse-linalg-linearoperator)'s
 - Support for _arbitrary_ matrix functions, i.e. `Callable`'s (Python) and `invocable`'s[^3] (C++)
-- Various distribution / engine choices for random vector generation (the stochastic part!)
-- Matrix-free interface to the _Lanczos_ and _Golub-Welsch_ methods for tridiagonalization and quadrature computation
+- Matrix-free interface to the _Lanczos_ and _Golub-Welsch_ methods 
+- Various composable stopping criteria for easy and adaptive convergence checking
 
 `primate` was partially inspired by the [`imate` package](https://github.com/ameli/imate)---for a comparison of the two, see [here](https://peekxc.github.io/primate/imate_compare.html).
 
