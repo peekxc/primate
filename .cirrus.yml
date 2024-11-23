@@ -57,7 +57,10 @@ build_and_test_task:
     python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
-    coverage report -m
+  coverage_script: |
+    python -m coverage xml -o coverage.xml
+    pipx run 'coveralls<4' --submit coverage.xml
+    pipx run 'coveralls<4' --finish
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
@@ -66,10 +69,7 @@ build_and_test_task:
     python -m pip install dist/scikit_primate*.whl
   test_post_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
-    python -m coverage xml -o coverage.xml
-  coverage_script: |
-    pipx run 'coveralls<4' --submit coverage.xml
-    pipx run 'coveralls<4' --finish
+    coverage report -m
     
 # python -m coveralls --submit coverage.xml
 # python -m coveralls --finish
