@@ -43,8 +43,8 @@ build_and_test_task:
     python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
+    python -m coverage xml -o coverage.xml
   submit_coverage: |
-    pipx run coverage xml -o coverage.xml
     pipx run 'coveralls<4' --submit coverage.xml
   uninstall_script: |
     python -m pip uninstall primate --yes

@@ -32,7 +32,7 @@ dependencies = [
 license = {file = "LICENSE"}
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-benchmark"] # "bokeh"
+test = ["pytest", "pytest-cov", "pytest-benchmark", "coverage"] # "bokeh"
 doc = ["quartodoc"]
 dev = ['meson-python', 'pybind11', 'numpy']
 
