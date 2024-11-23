@@ -16,6 +16,20 @@ env:
 # quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
 # quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
 
+lint_task: 
+  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
+  container:
+    image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
+  env:
+    PATH: /opt/python/cp310-cp310/bin:${PATH}
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: echo $PYTHON_VERSION
+  before_script: |
+    python -m pip install --upgrade pip ruff
+  lint_script: |
+    python -m ruff check src/*
+  
 build_and_test_task:
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
   container:
@@ -43,9 +57,7 @@ build_and_test_task:
     python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
-    python -m coverage xml -o coverage.xml
-  coverage_script: |
-    pipx run 'coveralls<4' --submit coverage.xml
+    coverage report -m
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
@@ -54,7 +66,10 @@ build_and_test_task:
     python -m pip install dist/scikit_primate*.whl
   test_post_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
-    coverage report -m
+    python -m coverage xml -o coverage.xml
+  coverage_script: |
+    python -m coveralls --submit coverage.xml
+    python -m coveralls --finish
     
 # macos_task:
 #   container:
