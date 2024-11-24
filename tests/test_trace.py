@@ -51,3 +51,7 @@ def test_xtrace():
 		est = xtrace(A, batch=nb, seed=rng, verbose=1)
 		err = np.abs(A.trace() - est)
 		assert np.isclose(err, 0.0)
+
+	x, info = xtrace(A, full=True)
+	assert isinstance(info, EstimatorResult)
+	assert np.abs(A.trace() - x) < 0.05

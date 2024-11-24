@@ -228,7 +228,7 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	# 	return msg
 
 
-class KneeCriterion:
+class KneeCriterion(ConvergenceCriterion):
 	def __init__(self, S: float = 1.0) -> None:
 		self.S = S
 

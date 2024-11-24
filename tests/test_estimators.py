@@ -1,18 +1,20 @@
 from typing import Callable
 import numpy as np
 from primate.estimators import (
+	ConvergenceCriterion,
 	KneeCriterion,
 	MeanEstimator,
 	CountCriterion,
 	ToleranceCriterion,
 	ConfidenceCriterion,
 	ControlVariableEstimator,
+	convergence_criterion,
 )
 from primate.stats import confidence_interval
 
 
 def test_MeanEstimator():
-	rng = np.random.default_rng()
+	rng = np.random.default_rng(1234)
 	mu = MeanEstimator()
 	samples = []
 	for _ in range(25):
@@ -49,7 +51,7 @@ def test_ControlVariableEstimator():
 
 
 def test_CountCriterion():
-	rng = np.random.default_rng()
+	rng = np.random.default_rng(1234)
 	mu = MeanEstimator()
 	cc = CountCriterion(10)
 	assert not cc(mu)
@@ -62,7 +64,7 @@ def test_CountCriterion():
 
 
 def test_ToleranceCriterion():
-	rng = np.random.default_rng()
+	rng = np.random.default_rng(1234)
 	mu = MeanEstimator()
 	cc = ToleranceCriterion(atol=0, rtol=0.10, ord=1)
 	while not cc(mu):
@@ -99,7 +101,7 @@ def test_KneeCriterion():
 
 
 def test_CriterionComposability():
-	rng = np.random.default_rng()
+	rng = np.random.default_rng(1234)
 	mu = MeanEstimator()
 	cc1 = CountCriterion(200)
 	cc2 = ConfidenceCriterion(confidence=0.95, atol=0.50, rtol=0.0)
@@ -121,3 +123,14 @@ def test_CriterionComposability():
 		assert not cc(mu)
 		mu.update(rng.uniform(size=1, low=-1, high=+1).item())
 	assert (cc1(mu) or cc2(mu)) and cc(mu)
+
+
+def test_converge_param():
+	cc = convergence_criterion("count", count=10)
+	assert isinstance(cc, ConvergenceCriterion)
+	cc = convergence_criterion("tolerance", atol=0.0, rtol=0.0)
+	assert isinstance(cc, ConvergenceCriterion)
+	cc = convergence_criterion("confidence", confidence=0.95)
+	assert isinstance(cc, ConvergenceCriterion)
+	cc = convergence_criterion("knee", S=10.0)
+	assert isinstance(cc, ConvergenceCriterion)

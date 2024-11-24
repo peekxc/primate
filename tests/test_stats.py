@@ -3,7 +3,7 @@ from primate.stats import Covariance, confidence_interval
 
 
 def test_Covariance():
-	rng = np.random.default_rng()
+	rng = np.random.default_rng(1234)
 	C = Covariance(dim=1)
 	samples = []
 	for _ in range(25):

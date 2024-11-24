@@ -1,7 +1,6 @@
 """Testing module for lanczos.py"""
 
 import numpy as np
-from numpy.random import default_rng
 from scipy.linalg import eigvalsh_tridiagonal
 
 from primate import _lanczos
@@ -10,7 +9,7 @@ from primate.random import symmetric
 
 
 def test_lanczos():
-	rng = default_rng(seed=1234)
+	rng = np.random.default_rng(seed=1234)
 	d = 50
 	A = rng.uniform(size=(d, d))
 	A @= A.T
@@ -22,7 +21,7 @@ def test_lanczos():
 
 
 def test_rayleigh():
-	rng = default_rng(seed=1234)
+	rng = np.random.default_rng(seed=1234)
 	d = 50
 	ew = rng.uniform(size=d, low=0, high=1)
 	A = symmetric(d, ew=ew, seed=rng)
@@ -30,3 +29,6 @@ def test_rayleigh():
 	rw = rayleigh_ritz(A, 20, v0=v0)
 	assert np.isclose(np.max(rw), np.max(ew), atol=1e-2)
 	assert np.isclose(np.min(rw), np.min(ew), atol=1e-2)
+
+	rw, rv = rayleigh_ritz(A, 20, v0=v0, return_eigenvectors=True)
+	assert np.allclose(rv.T @ rv, np.eye(len(rw))), "Rayleigh vectors not orthogonal"
