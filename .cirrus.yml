@@ -74,12 +74,13 @@ build_and_test_task:
 coverage_task:
   name: Submit coverage info
   container:
-    image: python:3.9:slim
+    image: python:3.10:slim
   script:
     - python -m coverage xml -o coverage.xml
     - pipx run 'coveralls<4' --submit coverage.xml
     - pipx run 'coveralls<4' --finish
-
+  depends_on:
+    - build_and_test_task
 # python -m coveralls --submit coverage.xml
 # python -m coveralls --finish
 # macos_task:
