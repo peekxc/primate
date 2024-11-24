@@ -71,7 +71,7 @@ build_and_test_task:
     python -m pytest tests/ --cov=primate --benchmark-skip
     coverage report -m
 
-task:
+coverage_task:
   name: Submit coverage info
   container:
     image: python:3.9:slim
