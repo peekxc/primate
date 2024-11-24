@@ -70,7 +70,16 @@ build_and_test_task:
   test_post_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
     coverage report -m
-    
+
+task:
+  name: Submit coverage info
+  container:
+    image: python:3.9:slim
+  script:
+    - python -m coverage xml -o coverage.xml
+    - pipx run 'coveralls<4' --submit coverage.xml
+    - pipx run 'coveralls<4' --finish
+
 # python -m coveralls --submit coverage.xml
 # python -m coveralls --finish
 # macos_task:
