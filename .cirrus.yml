@@ -80,7 +80,7 @@ coverage_task:
     - pipx run 'coveralls<4' --submit coverage.xml
     - pipx run 'coveralls<4' --finish
   depends_on:
-    - build_and_test_task
+    - build_and_test
 # python -m coveralls --submit coverage.xml
 # python -m coveralls --finish
 # macos_task:

@@ -5,7 +5,7 @@ import scipy as sp
 
 from .random import isotropic
 from .estimators import ConvergenceCriterion, convergence_criterion, MeanEstimator, EstimatorResult
-from .operators import _operator_checks
+from .operators import is_valid_operator
 
 
 def diag(
@@ -51,7 +51,7 @@ def diag(
 		from primate.diagonal import diag
 		```
 	"""
-	f_dtype = _operator_checks(A)
+	f_dtype = is_valid_operator(A)
 	N: int = A.shape[0]
 
 	## Parameterize the random vector generation

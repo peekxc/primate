@@ -8,7 +8,7 @@ from scipy.sparse.linalg import LinearOperator
 
 from .estimators import ConvergenceCriterion, EstimatorResult, MeanEstimator, convergence_criterion
 from .linalg import update_trinv
-from .operators import _operator_checks
+from .operators import is_valid_operator
 from .random import isotropic
 
 
@@ -107,7 +107,7 @@ def hutch(
 		from primate.trace import hutch
 		```
 	"""
-	f_dtype = _operator_checks(A)
+	f_dtype = is_valid_operator(A)
 	N: int = A.shape[0]
 
 	## Parameterize the various quantities
@@ -154,7 +154,7 @@ def hutchpp(
 		m: number of matvecs to use. If not given, defaults to `n // 3`.
 		batch: currently unused.
 	"""
-	f_dtype = _operator_checks(A)
+	f_dtype = is_valid_operator(A)
 	N: int = A.shape[0]
 
 	## Parameterize the random vector generation

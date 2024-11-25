@@ -2,7 +2,7 @@ from typing import Callable, Union, Any
 import numpy as np
 
 ## Natively support matrix functions
-_builtin_matrix_functions = ["identity", "abs", "sqrt", "log", "inv", "exp", "smoothstep", "numrank"]
+_BUILTIN_MATRIX_FUNCTIONS = ["identity", "abs", "sqrt", "log", "inv", "exp", "smoothstep", "numrank"]
 
 
 def softsign(x: np.ndarray = None, q: int = 1):
@@ -71,9 +71,12 @@ def step(x: np.ndarray = None, c: float = 0.0, nonnegative: bool = False):
 
 
 def param_callable(fun: Union[str, None], **kwargs: dict) -> Callable:
-	# assert fun in _builtin_matrix_functions, "If given as a string, matrix_function be one of the builtin functions."
+	if isinstance(fun, str):
+		assert fun in _BUILTIN_MATRIX_FUNCTIONS, "If given as a string, matrix_function be one of the builtin functions."
 	if fun is None or fun == "identity":
 		return identity
+	elif callable(fun):
+		return fun
 	elif fun == "abs":
 		return np.abs
 	elif fun == "sqrt":

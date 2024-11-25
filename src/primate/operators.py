@@ -4,12 +4,14 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, eigsh
 from scipy.sparse.linalg._interface import IdentityOperator
 
+from primate.special import param_callable
+
 from .lanczos import _lanczos
 from .quadrature import lanczos_quadrature
 from .tridiag import eigh_tridiag
 
 
-def _operator_checks(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
+def is_valid_operator(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	assert any(attr_checks), "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
 	assert hasattr(A, "shape") and len(A.shape) >= 2, "Operator must be at least two dimensional."
@@ -21,6 +23,7 @@ def _operator_checks(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
 
 
 def is_linear_op(A: Any) -> bool:
+	"""Checks whether a given operator has the correct interface for use with implicit matrix algorithms."""
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
 	is_valid_op = True
 	is_valid_op &= any(attr_checks)  # , "Invalid operator; must have an overloaded 'matvec' or 'matmul' method"
@@ -32,14 +35,14 @@ def is_linear_op(A: Any) -> bool:
 class MatrixFunction(LinearOperator):
 	"""Linear operator class for matrix functions."""
 
-	def __init__(
-		self, A: np.ndarray, fun: np.ufunc = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
-	) -> None:
+	def __init__(self, A: np.ndarray, fun: Callable, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict) -> None:
 		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
-		if fun is not None:
-			assert isinstance(fun, Callable), "Function must be numpy ufunc"
-		self._fun = fun if fun is not None else lambda x: x
+		fun = fun if fun is not None else lambda x: x
+		if isinstance(fun, str):
+			fun = param_callable(fun, **kwargs)
+		assert callable(fun), "Function must be Callable"
+		self._fun = fun
 		self._deg = min(deg, A.shape[0])
 		self._alpha = np.zeros(self._deg + 1, dtype=dtype)
 		self._beta = np.zeros(self._deg + 1, dtype=dtype)
@@ -110,7 +113,7 @@ def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.nda
 	# rw, Y = eigh_tridiag(a, b)  # O(d^2) space
 	# ## Equivalent to |x| * Q @ Y @ diag(rw) @ Y.T @ e_1
 	# y = np.linalg.norm(v) * Q @ Y @ (rw * Y[0, :])[:, np.newaxis]
-	M = MatrixFunction(A, deg)
+	M = MatrixFunction(A, fun=fun, deg=deg)
 	return M if v is None else M._matvec(v)
 
 
