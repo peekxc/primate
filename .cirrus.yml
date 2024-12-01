@@ -78,8 +78,8 @@ coverage_report_task:
   depends_on: build_and_test
   # only_if: $CI_PLATFORM == 'almalinux'
   name: Submit coverage info
-  # container:
-  #   image: python:3.10:slim
+  container:
+    image: quay.io/pypa/manylinux_2_28_x86_64
   script:
     - python -m coverage xml -o coverage.xml
     - pipx run 'coveralls<4' --submit coverage.xml
