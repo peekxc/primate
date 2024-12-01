@@ -35,12 +35,8 @@ build_and_test_task:
   container:
     # See: https://github.com/pypa/manylinux
     matrix: 
-      - env:
-          ci_platform: "centos7"
-        image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
-      - env: 
-          ci_platform: "almalinux"
-        image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
+      - image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
+      - image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
       
       # - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian, no c++20 support
       # - image: ghcr.io/cirruslabs/macos-runner:sonoma
@@ -53,7 +49,6 @@ build_and_test_task:
     CC: gcc 
     CXX: g++
     PATH: /opt/python/cp310-cp310/bin:${PATH}
-    CI_PLATFORM: ${CI_PLATFORM}
   pip_cache:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
@@ -80,8 +75,9 @@ coverage_report_task:
   name: Submit coverage info
   container:
     image: quay.io/pypa/manylinux_2_28_x86_64
+    PATH: /opt/python/cp310-cp310/bin:${PATH}
   script:
-    - python -m coverage xml -o coverage.xml
+    - pipx run 'coverage[toml]' xml -o coverage.xml
     - pipx run 'coveralls<4' --submit coverage.xml
     - pipx run 'coveralls<4' --finish
   

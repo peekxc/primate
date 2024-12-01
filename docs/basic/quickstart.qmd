@@ -98,12 +98,19 @@ ExpA = MatrixFunction(A, fun=np.exp)
 print(f"exp(A)v = {ExpA @ v}")
 ```
 
-If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`)
-
+If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`) using the Lanczos method (without reorthogonalization). Aside from trace and diagonal estimation, 
 
 
 ```{python}
+## Random symmetric matrix with spectrum in [-1, +1]
+ew = np.random.uniform(low=-1, high=+1, size=150)
+A = symmetric(len(ew), ew=ew)
+
+
+
+
 ew, U = np.linalg.eigh(A)
+
 
 U[:,:2] @ U[:,:2].T @ v
 
