@@ -131,6 +131,8 @@ filters:
 
 format:
   html:
+    include-in-header: 
+      - bokeh_cdn.html
     theme: 
       light: flatly
       dark: darkly

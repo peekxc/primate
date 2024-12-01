@@ -103,6 +103,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/3.6.1/bokeh.min.js" integrity="sha512-qzQ7weqWqj8EtLfMB4t3iCZkT1NVU+q/AMoq+lBJY/CjuX9ywmTWZod5IXZeFgyKXnVyPBBlFQLESUauOYAmqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -538,7 +539,7 @@ window.Quarto = {
 <p>A variety of <em>trace</em> estimators—that is, algorithms for estimating the quantity:</p>
 <p><span class="math display"> \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i </span></p>
 <p>are available in the <code>primate.trace</code> module:</p>
-<div id="d4b1d2b8" class="cell" data-execution_count="2">
+<div id="2147e639" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch, hutchpp, xtrace</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>)  <span class="co">## random symmetric matrix </span></span>
@@ -548,10 +549,10 @@ window.Quarto = {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch++:       </span><span class="sc">{</span>hutchpp(A)<span class="sc">:6f}</span><span class="ss">"</span>)    <span class="co">## Monte-Carlo estimator w/ deflation </span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"XTrace:        </span><span class="sc">{</span>xtrace(A)<span class="sc">:6f}</span><span class="ss">"</span>)     <span class="co">## Epperly's algorithm</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Actual trace:  67.787515
-Hutch:         68.217892
-Hutch++:       67.966344
-XTrace:        67.787515</code></pre>
+<pre><code>Actual trace:  72.536677
+Hutch:         74.240444
+Hutch++:       71.987032
+XTrace:        72.536677</code></pre>
 </div>
 </div>
 <p>Here, <code>A</code> can be a numpy matrix, a sparse matrix, or a <code>LinearOperator</code>. If the spectral sum of interest is not just the sum of the eigenvalues, but rather the sum under composition with some spectral function <span class="math inline">f(\lambda)</span>, i.e.&nbsp;the quantity of interest is of the form:</p>
@@ -643,7 +644,7 @@ XTrace:        67.787515</code></pre>
 </table>
 <p><br></p>
 <p>For example, one might compute the log-determinant of a positive definite matrix as follows:</p>
-<div id="080f5f9d" class="cell" data-execution_count="3">
+<div id="cca7632e" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function, IdentityOperator</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>, pd<span class="op">=</span><span class="va">True</span>)       <span class="co"># eigenvalues in (0, 1] </span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>) <span class="co"># or fun=np.log </span></span>
@@ -654,18 +655,18 @@ XTrace:        67.787515</code></pre>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch++   :  </span><span class="sc">{</span>hutchpp(M)<span class="sc">:6f}</span><span class="ss">"</span>)</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"XTrace    :  </span><span class="sc">{</span>xtrace(M)<span class="sc">:6f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>logdet(A) :  -154.144312
-tr(log(A)):  -154.144312
-Hutch     :  -166.639177
-Hutch++   :  -153.737941
-XTrace    :  -153.978924</code></pre>
+<pre><code>logdet(A) :  -184.692737
+tr(log(A)):  -184.692737
+Hutch     :  -193.367585
+Hutch++   :  -182.208546
+XTrace    :  -184.621731</code></pre>
 </div>
 </div>
 </section>
 <section id="diagonal-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="diagonal-estimation">Diagonal estimation</h2>
 <p>The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.</p>
-<div id="35c48aca" class="cell" data-execution_count="4">
+<div id="87fad877" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.diagonal <span class="im">import</span> diag, xdiag</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> A.diagonal()</span>
@@ -674,225 +675,181 @@ XTrace    :  -153.978924</code></pre>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal (true): </span><span class="sc">{</span>d1<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal est   : </span><span class="sc">{</span>d2<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Diagonal (true): [0.54968697 0.48960101 0.49447692 0.47773641 0.48477961 0.46974089
- 0.45448756 0.49278268 0.46308226 0.51857507 0.49184517 0.50710399
- 0.46590264 0.47062913 0.47919964 0.46902484 0.50506395 0.467224
- 0.51894141 0.53466592 0.51714597 0.5279012  0.4794661  0.4813528
- 0.48721224 0.52902752 0.55330945 0.49645548 0.51938593 0.43741348
- 0.53355823 0.49958051 0.50151183 0.44675413 0.50812872 0.52613871
- 0.48945744 0.46393831 0.51136589 0.52520016 0.51533952 0.44135037
- 0.48084077 0.47808502 0.49277022 0.54158404 0.52313368 0.46183489
- 0.48163083 0.42820872 0.50302743 0.50019652 0.50572689 0.4690371
- 0.46773069 0.46568055 0.46782853 0.51038056 0.5419983  0.49355537
- 0.4211999  0.55314169 0.49461266 0.51634604 0.44610457 0.46094316
- 0.48726254 0.5162495  0.46861948 0.51666589 0.50285835 0.50864331
- 0.5056485  0.46355375 0.52290347 0.51154529 0.49792651 0.50105026
- 0.49414167 0.48316386 0.46578555 0.50729763 0.48716965 0.52587961
- 0.48433519 0.4843776  0.53213133 0.53433909 0.5230893  0.44206393
- 0.42943587 0.46864331 0.45874898 0.51964131 0.47283709 0.46225109
- 0.50855052 0.54201372 0.45718963 0.49323674 0.50499993 0.4783244
- 0.48297431 0.50510227 0.52886059 0.49522149 0.46261325 0.5078776
- 0.50785473 0.48086693 0.51157085 0.53961956 0.50951068 0.53137776
- 0.51177774 0.5115731  0.50830074 0.47874391 0.49518595 0.53173225
- 0.48020883 0.47305573 0.5466895  0.48509724 0.57844942 0.50267975
- 0.48053915 0.52886011 0.4531079  0.48519128 0.45842747 0.48260731
- 0.51087804 0.50073223 0.51589332 0.51055631 0.49588501 0.51258133
- 0.48735096 0.53209772 0.46701131 0.49457568 0.48068915 0.44291768
- 0.44864358 0.50165426 0.50940561 0.53303458 0.46230692 0.47826089]
-Diagonal est   : [0.53607086 0.49324122 0.49113666 0.47781557 0.50357503 0.43569537
- 0.42325622 0.45447445 0.50733854 0.50885887 0.51762998 0.49740386
- 0.47594739 0.46055631 0.48056577 0.49563572 0.49221762 0.45763859
- 0.52634589 0.54098616 0.5526033  0.49272358 0.49110416 0.51345753
- 0.48522175 0.56418779 0.57545486 0.48830505 0.5014901  0.43650532
- 0.55853053 0.51594561 0.51344101 0.4625863  0.516656   0.5476163
- 0.48168479 0.47644227 0.46513713 0.51763804 0.56007328 0.43658329
- 0.47722926 0.45332959 0.55550188 0.56505926 0.50828515 0.45172424
- 0.46824449 0.43532188 0.46630796 0.49534843 0.56000665 0.48462336
- 0.45903083 0.53867312 0.49287201 0.47615586 0.54132283 0.50968524
- 0.43759258 0.58123051 0.4746877  0.51983819 0.48855547 0.45826756
- 0.48569925 0.5193559  0.50111815 0.49602907 0.50187306 0.51564624
- 0.5044877  0.49516492 0.53699773 0.53619662 0.49522637 0.49021747
- 0.49303352 0.4761422  0.47717333 0.52917669 0.49497692 0.49441117
- 0.4665241  0.47693987 0.56661897 0.54354691 0.52055566 0.45443996
- 0.4442943  0.44803011 0.45358942 0.4946686  0.50283473 0.48740529
- 0.51334192 0.56235233 0.48150723 0.49305866 0.52013675 0.45956274
- 0.50475784 0.47641195 0.52173937 0.53192062 0.4641294  0.52850242
- 0.56247616 0.45048661 0.53799171 0.59090927 0.47109949 0.52749242
- 0.51867995 0.53020794 0.49290483 0.48186812 0.50892381 0.54478249
- 0.46703982 0.48050925 0.48455908 0.48991388 0.56116414 0.48157484
- 0.4350509  0.52571963 0.47811558 0.41423778 0.44215122 0.51006299
- 0.51990018 0.50194132 0.51197482 0.48566303 0.46503789 0.49796135
- 0.45517743 0.47800713 0.47378722 0.48726434 0.49106137 0.43862349
- 0.45365974 0.49619377 0.49942659 0.55166607 0.44318283 0.48603981]</code></pre>
+<pre><code>Diagonal (true): [0.43039105 0.48917618 0.48019971 0.47211575 0.47279553 0.38957475
+ 0.47718335 0.49324081 0.44885169 0.4277269  0.47087562 0.40021082
+ 0.51547132 0.50355377 0.43224247 0.49904148 0.45830626 0.43908647
+ 0.49578801 0.41473005 0.4380252  0.49264303 0.45569725 0.45448873
+ 0.49354691 0.44135131 0.5123524  0.41117827 0.50954408 0.37621029
+ 0.41117917 0.41648082 0.47618701 0.48732248 0.44938215 0.43333856
+ 0.46679709 0.49037643 0.45963049 0.44015421 0.47784954 0.43383009
+ 0.41779562 0.40693143 0.44369976 0.42771624 0.45130083 0.46434983
+ 0.45069401 0.45504158 0.45437503 0.46827701 0.39472713 0.42624312
+ 0.4595601  0.5121464  0.45399921 0.43078203 0.46551555 0.44837789
+ 0.44421661 0.39559263 0.47489302 0.48145368 0.42333797 0.44775148
+ 0.44606398 0.46929713 0.45426927 0.50505132 0.42504741 0.53282389
+ 0.42652887 0.41920312 0.43661854 0.48297299 0.48787196 0.47261286
+ 0.42495842 0.50271214 0.46050455 0.42619204 0.44340256 0.52068483
+ 0.48418565 0.42781388 0.48397916 0.46672302 0.4538436  0.4041382
+ 0.45380718 0.42478812 0.4503791  0.4129976  0.45673551 0.4088903
+ 0.5177648  0.47017075 0.50772493 0.4640203  0.44584979 0.52458109
+ 0.46171403 0.39565151 0.45915515 0.4831754  0.47053768 0.44984129
+ 0.49918333 0.4513592  0.43904331 0.46739028 0.40243068 0.45461889
+ 0.48136249 0.37343887 0.47656894 0.44833618 0.4642718  0.46425367
+ 0.4396633  0.45419251 0.43057853 0.42926385 0.51863643 0.42451582
+ 0.46106745 0.46384575 0.46696267 0.50305207 0.47860004 0.51036545
+ 0.44803493 0.43002539 0.41305307 0.44538271 0.443284   0.41770939
+ 0.4444684  0.48169309 0.4389208  0.45038395 0.43559241 0.50012206
+ 0.54438985 0.41679314 0.44648339 0.4874597  0.49814334 0.39021321]
+Diagonal est   : [0.4128793  0.46909619 0.46910046 0.5084607  0.4290224  0.39593945
+ 0.45256075 0.47055374 0.45511556 0.43204271 0.43587872 0.42170364
+ 0.51325711 0.49237296 0.43155544 0.47099311 0.44998781 0.43656665
+ 0.50922468 0.41706541 0.41830947 0.5028076  0.46750451 0.48369103
+ 0.52780259 0.43014709 0.52558716 0.37352875 0.53748579 0.39841121
+ 0.38251536 0.44768673 0.44863359 0.49694396 0.45209826 0.45974035
+ 0.46906822 0.4836988  0.43171736 0.46365202 0.46533754 0.40974034
+ 0.38970675 0.41829271 0.45045844 0.40360921 0.46909385 0.45468882
+ 0.42620199 0.43833108 0.46759341 0.47787056 0.36319605 0.40968787
+ 0.45839489 0.48724121 0.44554116 0.43381381 0.46668268 0.43166525
+ 0.4367249  0.40380281 0.47487089 0.47503138 0.42141051 0.40831931
+ 0.41111861 0.46392608 0.48468158 0.50221113 0.4267977  0.50683815
+ 0.44670193 0.42080076 0.39849286 0.45631293 0.50799767 0.49588713
+ 0.41904142 0.501057   0.43516668 0.42627724 0.41813385 0.45841907
+ 0.48692434 0.43427885 0.45806324 0.47426466 0.49838729 0.37467643
+ 0.43432659 0.41503367 0.42361309 0.4534481  0.45442027 0.39641301
+ 0.49577302 0.46029685 0.48177843 0.49812826 0.47003316 0.46957324
+ 0.4705284  0.39502745 0.44140719 0.47528234 0.50620268 0.4368425
+ 0.49147006 0.46268273 0.46241059 0.46602402 0.39172531 0.42443054
+ 0.44625376 0.37060657 0.48127276 0.42414685 0.48129331 0.48512297
+ 0.47771264 0.45382653 0.45525822 0.44734659 0.53069052 0.42277241
+ 0.47087112 0.49024026 0.45307882 0.50674378 0.47194383 0.52304702
+ 0.41989139 0.45417754 0.36090709 0.44793991 0.44182605 0.39300832
+ 0.45818277 0.49261867 0.45057148 0.49345532 0.44785415 0.48727228
+ 0.56923258 0.4351688  0.42631992 0.43998622 0.46885881 0.39889632]</code></pre>
 </div>
 </div>
 </section>
 <section id="matrix-function-approximation" class="level2">
 <h2 class="anchored" data-anchor-id="matrix-function-approximation">Matrix function approximation</h2>
 <p>In <code>primate</code>, the matrix function <span class="math inline">f(A)</span> is not constructed explicitly but instead the action <span class="math inline">v \mapsto f(A)v</span> is approximated with a fixed-degree Krylov expansion. This can be useful when, for example, the matrix <span class="math inline">A</span> itself is so large that the corresponding (typically dense) matrix function <span class="math inline">f(A) \in \mathbb{R}^{n \times n}</span> simply is too large to be explicitly represented. If you just want to approximate the action of a matrix function for a single vector <span class="math inline">v \in \mathbb{R}^n</span>, simply supply the vector and the matrix alongside the <code>matrix_function</code> call:</p>
-<div id="365e0823" class="cell" data-execution_count="5">
+<div id="06f4368f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.random.uniform(size<span class="op">=</span>A.shape[<span class="dv">0</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> matrix_function(A, fun<span class="op">=</span>np.exp, v<span class="op">=</span>v)</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"f(A)v = </span><span class="sc">{</span>y<span class="sc">.</span>T<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>f(A)v = [[ 0.33822871  1.2276779   0.76719528  1.11136963  1.4334131   0.33545821
-   1.12125454  1.40637298  1.66598107  1.62535025  0.52019603  1.25063547
-   0.66670276  1.29393251  0.69282503  1.0287493   0.72214663 -0.09204598
-   1.47707884  1.22172414  0.08029525  0.78770763 -0.75596991  0.70779358
-   1.60077048  0.94272982  0.97505924  1.15440836  0.7374584   0.88640891
-   1.36302058  0.85310954  1.4806497   0.02803763  1.66195592  1.57124059
-   0.42895017  1.40212259  0.69677458  1.73957543  0.34056903  0.11018724
-  -0.14044896  1.35214665  1.11838172  0.92102208  0.16351914  1.12927213
-   0.67417896  0.47943645  0.04712505  0.86780522  1.09441989  0.00576696
-   0.95410643  1.24937734  1.00069938  1.34737089  1.34542673  1.17581268
-   0.94485497  0.61413515  1.16895108 -0.05663465  0.34726807 -0.0823824
-   0.66178324  2.03735537  0.28002841  0.36672736  1.33998001  0.71647919
-   0.76080901  0.10740978  0.33567239  1.76869953  0.58288343  1.09524021
-  -0.35552142  0.67262108  0.71137472  1.41219314  1.03440015  1.00939543
-   1.44968963  0.32503392  1.06705694  1.55320964  1.4216318   0.95248097
-   0.6225137   1.40062256  0.65766157  1.310364    0.63641147  0.614348
-   0.78440083  1.4886851   0.17951006  1.03270084  1.16250856  1.82769459
-   0.60232387  1.03733921  1.34704035  0.72221557 -0.0858992   1.01855611
-   0.03182451  0.9202459   0.62553324  0.49787513  0.50668105  1.41735634
-   1.56267389  0.32624453  0.63401124  0.3030791   1.35970263  1.06566395
-   1.56303962  1.44498106  1.17646442  0.92645546  0.39534649  0.3284482
-   0.75593762  1.18763865  0.04964799  0.35780967  0.69458988  0.81534473
-   1.2975112   0.54524531  0.63795013  0.13581013  1.65822673  0.53282028
-   0.57330929  0.84964084 -0.39623483  1.48480022  1.63635673  1.35609933
-   0.08125627  0.46667781  1.25768933  0.09536721  0.68150763  0.96698516]]</code></pre>
+<pre><code>f(A)v = [[ 0.50444509  1.24373753  0.66257527  1.87426017  1.35483644  0.32319258
+   0.11222462  1.51720659  1.32246605  1.27418307  0.47376965  0.687332
+   0.74285256  1.30279225  0.65919571  1.27426128  0.8169443   0.09650747
+   1.06342659  1.15395045  0.28096554  1.25793983 -0.31636388  0.31830014
+   0.92254213  0.76316112  0.11851581  1.4088218   0.34046194  0.58564573
+   1.56324821  1.03526213  1.51792923  0.28736624  1.50519537  0.82929802
+   0.36866717  1.23992286  1.01278857  1.36708799  0.49677659  0.45406084
+  -0.15705239  1.24516567  0.75535214  0.94982429  0.64904663  0.59256738
+   0.34900934  0.66340444  0.34038333  0.94300462  1.07683855 -0.10514469
+   0.93518472  1.48962457  1.13893832  2.15776093  1.74258434  1.4426845
+   0.38961754  1.28768415  1.20289649  0.28788456  0.53010087 -0.00470542
+   1.00184611  1.11400853 -0.04588343  0.23290699  1.29196692  1.26617789
+   1.11329847  0.05133848  0.28510027  1.42144544  0.21635319  0.88236445
+   0.07212113  0.63383665  1.03432736  1.33325086  1.33007781  1.45767937
+   1.29312312  0.12189215  0.99541253  1.38529962  0.6154369   0.70890881
+   0.47060941  1.22446674  1.29472167  1.40862791  0.98609169  0.98835942
+   0.91832746  1.72927251  0.0933377   1.11561648  1.13518724  1.15862124
+   0.9525651   0.90107864  1.6088772  -0.152054   -0.25593814  0.82607775
+  -0.14119817  1.61814449  0.47211876  0.23345096  0.57629949  1.62210853
+   1.40725064  0.28228201  0.05393534  0.82527403  2.32822925  1.08710937
+   1.60075676  1.9139616   1.73962763  0.97570428  0.05606992  0.27434433
+   0.37690065  0.994164    0.29030612  0.3907946   0.49984998  0.98740855
+   1.62383136  0.67884834  0.03748605  0.27472411  1.26595132 -0.00699944
+   0.45757148  1.18968276  0.44377037  1.20139756  1.7741653   0.48424526
+  -0.14270435  0.65139214  1.27905184 -0.09324766  1.20138143 -0.01421768]]</code></pre>
 </div>
 </div>
 <p>Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a <code>MatrixFunction</code> instance and use it like any other <code>LinearOperator</code>:</p>
-<div id="d62f12e2" class="cell" data-execution_count="6">
+<div id="487d57dd" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> MatrixFunction</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ExpA <span class="op">@</span> v</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exp(A)v = </span><span class="sc">{</span>y<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>exp(A)v = [ 0.33822871  1.2276779   0.76719528  1.11136963  1.4334131   0.33545821
-  1.12125454  1.40637298  1.66598107  1.62535025  0.52019603  1.25063547
-  0.66670276  1.29393251  0.69282503  1.0287493   0.72214663 -0.09204598
-  1.47707884  1.22172414  0.08029525  0.78770763 -0.75596991  0.70779358
-  1.60077048  0.94272982  0.97505924  1.15440836  0.7374584   0.88640891
-  1.36302058  0.85310954  1.4806497   0.02803763  1.66195592  1.57124059
-  0.42895017  1.40212259  0.69677458  1.73957543  0.34056903  0.11018724
- -0.14044896  1.35214665  1.11838172  0.92102208  0.16351914  1.12927213
-  0.67417896  0.47943645  0.04712505  0.86780522  1.09441989  0.00576696
-  0.95410643  1.24937734  1.00069938  1.34737089  1.34542673  1.17581268
-  0.94485497  0.61413515  1.16895108 -0.05663465  0.34726807 -0.0823824
-  0.66178324  2.03735537  0.28002841  0.36672736  1.33998001  0.71647919
-  0.76080901  0.10740978  0.33567239  1.76869953  0.58288343  1.09524021
- -0.35552142  0.67262108  0.71137472  1.41219314  1.03440015  1.00939543
-  1.44968963  0.32503392  1.06705694  1.55320964  1.4216318   0.95248097
-  0.6225137   1.40062256  0.65766157  1.310364    0.63641147  0.614348
-  0.78440083  1.4886851   0.17951006  1.03270084  1.16250856  1.82769459
-  0.60232387  1.03733921  1.34704035  0.72221557 -0.0858992   1.01855611
-  0.03182451  0.9202459   0.62553324  0.49787513  0.50668105  1.41735634
-  1.56267389  0.32624453  0.63401124  0.3030791   1.35970263  1.06566395
-  1.56303962  1.44498106  1.17646442  0.92645546  0.39534649  0.3284482
-  0.75593762  1.18763865  0.04964799  0.35780967  0.69458988  0.81534473
-  1.2975112   0.54524531  0.63795013  0.13581013  1.65822673  0.53282028
-  0.57330929  0.84964084 -0.39623483  1.48480022  1.63635673  1.35609933
-  0.08125627  0.46667781  1.25768933  0.09536721  0.68150763  0.96698516]</code></pre>
+<pre><code>exp(A)v = [ 0.50444509  1.24373753  0.66257527  1.87426017  1.35483644  0.32319258
+  0.11222462  1.51720659  1.32246605  1.27418307  0.47376965  0.687332
+  0.74285256  1.30279225  0.65919571  1.27426128  0.8169443   0.09650747
+  1.06342659  1.15395045  0.28096554  1.25793983 -0.31636388  0.31830014
+  0.92254213  0.76316112  0.11851581  1.4088218   0.34046194  0.58564573
+  1.56324821  1.03526213  1.51792923  0.28736624  1.50519537  0.82929802
+  0.36866717  1.23992286  1.01278857  1.36708799  0.49677659  0.45406084
+ -0.15705239  1.24516567  0.75535214  0.94982429  0.64904663  0.59256738
+  0.34900934  0.66340444  0.34038333  0.94300462  1.07683855 -0.10514469
+  0.93518472  1.48962457  1.13893832  2.15776093  1.74258434  1.4426845
+  0.38961754  1.28768415  1.20289649  0.28788456  0.53010087 -0.00470542
+  1.00184611  1.11400853 -0.04588343  0.23290699  1.29196692  1.26617789
+  1.11329847  0.05133848  0.28510027  1.42144544  0.21635319  0.88236445
+  0.07212113  0.63383665  1.03432736  1.33325086  1.33007781  1.45767937
+  1.29312312  0.12189215  0.99541253  1.38529962  0.6154369   0.70890881
+  0.47060941  1.22446674  1.29472167  1.40862791  0.98609169  0.98835942
+  0.91832746  1.72927251  0.0933377   1.11561648  1.13518724  1.15862124
+  0.9525651   0.90107864  1.6088772  -0.152054   -0.25593814  0.82607775
+ -0.14119817  1.61814449  0.47211876  0.23345096  0.57629949  1.62210853
+  1.40725064  0.28228201  0.05393534  0.82527403  2.32822925  1.08710937
+  1.60075676  1.9139616   1.73962763  0.97570428  0.05606992  0.27434433
+  0.37690065  0.994164    0.29030612  0.3907946   0.49984998  0.98740855
+  1.62383136  0.67884834  0.03748605  0.27472411  1.26595132 -0.00699944
+  0.45757148  1.18968276  0.44377037  1.20139756  1.7741653   0.48424526
+ -0.14270435  0.65139214  1.27905184 -0.09324766  1.20138143 -0.01421768]</code></pre>
 </div>
 </div>
 <p>If you don’t supply a vector <code>v</code> to the <code>matrix_function</code> call, a <code>MatrixFunction</code> instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (<code>deg</code>) using the Lanczos method (without reorthogonalization). Some function specializations are inherently more difficult to approximate and can depend on the smoothness of <span class="math inline">f</span> and the conditioning of the corresponding operator <span class="math inline">f(A)</span>; in general, the Lanczos method up to degree <span class="math inline">k</span> can approximate the action <span class="math inline">v \mapsto f(A)v</span> as well as the operator <span class="math inline">p(A)</span> can, where <span class="math inline">p</span> is best-fitting degree <span class="math inline">2k-1</span> polynomial approximation of <span class="math inline">f</span>.</p>
-<div id="0d43f65c" class="cell" data-execution_count="7">
+<div id="09dbddbb" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> expm</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Error from exp(A): </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm((expm(A) <span class="op">@</span> v) <span class="op">-</span> y)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> timeit <span class="im">import</span> timeit</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>timeforlan <span class="op">=</span> timeit(<span class="kw">lambda</span>: ExpA <span class="op">@</span> v, number<span class="op">=</span><span class="dv">100</span>)<span class="op">/</span><span class="dv">100</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>timeforexpmA <span class="op">=</span> timeit(<span class="kw">lambda</span>: expm(A), number<span class="op">=</span><span class="dv">100</span>)<span class="op">/</span><span class="dv">100</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>B <span class="op">=</span> expm(A)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>timeforexpmAv <span class="op">=</span> timeit(<span class="kw">lambda</span>: B <span class="op">@</span> v, number<span class="op">=</span><span class="dv">100</span>)<span class="op">/</span><span class="dv">100</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> expm(A)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ExpA0 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">5</span>, orth<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ExpA1 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">20</span>, orth<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ExpA2 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">50</span>, orth<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> ExpA <span class="op">@</span> v</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> ExpA0 <span class="op">@</span> v</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ExpA1 <span class="op">@</span> v </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> ExpA2 <span class="op">@</span> v</span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>sample_index <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> np.arange(<span class="dv">30</span>)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>timeforsp <span class="op">=</span> timeforexpmA <span class="op">+</span> timeforexpmAv <span class="op">*</span> sample_index</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>timeformf <span class="op">=</span> timeforlan <span class="op">*</span> sample_index</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> figure(width<span class="op">=</span><span class="dv">350</span>, height<span class="op">=</span><span class="dv">200</span>)</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>p.line(sample_index, timeforsp, color<span class="op">=</span><span class="st">'red'</span>)</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>p.scatter(sample_index, timeforsp, color<span class="op">=</span><span class="st">'red'</span>,  size<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>p.line(sample_index, timeformf, color<span class="op">=</span><span class="st">'blue'</span>)</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>p.scatter(sample_index, timeformf, color<span class="op">=</span><span class="st">'blue'</span>, size<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>show(p)</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">50</span>, orth<span class="op">=</span><span class="dv">50</span>)</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> ExpA <span class="op">@</span> v</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Error: </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm((expm(A) <span class="op">@</span> v) <span class="op">-</span> z)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-5 approx error  (no reorth.)   : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> x)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-20 approx error (no reorth.)   : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> y)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-50 approx error (full reorth.) : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> z)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Error from exp(A): 3.241183264847419e-14</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-
-  <div id="b0a9a45d-8e59-48ff-80f6-e0a731413027" data-root-id="p5693" style="display: contents;"></div>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/javascript">
-(function(root) {
-  function embed_document(root) {
-  const docs_json = {"96f2ffdd-02ac-467f-afe8-18cdf43aedb5":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p5693","attributes":{"width":350,"height":200,"x_range":{"type":"object","name":"DataRange1d","id":"p5694"},"y_range":{"type":"object","name":"DataRange1d","id":"p5695"},"x_scale":{"type":"object","name":"LinearScale","id":"p5702"},"y_scale":{"type":"object","name":"LinearScale","id":"p5703"},"title":{"type":"object","name":"Title","id":"p5700"},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p5733","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5727","attributes":{"selected":{"type":"object","name":"Selection","id":"p5728","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5729"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAA"},"shape":[30],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"uR6FAkBYYT9SuB65/mphP+xRuG+9fWE/hetRJnyQYT8fhevcOqNhP7kehZP5tWE/UrgeSrjIYT/sUbgAd9thP4XrUbc17mE/H4XrbfQAYj+5HoUksxNiP1K4HttxJmI/7FG4kTA5Yj+F61FI70tiPx+F6/6tXmI/uR6FtWxxYj9SuB5sK4RiP+xRuCLqlmI/hetR2aipYj8fheuPZ7xiP7kehUYmz2I/Urge/eThYj/sUbizo/RiP4XrUWpiB2M/H4XrICEaYz+5HoXX3yxjP1K4Ho6eP2M/7FG4RF1SYz+G61H7G2VjPx+F67Had2M/"},"shape":[30],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5734","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5735"}}},"glyph":{"type":"object","name":"Line","id":"p5730","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"red"}},"nonselection_glyph":{"type":"object","name":"Line","id":"p5731","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"red","line_alpha":0.1}},"muted_glyph":{"type":"object","name":"Line","id":"p5732","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"red","line_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"p5742","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5736","attributes":{"selected":{"type":"object","name":"Selection","id":"p5737","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5738"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAA"},"shape":[30],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"uR6FAkBYYT9SuB65/mphP+xRuG+9fWE/hetRJnyQYT8fhevcOqNhP7kehZP5tWE/UrgeSrjIYT/sUbgAd9thP4XrUbc17mE/H4XrbfQAYj+5HoUksxNiP1K4HttxJmI/7FG4kTA5Yj+F61FI70tiPx+F6/6tXmI/uR6FtWxxYj9SuB5sK4RiP+xRuCLqlmI/hetR2aipYj8fheuPZ7xiP7kehUYmz2I/Urge/eThYj/sUbizo/RiP4XrUWpiB2M/H4XrICEaYz+5HoXX3yxjP1K4Ho6eP2M/7FG4RF1SYz+G61H7G2VjPx+F67Had2M/"},"shape":[30],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5743","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5744"}}},"glyph":{"type":"object","name":"Scatter","id":"p5739","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"red"},"fill_color":{"type":"value","value":"red"},"hatch_color":{"type":"value","value":"red"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p5740","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"red"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"red"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"red"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p5741","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"red"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"red"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"red"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p5751","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5745","attributes":{"selected":{"type":"object","name":"Selection","id":"p5746","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5747"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAA"},"shape":[30],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"exSuRyzmPj97FK5HLOZOP1yPwjWhLFc/exSuRyzmXj/NzMys209jP1yPwjWhLGc/7FG4vmYJaz97FK5HLOZuP4XrUeh4YXE/zczMrNtPcz8VrkdxPj51P1yPwjWhLHc/pHA9+gMbeT/sUbi+Zgl7PzMzM4PJ93w/exSuRyzmfj/hehSGR2qAP4XrUeh4YYE/KVyPSqpYgj/NzMys20+DP3E9Cg8NR4Q/Fa5HcT4+hT+4HoXTbzWGP1yPwjWhLIc/AAAAmNIjiD+kcD36AxuJP0jhelw1Eoo/7FG4vmYJiz+PwvUgmACMPzMzM4PJ94w/"},"shape":[30],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5752","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5753"}}},"glyph":{"type":"object","name":"Line","id":"p5748","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"blue"}},"nonselection_glyph":{"type":"object","name":"Line","id":"p5749","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"blue","line_alpha":0.1}},"muted_glyph":{"type":"object","name":"Line","id":"p5750","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":"blue","line_alpha":0.2}}}},{"type":"object","name":"GlyphRenderer","id":"p5760","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5754","attributes":{"selected":{"type":"object","name":"Selection","id":"p5755","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5756"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAA"},"shape":[30],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"exSuRyzmPj97FK5HLOZOP1yPwjWhLFc/exSuRyzmXj/NzMys209jP1yPwjWhLGc/7FG4vmYJaz97FK5HLOZuP4XrUeh4YXE/zczMrNtPcz8VrkdxPj51P1yPwjWhLHc/pHA9+gMbeT/sUbi+Zgl7PzMzM4PJ93w/exSuRyzmfj/hehSGR2qAP4XrUeh4YYE/KVyPSqpYgj/NzMys20+DP3E9Cg8NR4Q/Fa5HcT4+hT+4HoXTbzWGP1yPwjWhLIc/AAAAmNIjiD+kcD36AxuJP0jhelw1Eoo/7FG4vmYJiz+PwvUgmACMPzMzM4PJ94w/"},"shape":[30],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5761","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5762"}}},"glyph":{"type":"object","name":"Scatter","id":"p5757","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"blue"},"fill_color":{"type":"value","value":"blue"},"hatch_color":{"type":"value","value":"blue"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p5758","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"blue"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"value","value":"blue"},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"blue"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p5759","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"size":{"type":"value","value":1},"line_color":{"type":"value","value":"blue"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"value","value":"blue"},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"blue"},"hatch_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p5701","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p5714"},{"type":"object","name":"WheelZoomTool","id":"p5715","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p5716","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p5717","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p5723","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p5722","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p5724"},{"type":"object","name":"ResetTool","id":"p5725"},{"type":"object","name":"HelpTool","id":"p5726"}]}},"left":[{"type":"object","name":"LinearAxis","id":"p5709","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p5710","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p5711"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p5712"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p5704","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p5705","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p5706"},"major_label_policy":{"type":"object","name":"AllLabels","id":"p5707"}}}],"center":[{"type":"object","name":"Grid","id":"p5708","attributes":{"axis":{"id":"p5704"}}},{"type":"object","name":"Grid","id":"p5713","attributes":{"dimension":1,"axis":{"id":"p5709"}}}]}}]}};
-  const render_items = [{"docid":"96f2ffdd-02ac-467f-afe8-18cdf43aedb5","roots":{"p5693":"b0a9a45d-8e59-48ff-80f6-e0a731413027"},"root_ids":["p5693"]}];
-  void root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
-  }
-  if (root.Bokeh !== undefined) {
-    embed_document(root);
-  } else {
-    let attempts = 0;
-    const timer = setInterval(function(root) {
-      if (root.Bokeh !== undefined) {
-        clearInterval(timer);
-        embed_document(root);
-      } else {
-        attempts++;
-        if (attempts > 100) {
-          clearInterval(timer);
-          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
-        }
-      }
-    }, 10, root)
-  }
-})(window);
-</script>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Error: 5.638564484707072e-14</code></pre>
+<pre><code>Deg-5 approx error  (no reorth.)   : 0.00012614623767986385
+Deg-20 approx error (no reorth.)   : 4.282655257652451e-14
+Deg-50 approx error (full reorth.) : 1.232476649260152e-13</code></pre>
 </div>
 </div>
+<p>As you can see, for smoother matrix functions (like <span class="math inline">\mathrm{exp}(A)</span>), even a low degree Krylov expansion can be more than sufficient for many application purposes, even without any re-orthogonalization.</p>
 </section>
 <section id="configuration" class="level2">
 <h2 class="anchored" data-anchor-id="configuration">Configuration</h2>
-<p>By default, the various estimators offered by <code>primate</code> simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over the computation and the type of information collected during execution.</p>
-<p>To get all the information about the computation, simply pass <code>full=True</code> to obtain an <code>EstimatorResult</code> along with the estimate itself. This object contains information about estimation process itself, basic properties, as well as convergence information about the computation:</p>
-<div id="91b942b9" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(info.message)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>By default, the various estimators offered by <code>primate</code> simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution.</p>
+<p>To get all the information about the computation, simply pass <code>full=True</code> to the corresponding estimator call. This will yield <code>EstimatorResult</code> along with the estimate itself, which contains information about execution itself, convergence information of the estimator, and other status messages, such as the argin of error of a default-constructed confidence interval:</p>
+<div id="4c79fef7" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(info.message)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Est: 73.740 +/- 1.173 (95% CI, #S:64)</code></pre>
+<pre><code>Est: 68.180 +/- 1.133 (95% CI, #S:64)</code></pre>
 </div>
 </div>
 <p>To get a better idea of what the sample values and the corresponding estimate looked like as the sample size increased, you can plot the sequence with the <code>figure_sequence</code> function:</p>
-<div id="0b5d069b" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.plotting <span class="im">import</span> figure_sequence</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>, record<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> figure_sequence(info.estimator.values)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="7ab0798b" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.plotting <span class="im">import</span> figure_sequence</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>, record<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> figure_sequence(info.estimator.values)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-  <div id="f6e7674b-146e-4e7e-93a4-546e239a5be7" data-root-id="p5771" style="display: contents;"></div>
+  <div id="be813e0e-8647-4e3f-8b6e-de02144f97ad" data-root-id="p1181" style="display: contents;"></div>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/javascript">
 (function(root) {
   function embed_document(root) {
-  const docs_json = {"0cbb5329-2fc2-4914-a3a7-1747ff3af6fd":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p5771","attributes":{"width":400,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p5772"},"y_range":{"type":"object","name":"DataRange1d","id":"p5773"},"x_scale":{"type":"object","name":"LinearScale","id":"p5781"},"y_scale":{"type":"object","name":"LinearScale","id":"p5782"},"title":{"type":"object","name":"Title","id":"p5774","attributes":{"text":"Monte Carlo sample variates","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p5812","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5806","attributes":{"selected":{"type":"object","name":"Selection","id":"p5807","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5808"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"5oFOlSUZU0D24k7bUAJUQFnu3gQLs1FAwrSjNYZ/UkDGJ1+N+kZRQIog0V6Oy1JAC2UlUkS7UkCF/7G33aFSQKmFKyisolNAv78GYmVEVEBoQrr/S9pSQOFeNBrPTFJAUUZ4moOuUkAssENYIJVSQOeYmWWmOFVAlA7cJzX2UUC4jQ5Y+ptOQKnLnutEPVNALS4apil3VUBph2+8TOxQQPy8ihTJTlJADaNXaVecU0DRyZQJJuBUQFb/yLI4nFFAykCl1wvNUkCKWRkIcFpTQJlYRta9w1RA/xP8aQoEVEC1of9wCaJRQASuVgmRyVVAND+PAUREUkDKPdPM3pdSQEpicWZvj1NA6aSv4H4gUkAQK+ffBYlRQHQybHFuGlFAJ3p4WmkjU0AXUqDyk/lRQNes3i2AElJAW6zmUGYaU0DL3UrVVM5RQAdFQ5DV1FFAPP9PlWgWU0CG1CAfpkdTQEe2AaS9J1BAVoclL7iGU0AeYjILvmBRQDh0gOlm1FRAYFFDVEGlUkD+AxNKy8FSQEJ3/vX2Z1BATRF35fV9UUCs5tu4CZ5SQBeSmSLmZFNAzSXBgFreUkBxrGkJdmhSQO3szp5WfVBAxmbjoHEWU0Amr/EpfvdSQO0OR2fUaVJAgyr30akMUkD1aq+jSSRQQOr0eEhfllJAkm3SlGOXUUA="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5813","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5814"}}},"glyph":{"type":"object","name":"Scatter","id":"p5809","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p5810","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p5811","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p5823","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p5817","attributes":{"selected":{"type":"object","name":"Selection","id":"p5818","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p5819"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"5oFOlSUZU0Busk44u41TQGfGfnyA71JA/gHI6oHTUkDAPOakM4RSQGENOBkYkFJAMKzH/EKWUkCb9iRUtpdSQIAGe91ftVJABpki0UbdUkBsqEd4Ad1SQPYMxkX90FJAESX7X1bOUkBJwds6QMpSQFN6+YG+81JAl6NX7OXjUkCMB3FK561SQAB2LEXetVJAfOtTL/3aUkDiTJUpQcJSQILkGorBvFJA/DLMQuvGUkBf1SLcRt5SQMnBaZrb0FJAOlafkrTQUkAz4K20ANZSQBsBvRRK6FJAovjsYGzyUkCAyeTl0uZSQPwuAtZy/1JASEg4EWn5UkD0HxW/XPZSQNCGhDgA+1JAKoA6AZP0UkBz6wTjL+pSQKU7pBFO3VJAM55yITPfUkB2FW00KNlSQDcMQjQQ1FJAa8NfW9LVUkD9DicmZc9SQBUEuuttyVJAfMIcNzjLUkCHTu4qDM5SQB/wIVv5vlJABVKR+1DDUkByFqWvxbtSQLz9LrbzxlJAm3e8qUPGUkCI/4rGLMZSQB0+iNZJulJA3tUMiDS0UkBpeqZ1ybNSQHHLCRoRt1JACGKr9se3UkA4WpNbXbZSQOYmErthrFJAGgnu3TWuUkABTYrWc69SQLTH4sdKrlJAozpQeKSrUkDWaGaFM6FSQLbUboQHoVJAGWOw9OCcUkA="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p5824","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p5825"}}},"glyph":{"type":"object","name":"Line","id":"p5820","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":1.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p5821","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":1.5}},"muted_glyph":{"type":"object","name":"Line","id":"p5822","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":1.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p5780","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p5793"},{"type":"object","name":"WheelZoomTool","id":"p5794","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p5795","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p5796","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p5802","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p5801","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p5803"},{"type":"object","name":"ResetTool","id":"p5804"},{"type":"object","name":"HelpTool","id":"p5805"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p5788","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p5789","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p5790"},"axis_label":"Estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p5791"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p5783","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p5784","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p5785"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p5786"}}}],"center":[{"type":"object","name":"Grid","id":"p5787","attributes":{"axis":{"id":"p5783"}}},{"type":"object","name":"Grid","id":"p5792","attributes":{"dimension":1,"axis":{"id":"p5788"}}},{"type":"object","name":"Legend","id":"p5815","attributes":{"location":"top_left","title_text_font_size":"11px","label_text_font_size":"11px","margin":4,"padding":4,"spacing":2,"items":[{"type":"object","name":"LegendItem","id":"p5816","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p5812"}]}},{"type":"object","name":"LegendItem","id":"p5826","attributes":{"label":{"type":"value","value":"estimator"},"renderers":[{"id":"p5823"}]}}]}}]}}]}};
-  const render_items = [{"docid":"0cbb5329-2fc2-4914-a3a7-1747ff3af6fd","roots":{"p5771":"f6e7674b-146e-4e7e-93a4-546e239a5be7"},"root_ids":["p5771"]}];
+  const docs_json = {"cf8d12ca-24d3-4ec9-98a0-772f8055958e":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p1181","attributes":{"width":400,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p1182"},"y_range":{"type":"object","name":"DataRange1d","id":"p1183"},"x_scale":{"type":"object","name":"LinearScale","id":"p1191"},"y_scale":{"type":"object","name":"LinearScale","id":"p1192"},"title":{"type":"object","name":"Title","id":"p1184","attributes":{"text":"Monte Carlo sample variates","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1222","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1216","attributes":{"selected":{"type":"object","name":"Selection","id":"p1217","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1218"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"knJNkPjMT0AXlgS3KQlTQHrFLTHooVBAw8E9zLMDUEBIXILafglRQA30m4+eRE1AEHAyBL9DUUBgNkXe/EFSQF+6ewX2pVJAfUZiSowXUUAtMY+sS4BQQHQzoxItCFBAQiqoRPd6VEDUH/a8rPRQQMDE4R0jOlJAUAe+CgIBUEAT34FGzdlQQEUQSoywsVJA8aEIo9QSUUCTPWEOkD1QQBi5CGm6HlJAe8x9Gb+0UUDNF3wNm/BRQGr4gggP4k9ApXLG36esUkDfr/r4xopSQGmo3GqG5lFAZtK1YjhwUEAqTvrjcq9SQMe7p5FM+FFATYmITKTCUEBT0GeGcVdRQPFjRC+93E5AfV3+edyqUUDmrp0L3X9QQAuLBq41/VBAwHwIBd6pUkAp+UuSEIpPQKcMRB8/X1BAZJKTG38KU0D1RW96T7NQQG+6MMxgS01AWWYFrbA1U0B8fmQoIbdQQC7NJm7KYVBAX/KWcYbdUUAeHBLeqXRPQG8XG8Mm5FBASALzdhhsUUC1Kn4B80BQQDMYHyVIf09AgaGcMLRzUkD93Auri01RQKfbB1j3cVBAu21rDfvMU0AO6v+R0RRQQCjfAAgD6VBAPXaM6ZgBU0BQWUGWZSZSQCUucAHcrU5Ay+HXH+xxUkAjB6R0LpNSQFn6TnmTcVFAfMzKZcslU0A="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1223","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1224"}}},"glyph":{"type":"object","name":"Scatter","id":"p1219","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1220","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1221","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1233","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1227","attributes":{"selected":{"type":"object","name":"Selection","id":"p1228","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1229"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"knJNkPjMT0Cwp5X/0ndRQElcyLqEMFFAp7Ulf1DlUED61tH3jOxQQH2HJgXYilBA2/GVKUKlUEBs2iuA2dhQQNzW+44VDFFA064fCDsNUUAhjBIXawBRQBOaXkG761BAtEJkkNMxUUB/0rdcdS1RQKXi/s9eP1FA8NSqA3krUUAue7clqyZRQCEuozmdPFFAs0EvP2o6UUBKjr68xS1RQM4uSBo/OVFAP82EMdw+UUDKPyCUlkZRQPlMzEhbOFFAmtPBoD9HUUCceSYksVNRQPk4LVYhWVFABmPE389QUUD2c4gm51xRQH0YozIVYlFA/5cNhvBcUUDCaRCOxFxRQMxQBTnJTVFAK9E5BoZQUUC0Ci7Tj0pRQNPx7MNpSFFAVgolSfdRUUCoK+80hUdRQB5FtomQQVFADWf15vxMUUCQIfJaPUlRQKbNo7YnOVFAS8VMRftEUUAMODDzwUFRQBKcydPHPFFATObpZ0ZAUUDHpa51+jdRQHs99mE7NlFAuEbhylQ3UUAznRdRZzJRQOimyTsiK1FA9NxDz3MxUUCFd0yB+zFRQHzArjRtLlFAL/KMVJ46UUB3bco+XzVRQN2gTUsINFFAISDTi/07UUAmSLKh9j9RQHbpehbQN1FAeEFjUfY8UUCP4TZae0JRQLcSK7g6Q1FAnpHh+sRKUUA="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1234","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1235"}}},"glyph":{"type":"object","name":"Line","id":"p1230","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":1.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1231","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":1.5}},"muted_glyph":{"type":"object","name":"Line","id":"p1232","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":1.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1190","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1203"},{"type":"object","name":"WheelZoomTool","id":"p1204","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p1205","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1206","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p1212","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1211","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p1213"},{"type":"object","name":"ResetTool","id":"p1214"},{"type":"object","name":"HelpTool","id":"p1215"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1198","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1199","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1200"},"axis_label":"Estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p1201"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1193","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1194","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1195"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1196"}}}],"center":[{"type":"object","name":"Grid","id":"p1197","attributes":{"axis":{"id":"p1193"}}},{"type":"object","name":"Grid","id":"p1202","attributes":{"dimension":1,"axis":{"id":"p1198"}}},{"type":"object","name":"Legend","id":"p1225","attributes":{"location":"top_left","title_text_font_size":"11px","label_text_font_size":"11px","margin":4,"padding":4,"spacing":2,"items":[{"type":"object","name":"LegendItem","id":"p1226","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p1222"}]}},{"type":"object","name":"LegendItem","id":"p1236","attributes":{"label":{"type":"value","value":"estimator"},"renderers":[{"id":"p1233"}]}}]}}]}}]}};
+  const render_items = [{"docid":"cf8d12ca-24d3-4ec9-98a0-772f8055958e","roots":{"p1181":"be813e0e-8647-4e3f-8b6e-de02144f97ad"},"root_ids":["p1181"]}];
   void root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
   }
   if (root.Bokeh !== undefined) {
@@ -933,6 +890,24 @@ print(f"GR approx:  {hutch(M)}")
 print(f"Hutch++ :   {hutchpp(M)}")
 print(f"XTrace:     {xtrace(M)}")
 ``` -->
+<!-- from timeit import timeit
+timeforlan = timeit(lambda: ExpA @ v, number=100)/100
+
+timeforexpmA = timeit(lambda: expm(A), number=100)/100
+B = expm(A)
+timeforexpmAv = timeit(lambda: B @ v, number=100)/100
+
+sample_index = 1 + np.arange(30)
+timeforsp = timeforexpmA + timeforexpmAv * sample_index
+timeformf = timeforlan * sample_index
+
+p = figure(width=350, height=200)
+
+p.line(sample_index, timeforsp, color='red')
+p.scatter(sample_index, timeforsp, color='red',  size=1)
+p.line(sample_index, timeformf, color='blue')
+p.scatter(sample_index, timeformf, color='blue', size=1)
+show(p) -->
 
 
 </section>

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Union
+from typing import Callable, Union, Optional
 
 import numpy as np
 import scipy as sp  # allows for lazy loading
@@ -17,7 +17,7 @@ def symmetric(
 	n: int,
 	dist: str = "normal",
 	pd: bool = True,
-	ew: np.ndarray = None,
+	ew: Optional[np.ndarray] = None,
 	seed: Union[int, np.random.Generator, None] = None,
 ) -> np.ndarray:
 	"""Generates a random symmetric matrix of size `n` with eigenvalues `ew`.
@@ -51,7 +51,7 @@ def symmetric(
 	return A
 
 
-def haar(n: int, ew: np.ndarray = None, seed: Union[int, np.random.Generator, None] = None) -> np.ndarray:
+def haar(n: int, ew: Optional[np.ndarray] = None, seed: Union[int, np.random.Generator, None] = None) -> np.ndarray:
 	"""Generates a random matrix with prescribed eigenvalues by sampling uniformly from the orthogonal group O(n).
 
 	Parameters:
@@ -74,7 +74,7 @@ def haar(n: int, ew: np.ndarray = None, seed: Union[int, np.random.Generator, No
 
 def isotropic(
 	size: Union[int, tuple, None] = None, pdf: str = "rademacher", seed: Union[int, np.random.Generator, None] = None
-) -> np.ndarray:
+) -> Union[np.ndarray, Callable]:
 	"""Generates random vectors from a specified isotropic distribution.
 
 	Parameters:
@@ -85,12 +85,11 @@ def isotropic(
 	Returns:
 		Array of shape `size` with rows distributed according to `pdf`.
 	"""
-	assert isinstance(pdf, Callable) or pdf in _ISO_DISTRIBUTIONS.keys(), f"Invalid distribution '{pdf}' supplied."
-	pdf = _ISO_DISTRIBUTIONS[pdf] if isinstance(pdf, str) else pdf
+	assert pdf in _ISO_DISTRIBUTIONS.keys(), f"Invalid distribution '{pdf}' supplied."
+	pdf: str = _ISO_DISTRIBUTIONS[pdf]
 	rng = np.random.default_rng(seed)
 	if size is None:
-		pdf = partial(isotropic, pdf=pdf, seed=rng)
-		return pdf
+		return partial(isotropic, pdf=pdf, seed=rng)
 	size = (1, size) if isinstance(size, int) else size
 	if pdf == "rademacher":
 		W = rng.choice([-1.0, +1.0], size=size, replace=True)

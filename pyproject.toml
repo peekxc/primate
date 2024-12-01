@@ -41,6 +41,9 @@ setup = []
 compile = ['-j6']
 install = [] # '--tags=runtime,python-runtime'
 
+[tool.mypy]
+disable_error_code = ['import-untyped', 'no-redef']
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-rA"

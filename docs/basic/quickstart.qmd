@@ -107,45 +107,28 @@ If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunctio
 
 ```{python}
 from scipy.linalg import expm
-print(f"Error from exp(A): {np.linalg.norm((expm(A) @ v) - y)}")
+ExpA = expm(A)
+ExpA0 = MatrixFunction(A, fun=np.exp, deg=5, orth=0)
+ExpA1 = MatrixFunction(A, fun=np.exp, deg=20, orth=0)
+ExpA2 = MatrixFunction(A, fun=np.exp, deg=50, orth=50)
 
+w = ExpA @ v
+x = ExpA0 @ v
+y = ExpA1 @ v 
+z = ExpA2 @ v
 
-from timeit import timeit
-timeforlan = timeit(lambda: ExpA @ v, number=100)/100
-
-timeforexpmA = timeit(lambda: expm(A), number=100)/100
-B = expm(A)
-timeforexpmAv = timeit(lambda: B @ v, number=100)/100
-
-sample_index = 1 + np.arange(30)
-timeforsp = timeforexpmA + timeforexpmAv * sample_index
-timeformf = timeforlan * sample_index
-
-p = figure(width=350, height=200)
-
-p.line(sample_index, timeforsp, color='red')
-p.scatter(sample_index, timeforsp, color='red',  size=1)
-p.line(sample_index, timeformf, color='blue')
-p.scatter(sample_index, timeformf, color='blue', size=1)
-show(p)
-
-ExpA = MatrixFunction(A, fun=np.exp, deg=50, orth=50)
-z = ExpA @ v
-print(f"Error: {np.linalg.norm((expm(A) @ v) - z)}")
-
+print(f"Deg-5 approx error  (no reorth.)   : {np.linalg.norm(w - x)}")
+print(f"Deg-20 approx error (no reorth.)   : {np.linalg.norm(w - y)}")
+print(f"Deg-50 approx error (full reorth.) : {np.linalg.norm(w - z)}")
 ```
 
-
-```{python}
-
-```
-
+As you can see, for smoother matrix functions (like $\mathrm{exp}(A)$), even a low degree Krylov expansion can be more than sufficient for many application purposes, even without any re-orthogonalization.
 
 ## Configuration 
 
-By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over the computation and the type of information collected during execution. 
+By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution. 
 
-To get all the information about the computation, simply pass `full=True` to obtain an `EstimatorResult` along with the estimate itself. This object contains information about estimation process itself, basic properties, as well as convergence information about the computation: 
+To get all the information about the computation, simply pass `full=True` to the corresponding estimator call. This will yield `EstimatorResult` along with the estimate itself, which contains information about execution itself, convergence information of the estimator, and other status messages, such as the argin of error of a default-constructed confidence interval: 
 ```{python}
 est, info = hutch(A, full=True)
 print(info.message)
@@ -154,12 +137,14 @@ print(info.message)
 To get a better idea of what the sample values and the corresponding estimate looked like as the sample size increased, you can plot the sequence with 
 the `figure_sequence` function:
 ```{python}
+#| echo: true
 from primate.plotting import figure_sequence
 
 est, info = hutch(A, full=True, record=True)
 p = figure_sequence(info.estimator.values)
 show(p)
 ```
+
 
 
 <!-- For example, consider applying the `sign` function at some tolerance level $\epsilon$:
@@ -179,3 +164,21 @@ print(f"GR approx:  {hutch(M)}")
 print(f"Hutch++ :   {hutchpp(M)}")
 print(f"XTrace:     {xtrace(M)}")
 ``` -->
+<!-- from timeit import timeit
+timeforlan = timeit(lambda: ExpA @ v, number=100)/100
+
+timeforexpmA = timeit(lambda: expm(A), number=100)/100
+B = expm(A)
+timeforexpmAv = timeit(lambda: B @ v, number=100)/100
+
+sample_index = 1 + np.arange(30)
+timeforsp = timeforexpmA + timeforexpmAv * sample_index
+timeformf = timeforlan * sample_index
+
+p = figure(width=350, height=200)
+
+p.line(sample_index, timeforsp, color='red')
+p.scatter(sample_index, timeforsp, color='red',  size=1)
+p.line(sample_index, timeformf, color='blue')
+p.scatter(sample_index, timeformf, color='blue', size=1)
+show(p) -->

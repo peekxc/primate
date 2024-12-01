@@ -33,7 +33,25 @@ def is_linear_op(A: Any) -> bool:
 
 
 class MatrixFunction(LinearOperator):
-	"""Linear operator class for matrix functions."""
+	r"""Linear operator class for matrix functions.
+
+	This class represents an implicitly defined matrix function, i.e. a `LinearOperator` approximating:
+
+	$$ f(A) = U f(\Lambda) U^T $$
+
+	Matrix-vector multiplications with the corresponding operator estimate the action $v \mapsto f(A)v$ using the Lanczos
+	method on a fixed-degree Krylov expansion.
+
+	Parameters:
+		A: numpy array, sparse matrix, or LinearOperator.
+		fun: optional spectral function to associate to the operator.
+		deg: degree of the Krylov expansion to perform.
+		dtype: floating point dtype to execute in. Must be float64 or float32.
+		kwargs: keyword arguments to pass to the Lanczos method.
+
+	Returns:
+		`LinearOperator` representing the matrix function.
+	"""
 
 	def __init__(
 		self, A: np.ndarray, fun: Optional[Callable] = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
@@ -81,6 +99,16 @@ class MatrixFunction(LinearOperator):
 		return self
 
 	def _matvec(self, x: np.ndarray):
+		r"""Estimates the matrix-vector action using the Lanczos method.
+
+		This function uses the Lanczos method to estimate the matrix-vector action:
+		$$ x \mapsto f(A) x $$
+		The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of $f(A)$.
+
+		:::{.callout-note}
+		Though mathematically equivalent, this method is computationally distinct from the operation `A.quad(x)`; see `.quad()` for more details.
+		:::
+		"""
 		if self._Q.shape[1] < self._deg:
 			self._Q = np.zeros((self.shape[0], self._deg), dtype=self.dtype, order="F")
 		# self.Q.fill(0)  # this is necessary to prevent orthogonalization
@@ -94,14 +122,16 @@ class MatrixFunction(LinearOperator):
 		return x_norm * self._Q @ Y @ (self._fun(rw) * Y[0, :])[:, np.newaxis]
 
 	def quad(self, x: np.ndarray):
-		r"""Estimates the quadratic form of the matrix function using Lanczos quadrature.
+		r"""Estimates the quadratic form using Lanczos quadrature.
 
 		This function uses the Lanczos method to estimate the quadratic form:
 		$$ x \mapsto x^T f(A) x $$
 		The error of the approximation depends on both the degree of the Krylov expansion and the conditioning of $f(A)$.
 
-		Note this method is mathematically equivalent though computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
-		which first applies $x \mapsto f(A)x$ and then performs a dot product. In particular, the
+		:::{.callout-note}
+		Though mathematically equivalent, this method is computationally distinct from the operation `x @ (A @ x)`, i.e. the operation
+		which first applies $x \mapsto f(A)x$ and then performs a dot product.
+		:::
 		"""
 		if self._orth < self._Q.shape[1]:
 			self._Q.resize((self.shape[0], self._deg))
