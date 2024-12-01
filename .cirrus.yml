@@ -15,6 +15,11 @@ env:
 # quay.io/pypa/manylinux2014_x86_64  # CentOS 7  (use GCC 10)
 # quay.io/pypa/manylinux_2_24_x86_64 # Debian    (unknown)
 # quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux (use clang)
+# - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian, no c++20 support
+# - image: ghcr.io/cirruslabs/macos-runner:sonoma
+# - image: cirrusci/windowsservercore:2019
+# - image: mcr.microsoft.com/windows/servercore:ltsc2019
+# - image: windows-2019
 
 lint_task: 
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
@@ -32,17 +37,13 @@ lint_task:
   
 build_and_test_task:
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
-  container:
-    # See: https://github.com/pypa/manylinux
-    matrix: 
-      - image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
-      - image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
-      
-      # - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian, no c++20 support
-      # - image: ghcr.io/cirruslabs/macos-runner:sonoma
-      # - image: cirrusci/windowsservercore:2019
-      # - image: mcr.microsoft.com/windows/servercore:ltsc2019
-      # - image: windows-2019
+  matrix:
+    # - name: CentOS 7 build 
+    #   container: 
+    #     image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
+    - name: AlmaLinux build
+      container: 
+        image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
   env:
     # CC: clang 
     # CXX: clang++
@@ -57,7 +58,11 @@ build_and_test_task:
   build_script: |
     python -m pip install '.[test]' --verbose
   test_script: |
-    python -m pytest tests/ --cov=primate --benchmark-skip
+    python -m pytest tests/ --cov=primate --benchmark-skip  
+  coverage_script: |
+    pipx run 'coverage[toml]' xml -o coverage.xml
+    pipx run 'coveralls<4' --submit coverage.xml
+    pipx run 'coveralls<4' --finish
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
@@ -68,18 +73,18 @@ build_and_test_task:
     python -m pytest tests/ --cov=primate --benchmark-skip
     coverage report -m
 
-coverage_report_task:
-  # only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
-  depends_on: build_and_test
-  # only_if: $CI_PLATFORM == 'almalinux'
-  name: Submit coverage info
-  container:
-    image: quay.io/pypa/manylinux_2_28_x86_64
-    PATH: /opt/python/cp310-cp310/bin:${PATH}
-  script:
-    - pipx run 'coverage[toml]' xml -o coverage.xml
-    - pipx run 'coveralls<4' --submit coverage.xml
-    - pipx run 'coveralls<4' --finish
+# coverage_report_task:
+#   # only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
+#   depends_on: build_and_test
+#   # only_if: $CI_PLATFORM == 'almalinux'
+#   name: Submit coverage info
+#   container:
+#     image: quay.io/pypa/manylinux_2_28_x86_64
+#     PATH: /opt/python/cp310-cp310/bin:${PATH}
+#   script:
+#     - pipx run 'coverage[toml]' xml -o coverage.xml
+#     - pipx run 'coveralls<4' --submit coverage.xml
+#     - pipx run 'coveralls<4' --finish
   
 
   
