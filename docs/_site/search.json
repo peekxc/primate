@@ -277,7 +277,7 @@
     "href": "reference/xdiag.html",
     "title": "xdiag",
     "section": "",
-    "text": "xdiag\ndiagonal.xdiag(A, m, pdf='sphere', seed=None)\nEstimates the diagonal of A using m / 2 matrix-vector multiplications.\nBased originally on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly.",
+    "text": "xdiag\ndiagonal.xdiag(A, m=None, pdf='sphere', seed=None)\nEstimates the diagonal of A using m / 2 matrix-vector multiplications.\nBased originally on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly.",
     "crumbs": [
       "Reference",
       "API Reference",
@@ -443,7 +443,7 @@
     "href": "index.html",
     "title": "Package overview",
     "section": "",
-    "text": "primate, short for Probabalistic Implicit Matrix Trace Estimator, is Python package that performs randomized matrix trace estimation of matrix functions—that is, matrices parameterized by functions:\n\\mathrm{tr}(f(A)) \\triangleq \\mathrm{tr}(U f(\\Lambda) U^{\\intercal}), \\quad \\quad f : [a,b] \\to \\mathbb{R}\nTrace estimates are obtained in a Monte-Carlo fashion via the stochastic Lanczos method (SLQ)1. This method is useful for sparse or highly structured matrices with efficiently computable quadratic forms.\nNotable features of primate include:\nMuch of primate’s computational code was directly ported from the (excellent) imate package—for a comparison of the two, see here.",
+    "text": "primate, short for Probabilistic Implicit Matrix Trace Estimator, is a Python package that provides estimators of quantities from matrices, linear operators, and matrix functions:\nf(A) \\triangleq U f(\\Lambda) U^{\\intercal}, \\quad \\quad f : [a,b] \\to \\mathbb{R}\nThis definition is quite general in that different parameterizations of f produce a variety of spectral quantities, including the matrix inverse A^{-1}, the matrix exponential \\mathrm{exp}(A), the matrix logarithm \\mathrm{log}(A), and so on.\nComposing these with trace and diagonal estimators yields approximations for the numerical rank, the log-determinant, the Schatten norms, the eigencount, the Estrada index, the Heat Kernel Signature, and so on.\nNotable features of primate include:\nprimate was partially inspired by the imate package—for a comparison of the two, see here.",
     "crumbs": [
       "Reference",
       "Overview"
@@ -454,7 +454,7 @@
     "href": "index.html#footnotes",
     "title": "Package overview",
     "section": "Footnotes",
-    "text": "Footnotes\n\n\nUbaru, S., Chen, J., & Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.↩︎\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
+    "text": "Footnotes\n\n\nThis includes std::function’s, C-style function pointers, functors, and lambda expressions.↩︎",
     "crumbs": [
       "Reference",
       "Overview"
@@ -875,6 +875,28 @@
       "API Reference",
       "Lanczos",
       "lanczos"
+    ]
+  },
+  {
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "Package overview",
+    "section": "Installation",
+    "text": "Installation\nprimate is a standard PEP-517 package, and thus can be installed via pip:\npython -m pip install scikit-primate\nAssuming your platform is supported, no compilation is needed.\nSee the installation page for details.",
+    "crumbs": [
+      "Reference",
+      "Overview"
+    ]
+  },
+  {
+    "objectID": "index.html#applications",
+    "href": "index.html#applications",
+    "title": "Package overview",
+    "section": "Applications",
+    "text": "Applications\nApplications of matrix functions include characterizing folding in proteins, principal component regression, spectral clustering, Gaussian process likelihood estimation, counting triangles in distributed-memory networks, characterizing graph similarity, and deep neural loss landscape analysis.\nIf you have a particular application, feel free to make a computational notebook to illustrate it as a use-case!",
+    "crumbs": [
+      "Reference",
+      "Overview"
     ]
   }
 ]

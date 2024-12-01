@@ -4,7 +4,7 @@ from primate.operators import is_linear_op, matrix_function, MatrixFunction, nor
 from primate.random import symmetric
 from primate.lanczos import lanczos
 from primate.tridiag import eigh_tridiag
-from primate.special import param_callable, _builtin_matrix_functions
+from primate.special import param_callable, _BUILTIN_MATRIX_FUNCTIONS
 
 
 def test_operator_logic():
@@ -74,7 +74,7 @@ def test_spectral():
 	n = 100
 	A = symmetric(n)
 	v = rng.uniform(size=A.shape[1], low=-1, high=1)
-	for fun in _builtin_matrix_functions:
+	for fun in _BUILTIN_MATRIX_FUNCTIONS:
 		f = param_callable(fun)
 		M = MatrixFunction(A, fun=f, deg=A.shape[0])
 		ew, ev = np.linalg.eigh(A)

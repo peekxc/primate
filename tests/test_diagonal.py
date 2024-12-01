@@ -2,7 +2,7 @@ import numpy as np
 from primate.diagonal import diag, xdiag
 
 
-def test_hutch():
+def test_diag():
 	rng = np.random.default_rng(1234)
 	A = rng.normal(size=(50, 50))
 	d, info = diag(A, converge="tolerance", atol=0.10, rtol=0.0, full=True)

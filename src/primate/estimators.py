@@ -8,6 +8,22 @@ import scipy as sp
 from .stats import Covariance
 
 
+def arr_summary(x: Union[float, np.ndarray]):
+	if x is None:
+		return "None"
+	x = np.atleast_1d(x)
+	with np.printoptions(precision=2, suppress=True, threshold=3, floatmode="fixed"):
+		if len(x) == 1:
+			return f"{x.item():.3f}"
+		elif len(x) <= 3:
+			return np.array2string(x, separator=",")
+		else:
+			x1 = np.array2string(x[:2], separator=",").strip("[]")
+			x2 = np.array2string(x[-1], separator=",").strip("[]")
+			xs = "[" + x1 + ",...," + x2 + "]"
+			return xs
+
+
 @runtime_checkable
 class Estimator(Sized, Protocol):
 	"""Protocol for generic stopping criteria for sequences."""
@@ -45,14 +61,14 @@ class EstimatorResult:
 	estimate: Union[float, np.ndarray]
 	estimator: Estimator
 	criterion: Union[ConvergenceCriterion, str, None] = None
-	status: str = ""
+	message: str = ""
 	nit: int = 0
 	info: dict = field(default_factory=dict)
 
-	def update(self, est: Estimator, **kwargs: dict):
+	def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs: dict):
 		self.estimate = est.estimate
 		self.estimator = est
-		self.status = est.__repr__()
+		self.message = converge.message(est) if hasattr(converge, "message") else ""
 		self.nit = est.__len__()
 		self.info = self.info | kwargs
 
@@ -157,6 +173,10 @@ class CountCriterion(ConvergenceCriterion):
 	def __call__(self, est: MeanEstimator) -> bool:
 		return len(est) >= self.count
 
+	def message(self, est: MeanEstimator) -> bool:
+		msg = f"Est: {arr_summary(est.estimate)} (#S:{ len(est) })"
+		return msg
+
 
 class ToleranceCriterion(ConvergenceCriterion):
 	def __init__(self, rtol: float = 0.01, atol: float = 1.49e-08, ord: Union[int, str] = 2) -> None:
@@ -169,6 +189,15 @@ class ToleranceCriterion(ConvergenceCriterion):
 			return False
 		error = np.linalg.norm(est.delta, ord=self.ord)
 		return error < self.atol or error < self.rtol * np.linalg.norm(est.mean, ord=self.ord)
+
+	def message(self, est: MeanEstimator) -> str:
+		msg = f"Est: {arr_summary(est.estimate)}"
+		msg += f"(atol={self.atol:3f}, rtol={self.rtol:3f}, #S:{ len(est) })"
+		if est.estimate is not None:
+			error = np.linalg.norm(est.delta, ord=self.ord)
+			norm = np.linalg.norm(est.estimate, ord=self.ord)
+			msg += f"\nnorm(it - est, {self.ord}) = {error:.3f}, norm(est, {self.ord}) = {norm:.3f}"
+		return msg
 
 
 class ConfidenceCriterion(ConvergenceCriterion):
@@ -211,21 +240,25 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	# 	self.vr_est = L * self.vr_pre + denom * (estimate - self.mu_pre) ** 2  # update sample variance
 	# 	self.mu_pre = self.mu_est
 	# 	self.vr_pre = self.vr_est
-	def __call__(self, est: MeanEstimator) -> bool:
+	def _error(self, est: Estimator):
 		if est.n_samples < 3:
-			return False
+			return (np.inf, np.inf)
 		std_dev = est.cov.covariance() ** (1 / 2)
 		std_error = std_dev / np.sqrt(est.n_samples)
 		rel_error = abs(std_error / est.estimate)
 		score = self.t_scores[est.n_samples] if est.n_samples < 30 else self.z
 		margin_of_error = score * std_error
-		return margin_of_error <= self.atol or rel_error <= self.rtol
+		return (margin_of_error, rel_error)
 
-	# def __repr__(self) -> str:
-	# 	msg = f"Est: {self.estimate:.3f} +/- {self.margin_of_error:.3f}"
-	# 	msg += f" ({self.confidence*100:.0f}% CI,"  # | {(cv*100):.0f}% CV
-	# 	msg += f" #S:{ self.n_samples })"
-	# 	return msg
+	def __call__(self, est: MeanEstimator) -> bool:
+		moe, rerr = self._error(est)
+		return moe <= self.atol or rerr <= self.rtol
+
+	def message(self, est: MeanEstimator) -> str:
+		msg = f"Est: {arr_summary(est.estimate)}"
+		moe, rerr = self._error(est)
+		msg += f" +/- {moe:.3f} ({self.confidence*100:.0f}% CI, #S:{ len(est) })"  # | {(cv*100):.0f}% CV
+		return msg
 
 
 class KneeCriterion(ConvergenceCriterion):
@@ -254,6 +287,12 @@ class KneeCriterion(ConvergenceCriterion):
 		## Set the knee_detected flag if the knee is prominent enough
 		threshold = max_diff - (self.S / (len(y) - 1))
 		return max_diff > threshold and diff_curve[-1] < threshold
+
+	def message(self, est: MeanEstimator) -> str:
+		# TODO: detect curvature and report it
+		# if est.estimate is not None:
+		msg = f"Est: {arr_summary(est.estimate)} (#S:{ len(est) }, S={self.S:3f})"
+		return msg
 
 
 CRITERIA = {

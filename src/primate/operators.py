@@ -35,12 +35,13 @@ def is_linear_op(A: Any) -> bool:
 class MatrixFunction(LinearOperator):
 	"""Linear operator class for matrix functions."""
 
-	def __init__(self, A: np.ndarray, fun: Callable, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict) -> None:
+	def __init__(
+		self, A: np.ndarray, fun: Optional[Callable] = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
+	) -> None:
 		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
 		fun = fun if fun is not None else lambda x: x
-		if isinstance(fun, str):
-			fun = param_callable(fun, **kwargs)
+		fun = param_callable(fun, **kwargs) if isinstance(fun, str) else fun
 		assert callable(fun), "Function must be Callable"
 		self._fun = fun
 		self._deg = min(deg, A.shape[0])
@@ -64,6 +65,17 @@ class MatrixFunction(LinearOperator):
 	@property
 	def degree(self) -> int:
 		return self._deg
+
+	@property
+	def fun(self) -> Callable:
+		return self._fun
+
+	@fun.setter
+	def fun(self, value: Callable) -> None:
+		assert callable(value), "Function must be callable."
+		out = value(np.ones(self.shape[1]))
+		assert isinstance(out, np.ndarray) and len(out) == self.shape[0], "Function must return array-like"
+		self._fun = value
 
 	def _adjoint(self):
 		return self

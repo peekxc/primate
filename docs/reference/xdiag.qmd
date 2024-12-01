@@ -1,7 +1,7 @@
 # xdiag { #diagonal.xdiag }
 
 ```python
-diagonal.xdiag(A, m, pdf='sphere', seed=None)
+diagonal.xdiag(A, m=None, pdf='sphere', seed=None)
 ```
 
 Estimates the diagonal of `A` using `m / 2` matrix-vector multiplications.

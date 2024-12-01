@@ -1,10 +1,12 @@
 website:
   sidebar:
   - border: false
-    collapse-level: 3
+    collapse-level: 2
     contents:
     - href: index.qmd
       text: Overview
+    - href: basic/quickstart.qmd
+      text: Quickstart
     - contents:
       - href: basic/install.qmd
         text: Installing

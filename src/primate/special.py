@@ -82,7 +82,7 @@ def param_callable(fun: Union[str, None], **kwargs: dict) -> Callable:
 	elif fun == "sqrt":
 		return np.sqrt
 	elif fun == "log":
-		return np.log
+		return lambda x: np.log(np.maximum(x, np.finfo(np.float64).eps))
 	elif fun == "inv":
 		return np.reciprocal
 	elif fun == "exp":

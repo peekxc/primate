@@ -57,8 +57,8 @@ def diag(
 	## Parameterize the random vector generation
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
+	estimator = MeanEstimator(kwargs.pop("record", False))
 	converge = convergence_criterion(converge, **kwargs)
-	estimator = MeanEstimator()
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
@@ -74,7 +74,7 @@ def diag(
 			numer += u * v.ravel()
 			denom += np.square(v.ravel())
 			estimator.update(np.atleast_2d(numer / denom))
-			result.update(estimator)
+			result.update(estimator, converge)
 			if callback is not None:
 				callback(result)
 		return (estimator.estimate, result)
@@ -93,13 +93,14 @@ def diag(
 # 	pass
 
 
-def xdiag(A: np.ndarray, m: int, pdf: str = "sphere", seed: Union[int, np.random.Generator, None] = None):
+def xdiag(
+	A: np.ndarray, m: Optional[int] = None, pdf: str = "sphere", seed: Union[int, np.random.Generator, None] = None
+):
 	"""Estimates the diagonal of `A` using `m / 2` matrix-vector multiplications.
 
 	Based originally on Program SM4.3, a MATLAB 2022b implementation for XDiag, by Ethan Epperly.
 	"""
-	# assert m >= 2, f"Number of matvecs must be at least 2."
-	m = min(m + (m % 2), 2 * A.shape[0])
+	m = 2 * A.shape[0] if m is None else min(m + (m % 2), 2 * A.shape[0])
 	n, m = A.shape[0], m // 2
 
 	## Configure

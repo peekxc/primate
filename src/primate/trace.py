@@ -113,8 +113,8 @@ def hutch(
 	## Parameterize the various quantities
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
+	estimator = MeanEstimator(kwargs.pop("record", False))
 	converge = convergence_criterion(converge, **kwargs)
-	estimator = MeanEstimator()
 	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
 	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
 
@@ -129,7 +129,7 @@ def hutch(
 		while not converge(estimator):
 			v = pdf(size=(N, batch)).astype(f_dtype)
 			estimator.update(quad_form(v))
-			result.update(estimator)
+			result.update(estimator, converge)
 			callback(result)
 		return (estimator.estimate, result)
 	else:
@@ -312,6 +312,6 @@ def xtrace(
 		# result.converged = err <= atol
 		result.nit = it
 		result.estimate = estimate
-		result.status = "ok"
+		result.message = "ok"
 		return (result.estimate, result)
 	return estimate

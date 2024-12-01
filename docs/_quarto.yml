@@ -111,10 +111,12 @@ quartodoc:
     search: true
     style: floating
     border: false
-    collapse-level: 3
+    collapse-level: 2
     contents:
       - href: index.qmd
         text: Overview
+      - text: Quickstart
+        href: basic/quickstart.qmd
       - section: Basics 
         contents:
           - text: Installing

@@ -15,6 +15,7 @@ def test_hutch():
 
 	est, info = hutch(A, maxiter=n, seed=rng, full=True)
 	assert isinstance(info, EstimatorResult)
+	assert isinstance(info.criterion.message(info.estimator), str)
 	# assert isinstance(info.samples, list) and len(info.samples) == n
 
 

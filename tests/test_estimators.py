@@ -1,13 +1,14 @@
 from typing import Callable
+
 import numpy as np
 from primate.estimators import (
-	ConvergenceCriterion,
-	KneeCriterion,
-	MeanEstimator,
-	CountCriterion,
-	ToleranceCriterion,
 	ConfidenceCriterion,
 	ControlVariableEstimator,
+	ConvergenceCriterion,
+	CountCriterion,
+	KneeCriterion,
+	MeanEstimator,
+	ToleranceCriterion,
 	convergence_criterion,
 )
 from primate.stats import confidence_interval

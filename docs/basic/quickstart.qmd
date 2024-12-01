@@ -1,0 +1,109 @@
+---
+title: "`primate` quickstart"
+---
+
+Below is a quick introduction to `primate`. 
+
+```{python}
+#| echo: false
+#| output: false
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+output_notebook()
+import numpy as np
+np.random.seed(1234)
+```
+
+## Trace estimation 
+
+To do trace estimation, use functions in the `trace` module: 
+```{python}
+from primate.trace import hutch, hutchpp, xtrace
+from primate.random import symmetric
+A = symmetric(150)  ## random positive-definite matrix 
+
+print(f"Actual trace:  {A.trace():6f}")     ## Actual trace
+print(f"Hutch:         {hutch(A):6f}")      ## Crude monte-carlo estimator
+print(f"Hutch++:       {hutchpp(A):6f}") 	  ## Monte-Carlo estimator w/ deflation 
+print(f"XTrace:        {xtrace(A):6f}")     ## Epperly's algorithm
+```
+
+For matrix functions, you can either construct a `LinearOperator` directly via the `matrix_function` API, or supply a string to the parameter `fun` describing the spectral function to apply. For example, one might compute the log-determinant of a positive definite matrix as follows:
+
+```{python}
+from primate.operators import matrix_function, IdentityOperator
+A = symmetric(150, pd=True)
+M = matrix_function(A, fun="log") # or fun=np.log 
+
+print(f"logdet(A) :  {np.log(np.linalg.det(A)):6f}")
+print(f"tr(log(A)):  {np.sum(np.log(np.linalg.eigvalsh(A))):6f}")
+print(f"Hutch     :  {hutch(M):6f}")
+print(f"Hutch++   :  {hutchpp(M):6f}")
+print(f"XTrace    :  {xtrace(M):6f}")
+```
+
+You can set `fun` to either string describing a built-in spectral function or an arbitrary `Callable`. Either way, these functions are evaluated on [approximations of] the spectrum of the operator, yield spectral sums estimating the quantity: 
+
+$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(\lambda_i) $$
+
+Below is a table summarizing common spectral sums that are often of interest in applications. 
+
+| **name**       | **matrix function**       | **$v \mapsto f(A)v$**            | **Applications**                          | **numpy call**                     | **trace**                  |
+|----------------|---------------------------|----------------------------------|-------------------------------------------|------------------------------------|----------------------------|
+| identity       | $A$                      | Linear transformation $Av$      | Basic matrix operations                   | `A`                       | $\text{Tr}(A)$             |
+| log            | $\log(A)$                | Amplifies/compresses components  | Determinant, entropy-like measures        | `logm(A)`            | $\log\det(A)$              |
+| exp            | $e^A$                    | Time evolution of systems        | Dynamical systems, graph diffusion        | `expm(A)                 | $\text{Tr}(e^A)$           |
+| inv            | $A^{-1}$                 | Solves $Ax = v$                  | Stability analysis, linear systems        | `inv(A)`                  | $\text{Tr}(A^{-1})$        |
+| sign        | $\text{sgn}_\epsilon(A)$ | Projects onto eigenspaces        | Rank approximation, low-rank modeling     | `U @ U.T`                  | $\text{Tr}(\text{sgn}_\epsilon(A))$ |
+| sqrt           | $A^{1/2}$                | Smooth spreading/diffusion       | Diffusion, kernel methods                 | `sqrtm(A)`           | $\text{Tr}(\sqrt{A})$      |
+| square         | $A^2$                    | Amplifies dominant components    | Energy measures, stability                | `A @ A`         | $\|A\|_F^2 = \text{Tr}(A^\top A)$ |
+| PCA            | $P_A$ (eigenspace)       | Projects onto dominant eigenspaces | Dim. reduction, feature extraction       | Custom projection matrix          | $\text{Tr}(P_A)$           |
+| Tikhonov       | $(A + \lambda I)^{-1}$   | Smooth solution to ill-posed sys. | Regularized inversion, stability          | `inv(A + lambda * eye(n))`        | None                       |
+| heat           | $e^{-tA}$                | Spreads/dampens energy           | Diffusion on graphs, spectral clustering  | `expm(-t * A)`            | $\text{Tr}(e^{-tA})$       |
+| pagerank       | $(I - \alpha A)^{-1}v$   | Stationary distribution          | Network centrality, web ranking           | Iterative solver                  | None                       |
+                |
+
+Note that some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$. 
+
+## Diagonal estimation 
+
+The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.  
+
+```{python}
+from primate.diagonal import diag, xdiag
+
+s = np.linalg.norm(A - A.diagonal(), 'fro')
+
+d1 = A.diagonal()
+d2, info = diag(A, rtol=1e-4, full=True)
+
+print(d1)
+print(d2)
+
+s = np.linalg.norm(A - A.diagonal(), 'fro')
+1e-3 * s
+```
+
+## Matrix function approximation 
+
+
+
+
+
+<!-- For example, consider applying the `sign` function at some tolerance level $\epsilon$:
+
+$$ \mathrm{sign}_\epsilon(x) = \begin{align} 1 & x \geq \epsilon \\ 0 & \text{otherwise} \end{align} $$
+
+The spectral sum defined by applying this function corresponds to the numerical rank of the operator, which is an interesting and sometimes useful quantity to estimate. However, the sign function itself is discontinuous (at $\epsilon$) and otherwise not smooth; thus, it cannot be well approximated by any polynomial of finite degree. Non-analytic functions such as these can prove difficult to approximate, as shown below:
+
+```{python}
+ew = np.sort(np.random.uniform(size=150, low=0, high=1))
+ew[:30] = 0.0
+A = symmetric(150, ew = ew, pd = False)
+M = matrix_function(A, fun="numrank")
+
+print(f"numrank(A): {np.linalg.matrix_rank(A)}")
+print(f"GR approx:  {hutch(M)}")
+print(f"Hutch++ :   {hutchpp(M)}")
+print(f"XTrace:     {xtrace(M)}")
+``` -->
