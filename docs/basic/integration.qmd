@@ -1,0 +1,66 @@
+---
+title: "Integration"
+---
+
+`primate` supports a variety of matrix-types of the box, including numpy `ndarray`'s, compressed [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html) (a lá SciPy), and [LinearOperators](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html).
+
+The basic requirements for any operator `A` to be used with any of `primate`'s spectral method are: 
+
+1. A method `A.__matmul__(v: ndarray) -> ndarray` OR `A.matvec(v: ndarray) -> ndarray` implementing $v \mapsto Av$
+2. An attribute `A.shape -> tuple[int, int]` giving the output/input dimensions of $A$
+3. An attribute `A.dtype -> np.dtype` giving the floating point precision of $A$ (32- or 64-bit)
+
+<!-- Note that in the matrix setting, `A.shape()` yields `(A.nrow(), A.ncol())`, so existing matrix implementations like [ndarray](https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html)'s and [sparray](https://docs.scipy.org/doc/scipy/reference/sparse.html#sparse-array-classes)'s natively support the interface. -->
+
+<!-- Using [PyLops](adthedocs.io/en/stable/index.html) terminology, any self-adjoint operator supporting _forward model_ of matrix-vector multiplication is compatible with most of `primate`'s API.  -->
+Here's an example of a simple operator representing a Diagonal matrix:
+
+```python
+import numpy as np 
+from numpy.typing import ArrayLike
+from scipy.sparse.linalg import LinearOperator 
+
+class DiagonalOp(LinearOperator):
+  diag: np.ndarray = None
+  
+  def __init__(self, d: ArrayLike, dtype = None):
+    self.diag = np.array(d)
+    self.shape = (len(d), len(d))
+    self.dtype = np.dtype('float64') if dtype is None else dtype
+
+  def _matvec(self, x: ArrayLike) -> np.ndarray:
+    out = self.diag * np.ravel(x)
+    return out.reshape(x.shape)
+```
+
+Note that by following the subclassing rules of [SciPy's LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html), this class inherits a `.matvec()` method and thus satisfies the constraints above. 
+
+Alternativelu, using SciPy's `aslinearoperator`, this can also be done in a one-liner: 
+
+```python
+from scipy.sparse.linalg import aslinearoperator 
+aslinearoperator(type('DiagonalOp', (object,), {'shape': (len(d),)*2, 'matvec': lambda x: np.atleast_2d(d).T * v}))
+# <_CustomLinearOperator with dtype=float64>
+```
+
+## C++ usage 
+
+Similarly, to call any C++ function, such `hutch` or `lanczos`, simply pass any type with `.shape()` and `.matvec()` member functions: 
+
+```cpp
+class LinOp {
+  int nrow, ncol;
+  
+  LinOp(int nr, int nc) : nrow(nr), ncol(nc) {}
+  
+  void matvec(const float* input, float* output) const {
+    ... // implementation details 
+  }
+
+  void shape() const { return std::make_pair(nrow, ncol); }
+}
+```
+
+It's up to you to ensure `shape()` yields the correct size; `primate` will supply vectors to `input` of size `.shape().second` (number of columns) and guarantees the pointer to the `output` will be at least `shape().first` (number of rows), no more. 
+
+To read more about how semantics extend to the C++ side via _C++20 concepts_, see the [C++ integration guide](../advanced/cpp_integration.qmd). If you're using pybind11 and you want to extend `primate`'s Python API to work natively with linear operator implemented in C++, see the [pybind11 integration guide](../advanced/pybind11_integration.qmd). 

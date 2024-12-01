@@ -16,23 +16,50 @@ np.random.seed(1234)
 
 ## Trace estimation 
 
-To estimate the trace of an operator, use functions in the `trace` module: 
+A variety of _trace_ estimators---that is, algorithms for estimating the quantity: 
+
+$$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i $$
+
+are available in the `primate.trace` module:
+
 ```{python}
 from primate.trace import hutch, hutchpp, xtrace
 from primate.random import symmetric
-A = symmetric(150)  ## random positive-definite matrix 
+A = symmetric(150)  ## random symmetric matrix 
 
 print(f"Actual trace:  {A.trace():6f}")     ## Actual trace
 print(f"Hutch:         {hutch(A):6f}")      ## Crude monte-carlo estimator
-print(f"Hutch++:       {hutchpp(A):6f}") 	  ## Monte-Carlo estimator w/ deflation 
+print(f"Hutch++:       {hutchpp(A):6f}")    ## Monte-Carlo estimator w/ deflation 
 print(f"XTrace:        {xtrace(A):6f}")     ## Epperly's algorithm
 ```
 
-Numpy matrices, sparse matrices, and `LinearOperators` are all supported. For matrix functions, you can either construct a `LinearOperator` directly via the `matrix_function` API, or supply a string to the parameter `fun` describing the spectral function to apply. For example, one might compute the log-determinant of a positive definite matrix as follows:
+Here, `A` can be a numpy matrix, a sparse matrix, or a `LinearOperator`. If the spectral sum of interest is not just the sum of the eigenvalues, but rather the sum under composition with some spectral function $f(\lambda)$, i.e. the quantity of interest is of the form: 
+
+$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) $$
+
+Then you may alternatively use the `matrix_function` API to construct a `LinearOperator` by passing in the corresponding spectral function as a `Callable` or by passing a string representing the name of one of the following built-in spectral functions:
+
+| **name**       | **matrix function**       | **Applications**                          | **numpy call**                     |
+|----------------|---------------------------|-------------------------------------------|------------------------------------|
+| identity       | $A$                      | Basic matrix operations                   | `A`                                |
+| log            | $\log(A)$                | Determinant, entropy-like measures        | `logm(A)`                         |
+| exp            | $e^A$                    | Dynamical systems, graph diffusion        | `expm(A)`                         |
+| inv            | $A^{-1}$                 | Stability analysis, linear systems        | `inv(A)`                          |
+| sign           | $\text{sgn}_\epsilon(A)$ | Rank approximation, low-rank modeling     | `U @ U.T`                         |
+| sqrt           | $A^{1/2}$                | Diffusion, kernel methods                 | `sqrtm(A)`                        |
+| square         | $A^2$                    | Energy measures, stability                | `A @ A`                           |
+| PCA            | $P_A$ (eigenspace)       | Dim. reduction, feature extraction        | Custom projection matrix          |
+| Tikhonov       | $(A + \lambda I)^{-1}$   | Regularized inversion, stability          | `inv(A + lambda * eye(n))`        |
+| heat           | $e^{-tA}$                | Diffusion on graphs, spectral clustering  | `expm(-t * A)`                    |
+| pagerank       | $(I - \alpha A)^{-1}v$   | Network centrality, web ranking           | Iterative solver                  |
+
+<br/>
+
+For example, one might compute the log-determinant of a positive definite matrix as follows:
 
 ```{python}
 from primate.operators import matrix_function, IdentityOperator
-A = symmetric(150, pd=True)
+A = symmetric(150, pd=True)       # eigenvalues in (0, 1] 
 M = matrix_function(A, fun="log") # or fun=np.log 
 
 print(f"logdet(A) :  {np.log(np.linalg.det(A)):6f}")
@@ -41,29 +68,6 @@ print(f"Hutch     :  {hutch(M):6f}")
 print(f"Hutch++   :  {hutchpp(M):6f}")
 print(f"XTrace    :  {xtrace(M):6f}")
 ```
-
-You can set `fun` to either string describing a built-in spectral function or an arbitrary `Callable`. Either way, these functions are evaluated on [approximations of] the spectrum of the operator, yield spectral sums estimating the quantity: 
-
-$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(\lambda_i) $$
-
-Below is a table summarizing common spectral sums that are often of interest in applications. 
-
-| **name**       | **matrix function**       | **$v \mapsto f(A)v$**            | **Applications**                          | **numpy call**                     | **trace**                  |
-|----------------|---------------------------|----------------------------------|-------------------------------------------|------------------------------------|----------------------------|
-| identity       | $A$                      | Linear transformation $Av$      | Basic matrix operations                   | `A`                       | $\text{Tr}(A)$             |
-| log            | $\log(A)$                | Amplifies/compresses components  | Determinant, entropy-like measures        | `logm(A)`            | $\log\det(A)$              |
-| exp            | $e^A$                    | Time evolution of systems        | Dynamical systems, graph diffusion        | `expm(A)                 | $\text{Tr}(e^A)$           |
-| inv            | $A^{-1}$                 | Solves $Ax = v$                  | Stability analysis, linear systems        | `inv(A)`                  | $\text{Tr}(A^{-1})$        |
-| sign        | $\text{sgn}_\epsilon(A)$ | Projects onto eigenspaces        | Rank approximation, low-rank modeling     | `U @ U.T`                  | $\text{Tr}(\text{sgn}_\epsilon(A))$ |
-| sqrt           | $A^{1/2}$                | Smooth spreading/diffusion       | Diffusion, kernel methods                 | `sqrtm(A)`           | $\text{Tr}(\sqrt{A})$      |
-| square         | $A^2$                    | Amplifies dominant components    | Energy measures, stability                | `A @ A`         | $\|A\|_F^2 = \text{Tr}(A^\top A)$ |
-| PCA            | $P_A$ (eigenspace)       | Projects onto dominant eigenspaces | Dim. reduction, feature extraction       | Custom projection matrix          | $\text{Tr}(P_A)$           |
-| Tikhonov       | $(A + \lambda I)^{-1}$   | Smooth solution to ill-posed sys. | Regularized inversion, stability          | `inv(A + lambda * eye(n))`        | None                       |
-| heat           | $e^{-tA}$                | Spreads/dampens energy           | Diffusion on graphs, spectral clustering  | `expm(-t * A)`            | $\text{Tr}(e^{-tA})$       |
-| pagerank       | $(I - \alpha A)^{-1}v$   | Stationary distribution          | Network centrality, web ranking           | Iterative solver                  | None                       |
-                |
-
-Note that some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$. 
 
 ## Diagonal estimation 
 
@@ -81,7 +85,7 @@ print(f"Diagonal est   : {d2}")
 
 ## Matrix function approximation 
 
-If you just want to approximate the action of a matrix function for some vector $v \in \mathbb{R}^n$, simply supply the vector and the matrix alongside the `matrix_function` call: 
+In `primate`, the matrix function $f(A)$ is not constructed explicitly but instead the action $v \mapsto f(A)v$ is approximated with a fixed-degree Krylov expansion. This can be useful when, for example, the matrix $A$ itself is so large that the corresponding (typically dense) matrix function $f(A) \in \mathbb{R}^{n \times n}$ simply is too large to be explicitly represented. If you just want to approximate the action of a matrix function for a single vector $v \in \mathbb{R}^n$, simply supply the vector and the matrix alongside the `matrix_function` call: 
 
 ```{python}
 from primate.operators import matrix_function
@@ -90,29 +94,49 @@ y = matrix_function(A, fun=np.exp, v=v)
 print(f"f(A)v = {y.T}")
 ```
 
-Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a MatrixFunction instance and use it like any other `LinearOperator`: 
+Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a `MatrixFunction` instance and use it like any other `LinearOperator`: 
 
 ```{python}
 from primate.operators import MatrixFunction
 ExpA = MatrixFunction(A, fun=np.exp)
-print(f"exp(A)v = {ExpA @ v}")
+y = ExpA @ v
+print(f"exp(A)v = {y}")
 ```
 
-If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`) using the Lanczos method (without reorthogonalization). Aside from trace and diagonal estimation, 
+If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`) using the Lanczos method (without reorthogonalization). Some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$; in general, the Lanczos method up to degree $k$ can approximate the action $v \mapsto f(A)v$ as well as the operator $p(A)$ can, where $p$ is best-fitting degree $2k-1$ polynomial approximation of $f$.
+
+```{python}
+from scipy.linalg import expm
+print(f"Error from exp(A): {np.linalg.norm((expm(A) @ v) - y)}")
+
+
+from timeit import timeit
+timeforlan = timeit(lambda: ExpA @ v, number=100)/100
+
+timeforexpmA = timeit(lambda: expm(A), number=100)/100
+B = expm(A)
+timeforexpmAv = timeit(lambda: B @ v, number=100)/100
+
+sample_index = 1 + np.arange(30)
+timeforsp = timeforexpmA + timeforexpmAv * sample_index
+timeformf = timeforlan * sample_index
+
+p = figure(width=350, height=200)
+
+p.line(sample_index, timeforsp, color='red')
+p.scatter(sample_index, timeforsp, color='red',  size=1)
+p.line(sample_index, timeformf, color='blue')
+p.scatter(sample_index, timeformf, color='blue', size=1)
+show(p)
+
+ExpA = MatrixFunction(A, fun=np.exp, deg=50, orth=50)
+z = ExpA @ v
+print(f"Error: {np.linalg.norm((expm(A) @ v) - z)}")
+
+```
 
 
 ```{python}
-## Random symmetric matrix with spectrum in [-1, +1]
-ew = np.random.uniform(low=-1, high=+1, size=150)
-A = symmetric(len(ew), ew=ew)
-
-
-
-
-ew, U = np.linalg.eigh(A)
-
-
-U[:,:2] @ U[:,:2].T @ v
 
 ```
 

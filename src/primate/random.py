@@ -25,8 +25,8 @@ def symmetric(
 	Parameters:
 		n: The size of the matrix.
 		dist: Distribution of individual matrix entries.
-		pd: Whether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.
-		ew: Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1].
+		pd: Whether to ensure the generated matrix is positive-definite, clipping eigenvalues as necessary.
+		ew: Desired eigenvalues of `A`. If not provided, generates random values in the range [-1, 1].
 		seed: seed for the random number generator.
 
 	Returns:
@@ -42,11 +42,10 @@ def symmetric(
 		np.einsum("ii->i", A)[:] = rng.random(n)
 	else:
 		raise ValueError(f"Invalid distribution {dist} supplied")
+	Q, R = np.linalg.qr(A)
 	if ew is None:
 		ew = rng.uniform(size=n, low=0.0 if pd else -1.0, high=1.0)
-	else:
-		ew = np.asarray(ew)
-	Q, R = np.linalg.qr(A)
+	ew = np.atleast_1d(ew)
 	A = Q @ np.diag(ew) @ Q.T
 	A = (A + A.T) / 2
 	return A

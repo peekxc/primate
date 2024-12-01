@@ -60,8 +60,8 @@ build_and_test_task:
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip  
   coverage_script: |
-    pipx run 'coverage[toml]' xml -o coverage.xml
-    pipx run 'coveralls<4' --submit coverage.xml
+    pipx run 'coverage[toml]' xml -o coverage.xml --rcfile=pyproject.toml
+    pipx run 'coveralls<4' --submit coverage.xml --rcfile=pyproject.toml
     pipx run 'coveralls<4' --finish
   uninstall_script: |
     python -m pip uninstall primate --yes
