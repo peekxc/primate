@@ -16,7 +16,7 @@ np.random.seed(1234)
 
 ## Trace estimation 
 
-To do trace estimation, use functions in the `trace` module: 
+To estimate the trace of an operator, use functions in the `trace` module: 
 ```{python}
 from primate.trace import hutch, hutchpp, xtrace
 from primate.random import symmetric
@@ -28,7 +28,7 @@ print(f"Hutch++:       {hutchpp(A):6f}") 	  ## Monte-Carlo estimator w/ deflatio
 print(f"XTrace:        {xtrace(A):6f}")     ## Epperly's algorithm
 ```
 
-For matrix functions, you can either construct a `LinearOperator` directly via the `matrix_function` API, or supply a string to the parameter `fun` describing the spectral function to apply. For example, one might compute the log-determinant of a positive definite matrix as follows:
+Numpy matrices, sparse matrices, and `LinearOperators` are all supported. For matrix functions, you can either construct a `LinearOperator` directly via the `matrix_function` API, or supply a string to the parameter `fun` describing the spectral function to apply. For example, one might compute the log-determinant of a positive definite matrix as follows:
 
 ```{python}
 from primate.operators import matrix_function, IdentityOperator
@@ -72,22 +72,63 @@ The diagonals of matrices and matrix functions (implicitly or explicitly represe
 ```{python}
 from primate.diagonal import diag, xdiag
 
-s = np.linalg.norm(A - A.diagonal(), 'fro')
-
 d1 = A.diagonal()
-d2, info = diag(A, rtol=1e-4, full=True)
+d2 = diag(A, rtol=1e-4)
 
-print(d1)
-print(d2)
-
-s = np.linalg.norm(A - A.diagonal(), 'fro')
-1e-3 * s
+print(f"Diagonal (true): {d1}")
+print(f"Diagonal est   : {d2}")
 ```
 
 ## Matrix function approximation 
 
+If you just want to approximate the action of a matrix function for some vector $v \in \mathbb{R}^n$, simply supply the vector and the matrix alongside the `matrix_function` call: 
+
+```{python}
+from primate.operators import matrix_function
+v = np.random.uniform(size=A.shape[0])
+y = matrix_function(A, fun=np.exp, v=v)
+print(f"f(A)v = {y.T}")
+```
+
+Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a MatrixFunction instance and use it like any other `LinearOperator`: 
+
+```{python}
+from primate.operators import MatrixFunction
+ExpA = MatrixFunction(A, fun=np.exp)
+print(f"exp(A)v = {ExpA @ v}")
+```
+
+If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`)
 
 
+
+```{python}
+ew, U = np.linalg.eigh(A)
+
+U[:,:2] @ U[:,:2].T @ v
+
+```
+
+
+## Configuration 
+
+By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over the computation and the type of information collected during execution. 
+
+To get all the information about the computation, simply pass `full=True` to obtain an `EstimatorResult` along with the estimate itself. This object contains information about estimation process itself, basic properties, as well as convergence information about the computation: 
+```{python}
+est, info = hutch(A, full=True)
+print(info.message)
+```
+
+To get a better idea of what the sample values and the corresponding estimate looked like as the sample size increased, you can plot the sequence with 
+the `figure_sequence` function:
+```{python}
+from primate.plotting import figure_sequence
+
+est, info = hutch(A, full=True, record=True)
+p = figure_sequence(info.estimator.values)
+show(p)
+```
 
 
 <!-- For example, consider applying the `sign` function at some tolerance level $\epsilon$:

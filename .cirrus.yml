@@ -35,9 +35,14 @@ build_and_test_task:
   container:
     # See: https://github.com/pypa/manylinux
     matrix: 
-      - image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
+      - env:
+          CI_PLATFORM: "centos7"
+        image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
+      - env: 
+          CI_PLATFORM: "almalinux"
+        image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
+      
       # - image: quay.io/pypa/manylinux_2_24_x86_64 # Debian, no c++20 support
-      - image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
       # - image: ghcr.io/cirruslabs/macos-runner:sonoma
       # - image: cirrusci/windowsservercore:2019
       # - image: mcr.microsoft.com/windows/servercore:ltsc2019
@@ -57,22 +62,20 @@ build_and_test_task:
     python -m pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
-  coverage_script: |
-    python -m coverage xml -o coverage.xml
-    pipx run 'coveralls<4' --submit coverage.xml
-    pipx run 'coveralls<4' --finish
   uninstall_script: |
     python -m pip uninstall primate --yes
   wheel_script: |
     python -m build
   install_script: |
     python -m pip install dist/scikit_primate*.whl
-  test_post_script: |
+  test_coverage_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip
     coverage report -m
 
-coverage_task:
-  only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
+coverage_report_task:
+  # only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
+  depends_on: build_and_test
+  only_if: $CI_PLATFORM == 'almalinux'
   name: Submit coverage info
   container:
     image: python:3.10:slim
@@ -80,8 +83,7 @@ coverage_task:
     - python -m coverage xml -o coverage.xml
     - pipx run 'coveralls<4' --submit coverage.xml
     - pipx run 'coveralls<4' --finish
-  depends_on:
-    - build_and_test
+  
 
   
 # python -m coveralls --submit coverage.xml

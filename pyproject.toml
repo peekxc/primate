@@ -32,7 +32,7 @@ dependencies = [
 license = {file = "LICENSE"}
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov", "pytest-benchmark", "coverage"] # "bokeh"
+test = ["pytest", "pytest-cov", "pytest-benchmark", "coverage >= 7.2.0"] # "bokeh"
 doc = ["quartodoc"]
 dev = ['meson-python', 'pybind11', 'numpy']
 
@@ -58,6 +58,7 @@ exclude_also = [
   "def __repr__",
 	"def _.*"
 ]
+
 ## NOTE: https://github.com/pypi/warehouse/blob/8060bfa3cb00c7f68bb4b10021b5361e92a04017/warehouse/forklift/legacy.py#L70-L72
 ## PyPI limits file sizes to 100 MB and project sizes to 10 GB
 [tool.cibuildwheel]
