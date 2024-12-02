@@ -52,9 +52,9 @@ build_and_test_task:
     PATH: /opt/python/cp310-cp310/bin:${PATH}
   pip_cache:
     folder: ~/.cache/pip
-    fingerprint_script: echo $PYTHON_VERSION
+    fingerprint_script: "{ echo $PYTHON_VERSION; pip freeze; } | tr \"\n\" \" \""
   before_script: |
-    python -m uv pip install --upgrade pip uv
+    python -m pip install --upgrade pip uv
   build_script: |
     python -m uv pip install '.[test]' --verbose
   test_script: |
