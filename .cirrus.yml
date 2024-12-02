@@ -50,11 +50,12 @@ build_and_test_task:
     CC: gcc 
     CXX: g++
     PATH: /opt/python/cp310-cp310/bin:${PATH}
-  pip_cache:
-    folder: ~/.cache/pip
-    fingerprint_script: "{ echo $PYTHON_VERSION; pip freeze; } | tr \"\n\" \" \""
   before_script: |
     python -m pip install --upgrade pip uv
+  pip_cache:
+    folder: ~/.cache/pip
+    fingerprint_script: "{ echo $PYTHON_VERSION; uv pip compile pyproject.toml --no-annotate --no-header; } | tr \"\n\" \" \""
+    populate_script: python -m uv pip install -r pyproject.toml 
   build_script: |
     python -m uv pip install '.[test]' --verbose
   test_script: |
