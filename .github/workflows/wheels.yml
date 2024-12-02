@@ -2,7 +2,7 @@ name: Package Wheels
 
 on:
   push: 
-    branches: ["pythran_overhaul"]
+    branches: ["main"]
   # release:
   #   branches: [ "main" ]
 
