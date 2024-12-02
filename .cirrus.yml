@@ -38,9 +38,6 @@ lint_task:
 build_and_test_task:
   only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')
   matrix:
-    # - name: CentOS 7 build 
-    #   container: 
-    #     image: quay.io/pypa/manylinux2014_x86_64  # CentOS 7 
     - name: AlmaLinux build
       container: 
         image: quay.io/pypa/manylinux_2_28_x86_64 # AlmaLinux
