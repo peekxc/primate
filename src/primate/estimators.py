@@ -1,6 +1,9 @@
+"""Estimators API."""
+
 from dataclasses import dataclass, field
+from numbers import Integral
 from operator import and_, or_
-from typing import Callable, Optional, Protocol, Sized, Union, runtime_checkable
+from typing import Callable, Iterable, Literal, Optional, Protocol, Sized, Union, runtime_checkable
 
 import numpy as np
 import scipy as sp
@@ -8,7 +11,7 @@ import scipy as sp
 from .stats import Covariance
 
 
-def arr_summary(x: Union[float, np.ndarray]):
+def arr_summary(x: Union[float, np.ndarray]) -> str:
 	if x is None:
 		return "None"
 	x = np.atleast_1d(x)
@@ -37,7 +40,7 @@ class Estimator(Sized, Protocol):
 	def estimate(self) -> Union[float, np.ndarray]: ...
 
 
-class ConvergenceCriterion(Callable):
+class ConvergenceCriterion:
 	"""Generic stopping criteria for sequences."""
 
 	def __init__(self, operation: Callable):
@@ -58,40 +61,50 @@ class ConvergenceCriterion(Callable):
 
 @dataclass
 class EstimatorResult:
-	estimate: Union[float, np.ndarray]
-	estimator: Estimator
+	"""Data class for representing the results of statistical estimators."""
+
+	estimator: Optional[Estimator] = None
 	criterion: Union[ConvergenceCriterion, str, None] = None
+	estimate: Union[float, np.ndarray] = 0.0
 	message: str = ""
 	nit: int = 0
 	info: dict = field(default_factory=dict)
 
+	def __iter__(self) -> Iterable:
+		return iter((self.estimator, self.criterion, self.estimate, self.message, self.nit, self.info))
+
 	def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs: dict):
-		self.estimate = est.estimate
 		self.estimator = est
+		self.criterion = converge
+		self.estimate = est.estimate
 		self.message = converge.message(est) if hasattr(converge, "message") else ""
-		self.nit = est.__len__()
-		self.info = self.info | kwargs
+		self.nit = len(est)
+		self.info |= kwargs
 
 
 class MeanEstimator(Estimator):
 	"""Sample mean estimator with stable covariance updating."""
 
-	delta: Union[float, np.ndarray]
-	cov: Optional[Covariance]
-	values: Optional[list]
+	n_samples: int = 0
+	delta: Union[float, np.ndarray] = np.atleast_1d(np.inf)
+	cov: Optional[Covariance] = None
+	values: Optional[list] = []
 
-	def __init__(self, record: bool = False) -> None:
+	def __init__(self, dim: Optional[int] = None, record: bool = False) -> None:
 		self.n_samples = 0
-		self.delta = None
-		self.cov = None
+		self.delta = np.atleast_1d(np.inf)
+		self.cov = Covariance(dim=dim) if isinstance(dim, Integral) else None
 		self.values = [] if record else None
 
 	@property
 	def mean(self) -> Optional[float]:
 		if self.cov is None:
 			return None
-		return self.cov.mu.item() if len(self.cov.mu) == 1 else self.cov.mu.ravel()
+		mu = np.atleast_1d(self.cov.mean)
+		return mu.item() if len(mu) == 1 else np.ravel(mu)
 
+	## ndim = 1, x.shape = (n,) => we have n samples of 1-d
+	## ndim = 2, x.shape = (n,m) => we have n samples of m-d
 	def update(self, x: Union[float, np.ndarray]):
 		x = np.atleast_1d(x)
 		x = x[:, None] if x.ndim == 1 else x
@@ -179,7 +192,9 @@ class CountCriterion(ConvergenceCriterion):
 
 
 class ToleranceCriterion(ConvergenceCriterion):
-	def __init__(self, rtol: float = 0.01, atol: float = 1.49e-08, ord: Union[int, str] = 2) -> None:
+	def __init__(
+		self, rtol: float = 0.01, atol: float = 1.49e-08, ord: Union[Literal["fro", "nuc"], float, None] = 2.0
+	) -> None:
 		self.rtol = rtol
 		self.atol = atol
 		self.ord = ord
@@ -188,14 +203,15 @@ class ToleranceCriterion(ConvergenceCriterion):
 		if est.mean is None:
 			return False
 		error = np.linalg.norm(est.delta, ord=self.ord)
-		return error < self.atol or error < self.rtol * np.linalg.norm(est.mean, ord=self.ord)
+		estimate = np.atleast_1d(est.estimate)
+		return bool(error < self.atol or error < self.rtol * np.linalg.norm(estimate, ord=self.ord))
 
 	def message(self, est: MeanEstimator) -> str:
 		msg = f"Est: {arr_summary(est.estimate)}"
 		msg += f"(atol={self.atol:3f}, rtol={self.rtol:3f}, #S:{ len(est) })"
 		if est.estimate is not None:
-			error = np.linalg.norm(est.delta, ord=self.ord)
-			norm = np.linalg.norm(est.estimate, ord=self.ord)
+			error = np.linalg.norm(np.atleast_1d(est.delta), ord=self.ord)
+			norm = np.linalg.norm(np.atleast_1d(est.estimate), ord=self.ord)
 			msg += f"\nnorm(it - est, {self.ord}) = {error:.3f}, norm(est, {self.ord}) = {norm:.3f}"
 		return msg
 
@@ -240,7 +256,7 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	# 	self.vr_est = L * self.vr_pre + denom * (estimate - self.mu_pre) ** 2  # update sample variance
 	# 	self.mu_pre = self.mu_est
 	# 	self.vr_pre = self.vr_est
-	def _error(self, est: Estimator):
+	def _error(self, est: MeanEstimator):
 		if est.n_samples < 3:
 			return (np.inf, np.inf)
 		std_dev = est.cov.covariance() ** (1 / 2)
@@ -265,7 +281,7 @@ class KneeCriterion(ConvergenceCriterion):
 	def __init__(self, S: float = 1.0) -> None:
 		self.S = S
 
-	def __call__(self, est: MeanEstimator):
+	def __call__(self, est: MeanEstimator) -> bool:
 		"""Applies the kneedle algorithm to detect the knee in the sequence."""
 		if est.values is None or len(est.values) < 3:
 			return False
@@ -303,7 +319,8 @@ CRITERIA = {
 }
 
 
-def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs) -> ConvergenceCriterion:
+def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs: dict) -> ConvergenceCriterion:
+	"""Parameterizes a convergence criterion."""
 	# assert criterion.lower() in CRITERIA.keys(), f"Invalid criterion {criterion}"
 	if isinstance(criterion, ConvergenceCriterion):
 		return criterion

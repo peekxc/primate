@@ -69,10 +69,10 @@ def test_operator_interface():
 	assert np.allclose(A @ v, M @ v)
 
 
-def test_spectral():
+def test_spectral_positive_definite():
 	rng = np.random.default_rng(1234)
 	n = 100
-	A = symmetric(n)
+	A = symmetric(n, pd=True)
 	v = rng.uniform(size=A.shape[1], low=-1, high=1)
 	for fun in _BUILTIN_MATRIX_FUNCTIONS:
 		f = param_callable(fun)

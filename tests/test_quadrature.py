@@ -6,7 +6,7 @@ from primate.quadrature import lanczos_quadrature
 
 def test_quadrature():
 	rng = np.random.default_rng(seed=1234)
-	A = symmetric(50, seed=rng)
+	A = symmetric(50, seed=rng, pd=True)
 	quad_ests = []
 	for _ in range(100):
 		v = rng.uniform(size=A.shape[1], low=0, high=1)

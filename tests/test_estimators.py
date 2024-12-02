@@ -66,7 +66,7 @@ def test_CountCriterion():
 
 def test_ToleranceCriterion():
 	rng = np.random.default_rng(1234)
-	mu = MeanEstimator()
+	mu = MeanEstimator(15)
 	cc = ToleranceCriterion(atol=0, rtol=0.10, ord=1)
 	while not cc(mu):
 		mu.update(rng.uniform(size=(1, 15), low=-1, high=+1))

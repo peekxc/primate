@@ -57,17 +57,18 @@ def diag(
 	## Parameterize the random vector generation
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-	estimator = MeanEstimator(kwargs.pop("record", False))
+	estimator = MeanEstimator(record=kwargs.pop("record", False))
 	converge = convergence_criterion(converge, **kwargs)
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
-		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
+		return 0.0 if not full else (0.0, EstimatorResult())
 
 	## Commence the Monte-Carlo iterations
 	if full or callback is not None:
 		numer, denom = np.zeros(N, dtype=f_dtype), np.zeros(N, dtype=f_dtype)
-		result = EstimatorResult(numer, False, converge, 0, {})
+		result = EstimatorResult(estimator, converge)
+
 		while not converge(estimator):
 			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
 			u = (A @ v).ravel()

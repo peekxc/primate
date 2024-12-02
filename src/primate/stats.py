@@ -17,6 +17,8 @@ class Covariance:
 
 	@property
 	def mean(self):
+		if self.n == 0:
+			return np.nan
 		return self.mu.item() if self.dim == 1 else self.mu
 
 	def update(self, X: np.ndarray) -> None:

@@ -54,24 +54,27 @@ build_and_test_task:
     folder: ~/.cache/pip
     fingerprint_script: echo $PYTHON_VERSION
   before_script: |
-    python -m pip install --upgrade pip
+    python -m uv pip install --upgrade pip uv
   build_script: |
-    python -m pip install '.[test]' --verbose
+    python -m uv pip install '.[test]' --verbose
   test_script: |
     python -m pytest tests/ --cov=primate --benchmark-skip  
+    coverage report -m
   coverage_script: |
     pipx run 'coverage[toml]' xml -o coverage.xml --rcfile=pyproject.toml
     pipx run 'coveralls<4' --submit coverage.xml --rcfile=pyproject.toml
     pipx run 'coveralls<4' --finish
-  uninstall_script: |
-    python -m pip uninstall primate --yes
-  wheel_script: |
-    python -m build
-  install_script: |
-    python -m pip install dist/scikit_primate*.whl
-  test_coverage_script: |
-    python -m pytest tests/ --cov=primate --benchmark-skip
-    coverage report -m
+
+
+# uninstall_script: |
+#   python -m pip uninstall primate --yes
+# wheel_script: |
+#   python -m build
+# install_script: |
+#   python -m pip install dist/scikit_primate*.whl
+# test_coverage_script: |
+#   python -m pytest tests/ --cov=primate --benchmark-skip
+#   coverage report -m
 
 # coverage_report_task:
 #   # only_if: changesInclude('.cirrus.yml', '**.{h,cpp,py,toml,build}')

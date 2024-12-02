@@ -16,7 +16,7 @@ _ISO_DISTRIBUTIONS = {
 def symmetric(
 	n: int,
 	dist: str = "normal",
-	pd: bool = True,
+	pd: bool = False,
 	ew: Optional[np.ndarray] = None,
 	seed: Union[int, np.random.Generator, None] = None,
 ) -> np.ndarray:
@@ -73,7 +73,9 @@ def haar(n: int, ew: Optional[np.ndarray] = None, seed: Union[int, np.random.Gen
 
 
 def isotropic(
-	size: Union[int, tuple, None] = None, pdf: str = "rademacher", seed: Union[int, np.random.Generator, None] = None
+	size: Union[int, tuple, None] = None,
+	pdf: Union[Callable, str] = "rademacher",
+	seed: Union[int, np.random.Generator, None] = None,
 ) -> Union[np.ndarray, Callable]:
 	"""Generates random vectors from a specified isotropic distribution.
 
@@ -85,6 +87,8 @@ def isotropic(
 	Returns:
 		Array of shape `size` with rows distributed according to `pdf`.
 	"""
+	if callable(pdf):
+		return pdf
 	assert pdf in _ISO_DISTRIBUTIONS.keys(), f"Invalid distribution '{pdf}' supplied."
 	pdf: str = _ISO_DISTRIBUTIONS[pdf]
 	rng = np.random.default_rng(seed)

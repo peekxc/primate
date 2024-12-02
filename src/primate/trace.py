@@ -113,18 +113,18 @@ def hutch(
 	## Parameterize the various quantities
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-	estimator = MeanEstimator(kwargs.pop("record", False))
+	estimator = MeanEstimator(record=kwargs.pop("record", False))
 	converge = convergence_criterion(converge, **kwargs)
 	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
 	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
-		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, converge, 0, {}))
+		return 0.0 if not full else (0.0, EstimatorResult(estimator, converge))
 
 	## Commence the Monte-Carlo iterations
 	if full or callback is not None:
-		result = EstimatorResult(0.0, False, converge, 0, {})
+		result = EstimatorResult(estimator, converge)
 		callback = lambda x: x if callback is None else callback
 		while not converge(estimator):
 			v = pdf(size=(N, batch)).astype(f_dtype)
@@ -287,7 +287,7 @@ def xtrace(
 	## Commence the batched-iteration
 	estimate = np.inf
 	it = 0
-	result = EstimatorResult(0.0, False, None, 0, {})
+	result = EstimatorResult()
 	rng = np.random.default_rng(seed)
 	while (it * batch) < A.shape[1]:  # err >= (error_atol + error_rtol * abs(t)):
 		## Determine number of new sample vectors to generate
