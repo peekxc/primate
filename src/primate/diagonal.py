@@ -121,7 +121,7 @@ def xdiag(
 	Z = A.T @ Q
 	T = Z.T @ N
 	R_inv = np.linalg.inv(R)
-	S = R_inv / np.linalg.norm(R_inv, axis=0)
+	S = R_inv.T / np.linalg.norm(R_inv, axis=1)
 	QS = Q @ S
 
 	## Vector quantities

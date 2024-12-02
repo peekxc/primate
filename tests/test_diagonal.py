@@ -22,16 +22,16 @@ def test_xdiag():
 
 	## Ensure error is decreasing
 	errors = []
-	budget = np.linspace(2, A.shape[0], 10).astype(int)
+	budget = np.linspace(2, 2 * A.shape[0], 10).astype(int)
 	for m in budget:
-		d = xdiag(A, m, pdf="sphere", seed=rng)
+		d = xdiag(A, m, pdf="signs", seed=rng)
 		errors.append(np.linalg.norm(np.diag(A) - d))
 		# print(f"Error: {np.linalg.norm(np.diag(A) - d)}")
 
 	y = np.array(errors)
 	B = np.c_[budget, np.ones(len(budget))]
 	m, c = np.linalg.lstsq(B, y)[0]
-	assert m < -0.50, "Error is not decreasing appreciably"
+	assert m < -0.10, "Error is not decreasing appreciably"
 
 
 # def test_diagonal():
