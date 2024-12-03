@@ -6,7 +6,7 @@ from .fttr import fttr
 from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 
-def lanczos_quadrature(
+def quadrature(
 	d: np.ndarray,
 	e: np.ndarray,
 	deg: Optional[int] = None,

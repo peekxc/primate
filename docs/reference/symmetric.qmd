@@ -1,7 +1,7 @@
 # symmetric { #random.symmetric }
 
 ```python
-symmetric(n, dist='normal', pd=True, ew=None, seed=None)
+symmetric(n, dist='normal', pd=False, ew=None, seed=None)
 ```
 
 Generates a random symmetric matrix of size `n` with eigenvalues `ew`.
@@ -12,8 +12,8 @@ Generates a random symmetric matrix of size `n` with eigenvalues `ew`.
 |--------|-----------------------------------------|-------------------------------------------------------------------------------------------------|------------|
 | n      | int                                     | The size of the matrix.                                                                         | _required_ |
 | dist   | str                                     | Distribution of individual matrix entries.                                                      | `'normal'` |
-| pd     | bool                                    | Whether to ensure the generated matrix is positive-definite, clipping eigenvalues as necessary. | `True`     |
-| ew     | np.ndarray                              | Desired eigenvalues of `A`. If not provided, generates random values in the range [-1, 1].      | `None`     |
+| pd     | bool                                    | Whether to ensure the generated matrix is positive-definite, clipping eigenvalues as necessary. | `False`    |
+| ew     | Optional\[np.ndarray\]                  | Desired eigenvalues of `A`. If not provided, generates random values in the range [-1, 1].      | `None`     |
 | seed   | Union\[int, np.random.Generator, None\] | seed for the random number generator.                                                           | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}

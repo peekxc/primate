@@ -2,7 +2,18 @@
 title: "`primate` quickstart"
 ---
 
-Below is a quick introduction to `primate`. 
+`primate` is a package that contains a variety of algorithms for estimating quantities from matrix functions, with a focus 
+on implicit matrix representations and support for common quantities of interest, such as the trace or the diagonal.
+
+Below is a quick introduction to: 
+
+- Trace estimation
+- Diagonal estimation 
+- Matrix function approximation
+- Configuring the output 
+- Configuring the execution
+
+<br/>
 
 ```{python}
 #| echo: false
@@ -16,21 +27,23 @@ np.random.seed(1234)
 
 ## Trace estimation 
 
-A variety of _trace_ estimators---that is, algorithms for estimating the quantity: 
+A variety of _trace_ estimators are available in the `primate.trace` module. These algorithms estimate the quantity: 
 
 $$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i $$
 
-are available in the `primate.trace` module:
+The following example demonstrates a variety of trace estimators, including the Girard-Hutchinson estimator (`hutch`), the 
+improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
 
 ```{python}
 from primate.trace import hutch, hutchpp, xtrace
 from primate.random import symmetric
-A = symmetric(150)  ## random symmetric matrix 
+rng = np.random.default_rng(1234)      # for reproducibility 
+A = symmetric(150, pd=True, seed=rng)  # random PD matrix 
 
-print(f"Actual trace:  {A.trace():6f}")     ## Actual trace
-print(f"Hutch:         {hutch(A):6f}")      ## Crude monte-carlo estimator
-print(f"Hutch++:       {hutchpp(A):6f}")    ## Monte-Carlo estimator w/ deflation 
-print(f"XTrace:        {xtrace(A):6f}")     ## Epperly's algorithm
+print(f"Trace   :  {A.trace():6f}")   ## Actual trace
+print(f"Hutch   :  {hutch(A):6f}")    ## Crude Monte-Carlo estimator
+print(f"Hutch++ :  {hutchpp(A):6f}")  ## Monte-Carlo estimator w/ deflation 
+print(f"XTrace  :  {xtrace(A):6f}")   ## Epperly's algorithm
 ```
 
 Here, `A` can be a numpy matrix, a sparse matrix, or a `LinearOperator`. If the spectral sum of interest is not just the sum of the eigenvalues, but rather the sum under composition with some spectral function $f(\lambda)$, i.e. the quantity of interest is of the form: 
@@ -59,7 +72,6 @@ For example, one might compute the log-determinant of a positive definite matrix
 
 ```{python}
 from primate.operators import matrix_function, IdentityOperator
-A = symmetric(150, pd=True)       # eigenvalues in (0, 1] 
 M = matrix_function(A, fun="log") # or fun=np.log 
 
 print(f"logdet(A) :  {np.log(np.linalg.det(A)):6f}")
@@ -74,13 +86,16 @@ print(f"XTrace    :  {xtrace(M):6f}")
 The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.  
 
 ```{python}
+from primate.estimators import arr_summary
 from primate.diagonal import diag, xdiag
 
 d1 = A.diagonal()
 d2 = diag(A, rtol=1e-4)
+d3 = xdiag(A)
 
-print(f"Diagonal (true): {d1}")
-print(f"Diagonal est   : {d2}")
+print(f"Diagonal (true): {arr_summary(d1)}")
+print(f"Diagonal Hutch : {arr_summary(d2)}")
+print(f"Diagonal XDiag : {arr_summary(d3)}")
 ```
 
 ## Matrix function approximation 
@@ -91,7 +106,7 @@ In `primate`, the matrix function $f(A)$ is not constructed explicitly but inste
 from primate.operators import matrix_function
 v = np.random.uniform(size=A.shape[0])
 y = matrix_function(A, fun=np.exp, v=v)
-print(f"f(A)v = {y.T}")
+print(f"f(A)v = {arr_summary(y.ravel())}")
 ```
 
 Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a `MatrixFunction` instance and use it like any other `LinearOperator`: 
@@ -100,10 +115,10 @@ Alternatively, if you prefer an object-oriented approach (or you plan on doing m
 from primate.operators import MatrixFunction
 ExpA = MatrixFunction(A, fun=np.exp)
 y = ExpA @ v
-print(f"exp(A)v = {y}")
+print(f"exp(A)v = {arr_summary(y)}")
 ```
 
-If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. By default, the action of the matrix function is approximated over a fixed-degree Krylov subspace (`deg`) using the Lanczos method (without reorthogonalization). Some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$; in general, the Lanczos method up to degree $k$ can approximate the action $v \mapsto f(A)v$ as well as the operator $p(A)$ can, where $p$ is best-fitting degree $2k-1$ polynomial approximation of $f$.
+If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. Note some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$; in general, a `MatrixFunction` instance with degree $k$ approximates the action $v \mapsto f(A)v$ about as well as the operator $p(A)$, where $p$ is a degree $2k-1$ polynomial interpolant of $f$. 
 
 ```{python}
 from scipy.linalg import expm
@@ -122,20 +137,22 @@ print(f"Deg-20 approx error (no reorth.)   : {np.linalg.norm(w - y)}")
 print(f"Deg-50 approx error (full reorth.) : {np.linalg.norm(w - z)}")
 ```
 
-As you can see, for smoother matrix functions (like $\mathrm{exp}(A)$), even a low degree Krylov expansion can be more than sufficient for many application purposes, even without any re-orthogonalization.
+As you can see, for smoother matrix functions (like $\mathrm{exp}(A)$), even a low degree Krylov expansion can be more than sufficient for many application purposes---all without any re-orthogonalization! See the matrix function guide for more background on this. 
 
-## Configuration 
+## Configuring the output
 
-By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution. 
+<!-- By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution.  -->
 
-To get all the information about the computation, simply pass `full=True` to the corresponding estimator call. This will yield `EstimatorResult` along with the estimate itself, which contains information about execution itself, convergence information of the estimator, and other status messages, such as the argin of error of a default-constructed confidence interval: 
+Passing `full=True` returns additional information about the computation in the form of `EstimatorResult` (along with the estimate itself), which contains information about execution itself, convergence information of the estimator, and other status messages. 
+
+For example, with the default `converge="confidene"` criterion, the margin of error of a default-constructed confidence interval is returned: 
 ```{python}
-est, info = hutch(A, full=True)
+est, info = hutch(A, converge="confidence", full=True)
 print(info.message)
 ```
 
-To get a better idea of what the sample values and the corresponding estimate looked like as the sample size increased, you can plot the sequence with 
-the `figure_sequence` function:
+A more visual way of viewing the sample values and the corresponding estimate as a function of the sample size is to plot the sequence with 
+the `figure_sequence` function (note this requires saving the samples with `record=True`):
 ```{python}
 #| echo: true
 from primate.plotting import figure_sequence
@@ -144,6 +161,18 @@ est, info = hutch(A, full=True, record=True)
 p = figure_sequence(info.estimator.values)
 show(p)
 ```
+
+You can also pass a callback function, which receives as its only argument an `EstimatorResult` instance. 
+This can be useful for quickly monitoring convergence information. 
+
+```{python}
+def hutch_callback(result: EstimatorResult):
+	if (result.nit % 150) == 0:
+		print(result.criterion.message(result.estimator))
+
+est, info = hutch(A, converge="confidence", callback=hutch_callback)
+```
+
 
 
 

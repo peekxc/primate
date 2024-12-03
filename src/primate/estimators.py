@@ -1,17 +1,20 @@
 """Estimators API."""
+## Update: Don't use mypy. It's way too strict, can't handle properties, can't handle variable overwrites, can't
+## handle inheritance well, can't handle kwargs well, can't handle replacing variables with new variables, complains way too often.
 
+import typing
 from dataclasses import dataclass, field
-from numbers import Integral
-from operator import and_, or_
+from operator import and_, or_, not_
 from typing import Callable, Iterable, Literal, Optional, Protocol, Sized, Union, runtime_checkable
 
 import numpy as np
 import scipy as sp
 
+from .typing import restrict_kwargs, setdiff_kwargs
 from .stats import Covariance
 
 
-def arr_summary(x: Union[float, np.ndarray]) -> str:
+def arr_summary(x: Union[None, float, np.ndarray]) -> str:
 	if x is None:
 		return "None"
 	x = np.atleast_1d(x)
@@ -29,34 +32,46 @@ def arr_summary(x: Union[float, np.ndarray]) -> str:
 
 @runtime_checkable
 class Estimator(Sized, Protocol):
-	"""Protocol for generic stopping criteria for sequences."""
+	"""Protocol for generic updateable estimator for sequences.
 
-	n_samples: int
+	Here, an estimator is a object that keeps track of an *estimate* by receiving updated samples.
+	Every estimator tracks the number of samples it's received (its length) as well as the current /
+	most up-to-date estimate. Optionally, an estimator may also record its
+	"""
+
+	n_samples: int = 0
+	values: Optional[list] = None
 
 	def __len__(self) -> int:
 		return self.n_samples
 
 	def update(self, x: Union[float, np.ndarray], **kwargs: dict): ...
+
+	@property
 	def estimate(self) -> Union[float, np.ndarray]: ...
 
 
 class ConvergenceCriterion:
-	"""Generic stopping criteria for sequences."""
+	"""Generic lazy-evaluated stopping criteria for sequences."""
 
 	def __init__(self, operation: Callable):
 		assert callable(operation)
 		self._operation = operation
 
 	def __or__(self, other: "ConvergenceCriterion"):
-		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
 		return ConvergenceCriterion(lambda est: or_(self(est), other(est)))
 
 	def __and__(self, other: "ConvergenceCriterion"):
-		# other_op = other._operation if isinstance(other, ConvergenceCriterion) else (lambda: other)
 		return ConvergenceCriterion(lambda est: and_(self(est), other(est)))
+
+	def __invert__(self):
+		return ConvergenceCriterion(lambda est: not_(self(est)))
 
 	def __call__(self, est: Estimator) -> bool:
 		return self._operation(est)
+
+	def message(self, est: Estimator) -> str:
+		return "Composite convergence criterion"
 
 
 @dataclass
@@ -93,8 +108,10 @@ class MeanEstimator(Estimator):
 	def __init__(self, dim: Optional[int] = None, record: bool = False) -> None:
 		self.n_samples = 0
 		self.delta = np.atleast_1d(np.inf)
-		self.cov = Covariance(dim=dim) if isinstance(dim, Integral) else None
 		self.values = [] if record else None
+		if dim is not None:
+			dim: int = int(dim)
+			self.cov = Covariance(dim=dim)
 
 	@property
 	def mean(self) -> Optional[float]:
@@ -119,17 +136,19 @@ class MeanEstimator(Estimator):
 			self.values.extend(x)
 
 	@property
-	def estimate(self) -> float:
+	def estimate(self) -> Union[float, np.ndarray, None]:
 		return self.mean
 
 
 class ControlVariableEstimator(MeanEstimator):
-	def __init__(self, ecv: Union[float, np.ndarray], alpha: Optional[Union[float, np.ndarray]] = None, **kwargs: dict):
+	def __init__(self, ecv: Union[float, np.ndarray], alpha: Union[float, np.ndarray, None] = None, **kwargs: dict):
 		super().__init__(**kwargs)
-		ecv = np.atleast_1d(ecv).ravel()
-		assert alpha is None or len(ecv) == len(alpha), "Coefficients alpha must have same length as the control variables."
-		self.ecv = ecv
+		ecv: np.ndarray = np.atleast_1d(ecv).ravel()
+		if alpha is not None:
+			alpha: np.ndarray = np.atleast_1d(alpha).ravel()
+			assert len(ecv) == len(alpha), "Coefficients alpha must have same length as the control variables."
 		self.alpha = alpha
+		self.ecv = ecv
 		self.cov = Covariance(dim=len(ecv) + 1)
 		self._estimate_cor = alpha is None
 		self.n_samples = 0
@@ -183,11 +202,11 @@ class CountCriterion(ConvergenceCriterion):
 	def __init__(self, count: int):
 		self.count = count
 
-	def __call__(self, est: MeanEstimator) -> bool:
+	def __call__(self, est: Estimator) -> bool:
 		return len(est) >= self.count
 
-	def message(self, est: MeanEstimator) -> bool:
-		msg = f"Est: {arr_summary(est.estimate)} (#S:{ len(est) })"
+	def message(self, est: Estimator) -> str:
+		msg = f"Est: {arr_summary(np.array(est.estimate))} (#S:{ len(est) })"
 		return msg
 
 
@@ -199,14 +218,14 @@ class ToleranceCriterion(ConvergenceCriterion):
 		self.atol = atol
 		self.ord = ord
 
-	def __call__(self, est: MeanEstimator) -> bool:
-		if est.mean is None:
+	def __call__(self, est: Estimator) -> bool:
+		if est.estimate is None:
 			return False
 		error = np.linalg.norm(est.delta, ord=self.ord)
 		estimate = np.atleast_1d(est.estimate)
 		return bool(error < self.atol or error < self.rtol * np.linalg.norm(estimate, ord=self.ord))
 
-	def message(self, est: MeanEstimator) -> str:
+	def message(self, est: Estimator) -> str:
 		msg = f"Est: {arr_summary(est.estimate)}"
 		msg += f"(atol={self.atol:3f}, rtol={self.rtol:3f}, #S:{ len(est) })"
 		if est.estimate is not None:
@@ -217,16 +236,9 @@ class ToleranceCriterion(ConvergenceCriterion):
 
 
 class ConfidenceCriterion(ConvergenceCriterion):
-	"""Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT.
+	"""Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT."""
 
-	Provides the following methods:
-		- __call__ = Updates the estimator with newly measured samples
-		- converged = Checks convergence of the estimator within an interval
-		-	plot = Plots the samples and their sample distribution CI's
-
-	"""
-
-	def __init__(self, confidence: float = 0.95, atol: float = 0.05, rtol: float = 0.01) -> None:
+	def __init__(self, confidence: float = 0.95, atol: float = 0.00, rtol: float = 0.01) -> None:
 		assert 0 < confidence and confidence < 1, "Confidence must be in (0, 1)"
 		self.atol = 0.0 if atol is None else atol
 		self.rtol = 0.0 if rtol is None else rtol
@@ -256,6 +268,7 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	# 	self.vr_est = L * self.vr_pre + denom * (estimate - self.mu_pre) ** 2  # update sample variance
 	# 	self.mu_pre = self.mu_est
 	# 	self.vr_pre = self.vr_est
+	@typing.no_type_check
 	def _error(self, est: MeanEstimator):
 		if est.n_samples < 3:
 			return (np.inf, np.inf)
@@ -267,10 +280,11 @@ class ConfidenceCriterion(ConvergenceCriterion):
 		return (margin_of_error, rel_error)
 
 	def __call__(self, est: MeanEstimator) -> bool:
+		assert isinstance(est, MeanEstimator), "Must be a mean estimator"
 		moe, rerr = self._error(est)
 		return moe <= self.atol or rerr <= self.rtol
 
-	def message(self, est: MeanEstimator) -> str:
+	def message(self, est: Estimator) -> str:
 		msg = f"Est: {arr_summary(est.estimate)}"
 		moe, rerr = self._error(est)
 		msg += f" +/- {moe:.3f} ({self.confidence*100:.0f}% CI, #S:{ len(est) })"  # | {(cv*100):.0f}% CV
@@ -281,7 +295,7 @@ class KneeCriterion(ConvergenceCriterion):
 	def __init__(self, S: float = 1.0) -> None:
 		self.S = S
 
-	def __call__(self, est: MeanEstimator) -> bool:
+	def __call__(self, est: Estimator) -> bool:
 		"""Applies the kneedle algorithm to detect the knee in the sequence."""
 		if est.values is None or len(est.values) < 3:
 			return False
@@ -304,7 +318,7 @@ class KneeCriterion(ConvergenceCriterion):
 		threshold = max_diff - (self.S / (len(y) - 1))
 		return max_diff > threshold and diff_curve[-1] < threshold
 
-	def message(self, est: MeanEstimator) -> str:
+	def message(self, est: Estimator) -> str:
 		# TODO: detect curvature and report it
 		# if est.estimate is not None:
 		msg = f"Est: {arr_summary(est.estimate)} (#S:{ len(est) }, S={self.S:3f})"
@@ -319,21 +333,14 @@ CRITERIA = {
 }
 
 
+## TODO: see https://mypy.readthedocs.io/en/stable/changelog.html#using-typeddict-for-kwargs-typing for Unpack
+@typing.no_type_check
 def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs: dict) -> ConvergenceCriterion:
 	"""Parameterizes a convergence criterion."""
-	# assert criterion.lower() in CRITERIA.keys(), f"Invalid criterion {criterion}"
 	if isinstance(criterion, ConvergenceCriterion):
 		return criterion
-	criterion = criterion.lower()
-	if criterion == "count":
-		cc = CountCriterion(**{k: v for k, v in kwargs.items() if k in {"count"}})
-	elif criterion == "tolerance":
-		cc = ToleranceCriterion(**{k: v for k, v in kwargs.items() if k in {"ord", "atol", "rtol"}})
-	elif criterion == "confidence":
-		cc = ConfidenceCriterion(**{k: v for k, v in kwargs.items() if k in {"confidence", "atol", "rtol"}})
-	elif criterion == "knee":
-		cc = KneeCriterion(**{k: v for k, v in kwargs.items() if k in {"S"}})
-	else:
-		raise ValueError("Invalid criterion given")  # this should never happen
+	assert isinstance(criterion, str) and criterion.lower() in CRITERIA.keys(), f"Invalid criterion {criterion}"
+	crit = CRITERIA[criterion.lower()]
+	cc = crit(**restrict_kwargs(crit, kwargs))
 	assert isinstance(cc, ConvergenceCriterion), "`converge` must satisfy the ConvergenceEstimator protocol."
 	return cc

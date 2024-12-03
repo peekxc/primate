@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 import numpy as np
 from scipy.sparse import sparray, spdiags
@@ -31,7 +31,7 @@ def lanczos(
 	return_basis: bool = False,
 	seed: Union[int, np.random.Generator, None] = None,
 	dtype: Optional[np.dtype] = None,
-	**kwargs,
+	**kwargs: Any,
 ) -> tuple:
 	"""Lanczos method for symmetric tridiagonalization.
 

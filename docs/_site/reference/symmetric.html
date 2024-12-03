@@ -474,15 +474,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="random.symmetric" class="level1">
 <h1>symmetric</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>symmetric(n, dist<span class="op">=</span><span class="st">'normal'</span>, pd<span class="op">=</span><span class="va">True</span>, ew<span class="op">=</span><span class="va">None</span>, seed<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>symmetric(n, dist<span class="op">=</span><span class="st">'normal'</span>, pd<span class="op">=</span><span class="va">False</span>, ew<span class="op">=</span><span class="va">None</span>, seed<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Generates a random symmetric matrix of size <code>n</code> with eigenvalues <code>ew</code>.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 5%">
-<col style="width: 26%">
-<col style="width: 60%">
+<col style="width: 25%">
+<col style="width: 61%">
 <col style="width: 7%">
 </colgroup>
 <thead>
@@ -509,13 +509,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>pd</td>
 <td>bool</td>
-<td>Whether to ensure the generated matrix is positive-definite. Potentially clips eigenvalues.</td>
-<td><code>True</code></td>
+<td>Whether to ensure the generated matrix is positive-definite, clipping eigenvalues as necessary.</td>
+<td><code>False</code></td>
 </tr>
 <tr class="even">
 <td>ew</td>
-<td>np.ndarray</td>
-<td>Desired eigenvalues of <code>A</code>. If not provided, generates random values in the range [0, 1].</td>
+<td>Optional[np.ndarray]</td>
+<td>Desired eigenvalues of <code>A</code>. If not provided, generates random values in the range [-1, 1].</td>
 <td><code>None</code></td>
 </tr>
 <tr class="odd">

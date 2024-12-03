@@ -13,9 +13,23 @@ def test_hutch():
 	est = hutch(A, seed=rng)
 	assert np.abs(A.trace() - est) <= 10 * (1 / np.sqrt(n))
 
-	est, info = hutch(A, maxiter=n, seed=rng, full=True)
+	est, info = hutch(A, seed=rng, full=True)
 	assert isinstance(info, EstimatorResult)
-	assert isinstance(info.criterion.message(info.estimator), str)
+
+	def counter():
+		cc = 0
+
+		def _increment(result):
+			nonlocal cc
+			cc += 1
+
+		return _increment
+
+	counter_cb = counter()
+	hutch(A, callback=counter_cb)
+	assert counter_cb.__closure__[0].cell_contents > 0
+
+	# assert isinstance(info.criterion.message(info.estimator), str)
 	# assert isinstance(info.samples, list) and len(info.samples) == n
 
 
@@ -38,8 +52,8 @@ def test_hutch_mf_identity():
 	A = symmetric(n, pd=True, ew=ew, seed=rng)
 	M = MatrixFunction(A, deg=n, orth=n)
 
-	est1 = hutch(A, maxiter=150, seed=1234)
-	est2 = hutch(M, maxiter=150, seed=1234)
+	est1 = hutch(A, converge="count", count=150, seed=1234)
+	est2 = hutch(M, converge="count", count=150, seed=1234)
 	assert np.isclose(est1, est2, atol=1e-6)
 
 
@@ -49,10 +63,11 @@ def test_xtrace():
 	A = rng.uniform(size=(50, 50))
 	for nb in [1, 2, 3, 5, 10, 20, 50]:
 		rng = np.random.default_rng(1234)
-		est = xtrace(A, batch=nb, seed=rng, verbose=1)
+		est = xtrace(A, batch=nb, seed=rng, verbose=1, converge="count", count=50)
 		err = np.abs(A.trace() - est)
 		assert np.isclose(err, 0.0)
 
-	x, info = xtrace(A, full=True)
+	x, info = xtrace(A, full=True, converge="confidence", record=True, atol=0, rtol=0.0)
+	assert info.estimator.values != []
 	assert isinstance(info, EstimatorResult)
-	assert np.abs(A.trace() - x) < 0.05
+	assert np.abs(A.trace() - x) < 1e-6

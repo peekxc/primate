@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project _loosely_ adheres to [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.4.0 [Unreleased]
+## v0.5.x [Unreleased]
+- Complete rewrite of the package using Pythran for maintainability 
+
+## v0.4.0 
 - Removed ability to specify scalar-valued matrix functions 
 - Added ability to specify vector-valued matrix functions (strictly more general!)
 - Added transform() function to MatrixFunction class to allow preprocessing of vector inputs (e.g. for deflation)
@@ -19,7 +22,7 @@ All notable changes to this project will be documented in this file. This projec
 - Added initial Hutch++ code 
 
 ## v0.3.5
-- Added initial python-pnly XTrace implementation 
+- Added initial python-only XTrace implementation 
 - Added unit tests to increase coverage on matrix function API 
 
 ## v0.3.4

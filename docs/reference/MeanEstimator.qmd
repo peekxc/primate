@@ -1,7 +1,7 @@
 # MeanEstimator { #estimators.MeanEstimator }
 
 ```python
-MeanEstimator(self, record=False)
+MeanEstimator(self, dim=None, record=False)
 ```
 
 Sample mean estimator with stable covariance updating.

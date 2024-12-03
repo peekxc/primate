@@ -11,7 +11,7 @@ Generates a random matrix with prescribed eigenvalues by sampling uniformly from
 | Name   | Type                                    | Description                                                                               | Default    |
 |--------|-----------------------------------------|-------------------------------------------------------------------------------------------|------------|
 | n      | int                                     | The size of the matrix.                                                                   | _required_ |
-| ew     | np.ndarray                              | Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1]. | `None`     |
+| ew     | Optional\[np.ndarray\]                  | Desired eigenvalues of `A`. If not provided, generates random values in the range [0, 1]. | `None`     |
 | seed   | Union\[int, np.random.Generator, None\] | seed for the random number generator.                                                     | `None`     |
 
 ## Returns {.doc-section .doc-section-returns}

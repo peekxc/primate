@@ -6,7 +6,14 @@ from typing import Callable, Generator, Iterable, Optional, Union
 import numpy as np
 from scipy.sparse.linalg import LinearOperator
 
-from .estimators import ConvergenceCriterion, EstimatorResult, MeanEstimator, convergence_criterion
+from .estimators import (
+	ConfidenceCriterion,
+	ConvergenceCriterion,
+	CountCriterion,
+	EstimatorResult,
+	MeanEstimator,
+	convergence_criterion,
+)
 from .linalg import update_trinv
 from .operators import is_valid_operator
 from .random import isotropic
@@ -24,46 +31,11 @@ def _chunk(iterable: Iterable, n: int) -> Generator:
 			yield batch
 
 
-## Based on Theorem 4.3 and Lemma 4.4 of Ubaru
-def _suggest_nv_trace(p: float, eps: float, f: str = "identity", dist: str = "rademacher") -> int:
-	"""Suggests a number of sample vectors to use to get an eps-accurate trace estimate with probability p."""
-	assert p >= 0 and p < 1, "Probability of success 'p' must be  must be between [0, 1)"
-	eta = 1.0 - p
-	if f == "identity":
-		return int(np.round((6 / eps**2) * np.log(2 / eta)))
-	else:
-		raise NotImplementedError("TODO")
-
-
-def _estimator_msg(info: dict) -> str:
-	msg = f"{info['estimator']} estimator"
-	msg += f" (fun={info.get('function', None)}"
-	if info.get("lanczos_kwargs", None) is not None:
-		msg += f", deg={info['lanczos_kwargs'].get('deg', 20)}"
-	if info.get("quad", None) is not None:
-		msg += f", quad={info['quad']}"
-	msg += ")\n"
-	msg += f"Est: {info['estimate']:.3f}"
-	if "margin_of_error" in info:
-		moe, conf, cv = (info[k] for k in ["margin_of_error", "confidence", "coeff_var"])
-		msg += f" +/- {moe:.3f} ({conf*100:.0f}% CI | {(cv*100):.0f}% CV)"
-	msg += f", (#S:{ info['n_samples'] } | #MV:{ info['n_matvecs']}) [{info['pdf'][0].upper()}]"
-	if info.get("seed", -1) != -1:
-		msg += f" (seed: {info['seed']})"
-	return msg
-
-
-def _reduce(nodes: np.ndarray, weights: np.ndarray) -> np.ndarray:
-	if nodes.ndim == 1:
-		return np.sum(nodes * weights, axis=-1)
-	return np.sum(nodes * weights[:, np.newaxis], axis=-1)
-
-
 def hutch(
 	A: Union[LinearOperator, np.ndarray],
 	batch: int = 32,
 	pdf: Union[str, Callable] = "rademacher",
-	converge: Union[str, ConvergenceCriterion] = "confidence",
+	converge: Union[str, ConvergenceCriterion] = "default",
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
@@ -114,7 +86,12 @@ def hutch(
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
 	estimator = MeanEstimator(record=kwargs.pop("record", False))
-	converge = convergence_criterion(converge, **kwargs)
+	if converge == "default":
+		cc1 = CountCriterion(count=200)
+		cc2 = ConfidenceCriterion(confidence=0.95, atol=1.0, rtol=0.0)
+		converge = cc1 | cc2
+	else:
+		converge = convergence_criterion(converge, **kwargs)
 	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
 	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
 
@@ -125,7 +102,7 @@ def hutch(
 	## Commence the Monte-Carlo iterations
 	if full or callback is not None:
 		result = EstimatorResult(estimator, converge)
-		callback = lambda x: x if callback is None else callback
+		callback = (lambda x: x) if callback is None else callback
 		while not converge(estimator):
 			v = pdf(size=(N, batch)).astype(f_dtype)
 			estimator.update(quad_form(v))
@@ -215,7 +192,8 @@ def _xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: n
 	Returns:
 		tuple (t, est, err) representing the averaged leave-one-out trace estimate
 	"""
-	diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
+	# diag_prod = lambda A, B: np.diag(A.T @ B)[:, np.newaxis]
+	diag_prod = lambda A, B: np.einsum("ij,ji->i", A.T, B)[:, np.newaxis]  ## Faster version of the above
 
 	n, m = W.shape
 	W_proj = Q.T @ W
@@ -241,20 +219,25 @@ def _xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: n
 	## Trace estimate
 	tr_ests = np.trace(H) * np.ones(shape=(m, 1)) - dSHS
 	tr_ests += (-dTW + dWHW + dSW * dSRmHW + abs(dSW) ** 2 * dSHS + dTmHRS * dSW) * scale
-	t = tr_ests.mean()
-	err = np.std(tr_ests) / np.sqrt(m)
-	return t, tr_ests, err
+	return tr_ests
+	# t = tr_ests.mean()
+	# err = np.std(tr_ests) / np.sqrt(m)
+	# return t, tr_ests, err
 
 
 def xtrace(
 	A: Union[LinearOperator, np.ndarray],
 	batch: int = 32,
 	pdf: Union[str, Callable] = "sphere",
+	converge: Union[str, ConvergenceCriterion] = "default",
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
-	verbose: int = 0,
+	callback: Optional[Callable] = None,
+	**kwargs: dict,
 ) -> Union[float, tuple]:
-	"""Estimates the trace of `A` using the XTrace trace estimator.
+	"""Estimates the trace of `A` using the XTrace estimator.
+
+	This function implements Epperly's exchangeable 'XTrace' estimator.
 
 	Parameters:
 		A: real symmetric matrix or linear operator.
@@ -269,13 +252,24 @@ def xtrace(
 	Returns:
 		Estimate the trace of `A`. If `info = True`, additional information about the computation is also returned.
 	"""
-
 	from scipy.linalg import qr_insert
 
 	assert batch >= 1, "Batch size must be positive."
 	# assert atol >= 0.0 and rtol >= 0.0, "Error tolerances must be positive"
 	# assert cond_tol >= 0.0, "Condition number must be non-negative"
 	n = A.shape[0]
+	callback = (lambda result: ...) if not callable(callback) else callback
+	record = kwargs.pop("record", False)
+	estimator = MeanEstimator(record=record)
+
+	## Parameterize the convergence criteria
+	if converge == "default":
+		cc1 = CountCriterion(count=n)
+		cc2 = ConfidenceCriterion(confidence=0.95)
+		converge = cc1 | cc2
+	else:
+		converge = CountCriterion(count=n)
+		converge |= convergence_criterion(converge, **kwargs)
 
 	## Setup outputs. TODO: these should really be resizable arrays
 	W = np.zeros(shape=(n, 0))  # Isotropic vectors
@@ -284,12 +278,10 @@ def xtrace(
 	Q, R = np.linalg.qr(Y, mode="reduced")
 	R_inv = np.zeros(shape=(0, 0))
 
-	## Commence the batched-iteration
-	estimate = np.inf
-	it = 0
+	## Commence the batch-iterations
 	result = EstimatorResult()
 	rng = np.random.default_rng(seed)
-	while (it * batch) < A.shape[1]:  # err >= (error_atol + error_rtol * abs(t)):
+	while not converge(estimator):
 		## Determine number of new sample vectors to generate
 		ns = min(A.shape[1] - W.shape[1], int(batch))
 
@@ -305,13 +297,12 @@ def xtrace(
 		Z = np.c_[Z, A @ Q[:, -ns:]]
 
 		## Expand the subspace
-		estimate, t_samples, err = _xtrace(W, Z, Q, R, R_inv, pdf)
-		it += 1
+		t_samples = _xtrace(W, Z, Q, R, R_inv, pdf)
 
-	if full:
-		# result.converged = err <= atol
-		result.nit = it
-		result.estimate = estimate
-		result.message = "ok"
-		return (result.estimate, result)
-	return estimate
+		## Test for convergence
+		estimator = MeanEstimator(record=record)  # degenerate approach since XTrace tracks this
+		estimator.update(t_samples.ravel())
+		result.update(estimator, converge)
+		callback(result)
+
+	return (result.estimate, result) if full else result.estimate

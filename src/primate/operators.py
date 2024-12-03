@@ -7,7 +7,7 @@ from scipy.sparse.linalg._interface import IdentityOperator
 from primate.special import param_callable
 
 from .lanczos import _lanczos
-from .quadrature import lanczos_quadrature
+from .integrate import quadrature
 from .tridiag import eigh_tridiag
 
 
@@ -144,7 +144,7 @@ class MatrixFunction(LinearOperator):
 			xc = x[:, j]
 			x_norm_sq = np.linalg.norm(xc) ** 2
 			_lanczos.lanczos(self._A, xc, self._deg, self._rtol, self._orth, self._alpha, self._beta, self._Q)
-			lanczos_quadrature(self._alpha, self._beta, deg=self._deg, quad="gw", nodes=self._nodes, weights=self._weights)
+			quadrature(self._alpha, self._beta, deg=self._deg, quad="gw", nodes=self._nodes, weights=self._weights)
 			y[j] = np.sum(self._fun(self._nodes) * self._weights, axis=-1) * x_norm_sq
 		return y
 

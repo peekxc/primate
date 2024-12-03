@@ -1,7 +1,7 @@
 import numpy as np
 from primate.lanczos import lanczos
 from primate.random import symmetric
-from primate.quadrature import lanczos_quadrature
+from primate.integrate import quadrature
 
 
 def test_quadrature():
@@ -12,7 +12,7 @@ def test_quadrature():
 		v = rng.uniform(size=A.shape[1], low=0, high=1)
 		v /= np.linalg.norm(v)
 		a, b = lanczos(A, deg=A.shape[1], v0=v)
-		nodes, weights = lanczos_quadrature(a, b, deg=30, quad="gw")
+		nodes, weights = quadrature(a, b, deg=30, quad="gw")
 		quad_ests.append(np.sum(nodes * weights))
 	tr_est = np.mean(quad_ests) * A.shape[1]
 	assert np.max(np.abs(tr_est - A.trace())) <= 0.10 * A.trace()
@@ -24,7 +24,7 @@ def test_quadrature():
 		v = rng.uniform(size=A.shape[1], low=0, high=1)
 		v /= np.linalg.norm(v)
 		a, b = lanczos(A, deg=A.shape[1], v0=v)
-		nodes, weights = lanczos_quadrature(a, b, deg=30, quad="fttr")
+		nodes, weights = quadrature(a, b, deg=30, quad="fttr")
 
 		quad_ests.append(np.sum(nodes * weights))
 	tr_est = np.mean(quad_ests) * A.shape[1]
@@ -67,7 +67,7 @@ def test_fftr():
 
 	a, b = np.diag(T, 0).copy(), np.append([0], np.diag(T, 1)).copy()
 	mu_0 = np.sum(np.abs(ew))
-	fttr_nodes, fttr_weights_run = lanczos_quadrature(a, b, deg=30, quad="fttr")
+	fttr_nodes, fttr_weights_run = quadrature(a, b, deg=30, quad="fttr")
 	fttr_weights_true = np.ravel(ev[0, :]) ** 2
 	assert np.allclose(fttr_weights_run, fttr_weights_true)
 

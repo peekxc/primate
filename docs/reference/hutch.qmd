@@ -5,7 +5,7 @@ trace.hutch(
     A,
     batch=32,
     pdf='rademacher',
-    converge='confidence',
+    converge='default',
     seed=None,
     full=False,
     callback=None,
@@ -31,7 +31,7 @@ intervals on the fly, which may be used in conjunction with `atol` and `rtol` to
 | A        | Union\[LinearOperator, np.ndarray\]     | real symmetric matrix or linear operator.                                         | _required_     |
 | batch    | int                                     | Number of random vectors to sample at a time for batched matrix multiplication.   | `32`           |
 | pdf      | Union\[str, Callable\]                  | Choice of zero-centered distribution to sample random vectors from.               | `'rademacher'` |
-| converge | Union\[str, ConvergenceCriterion\]      | Convergence criterion to test for estimator convergence. See details.             | `'confidence'` |
+| converge | Union\[str, ConvergenceCriterion\]      | Convergence criterion to test for estimator convergence. See details.             | `'default'`    |
 | seed     | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
 | full     | bool                                    | Whether to return additional information about the computation.                   | `False`        |
 | callback | Optional\[Callable\]                    | Optional callable to execute after each batch of samples.                         | `None`         |

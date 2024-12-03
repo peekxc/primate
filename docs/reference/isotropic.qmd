@@ -11,11 +11,11 @@ Generates random vectors from a specified isotropic distribution.
 | Name   | Type                                    | Description                                                                         | Default        |
 |--------|-----------------------------------------|-------------------------------------------------------------------------------------|----------------|
 | size   | Union\[int, tuple, None\]               | Output shape to generate.                                                           | `None`         |
-| pdf    | str                                     | Isotropic distribution to sample from. Must be "rademacher", "sphere", or "normal". | `'rademacher'` |
+| pdf    | Union\[Callable, str\]                  | Isotropic distribution to sample from. Must be "rademacher", "sphere", or "normal". | `'rademacher'` |
 | seed   | Union\[int, np.random.Generator, None\] | Seed or generator for pseudorandom number generation.                               | `None`         |
 
 ## Returns {.doc-section .doc-section-returns}
 
-| Name   | Type       | Description                                                     |
-|--------|------------|-----------------------------------------------------------------|
-|        | np.ndarray | Array of shape `size` with rows distributed according to `pdf`. |
+| Name   | Type                          | Description                                                     |
+|--------|-------------------------------|-----------------------------------------------------------------|
+|        | Union\[np.ndarray, Callable\] | Array of shape `size` with rows distributed according to `pdf`. |

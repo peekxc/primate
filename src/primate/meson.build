@@ -60,7 +60,7 @@ python_sources = [
 	'fttr.py', 
 	'tqli.py', 
 	'tridiag.py',
-	'quadrature.py',
+	'integrate.py',
 	'random.py',
 	'trace.py',
 	'diagonal.py',
@@ -70,6 +70,7 @@ python_sources = [
 	'special.py',
 	'plotting.py',
 	'linalg.py',
+	'typing.py',
   '__init__.py'
 ]
 message('Source install dir = '+py.get_install_dir())
