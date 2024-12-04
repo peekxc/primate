@@ -71,3 +71,21 @@ def test_xtrace():
 	assert info.estimator.values != []
 	assert isinstance(info, EstimatorResult)
 	assert np.abs(A.trace() - x) < 1e-6
+
+
+def test_xtrace2():
+	from primate.trace import xtrace
+	from primate.random import symmetric
+
+	rng = np.random.default_rng(1234)  # for reproducibility
+	A = symmetric(150, pd=True, seed=rng)  # random PD matrix
+	print(xtrace(A, seed=rng))
+	print(A.trace())
+	assert np.isclose(xtrace(A), A.trace())
+
+	tr_est, result = xtrace(A, full=True, record=True)
+	result.estimator.values
+
+	estimates = []
+	xtrace(A, batch=1, full=True, callback=lambda res: estimates.append(res.estimate))
+	np.std(estimates)

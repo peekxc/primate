@@ -198,7 +198,8 @@ def _xtrace(W: np.ndarray, Z: np.ndarray, Q: np.ndarray, R: np.ndarray, R_inv: n
 	n, m = W.shape
 	W_proj = Q.T @ W
 	# R_inv = solve_triangular(R, np.identity(m)).T  # todo: replace with dtrtri?
-	S = R_inv / np.linalg.norm(R_inv, axis=0)  # S == 'spherical', makes columns unit norm
+	# S = R_inv / np.linalg.norm(R_inv, axis=0)  # S == 'spherical', makes columns unit norm
+	S = R_inv.T / np.linalg.norm(R_inv, axis=1)
 
 	## Handle the scale
 	if not pdf == "sphere":
@@ -264,9 +265,7 @@ def xtrace(
 
 	## Parameterize the convergence criteria
 	if converge == "default":
-		cc1 = CountCriterion(count=n)
-		cc2 = ConfidenceCriterion(confidence=0.95)
-		converge = cc1 | cc2
+		converge = CountCriterion(count=n)
 	else:
 		converge = CountCriterion(count=n)
 		converge |= convergence_criterion(converge, **kwargs)

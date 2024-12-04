@@ -1,19 +1,10 @@
 ---
-title: "`primate` quickstart"
+title: "Quickstart"
 ---
 
-`primate` is a package that contains a variety of algorithms for estimating quantities from matrix functions, with a focus 
-on implicit matrix representations and support for common quantities of interest, such as the trace or the diagonal.
-
-Below is a quick introduction to: 
-
-- Trace estimation
-- Diagonal estimation 
-- Matrix function approximation
-- Configuring the output 
-- Configuring the execution
-
-<br/>
+`primate` contains a variety of algorithms for estimating quantities from matrices and matrix functions, with a focus 
+on common quantities of interest, such as the trace or the diagonal. This page briefly outlines the variety of options
+`primate` offers to approximate these quantities, and how to configure these approximations per use case. 
 
 ```{python}
 #| echo: false
@@ -25,14 +16,18 @@ import numpy as np
 np.random.seed(1234)
 ```
 
+## Implicit matrix representations 
+
+In all of the examples below, by the term _matrix_ we mean generically anything that comes with an associated 
+$v \mapsto Av$ capability. 
+
 ## Trace estimation 
 
-A variety of _trace_ estimators are available in the `primate.trace` module. These algorithms estimate the quantity: 
+The _implicit matrix trace estimation_ problem seeks to estimate the quantity: 
 
 $$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i $$
 
-The following example demonstrates a variety of trace estimators, including the Girard-Hutchinson estimator (`hutch`), the 
-improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
+A variety of _trace_ estimators are available in the `primate.trace` module, including the Girard-Hutchinson estimator (`hutch`), the improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
 
 ```{python}
 from primate.trace import hutch, hutchpp, xtrace
@@ -163,9 +158,10 @@ show(p)
 ```
 
 You can also pass a callback function, which receives as its only argument an `EstimatorResult` instance. 
-This can be useful for quickly monitoring convergence information. 
+This can be useful for quickly monitoring convergence status, saving intermediate information, etc. 
 
 ```{python}
+from primate.estimators import EstimatorResult
 def hutch_callback(result: EstimatorResult):
 	if (result.nit % 150) == 0:
 		print(result.criterion.message(result.estimator))
