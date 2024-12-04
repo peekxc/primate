@@ -82,20 +82,20 @@ jobs:
           path: wheelhouse/*.whl
 
 
-  # upload_all:
-  #   needs: [build_wheels]
-  #   environment: pypi
-  #   permissions:
-  #     id-token: write
-  #   runs-on: ubuntu-latest
-  #   # if: github.event_name == 'release' && github.event.action == 'published'
-  #   if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-  #   steps:
-  #   - uses: actions/download-artifact@v3
-  #     with:
-  #       name: artifact
-  #       path: |
-  #         dist
-  #         wheelhouse
-  #         dist/wheelhouse
-  #   - uses: pypa/gh-action-pypi-publish@release/v1
+  upload_all:
+    needs: [build_wheels]
+    environment: pypi
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: artifact
+        path: |
+          dist
+          wheelhouse
+          dist/wheelhouse
+    - uses: pypa/gh-action-pypi-publish@release/v1
