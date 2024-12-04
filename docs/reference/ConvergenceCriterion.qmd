@@ -4,4 +4,4 @@
 ConvergenceCriterion(self, operation)
 ```
 
-Generic stopping criteria for sequences.
+Generic lazy-evaluated stopping criteria for sequences.

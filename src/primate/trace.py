@@ -43,7 +43,7 @@ def hutch(
 ) -> Union[float, tuple]:
 	r"""Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator.
 
-	This function uses up to `maxiter` random vectors to estimate of the trace of $A$ via the approximation:
+	This function uses random vectors to estimate of the trace of $A$ via the approximation:
 	$$ \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v $$
 	When $v$ are isotropic, this approximation forms an unbiased estimator of the trace.
 

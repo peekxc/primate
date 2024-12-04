@@ -14,7 +14,7 @@ def quadrature(
 	nodes: Optional[np.ndarray] = None,  # Output nodes of the quadrature
 	weights: Optional[np.ndarray] = None,  # Output weights of the quadrature
 	**kwargs: dict,
-):
+) -> tuple:
 	r"""Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.
 
 	This function computes the fixed degree Gaussian quadrature rule for a symmetric Jacobi matrix $J$,

@@ -4,4 +4,8 @@
 Estimator()
 ```
 
-Protocol for generic stopping criteria for sequences.
+Protocol for generic updateable estimator for sequences.
+
+Here, an estimator is a object that keeps track of an *estimate* by receiving updated samples.
+Every estimator tracks the number of samples it's received (its length) as well as the current /
+most up-to-date estimate. Optionally, an estimator may also record its

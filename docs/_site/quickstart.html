@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>hutch</title>
+<title>Quickstart</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -57,26 +57,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../reference/hutchpp.html" rel="next">
-<link href="../reference/quadrature.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./guides/intro_trace.html" rel="next">
+<link href="./basic/integration.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -104,6 +104,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bokeh/3.6.1/bokeh.min.js" integrity="sha512-qzQ7weqWqj8EtLfMB4t3iCZkT1NVU+q/AMoq+lBJY/CjuX9ywmTWZod5IXZeFgyKXnVyPBBlFQLESUauOYAmqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 <link href="https://cdn.jsdelivr.net/npm/pseudocode@latest/build/pseudocode.min.css" rel="stylesheet">
 
   <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
@@ -150,7 +153,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../custom.css">
+<link rel="stylesheet" href="custom.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -160,7 +163,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">PRIMATE</span>
     </a>
   </div>
@@ -171,7 +174,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
+    <a class="nav-link active" href="./reference/index.html" aria-current="page"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -198,7 +201,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="./quickstart.html">Quickstart</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -220,19 +223,13 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../quickstart.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quickstart</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="./imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -247,14 +244,20 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/install.html" class="sidebar-item-text sidebar-link">
+  <a href="./basic/install.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Installing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/integration.html" class="sidebar-item-text sidebar-link">
+  <a href="./basic/integration.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Implicit representations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./quickstart.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Quickstart</span></a>
   </div>
 </li>
       </ul>
@@ -270,13 +273,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/intro_trace.qmd" class="sidebar-item-text sidebar-link">
+  <a href="./guides/intro_trace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
+  <a href="./guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Matrix functions</span></a>
   </div>
 </li>
@@ -293,7 +296,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Function reference</span></a>
   </div>
 </li>
@@ -308,13 +311,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">rayleigh_ritz</span></a>
   </div>
 </li>
@@ -331,7 +334,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/quadrature.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/quadrature.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">quadrature</span></a>
   </div>
 </li>
@@ -339,28 +342,28 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link active">
+  <a href="./reference/hutch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/hutchpp.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/hutchpp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutchpp</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/xtrace.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/xtrace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">xtrace</span></a>
   </div>
 </li>
@@ -377,13 +380,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/diag.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/diag.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">diag</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/xdiag.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/xdiag.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">xdiag</span></a>
   </div>
 </li>
@@ -400,19 +403,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Toeplitz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">normalize_unit</span></a>
   </div>
 </li>
@@ -429,19 +432,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/isotropic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">isotropic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/symmetric.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">symmetric</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/haar.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/haar.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">haar</span></a>
   </div>
 </li>
@@ -458,49 +461,49 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Estimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MeanEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ControlVariableEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConvergenceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/CountCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/CountCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">CountCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ToleranceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConfidenceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/KneeCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/KneeCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KneeCriterion</span></a>
   </div>
 </li>
@@ -517,13 +520,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Covariance.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Covariance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/confidence_interval.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/confidence_interval.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">confidence_interval</span></a>
   </div>
 </li>
@@ -541,20 +544,20 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#implicit-matrix-representations" id="toc-implicit-matrix-representations" class="nav-link active" data-scroll-target="#implicit-matrix-representations">Implicit matrix representations</a></li>
+  <li><a href="#trace-estimation" id="toc-trace-estimation" class="nav-link" data-scroll-target="#trace-estimation">Trace estimation</a></li>
+  <li><a href="#diagonal-estimation" id="toc-diagonal-estimation" class="nav-link" data-scroll-target="#diagonal-estimation">Diagonal estimation</a></li>
+  <li><a href="#matrix-function-approximation" id="toc-matrix-function-approximation" class="nav-link" data-scroll-target="#matrix-function-approximation">Matrix function approximation</a></li>
+  <li><a href="#configuring-the-output" id="toc-configuring-the-output" class="nav-link" data-scroll-target="#configuring-the-output">Configuring the output</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="./quickstart.html">Quickstart</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">hutch</h1>
+<h1 class="title">Quickstart</h1>
 </div>
 
 
@@ -571,144 +574,222 @@ window.Quarto = {
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>trace.hutch(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    batch<span class="op">=</span><span class="dv">32</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pdf<span class="op">=</span><span class="st">'rademacher'</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    converge<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    full<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Estimates the trace of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</p>
-<p>This function uses random vectors to estimate of the trace of <span class="math inline">A</span> via the approximation: <span class="math display"> \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v </span> When <span class="math inline">v</span> are isotropic, this approximation forms an unbiased estimator of the trace.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Convergence behavior is controlled by the <code>estimator</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation.</p>
-</div>
-</div>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 27%">
-<col style="width: 55%">
-<col style="width: 10%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A</td>
-<td>Union[LinearOperator, np.ndarray]</td>
-<td>real symmetric matrix or linear operator.</td>
-<td><em>required</em></td>
-</tr>
-<tr class="even">
-<td>batch</td>
-<td>int</td>
-<td>Number of random vectors to sample at a time for batched matrix multiplication.</td>
-<td><code>32</code></td>
-</tr>
-<tr class="odd">
-<td>pdf</td>
-<td>Union[str, Callable]</td>
-<td>Choice of zero-centered distribution to sample random vectors from.</td>
-<td><code>'rademacher'</code></td>
-</tr>
-<tr class="even">
-<td>converge</td>
-<td>Union[str, ConvergenceCriterion]</td>
-<td>Convergence criterion to test for estimator convergence. See details.</td>
-<td><code>'default'</code></td>
-</tr>
-<tr class="odd">
-<td>seed</td>
-<td>Union[int, np.random.Generator, None]</td>
-<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>full</td>
-<td>bool</td>
-<td>Whether to return additional information about the computation.</td>
-<td><code>False</code></td>
-</tr>
-<tr class="odd">
-<td>callback</td>
-<td>Optional[Callable]</td>
-<td>Optional callable to execute after each batch of samples.</td>
-<td><code>None</code></td>
-</tr>
-<tr class="even">
-<td>**kwargs</td>
-<td>dict</td>
-<td>Additional keyword arguments to parameterize the convergence criterion.</td>
-<td><code>{}</code></td>
-</tr>
-</tbody>
-</table>
+<p><code>primate</code> contains a variety of algorithms for estimating quantities from matrices and matrix functions, with a focus on common quantities of interest, such as the trace or the diagonal. This page briefly outlines the variety of options <code>primate</code> offers to approximate these quantities, and how to configure these approximations per use case.</p>
+<section id="implicit-matrix-representations" class="level2">
+<h2 class="anchored" data-anchor-id="implicit-matrix-representations">Implicit matrix representations</h2>
+<p>In all of the examples below, by the term <em>matrix</em> we mean generically anything that comes with an associated <span class="math inline">v \mapsto Av</span> capability via and overloaded <code>__matvec__</code> or <code>__matmul__</code> magic. While this includes dense matrices, such as those used by e.g.&nbsp;NumPy and PyTorch, is also includes <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator">LinearOperator’s</a>. Because the latter mots option need not store any part of <code>A</code> explicitly, such operators are referred to as <em>implicit</em> matrix representations. <!-- All of `primate`'s estimators work out-of-the-box with Numpy matrices, [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html), and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator).  --></p>
 </section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 5%">
-<col style="width: 16%">
-<col style="width: 78%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>Union[float, tuple]</td>
-<td>Estimate the trace of <span class="math inline">f(A)</span>. If <code>info = True</code>, additional information about the computation is also returned.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<ul>
-<li><a href="../reference/lanczos.lanczos.md">lanczos</a>: the lanczos tridiagonalization algorithm.</li>
-<li><a href="../reference/MeanEstimator.md">MeanEstimator</a>: Standard estimator of the mean from iid samples.</li>
-<li><a href="../reference/ConfidenceCriterion.md">ConfidenceCriterion</a>: Criterion for convergence that uses the central limit theorem.</li>
-</ul>
-</section>
-<section id="reference" class="level2 doc-section doc-section-reference">
-<h2 class="doc-section doc-section-reference anchored" data-anchor-id="reference">Reference</h2>
+<section id="trace-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="trace-estimation">Trace estimation</h2>
+<p>The <em>implicit matrix trace estimation</em> problem is to estimate the trace using <em>only</em> <span class="math inline">v \mapsto Av</span> applications:</p>
+<p><span class="math display"> \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i </span></p>
+<p>This <em>implicit trace</em> estimators are available in the<code>primate.trace</code>, which include the Girard-Hutchinson estimator (<code>hutch</code>), the improved Hutch++ (<code>hutchpp</code>), and XTrace (<code>xtrace</code>):</p>
+<div id="45971ea3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch, hutchpp, xtrace</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">1234</span>)      <span class="co"># for reproducibility </span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>A <span class="op">=</span> symmetric(<span class="dv">150</span>, pd<span class="op">=</span><span class="va">True</span>, seed<span class="op">=</span>rng)  <span class="co"># random PD matrix </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Trace   :  </span><span class="sc">{</span>A<span class="sc">.</span>trace()<span class="sc">:6f}</span><span class="ss">"</span>)   <span class="co">## Actual trace</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch   :  </span><span class="sc">{</span>hutch(A)<span class="sc">:6f}</span><span class="ss">"</span>)    <span class="co">## Crude Monte-Carlo estimator</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch++ :  </span><span class="sc">{</span>hutchpp(A)<span class="sc">:6f}</span><span class="ss">"</span>)  <span class="co">## Monte-Carlo estimator w/ deflation </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"XTrace  :  </span><span class="sc">{</span>xtrace(A)<span class="sc">:6f}</span><span class="ss">"</span>)   <span class="co">## Epperly's algorithm</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Trace   :  74.884261
+Hutch   :  74.910619
+Hutch++ :  74.653316
+XTrace  :  74.884261</code></pre>
+</div>
+</div>
+<p>If the spectral sum of interest is comprised of summing eigenvalues under composition with some spectral function <span class="math inline">f(\lambda)</span>, i.e.&nbsp;of the form:</p>
+<p><span class="math display"> \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) = \sum\limits_{i=1}^n e_i^T f(A) e_i </span></p>
+<p>Then you may use the <code>matrix_function</code> API to construct a <code>LinearOperator</code> that approximates matrix function applications <span class="math inline">v \mapsto f(A)v</span>. To do this, simply call <code>matrix_function(A, fun=...)</code> where <code>fun</code> is either:</p>
 <ol type="1">
-<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
-<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
+<li>a string representing the name of one of a built-in matrix function, or</li>
+<li>the corresponding spectral function as a <code>Callable</code></li>
 </ol>
-</section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="272c9340" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>For example, one might compute the log-determinant of a positive definite matrix as follows:</p>
+<div id="a259f309" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function, IdentityOperator</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>) <span class="co"># or fun=np.log </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"logdet(A) :  </span><span class="sc">{</span>np<span class="sc">.</span>log(np.linalg.det(A))<span class="sc">:6f}</span><span class="ss">"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"tr(log(A)):  </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(np.log(np.linalg.eigvalsh(A)))<span class="sc">:6f}</span><span class="ss">"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch     :  </span><span class="sc">{</span>hutch(M)<span class="sc">:6f}</span><span class="ss">"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Hutch++   :  </span><span class="sc">{</span>hutchpp(M)<span class="sc">:6f}</span><span class="ss">"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"XTrace    :  </span><span class="sc">{</span>xtrace(M)<span class="sc">:6f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>logdet(A) :  -151.529763
+tr(log(A)):  -151.529763
+Hutch     :  -153.791576
+Hutch++   :  -151.603720
+XTrace    :  -151.528086</code></pre>
 </div>
+</div>
+</section>
+<section id="diagonal-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="diagonal-estimation">Diagonal estimation</h2>
+<p>The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.</p>
+<div id="8fb162d5" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.estimators <span class="im">import</span> arr_summary</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.diagonal <span class="im">import</span> diag, xdiag</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>d1 <span class="op">=</span> A.diagonal()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>d2 <span class="op">=</span> diag(A, rtol<span class="op">=</span><span class="fl">1e-4</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>d3 <span class="op">=</span> xdiag(A)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal (true): </span><span class="sc">{</span>arr_summary(d1)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal Hutch : </span><span class="sc">{</span>arr_summary(d2)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal XDiag : </span><span class="sc">{</span>arr_summary(d3)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Diagonal (true): [0.48,0.53,...,0.48]
+Diagonal Hutch : [0.50,0.56,...,0.50]
+Diagonal XDiag : [0.48,0.53,...,0.48]</code></pre>
+</div>
+</div>
+</section>
+<section id="matrix-function-approximation" class="level2">
+<h2 class="anchored" data-anchor-id="matrix-function-approximation">Matrix function approximation</h2>
+<p>In <code>primate</code>, the matrix function <span class="math inline">f(A)</span> is not constructed explicitly but instead the action <span class="math inline">v \mapsto f(A)v</span> is approximated with a fixed-degree Krylov expansion. This can be useful when, for example, the matrix <span class="math inline">A</span> itself is so large that the corresponding (typically dense) matrix function <span class="math inline">f(A) \in \mathbb{R}^{n \times n}</span> simply is too large to be explicitly represented. If you just want to approximate the action of a matrix function for a single vector <span class="math inline">v \in \mathbb{R}^n</span>, simply supply the vector and the matrix alongside the <code>matrix_function</code> call:</p>
+<div id="2a38a787" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.random.uniform(size<span class="op">=</span>A.shape[<span class="dv">0</span>])</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> matrix_function(A, fun<span class="op">=</span>np.exp, v<span class="op">=</span>v)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"f(A)v = </span><span class="sc">{</span>arr_summary(y.ravel())<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>f(A)v = [0.52,0.90,...,0.24]</code></pre>
+</div>
+</div>
+<p>Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a <code>MatrixFunction</code> instance and use it like any other <code>LinearOperator</code>:</p>
+<div id="ab8617f9" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> MatrixFunction</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ExpA <span class="op">@</span> v</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"exp(A)v = </span><span class="sc">{</span>arr_summary(y)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>exp(A)v = [0.52,0.90,...,0.24]</code></pre>
+</div>
+</div>
+<p>If you don’t supply a vector <code>v</code> to the <code>matrix_function</code> call, a <code>MatrixFunction</code> instance is constructed using whatever additional arguments are passed in and returned. Note some function specializations are inherently more difficult to approximate and can depend on the smoothness of <span class="math inline">f</span> and the conditioning of the corresponding operator <span class="math inline">f(A)</span>; in general, a <code>MatrixFunction</code> instance with degree <span class="math inline">k</span> approximates the action <span class="math inline">v \mapsto f(A)v</span> about as well as the operator <span class="math inline">p(A)</span>, where <span class="math inline">p</span> is a degree <span class="math inline">2k-1</span> polynomial interpolant of <span class="math inline">f</span>.</p>
+<div id="826e2f2c" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> expm</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> expm(A)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ExpA0 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">5</span>, orth<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>ExpA1 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">20</span>, orth<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>ExpA2 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">50</span>, orth<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> ExpA <span class="op">@</span> v</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> ExpA0 <span class="op">@</span> v</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ExpA1 <span class="op">@</span> v </span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> ExpA2 <span class="op">@</span> v</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-5 approx error  (no reorth.)   : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> x)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-20 approx error (no reorth.)   : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> y)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Deg-50 approx error (full reorth.) : </span><span class="sc">{</span>np<span class="sc">.</span>linalg<span class="sc">.</span>norm(w <span class="op">-</span> z)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Deg-5 approx error  (no reorth.)   : 0.0001254249077837913
+Deg-20 approx error (no reorth.)   : 8.246535086916179e-14
+Deg-50 approx error (full reorth.) : 9.442567959828599e-14</code></pre>
+</div>
+</div>
+<p>As you can see, for smoother matrix functions (like <span class="math inline">\mathrm{exp}(A)</span>), even a low degree Krylov expansion can be more than sufficient for many application purposes—all without any re-orthogonalization! See the matrix function guide for more background on this.</p>
+</section>
+<section id="configuring-the-output" class="level2">
+<h2 class="anchored" data-anchor-id="configuring-the-output">Configuring the output</h2>
+<!-- By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution.  -->
+<p>Passing <code>full=True</code> returns additional information about the computation in the form of <code>EstimatorResult</code> (along with the estimate itself), which contains information about execution itself, convergence information of the estimator, and other status messages.</p>
+<p>For example, with the default <code>converge="confidene"</code> criterion, the margin of error of a default-constructed confidence interval is returned:</p>
+<div id="b4f3a2f4" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, converge<span class="op">=</span><span class="st">"confidence"</span>, full<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(info.message)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Est: 74.314 +/- 1.260 (95% CI, #S:64)</code></pre>
+</div>
+</div>
+<p>A more visual way of viewing the sample values and the corresponding estimate as a function of the sample size is to plot the sequence with the <code>figure_sequence</code> function (note this requires saving the samples with <code>record=True</code>):</p>
+<div id="bae62517" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.plotting <span class="im">import</span> figure_sequence</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>, record<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>p <span class="op">=</span> figure_sequence(info.estimator.values)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+  <div id="b71865d5-3a0a-4fe7-acc5-8bd7507ade6e" data-root-id="p1001" style="display: contents;"></div>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/javascript">
+(function(root) {
+  function embed_document(root) {
+  const docs_json = {"c6cde032-6eaa-4b77-a8eb-acc7b88653f9":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p1001","attributes":{"width":400,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p1002"},"y_range":{"type":"object","name":"DataRange1d","id":"p1003"},"x_scale":{"type":"object","name":"LinearScale","id":"p1011"},"y_scale":{"type":"object","name":"LinearScale","id":"p1012"},"title":{"type":"object","name":"Title","id":"p1004","attributes":{"text":"Monte Carlo sample variates","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1042","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1036","attributes":{"selected":{"type":"object","name":"Selection","id":"p1037","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1038"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAA"},"shape":[96],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"0SL7pcX6UkA6+OaTpGdSQIAPBmcBO1JA5HZHDesAU0Dsnrm/e4dRQMoBP4o4OlJAsEbs8HATT0CXsxFWY5VRQMsdMnFlBVNAXthDv2WyUkBqtzGBcE5TQPJsNSAVUlFA7ez3lRjvVECnbCkmJiBSQCWFBVBurFNA3w/x/+7uU0ACPuALhJlTQOfvYUGua1FAuobKYfL9UUD2e1b5gC5SQOmPJNHn1lJAHYqfvo98VUAc+8VNWmRRQHbZ0pbO61BAhLjM+la7UEAU+ETUz8lRQOCcuD2fL1BASi9CXvVaUkBtwNbVCPFRQKzKNYf8HFNAm3SHDbf+U0DE5/jetXZUQHav+joANFJAsIk2Qn4GUkAf5wsSSkVSQNuXmRQqPFNAoXSdpsNMUUBC4FU9GxdSQByeupDvVlJAsvIKgiAAVECqOgMxoDRTQHZIxiALsFFAuB/0oYf3UkCrgUFiLwRVQDmqeytxSVJALbMH9/KRUkC8Aq6Gtl1SQMmnhx9cXlNAhz3xDeN/UUDRIvPEj6VTQHTYg2/csVRA7Cj5eOrNUUAaIlJeWVRTQPkBQPRe5VFApB9Q+CCtVEDfKpC3yqFTQDPxoTg8gFFA0noKJoiNUEB6UqIKY5lTQJoNihqMeFNA4O7mI+VIUkDeNX9S1BZSQLNQKDbtmlNA5x3W+l+LUUCjFLKMKO5SQMP8Wot09lFA86aAzEQsU0AmS+0/oEFSQPXG5bmvKFJAWK27bPIKU0Ck6PZKQMlRQFetJqacMFRApZQQydkcUkAvbWq1Es5UQNFEkAoca1NA8AbHW2G3UEB9WPSadIlTQPtWnJdKylJAdqB1bC3PUUD3rQuQuPJRQPNkqv0gT1NAMJ5wco2yUUC9hyaJ5YNTQF5H0FxdKlJAkHl9TKPeUUCX6CpnXaJWQPwGkTQ+aVRAOUHjNJ3jU0C6isn5SzVTQKk+e10milNAq9wO/aGHVEAGYJ8TjStTQJ5q+fUiJ1JA3EVZFHgdUUB6FRsSBmRUQJcVRUPdiFNA"},"shape":[96],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1043","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1044"}}},"glyph":{"type":"object","name":"Scatter","id":"p1039","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1040","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1041","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1053","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1047","attributes":{"selected":{"type":"object","name":"Selection","id":"p1048","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1049"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAA"},"shape":[96],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"0SL7pcX6UkCGDfEcNbFSQC8O+IrOiVJAXOiLq5WnUkASQMji9m1SQAcLXClXZVJAgA7yxtL8UUAjA9bY5O9RQIsiGT+6DlJAIJtQMhgfUkAPEmXcqzpSQKIZYfdJJ1JARlFFFwteUkAWCjFPn1lSQMGJlKQ1cFJAI1JKOiGIUkDlQXEZNphSQFa9xeKDh1JAM0E/VUaAUkCKakCqL3xSQJv+uJOBgFJAlZAgZzyjUkBYoBwYX5VSQA84ZL2jg1JArVG6OmNxUkD/HKJA8WpSQOvCAUrIVVJA7w8EnfdVUkAWrPmefFJSQE7gLp48WVJAQIprNtVmUkAs9a87VHdSQBcSF+5JdVJAQjtUtAdyUkDwly11wHBSQNTQfvJmdlJAF+NqnVtuUkBjpsjQD2xSQFqFeSSFa1JA4/RpoKJ1UkBSCRAnS3pSQLuE3WN6dVJACC/MpoB4UkAXq1RCUIdSQMkLg0fwhVJAE0fOHjOGUkAWfNiYVoVSQP/MpgvciVJARqBpeW6EUkDEnfbRNopSQM2AF98HlVJACMQgnTORUkANTYI24pRSQKlLDyeikVJAqRcjQnGbUkAmwfKRIKBSQC9f35QTm1JAWbym7wOSUkDy5VyzepZSQN/q4UE/mlJA5xR52OmYUkAUqmi50JZSQEvRMq/xmlJAfl5haLOWUkCuiCfbC5hSQFGOIBSZlVJAkeajxtiXUkAMKBIulJZSQBcUl3b8lFJADW7Z3KuWUkDHb1Qxx5NSQExb1wuDmVJA+iPY4M2XUkCQR8zcdJ9SQEWgiv8rolJAJpQ6zrabUkAx2fM3zZ5SQOh+QfRbn1JA4Br+VrmcUkCEeYFUmZpSQAH+0OTTnFJA3OOEf/iZUkBLZC0BypxSQJELXUhtm1JAsuLSsTSZUkCZdwwlOKVSQHptxDxqqlJAV4GtXPmtUkBg99iafq9SQOezyY7ssVJALeSl7xW3UkDfbYQDWrhSQJFaMEjKtlJAjsT/iG+yUkBgotfw/7ZSQJMbXpQvuVJA"},"shape":[96],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1054","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1055"}}},"glyph":{"type":"object","name":"Line","id":"p1050","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":1.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1051","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":1.5}},"muted_glyph":{"type":"object","name":"Line","id":"p1052","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":1.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1010","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1023"},{"type":"object","name":"WheelZoomTool","id":"p1024","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p1025","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1026","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p1032","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1031","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p1033"},{"type":"object","name":"ResetTool","id":"p1034"},{"type":"object","name":"HelpTool","id":"p1035"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1018","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1019","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1020"},"axis_label":"Estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p1021"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1013","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1014","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1015"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1016"}}}],"center":[{"type":"object","name":"Grid","id":"p1017","attributes":{"axis":{"id":"p1013"}}},{"type":"object","name":"Grid","id":"p1022","attributes":{"dimension":1,"axis":{"id":"p1018"}}},{"type":"object","name":"Legend","id":"p1045","attributes":{"location":"top_left","title_text_font_size":"11px","label_text_font_size":"11px","margin":4,"padding":4,"spacing":2,"items":[{"type":"object","name":"LegendItem","id":"p1046","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p1042"}]}},{"type":"object","name":"LegendItem","id":"p1056","attributes":{"label":{"type":"value","value":"estimator"},"renderers":[{"id":"p1053"}]}}]}}]}}]}};
+  const render_items = [{"docid":"c6cde032-6eaa-4b77-a8eb-acc7b88653f9","roots":{"p1001":"b71865d5-3a0a-4fe7-acc5-8bd7507ade6e"},"root_ids":["p1001"]}];
+  void root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
+  }
+  if (root.Bokeh !== undefined) {
+    embed_document(root);
+  } else {
+    let attempts = 0;
+    const timer = setInterval(function(root) {
+      if (root.Bokeh !== undefined) {
+        clearInterval(timer);
+        embed_document(root);
+      } else {
+        attempts++;
+        if (attempts > 100) {
+          clearInterval(timer);
+          console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+        }
+      }
+    }, 10, root)
+  }
+})(window);
+</script>
+</div>
+</div>
+<p>You can also pass a callback function, which receives as its only argument an <code>EstimatorResult</code> instance. This can be useful for quickly monitoring convergence status, saving intermediate information, etc.</p>
+<div id="00f02e9c" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.estimators <span class="im">import</span> EstimatorResult</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hutch_callback(result: EstimatorResult):</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (result.nit <span class="op">%</span> <span class="dv">10</span>) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(result.criterion.message(result.estimator))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, converge<span class="op">=</span><span class="st">"confidence"</span>, callback<span class="op">=</span>hutch_callback)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<!-- For example, consider applying the `sign` function at some tolerance level $\epsilon$:
+
+$$ \mathrm{sign}_\epsilon(x) = \begin{align} 1 & x \geq \epsilon \\ 0 & \text{otherwise} \end{align} $$
+
+The spectral sum defined by applying this function corresponds to the numerical rank of the operator, which is an interesting and sometimes useful quantity to estimate. However, the sign function itself is discontinuous (at $\epsilon$) and otherwise not smooth; thus, it cannot be well approximated by any polynomial of finite degree. Non-analytic functions such as these can prove difficult to approximate, as shown below:
+
+
+ew = np.sort(np.random.uniform(size=150, low=0, high=1))
+ew[:30] = 0.0
+A = symmetric(150, ew = ew, pd = False)
+M = matrix_function(A, fun="numrank")
+
+print(f"numrank(A): {np.linalg.matrix_rank(A)}")
+print(f"GR approx:  {hutch(M)}")
+print(f"Hutch++ :   {hutchpp(M)}")
+print(f"XTrace:     {xtrace(M)}")
+``` -->
+<!-- from timeit import timeit
+timeforlan = timeit(lambda: ExpA @ v, number=100)/100
+
+timeforexpmA = timeit(lambda: expm(A), number=100)/100
+B = expm(A)
+timeforexpmAv = timeit(lambda: B @ v, number=100)/100
+
+sample_index = 1 + np.arange(30)
+timeforsp = timeforexpmA + timeforexpmAv * sample_index
+timeformf = timeforlan * sample_index
+
+p = figure(width=350, height=200)
+
+p.line(sample_index, timeforsp, color='red')
+p.scatter(sample_index, timeforsp, color='red',  size=1)
+p.line(sample_index, timeformf, color='blue')
+p.scatter(sample_index, timeformf, color='blue', size=1)
+show(p) -->
 
 
 </section>
@@ -1280,13 +1361,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/quadrature.html" class="pagination-link" aria-label="quadrature">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">quadrature</span>
+      <a href="./basic/integration.html" class="pagination-link" aria-label="Implicit representations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Implicit representations</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/hutchpp.html" class="pagination-link" aria-label="hutchpp">
-        <span class="nav-page-text">hutchpp</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./guides/intro_trace.html" class="pagination-link" aria-label="Introduction">
+        <span class="nav-page-text">Introduction</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

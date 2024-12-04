@@ -6,7 +6,12 @@
 | --- | --- |
 | [lanczos](lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
 | [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
-| [lanczos_quadrature](lanczos_quadrature.qmd#quadrature.lanczos_quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
+
+## Integrate
+
+| | |
+| --- | --- |
+| [quadrature](quadrature.qmd#integrate.quadrature) | Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix. |
 
 ## Trace
 
@@ -14,7 +19,7 @@
 | --- | --- |
 | [hutch](hutch.qmd#trace.hutch) | Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator. |
 | [hutchpp](hutchpp.qmd#trace.hutchpp) | Hutch++ estimator. |
-| [xtrace](xtrace.qmd#trace.xtrace) | Estimates the trace of `A` using the XTrace trace estimator. |
+| [xtrace](xtrace.qmd#trace.xtrace) | Estimates the trace of `A` using the XTrace estimator. |
 
 ## Diagonal
 
@@ -43,10 +48,10 @@
 
 | | |
 | --- | --- |
-| [Estimator](Estimator.qmd#estimators.Estimator) | Protocol for generic stopping criteria for sequences. |
+| [Estimator](Estimator.qmd#estimators.Estimator) | Protocol for generic updateable estimator for sequences. |
 | [MeanEstimator](MeanEstimator.qmd#estimators.MeanEstimator) | Sample mean estimator with stable covariance updating. |
 | [ControlVariableEstimator](ControlVariableEstimator.qmd#estimators.ControlVariableEstimator) |  |
-| [ConvergenceCriterion](ConvergenceCriterion.qmd#estimators.ConvergenceCriterion) | Generic stopping criteria for sequences. |
+| [ConvergenceCriterion](ConvergenceCriterion.qmd#estimators.ConvergenceCriterion) | Generic lazy-evaluated stopping criteria for sequences. |
 | [CountCriterion](CountCriterion.qmd#estimators.CountCriterion) | Convergence criterion that returns TRUE when above a given count. |
 | [ToleranceCriterion](ToleranceCriterion.qmd#estimators.ToleranceCriterion) |  |
 | [ConfidenceCriterion](ConfidenceCriterion.qmd#estimators.ConfidenceCriterion) | Parameterizes an expected value estimator that checks convergence of a sample mean within a confidence interval using the CLT. |
@@ -56,5 +61,5 @@
 
 | | |
 | --- | --- |
-| [stats.Covariance](stats.Covariance.qmd#stats.Covariance) | Updateable covariance matrix. |
-| [stats.confidence_interval](stats.confidence_interval.qmd#stats.confidence_interval) | Confidence intervals for the sample mean of a set of measurements. |
+| [Covariance](Covariance.qmd#stats.Covariance) | Updateable covariance matrix. |
+| [confidence_interval](confidence_interval.qmd#stats.confidence_interval) | Confidence intervals for the sample mean of a set of measurements. |

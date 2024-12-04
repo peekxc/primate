@@ -19,15 +19,20 @@ np.random.seed(1234)
 ## Implicit matrix representations 
 
 In all of the examples below, by the term _matrix_ we mean generically anything that comes with an associated 
-$v \mapsto Av$ capability. 
+$v \mapsto Av$ capability via and overloaded `__matvec__` or `__matmul__` magic. While this includes dense matrices, 
+such as those used by e.g. NumPy and PyTorch, is also includes [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html)
+and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator). 
+Because the latter mots option need not store any part of `A` explicitly, such operators are referred to as _implicit_ matrix 
+representations. 
+<!-- All of `primate`'s estimators work out-of-the-box with Numpy matrices, [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html), and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator).  -->
 
 ## Trace estimation 
 
-The _implicit matrix trace estimation_ problem seeks to estimate the quantity: 
+The _implicit matrix trace estimation_ problem is to estimate the trace using *only* $v \mapsto Av$ applications: 
 
-$$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i $$
+$$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i $$
 
-A variety of _trace_ estimators are available in the `primate.trace` module, including the Girard-Hutchinson estimator (`hutch`), the improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
+This _implicit trace_ estimators are available in the`primate.trace`, which include the Girard-Hutchinson estimator (`hutch`), the improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
 
 ```{python}
 from primate.trace import hutch, hutchpp, xtrace
@@ -41,27 +46,15 @@ print(f"Hutch++ :  {hutchpp(A):6f}")  ## Monte-Carlo estimator w/ deflation
 print(f"XTrace  :  {xtrace(A):6f}")   ## Epperly's algorithm
 ```
 
-Here, `A` can be a numpy matrix, a sparse matrix, or a `LinearOperator`. If the spectral sum of interest is not just the sum of the eigenvalues, but rather the sum under composition with some spectral function $f(\lambda)$, i.e. the quantity of interest is of the form: 
+If the spectral sum of interest is comprised of summing eigenvalues under composition with some spectral function $f(\lambda)$, i.e. of the form: 
 
-$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) $$
+$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) = \sum\limits_{i=1}^n e_i^T f(A) e_i $$
 
-Then you may alternatively use the `matrix_function` API to construct a `LinearOperator` by passing in the corresponding spectral function as a `Callable` or by passing a string representing the name of one of the following built-in spectral functions:
+Then you may use the `matrix_function` API to construct a `LinearOperator` that approximates matrix function applications $v \mapsto f(A)v$. 
+To do this, simply call `matrix_function(A, fun=...)` where `fun` is either: 
 
-| **name**       | **matrix function**       | **Applications**                          | **numpy call**                     |
-|----------------|---------------------------|-------------------------------------------|------------------------------------|
-| identity       | $A$                      | Basic matrix operations                   | `A`                                |
-| log            | $\log(A)$                | Determinant, entropy-like measures        | `logm(A)`                         |
-| exp            | $e^A$                    | Dynamical systems, graph diffusion        | `expm(A)`                         |
-| inv            | $A^{-1}$                 | Stability analysis, linear systems        | `inv(A)`                          |
-| sign           | $\text{sgn}_\epsilon(A)$ | Rank approximation, low-rank modeling     | `U @ U.T`                         |
-| sqrt           | $A^{1/2}$                | Diffusion, kernel methods                 | `sqrtm(A)`                        |
-| square         | $A^2$                    | Energy measures, stability                | `A @ A`                           |
-| PCA            | $P_A$ (eigenspace)       | Dim. reduction, feature extraction        | Custom projection matrix          |
-| Tikhonov       | $(A + \lambda I)^{-1}$   | Regularized inversion, stability          | `inv(A + lambda * eye(n))`        |
-| heat           | $e^{-tA}$                | Diffusion on graphs, spectral clustering  | `expm(-t * A)`                    |
-| pagerank       | $(I - \alpha A)^{-1}v$   | Network centrality, web ranking           | Iterative solver                  |
-
-<br/>
+1. a string representing the name of one of a built-in matrix function, or
+2. the corresponding spectral function as a `Callable`
 
 For example, one might compute the log-determinant of a positive definite matrix as follows:
 
@@ -163,7 +156,7 @@ This can be useful for quickly monitoring convergence status, saving intermediat
 ```{python}
 from primate.estimators import EstimatorResult
 def hutch_callback(result: EstimatorResult):
-	if (result.nit % 150) == 0:
+	if (result.nit % 10) == 0:
 		print(result.criterion.message(result.estimator))
 
 est, info = hutch(A, converge="confidence", callback=hutch_callback)

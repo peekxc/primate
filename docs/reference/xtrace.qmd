@@ -1,23 +1,34 @@
 # xtrace { #trace.xtrace }
 
 ```python
-trace.xtrace(A, batch=32, pdf='sphere', seed=None, full=False, verbose=0)
+trace.xtrace(
+    A,
+    batch=32,
+    pdf='sphere',
+    converge='default',
+    seed=None,
+    full=False,
+    callback=None,
+    **kwargs,
+)
 ```
 
-Estimates the trace of `A` using the XTrace trace estimator.
+Estimates the trace of `A` using the XTrace estimator.
+
+This function implements Epperly's exchangeable 'XTrace' estimator.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name     | Type                                    | Description                                                                       | Default    |
-|----------|-----------------------------------------|-----------------------------------------------------------------------------------|------------|
-| A        | Union\[LinearOperator, np.ndarray\]     | real symmetric matrix or linear operator.                                         | _required_ |
-| batch    | int                                     | Number of random vectors to sample at a time for batched matrix multiplication.   | `32`       |
-| pdf      | Union\[str, Callable\]                  | Choice of zero-centered distribution to sample random vectors from.               | `'sphere'` |
-| converge |                                         | Convergence criterion to test for estimator convergence. See details.             | _required_ |
-| seed     | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`     |
-| full     | bool                                    | Whether to return additional information about the computation.                   | `False`    |
-| callback |                                         | Optional callable to execute after each batch of samples.                         | _required_ |
-| **kwargs |                                         | Additional keyword arguments to parameterize the convergence criterion.           | _required_ |
+| Name     | Type                                    | Description                                                                       | Default     |
+|----------|-----------------------------------------|-----------------------------------------------------------------------------------|-------------|
+| A        | Union\[LinearOperator, np.ndarray\]     | real symmetric matrix or linear operator.                                         | _required_  |
+| batch    | int                                     | Number of random vectors to sample at a time for batched matrix multiplication.   | `32`        |
+| pdf      | Union\[str, Callable\]                  | Choice of zero-centered distribution to sample random vectors from.               | `'sphere'`  |
+| converge | Union\[str, ConvergenceCriterion\]      | Convergence criterion to test for estimator convergence. See details.             | `'default'` |
+| seed     | Union\[int, np.random.Generator, None\] | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`      |
+| full     | bool                                    | Whether to return additional information about the computation.                   | `False`     |
+| callback | Optional\[Callable\]                    | Optional callable to execute after each batch of samples.                         | `None`      |
+| **kwargs | dict                                    | Additional keyword arguments to parameterize the convergence criterion.           | `{}`        |
 
 ## Returns {.doc-section .doc-section-returns}
 

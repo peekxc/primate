@@ -45,8 +45,10 @@ quartodoc:
           package: lanczos
         - name: rayleigh_ritz
           package: lanczos
-        - name: lanczos_quadrature
-          package: quadrature
+    - title: Integrate
+      contents: 
+        - name: quadrature
+          package: integrate
     - title: Trace
       contents:
         - name: hutch
@@ -104,8 +106,10 @@ quartodoc:
           package: estimators
     - title: Stats
       contents: 
-        - stats.Covariance
-        - stats.confidence_interval
+        - name: Covariance
+          package: stats
+        - name: confidence_interval
+          package: stats
   sidebar:
     file: "_sidebar.yml"
     search: true
@@ -115,14 +119,24 @@ quartodoc:
     contents:
       - href: index.qmd
         text: Overview
-      - text: Quickstart
-        href: basic/quickstart.qmd
+      - href: table.qmd
+        text: Table of matrix functions
+      - text: Comparison to *imate*
+        href: imate_compare.qmd
       - section: Basics 
         contents:
           - text: Installing
             href: basic/install.qmd
-          - text: Comparison to *imate*
-            href: basic/imate_compare.qmd
+          - text: Integration
+            href: basic/integration.qmd  
+          - text: Quickstart
+            href: basic/quickstart.qmd
+      - section: Guides 
+        contents:
+          - text: Introduction
+            href: guides/intro_trace.qmd
+          - text: Matrix functions
+            href: guides/matrix_functions.qmd  
       - section: "API Reference"
         contents:
           - "{{ contents }}"

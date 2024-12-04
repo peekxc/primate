@@ -5,21 +5,33 @@ website:
     contents:
     - href: index.qmd
       text: Overview
-    - href: basic/quickstart.qmd
-      text: Quickstart
+    - href: table.qmd
+      text: Table of matrix functions
+    - href: imate_compare.qmd
+      text: Comparison to *imate*
     - contents:
       - href: basic/install.qmd
         text: Installing
-      - href: basic/imate_compare.qmd
-        text: Comparison to *imate*
+      - href: basic/integration.qmd
+        text: Integration
+      - href: basic/quickstart.qmd
+        text: Quickstart
       section: Basics
+    - contents:
+      - href: guides/intro_trace.qmd
+        text: Introduction
+      - href: guides/matrix_functions.qmd
+        text: Matrix functions
+      section: Guides
     - contents:
       - reference/index.qmd
       - contents:
         - reference/lanczos.qmd
         - reference/rayleigh_ritz.qmd
-        - reference/lanczos_quadrature.qmd
         section: Lanczos
+      - contents:
+        - reference/quadrature.qmd
+        section: Integrate
       - contents:
         - reference/hutch.qmd
         - reference/hutchpp.qmd
@@ -50,8 +62,8 @@ website:
         - reference/KneeCriterion.qmd
         section: Estimators
       - contents:
-        - reference/stats.Covariance.qmd
-        - reference/stats.confidence_interval.qmd
+        - reference/Covariance.qmd
+        - reference/confidence_interval.qmd
         section: Stats
       section: API Reference
     id: reference

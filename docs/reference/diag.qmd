@@ -25,13 +25,14 @@ intervals on the fly, which may be used in conjunction with `atol` and `rtol` to
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name      | Type                                                 | Description                                                                       | Default        |
-|-----------|------------------------------------------------------|-----------------------------------------------------------------------------------|----------------|
-| A         | Union\[sp.sparse.linalg.LinearOperator, np.ndarray\] | real symmetric matrix or linear operator.                                         | _required_     |
-| pdf       | Union\[str, Callable\]                               | Choice of zero-centered distribution to sample random vectors from.               | `'rademacher'` |
-| estimator |                                                      | Type of estimator to use for convergence testing. See details.                    | _required_     |
-| seed      | Union\[int, np.random.Generator, None\]              | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
-| full      | bool                                                 | Whether to return additional information about the computation.                   | `False`        |
+| Name     | Type                                                 | Description                                                                       | Default        |
+|----------|------------------------------------------------------|-----------------------------------------------------------------------------------|----------------|
+| A        | Union\[sp.sparse.linalg.LinearOperator, np.ndarray\] | real symmetric matrix or linear operator.                                         | _required_     |
+| pdf      | Union\[str, Callable\]                               | Choice of zero-centered distribution to sample random vectors from.               | `'rademacher'` |
+| converge | Union\[str, ConvergenceCriterion\]                   | Convergence criterion to use for convergence testing. See details.                | `'tolerance'`  |
+| seed     | Union\[int, np.random.Generator, None\]              | Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility. | `None`         |
+| full     | bool                                                 | Whether to return additional information about the computation.                   | `False`        |
+| callback | Optional\[Callable\]                                 | Callable to execute between each iteration.                                       | `None`         |
 
 ## Returns {.doc-section .doc-section-returns}
 

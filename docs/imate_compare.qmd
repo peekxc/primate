@@ -8,21 +8,22 @@ Notable differences between the two packages include:
 
 | **Feature**      | `primate`             | `imate`                |
 |------------------|-----------------------|------------------------|
-| Matrix support   | Symmetric only        | Symmetric or Rectangular |
-| Parallel support | CPU only[^3]          | CPU / GPU              |
+| Matrix support   | Symmetric only[^4]    | Symmetric or Rectangular |
+| Parallel support | Limited[^3]           | CPU / GPU              |
 | Function support | Arbitrary             | Package supported[^2]  |
 | Operator support | Arbitrary             | Matrix-derived         |
 | Linking strategy | Header only           | Dynamically linked     |
 | C++ version      | $\geq$ C++20          | Any                    |
-| FFI              | Pybind11              | Cython                 |
+| FFI              | Pybind11 / Pythran    | Cython                 |
 | Build tool       | Meson                 | CMake                  |
 
-One motivation for developing `primate` was to modularize and streamline access to Lanczos-based methods, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
+One motivation for developing `primate` was to modularize and streamline access to Lanczos-based approximation methods, which is achieved through the use of things like [function templates](https://en.cppreference.com/w/cpp/language/function_template), [type erasure](https://en.wikipedia.org/wiki/Type_erasure), and [header-only](https://en.wikipedia.org/wiki/Header-only) definitions. 
 These modifications not only simplify access from *user* (i.e. dependent) packages, but they enable native support for arbitrary classes adhering to the [LinearOperator concept](advanced/cpp_integration.qmd). For more details on this, see the integration guides. 
 
-[^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using the [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) template C++ library.
+[^1]: Before v0.2, much of `primate`'s code was essentially ported and refactored from `imate`. The code for v0.2+ has been re-written using the [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) template C++ library. In v0.5+, `primate` was refactored again, migrating most of the codebase to Python or Pythran for maintainability. 
 [^2]: See [imates documentation](https://ameli.github.io/imate/api.html#functions) for the list of supported functions.
-[^3]: `primate` does not provide native GPU-implemented Linear operators. However, there is nothing preventing one from using e.g. CUDA- or ROCm-based GPU-based tensor libraries to accelerate matrix-vector products. Indeed, `primate` was [designed](advanced/cpp_integration.qmd) to work with essentially any operator matching the interface. 
+[^3]: Parallel support w/ OpenMP was dropped in v0.5 in favor moving to a [ThreadPoolExecutor](https://docs.python.org/3/library/concurrent.futures.html#module-concurrent.futures) in the future (yet to be implemented). Moreover, unlike `imate`, `primate` does not provide native GPU-implemented Linear operators. However, one may always _wrap_ a e.g. CUDA- or ROCm-based GPU-backed tensor as a `LinearOperator` to accelerate matrix-vector products.
+[^4]: With matrix functions, `primate` only supports symmetric operators; however, many quantities from rectangular matrices can be obtained from e.g. $A^T A$
 
 <!-- - `imate` might be convenient for Python users that use Cython, whereas `primate` is convenient for C++ users that use pybind11 -->
 

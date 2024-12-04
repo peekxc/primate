@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>hutch</title>
+<title>Table of matrix functions</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,63 +20,29 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../reference/hutchpp.html" rel="next">
-<link href="../reference/quadrature.html" rel="prev">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./imate_compare.html" rel="next">
+<link href="./index.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -150,7 +116,7 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="../custom.css">
+<link rel="stylesheet" href="custom.css">
 </head>
 
 <body class="nav-sidebar floating nav-fixed">
@@ -160,7 +126,7 @@ window.Quarto = {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">PRIMATE</span>
     </a>
   </div>
@@ -171,7 +137,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="../reference/index.html" aria-current="page"> 
+    <a class="nav-link active" href="./reference/index.html" aria-current="page"> 
 <span class="menu-text">Reference</span></a>
   </li>  
 </ul>
@@ -198,7 +164,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./table.html">Table of matrix functions</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -220,19 +186,19 @@ window.Quarto = {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Overview</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../quickstart.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Quickstart</span></a>
+  <a href="./table.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Table of matrix functions</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
+  <a href="./imate_compare.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
@@ -247,14 +213,20 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/install.html" class="sidebar-item-text sidebar-link">
+  <a href="./basic/install.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Installing</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/integration.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Implicit representations</span></a>
+  <a href="./basic/integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Integration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./basic/quickstart.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quickstart</span></a>
   </div>
 </li>
       </ul>
@@ -270,13 +242,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/intro_trace.qmd" class="sidebar-item-text sidebar-link">
+  <a href="./guides/intro_trace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Introduction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
+  <a href="./guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Matrix functions</span></a>
   </div>
 </li>
@@ -293,7 +265,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Function reference</span></a>
   </div>
 </li>
@@ -308,13 +280,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/lanczos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">lanczos</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/rayleigh_ritz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">rayleigh_ritz</span></a>
   </div>
 </li>
@@ -331,7 +303,7 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/quadrature.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/quadrature.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">quadrature</span></a>
   </div>
 </li>
@@ -339,28 +311,28 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link active">
+  <a href="./reference/hutch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutch</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/hutchpp.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/hutchpp.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutchpp</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/xtrace.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/xtrace.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">xtrace</span></a>
   </div>
 </li>
@@ -377,13 +349,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/diag.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/diag.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">diag</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/xdiag.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/xdiag.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">xdiag</span></a>
   </div>
 </li>
@@ -400,19 +372,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MatrixFunction</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Toeplitz.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Toeplitz</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/normalize_unit.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">normalize_unit</span></a>
   </div>
 </li>
@@ -429,19 +401,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/isotropic.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">isotropic</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/symmetric.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/symmetric.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">symmetric</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/haar.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/haar.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">haar</span></a>
   </div>
 </li>
@@ -458,49 +430,49 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Estimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Estimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/MeanEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">MeanEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ControlVariableEstimator.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ControlVariableEstimator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ConvergenceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConvergenceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/CountCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/CountCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">CountCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ToleranceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ToleranceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/ConfidenceCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">ConfidenceCriterion</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/KneeCriterion.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/KneeCriterion.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">KneeCriterion</span></a>
   </div>
 </li>
@@ -517,13 +489,13 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/Covariance.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/Covariance.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/confidence_interval.html" class="sidebar-item-text sidebar-link">
+  <a href="./reference/confidence_interval.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">confidence_interval</span></a>
   </div>
 </li>
@@ -536,25 +508,15 @@ window.Quarto = {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
-  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">hutch</h1>
+<h1 class="title">Table of matrix functions</h1>
 </div>
 
 
@@ -571,147 +533,95 @@ window.Quarto = {
 </header>
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>trace.hutch(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    batch<span class="op">=</span><span class="dv">32</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pdf<span class="op">=</span><span class="st">'rademacher'</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    converge<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    full<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Estimates the trace of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</p>
-<p>This function uses random vectors to estimate of the trace of <span class="math inline">A</span> via the approximation: <span class="math display"> \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v </span> When <span class="math inline">v</span> are isotropic, this approximation forms an unbiased estimator of the trace.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Convergence behavior is controlled by the <code>estimator</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation.</p>
-</div>
-</div>
-<section id="parameters" class="level2 doc-section doc-section-parameters">
-<h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
+<p>Listed below is a table of some common matrix functions, some of their application domains, and their corresponding NumPy/SciPy calls (under each respective <code>linalg</code> module).</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 6%">
-<col style="width: 27%">
-<col style="width: 55%">
-<col style="width: 10%">
+<col style="width: 13%">
+<col style="width: 22%">
+<col style="width: 35%">
+<col style="width: 29%">
 </colgroup>
 <thead>
 <tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Default</th>
+<th><strong>name</strong></th>
+<th><strong>matrix function</strong></th>
+<th><strong>Applications</strong></th>
+<th><strong>numpy call</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>A</td>
-<td>Union[LinearOperator, np.ndarray]</td>
-<td>real symmetric matrix or linear operator.</td>
-<td><em>required</em></td>
+<td>identity</td>
+<td><span class="math inline">A</span></td>
+<td>Basic matrix operations</td>
+<td><code>A</code></td>
 </tr>
 <tr class="even">
-<td>batch</td>
-<td>int</td>
-<td>Number of random vectors to sample at a time for batched matrix multiplication.</td>
-<td><code>32</code></td>
+<td>log</td>
+<td><span class="math inline">\log(A)</span></td>
+<td>Determinant, entropy-like measures</td>
+<td><code>logm(A)</code></td>
 </tr>
 <tr class="odd">
-<td>pdf</td>
-<td>Union[str, Callable]</td>
-<td>Choice of zero-centered distribution to sample random vectors from.</td>
-<td><code>'rademacher'</code></td>
+<td>exp</td>
+<td><span class="math inline">e^A</span></td>
+<td>Dynamical systems, graph diffusion</td>
+<td><code>expm(A)</code></td>
 </tr>
 <tr class="even">
-<td>converge</td>
-<td>Union[str, ConvergenceCriterion]</td>
-<td>Convergence criterion to test for estimator convergence. See details.</td>
-<td><code>'default'</code></td>
+<td>inv</td>
+<td><span class="math inline">A^{-1}</span></td>
+<td>Stability analysis, linear systems</td>
+<td><code>inv(A)</code></td>
 </tr>
 <tr class="odd">
-<td>seed</td>
-<td>Union[int, np.random.Generator, None]</td>
-<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
-<td><code>None</code></td>
+<td>sign</td>
+<td><span class="math inline">\text{sgn}_\epsilon(A)</span></td>
+<td>Rank approximation, low-rank modeling</td>
+<td><code>U @ U.T</code></td>
 </tr>
 <tr class="even">
-<td>full</td>
-<td>bool</td>
-<td>Whether to return additional information about the computation.</td>
-<td><code>False</code></td>
+<td>sqrt</td>
+<td><span class="math inline">A^{1/2}</span></td>
+<td>Diffusion, kernel methods</td>
+<td><code>sqrtm(A)</code></td>
 </tr>
 <tr class="odd">
-<td>callback</td>
-<td>Optional[Callable]</td>
-<td>Optional callable to execute after each batch of samples.</td>
-<td><code>None</code></td>
+<td>square</td>
+<td><span class="math inline">A^2</span></td>
+<td>Energy measures, stability</td>
+<td><code>A @ A</code></td>
 </tr>
 <tr class="even">
-<td>**kwargs</td>
-<td>dict</td>
-<td>Additional keyword arguments to parameterize the convergence criterion.</td>
-<td><code>{}</code></td>
+<td>topk</td>
+<td><span class="math inline">P_A</span> (eigenspace)</td>
+<td>Dim. reduction, feature extraction</td>
+<td>Custom projection matrix</td>
+</tr>
+<tr class="odd">
+<td>tikhonov</td>
+<td><span class="math inline">(A + \lambda I)^{-1}</span></td>
+<td>Regularized inversion, stability</td>
+<td><code>inv(A + lambda * eye(n))</code></td>
+</tr>
+<tr class="even">
+<td>exp</td>
+<td><span class="math inline">e^{-tA}</span></td>
+<td>Diffusion on graphs, spectral clustering</td>
+<td><code>expm(-t * A)</code></td>
+</tr>
+<tr class="odd">
+<td>pagerank</td>
+<td><span class="math inline">(I - \alpha A)^{-1}v</span></td>
+<td>Network centrality, web ranking</td>
+<td>Iterative solver</td>
 </tr>
 </tbody>
 </table>
-</section>
-<section id="returns" class="level2 doc-section doc-section-returns">
-<h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 5%">
-<col style="width: 16%">
-<col style="width: 78%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td></td>
-<td>Union[float, tuple]</td>
-<td>Estimate the trace of <span class="math inline">f(A)</span>. If <code>info = True</code>, additional information about the computation is also returned.</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<ul>
-<li><a href="../reference/lanczos.lanczos.md">lanczos</a>: the lanczos tridiagonalization algorithm.</li>
-<li><a href="../reference/MeanEstimator.md">MeanEstimator</a>: Standard estimator of the mean from iid samples.</li>
-<li><a href="../reference/ConfidenceCriterion.md">ConfidenceCriterion</a>: Criterion for convergence that uses the central limit theorem.</li>
-</ul>
-</section>
-<section id="reference" class="level2 doc-section doc-section-reference">
-<h2 class="doc-section doc-section-reference anchored" data-anchor-id="reference">Reference</h2>
-<ol type="1">
-<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
-<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
-</ol>
-</section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="272c9340" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p><br></p>
+<p>If you know of another useful or commonly used matrix function, feel feel to make a PR to add it!</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1280,13 +1190,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/quadrature.html" class="pagination-link" aria-label="quadrature">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">quadrature</span>
+      <a href="./index.html" class="pagination-link" aria-label="Overview">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/hutchpp.html" class="pagination-link" aria-label="hutchpp">
-        <span class="nav-page-text">hutchpp</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./imate_compare.html" class="pagination-link" aria-label="Comparison to *imate*">
+        <span class="nav-page-text">Comparison to <em>imate</em></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

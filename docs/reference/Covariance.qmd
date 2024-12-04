@@ -1,0 +1,50 @@
+# Covariance { #stats.Covariance }
+
+```python
+Covariance(self, dim=1)
+```
+
+Updateable covariance matrix.
+
+Uses Welford's algorithm to stably update the sample mean and (co)variance estimates.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [covariance](#stats.Covariance.covariance) | Covariance matrix of the observations. |
+| [update](#stats.Covariance.update) | Update mean and (co)variance estimates based on new observations. |
+
+### covariance { #stats.Covariance.covariance }
+
+```python
+Covariance.covariance(ddof=1)
+```
+
+Covariance matrix of the observations.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type   | Description                                                          | Default   |
+|--------|--------|----------------------------------------------------------------------|-----------|
+| ddof   | int    | Delta degrees of freedom (1 for sample covariance, 0 for population) | `1`       |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type       | Description                                            |
+|--------|------------|--------------------------------------------------------|
+|        | np.ndarray | Current covariance matrix estimate of shape (dim, dim) |
+
+### update { #stats.Covariance.update }
+
+```python
+Covariance.update(X)
+```
+
+Update mean and (co)variance estimates based on new observations.
+
+#### Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type       | Description                                           | Default    |
+|--------|------------|-------------------------------------------------------|------------|
+| X      | np.ndarray | (batch_size, dim)-array representing new observations | _required_ |

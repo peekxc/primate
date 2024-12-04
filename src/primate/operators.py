@@ -48,9 +48,6 @@ class MatrixFunction(LinearOperator):
 		deg: degree of the Krylov expansion to perform.
 		dtype: floating point dtype to execute in. Must be float64 or float32.
 		kwargs: keyword arguments to pass to the Lanczos method.
-
-	Returns:
-		`LinearOperator` representing the matrix function.
 	"""
 
 	def __init__(

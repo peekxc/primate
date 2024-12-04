@@ -79,13 +79,8 @@ def test_xtrace2():
 
 	rng = np.random.default_rng(1234)  # for reproducibility
 	A = symmetric(150, pd=True, seed=rng)  # random PD matrix
-	print(xtrace(A, seed=rng))
-	print(A.trace())
 	assert np.isclose(xtrace(A), A.trace())
 
-	tr_est, result = xtrace(A, full=True, record=True)
-	result.estimator.values
-
 	estimates = []
-	xtrace(A, batch=1, full=True, callback=lambda res: estimates.append(res.estimate))
-	np.std(estimates)
+	xtrace(A, batch=1, full=True, seed=rng, callback=lambda res: estimates.append(res.estimate))
+	assert np.std(estimates) < 0.60

@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../basic/install.html" rel="next">
-<link href="../index.html" rel="prev">
+<link href="../guides/intro_trace.html" rel="next">
+<link href="../basic/integration.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -201,7 +201,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/quickstart.html">Quickstart</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="../basic/quickstart.html">Quickstart</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -229,8 +229,14 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/quickstart.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Quickstart</span></a>
+  <a href="../table.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Table of matrix functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -250,8 +256,14 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/imate_compare.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparison to <em>imate</em></span></a>
+  <a href="../basic/integration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Integration</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../basic/quickstart.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Quickstart</span></a>
   </div>
 </li>
       </ul>
@@ -259,12 +271,35 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">API Reference</span></a>
+ <span class="menu-text">Guides</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/intro_trace.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matrix functions</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
@@ -273,13 +308,13 @@ window.Quarto = {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
  <span class="menu-text">Lanczos</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
@@ -292,23 +327,34 @@ window.Quarto = {
  <span class="menu-text">rayleigh_ritz</span></a>
   </div>
 </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Integrate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/lanczos_quadrature.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">lanczos_quadrature</span></a>
+  <a href="../reference/quadrature.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">quadrature</span></a>
   </div>
 </li>
       </ul>
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
@@ -331,13 +377,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
  <span class="menu-text">Diagonal</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/diag.html" class="sidebar-item-text sidebar-link">
@@ -354,13 +400,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
  <span class="menu-text">Operators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
@@ -383,13 +429,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
@@ -412,13 +458,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
  <span class="menu-text">Estimators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
@@ -471,23 +517,23 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
  <span class="menu-text">Stats</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stats.Covariance.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.Covariance</span></a>
+  <a href="../reference/Covariance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Covariance</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/stats.confidence_interval.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">stats.confidence_interval</span></a>
+  <a href="../reference/confidence_interval.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">confidence_interval</span></a>
   </div>
 </li>
       </ul>
@@ -515,7 +561,7 @@ window.Quarto = {
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../basic/install.html">Basics</a></li><li class="breadcrumb-item"><a href="../basic/quickstart.html">Quickstart</a></li></ol></nav>
 <div class="quarto-title">
 <h1 class="title">Quickstart</h1>
 </div>
@@ -537,14 +583,14 @@ window.Quarto = {
 <p><code>primate</code> contains a variety of algorithms for estimating quantities from matrices and matrix functions, with a focus on common quantities of interest, such as the trace or the diagonal. This page briefly outlines the variety of options <code>primate</code> offers to approximate these quantities, and how to configure these approximations per use case.</p>
 <section id="implicit-matrix-representations" class="level2">
 <h2 class="anchored" data-anchor-id="implicit-matrix-representations">Implicit matrix representations</h2>
-<p>In all of the examples below, by the term <em>matrix</em> we mean generically anything that comes with an associated <span class="math inline">v \mapsto Av</span> capability.</p>
+<p>In all of the examples below, by the term <em>matrix</em> we mean generically anything that comes with an associated <span class="math inline">v \mapsto Av</span> capability via and overloaded <code>__matvec__</code> or <code>__matmul__</code> magic. While this includes dense matrices, such as those used by e.g.&nbsp;NumPy and PyTorch, is also includes <a href="https://docs.scipy.org/doc/scipy/reference/sparse.html">sparse matrices</a> and <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator">LinearOperator’s</a>. Because the latter mots option need not store any part of <code>A</code> explicitly, such operators are referred to as <em>implicit</em> matrix representations. <!-- All of `primate`'s estimators work out-of-the-box with Numpy matrices, [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html), and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator).  --></p>
 </section>
 <section id="trace-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="trace-estimation">Trace estimation</h2>
-<p>The <em>implicit matrix trace estimation</em> problem seeks to estimate the quantity:</p>
-<p><span class="math display"> \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i </span></p>
-<p>A variety of <em>trace</em> estimators are available in the <code>primate.trace</code> module, including the Girard-Hutchinson estimator (<code>hutch</code>), the improved Hutch++ (<code>hutchpp</code>), and XTrace (<code>xtrace</code>):</p>
-<div id="8cd2abaa" class="cell" data-execution_count="2">
+<p>The <em>implicit matrix trace estimation</em> problem is to estimate the trace using <em>only</em> <span class="math inline">v \mapsto Av</span> applications:</p>
+<p><span class="math display"> \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i </span></p>
+<p>This <em>implicit trace</em> estimators are available in the<code>primate.trace</code>, which include the Girard-Hutchinson estimator (<code>hutch</code>), the improved Hutch++ (<code>hutchpp</code>), and XTrace (<code>xtrace</code>):</p>
+<div id="21ad4e46" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch, hutchpp, xtrace</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.random <span class="im">import</span> symmetric</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">1234</span>)      <span class="co"># for reproducibility </span></span>
@@ -556,101 +602,20 @@ window.Quarto = {
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"XTrace  :  </span><span class="sc">{</span>xtrace(A)<span class="sc">:6f}</span><span class="ss">"</span>)   <span class="co">## Epperly's algorithm</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Trace   :  74.884261
-Hutch   :  74.774909
-Hutch++ :  74.848081
-XTrace  :  78.027808</code></pre>
+Hutch   :  75.419234
+Hutch++ :  74.522790
+XTrace  :  74.884261</code></pre>
 </div>
 </div>
-<p>Here, <code>A</code> can be a numpy matrix, a sparse matrix, or a <code>LinearOperator</code>. If the spectral sum of interest is not just the sum of the eigenvalues, but rather the sum under composition with some spectral function <span class="math inline">f(\lambda)</span>, i.e.&nbsp;the quantity of interest is of the form:</p>
-<p><span class="math display"> \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) </span></p>
-<p>Then you may alternatively use the <code>matrix_function</code> API to construct a <code>LinearOperator</code> by passing in the corresponding spectral function as a <code>Callable</code> or by passing a string representing the name of one of the following built-in spectral functions:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 13%">
-<col style="width: 22%">
-<col style="width: 35%">
-<col style="width: 29%">
-</colgroup>
-<thead>
-<tr class="header">
-<th><strong>name</strong></th>
-<th><strong>matrix function</strong></th>
-<th><strong>Applications</strong></th>
-<th><strong>numpy call</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>identity</td>
-<td><span class="math inline">A</span></td>
-<td>Basic matrix operations</td>
-<td><code>A</code></td>
-</tr>
-<tr class="even">
-<td>log</td>
-<td><span class="math inline">\log(A)</span></td>
-<td>Determinant, entropy-like measures</td>
-<td><code>logm(A)</code></td>
-</tr>
-<tr class="odd">
-<td>exp</td>
-<td><span class="math inline">e^A</span></td>
-<td>Dynamical systems, graph diffusion</td>
-<td><code>expm(A)</code></td>
-</tr>
-<tr class="even">
-<td>inv</td>
-<td><span class="math inline">A^{-1}</span></td>
-<td>Stability analysis, linear systems</td>
-<td><code>inv(A)</code></td>
-</tr>
-<tr class="odd">
-<td>sign</td>
-<td><span class="math inline">\text{sgn}_\epsilon(A)</span></td>
-<td>Rank approximation, low-rank modeling</td>
-<td><code>U @ U.T</code></td>
-</tr>
-<tr class="even">
-<td>sqrt</td>
-<td><span class="math inline">A^{1/2}</span></td>
-<td>Diffusion, kernel methods</td>
-<td><code>sqrtm(A)</code></td>
-</tr>
-<tr class="odd">
-<td>square</td>
-<td><span class="math inline">A^2</span></td>
-<td>Energy measures, stability</td>
-<td><code>A @ A</code></td>
-</tr>
-<tr class="even">
-<td>PCA</td>
-<td><span class="math inline">P_A</span> (eigenspace)</td>
-<td>Dim. reduction, feature extraction</td>
-<td>Custom projection matrix</td>
-</tr>
-<tr class="odd">
-<td>Tikhonov</td>
-<td><span class="math inline">(A + \lambda I)^{-1}</span></td>
-<td>Regularized inversion, stability</td>
-<td><code>inv(A + lambda * eye(n))</code></td>
-</tr>
-<tr class="even">
-<td>heat</td>
-<td><span class="math inline">e^{-tA}</span></td>
-<td>Diffusion on graphs, spectral clustering</td>
-<td><code>expm(-t * A)</code></td>
-</tr>
-<tr class="odd">
-<td>pagerank</td>
-<td><span class="math inline">(I - \alpha A)^{-1}v</span></td>
-<td>Network centrality, web ranking</td>
-<td>Iterative solver</td>
-</tr>
-</tbody>
-</table>
-<p><br></p>
+<p>If the spectral sum of interest is comprised of summing eigenvalues under composition with some spectral function <span class="math inline">f(\lambda)</span>, i.e.&nbsp;of the form:</p>
+<p><span class="math display"> \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) = \sum\limits_{i=1}^n e_i^T f(A) e_i </span></p>
+<p>Then you may use the <code>matrix_function</code> API to construct a <code>LinearOperator</code> that approximates matrix function applications <span class="math inline">v \mapsto f(A)v</span>. To do this, simply call <code>matrix_function(A, fun=...)</code> where <code>fun</code> is either:</p>
+<ol type="1">
+<li>a string representing the name of one of a built-in matrix function, or</li>
+<li>the corresponding spectral function as a <code>Callable</code></li>
+</ol>
 <p>For example, one might compute the log-determinant of a positive definite matrix as follows:</p>
-<div id="c40744ef" class="cell" data-execution_count="3">
+<div id="1267d795" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function, IdentityOperator</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>M <span class="op">=</span> matrix_function(A, fun<span class="op">=</span><span class="st">"log"</span>) <span class="co"># or fun=np.log </span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -662,16 +627,16 @@ XTrace  :  78.027808</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>logdet(A) :  -151.529763
 tr(log(A)):  -151.529763
-Hutch     :  -152.346095
-Hutch++   :  -149.577572
-XTrace    :  -160.472063</code></pre>
+Hutch     :  -153.679245
+Hutch++   :  -153.202599
+XTrace    :  -151.525980</code></pre>
 </div>
 </div>
 </section>
 <section id="diagonal-estimation" class="level2">
 <h2 class="anchored" data-anchor-id="diagonal-estimation">Diagonal estimation</h2>
 <p>The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.</p>
-<div id="9a1ba998" class="cell" data-execution_count="4">
+<div id="242a2cd7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.estimators <span class="im">import</span> arr_summary</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.diagonal <span class="im">import</span> diag, xdiag</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -684,15 +649,15 @@ XTrace    :  -160.472063</code></pre>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diagonal XDiag : </span><span class="sc">{</span>arr_summary(d3)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Diagonal (true): [0.48,0.53,...,0.48]
-Diagonal Hutch : [0.49,0.53,...,0.51]
-Diagonal XDiag : [0.48,0.54,...,0.48]</code></pre>
+Diagonal Hutch : [0.46,0.48,...,0.48]
+Diagonal XDiag : [0.48,0.53,...,0.48]</code></pre>
 </div>
 </div>
 </section>
 <section id="matrix-function-approximation" class="level2">
 <h2 class="anchored" data-anchor-id="matrix-function-approximation">Matrix function approximation</h2>
 <p>In <code>primate</code>, the matrix function <span class="math inline">f(A)</span> is not constructed explicitly but instead the action <span class="math inline">v \mapsto f(A)v</span> is approximated with a fixed-degree Krylov expansion. This can be useful when, for example, the matrix <span class="math inline">A</span> itself is so large that the corresponding (typically dense) matrix function <span class="math inline">f(A) \in \mathbb{R}^{n \times n}</span> simply is too large to be explicitly represented. If you just want to approximate the action of a matrix function for a single vector <span class="math inline">v \in \mathbb{R}^n</span>, simply supply the vector and the matrix alongside the <code>matrix_function</code> call:</p>
-<div id="3160bf71" class="cell" data-execution_count="5">
+<div id="d644de28" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> matrix_function</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>v <span class="op">=</span> np.random.uniform(size<span class="op">=</span>A.shape[<span class="dv">0</span>])</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> matrix_function(A, fun<span class="op">=</span>np.exp, v<span class="op">=</span>v)</span>
@@ -702,7 +667,7 @@ Diagonal XDiag : [0.48,0.54,...,0.48]</code></pre>
 </div>
 </div>
 <p>Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a <code>MatrixFunction</code> instance and use it like any other <code>LinearOperator</code>:</p>
-<div id="5c53f32c" class="cell" data-execution_count="6">
+<div id="80026185" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.operators <span class="im">import</span> MatrixFunction</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> ExpA <span class="op">@</span> v</span>
@@ -712,7 +677,7 @@ Diagonal XDiag : [0.48,0.54,...,0.48]</code></pre>
 </div>
 </div>
 <p>If you don’t supply a vector <code>v</code> to the <code>matrix_function</code> call, a <code>MatrixFunction</code> instance is constructed using whatever additional arguments are passed in and returned. Note some function specializations are inherently more difficult to approximate and can depend on the smoothness of <span class="math inline">f</span> and the conditioning of the corresponding operator <span class="math inline">f(A)</span>; in general, a <code>MatrixFunction</code> instance with degree <span class="math inline">k</span> approximates the action <span class="math inline">v \mapsto f(A)v</span> about as well as the operator <span class="math inline">p(A)</span>, where <span class="math inline">p</span> is a degree <span class="math inline">2k-1</span> polynomial interpolant of <span class="math inline">f</span>.</p>
-<div id="372f3e11" class="cell" data-execution_count="7">
+<div id="115bb954" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.linalg <span class="im">import</span> expm</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ExpA <span class="op">=</span> expm(A)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>ExpA0 <span class="op">=</span> MatrixFunction(A, fun<span class="op">=</span>np.exp, deg<span class="op">=</span><span class="dv">5</span>, orth<span class="op">=</span><span class="dv">0</span>)</span>
@@ -740,15 +705,15 @@ Deg-50 approx error (full reorth.) : 9.442567959828599e-14</code></pre>
 <!-- By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution.  -->
 <p>Passing <code>full=True</code> returns additional information about the computation in the form of <code>EstimatorResult</code> (along with the estimate itself), which contains information about execution itself, convergence information of the estimator, and other status messages.</p>
 <p>For example, with the default <code>converge="confidene"</code> criterion, the margin of error of a default-constructed confidence interval is returned:</p>
-<div id="9cd3b51b" class="cell" data-execution_count="8">
+<div id="78590bc0" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, converge<span class="op">=</span><span class="st">"confidence"</span>, full<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(info.message)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Est: 76.801 +/- 1.313 (95% CI, #S:32)</code></pre>
+<pre><code>Est: 74.741 +/- 1.206 (95% CI, #S:64)</code></pre>
 </div>
 </div>
 <p>A more visual way of viewing the sample values and the corresponding estimate as a function of the sample size is to plot the sequence with the <code>figure_sequence</code> function (note this requires saving the samples with <code>record=True</code>):</p>
-<div id="817cb993" class="cell" data-execution_count="9">
+<div id="3dbd44c3" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.plotting <span class="im">import</span> figure_sequence</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, full<span class="op">=</span><span class="va">True</span>, record<span class="op">=</span><span class="va">True</span>)</span>
@@ -756,14 +721,14 @@ Deg-50 approx error (full reorth.) : 9.442567959828599e-14</code></pre>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>show(p)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-  <div id="c4484a3e-b2bf-4699-9a99-4f4ffb23bd67" data-root-id="p1361" style="display: contents;"></div>
+  <div id="d953edb2-7cc8-421a-ba31-463fb9daad79" data-root-id="p1001" style="display: contents;"></div>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/javascript">
 (function(root) {
   function embed_document(root) {
-  const docs_json = {"6f61789e-f3b8-4d45-9ae3-498f11dac49b":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p1361","attributes":{"width":400,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p1362"},"y_range":{"type":"object","name":"DataRange1d","id":"p1363"},"x_scale":{"type":"object","name":"LinearScale","id":"p1371"},"y_scale":{"type":"object","name":"LinearScale","id":"p1372"},"title":{"type":"object","name":"Title","id":"p1364","attributes":{"text":"Monte Carlo sample variates","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1402","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1396","attributes":{"selected":{"type":"object","name":"Selection","id":"p1397","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1398"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"0WScs0LqUkBSMUa24nxUQJFHOljp4VJAwVrOjTHsU0CHiLuLT/NQQMmh+p8+A1NA792/0B6iU0AkjfAF/dlSQLPU1SShdVJAdqGOLXEVU0BH2qzTrH5SQOu+IJRxolRAdyCMFpWoUUA/dHH1vBVSQMf29WQfmVNAe9hVVTwfU0CZu36c0wxTQIBcBH7/aVJAxPPwse60VEBR8RJKzA1TQCMJqdKDZlNA/ZKKLoLtUUC8MIBzxOlSQEJ6UHiNDFJAt/Nr9yjsUUA9iJtpEtBTQL3VImeJqFNAooxk3JCDVECaR6MJeKRSQM2tsuVzJFJAuuNYWpw+UkBpQGGgJsRTQMNvImmSGlFA5bMxCdCaUUC/7O4sJOdTQC8I8iUSp1BA044bCmzMUkC2+GrhiVxTQJykF7GEn1JANMGz0RgeU0ARcUzD/tpSQJ8VcDIItFNAY8ijtLFgU0DUwvhgbhhUQOHQAWzp3lJAgm95oG8zU0C+kFw2eldTQD9VBHBQiVNAXQ6HR2njUUC+dPz2DA5TQN9+W16lSVNAdb106JvWUUAYB7mBrslSQPqTlm2++lJAWy9Aq8mWUECCmJSrMTdTQMQuaW8xYlNAiRGZoNcWUEBcCx1FmtNUQEJ+NhQ4yFNASK8rT7vEUkCr4Dm8K2tSQAgaTdH6K1FAji1jTrslUkA="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1403","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1404"}}},"glyph":{"type":"object","name":"Scatter","id":"p1399","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1400","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1401","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1413","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1407","attributes":{"selected":{"type":"object","name":"Selection","id":"p1408","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1409"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAA=="},"shape":[64],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"0WScs0LqUkASS/G0krNTQDyfCZavbVNAHc76E1CNU0AywIfFHAhTQMvlmhRNB1NAYlLpCmsdU0C6OUpK/RRTQEegkmJIA1NAmdOrQxkFU0AGGmbc4PhSQG5SYJZXHFNAvsSex77/UkC1rOTKB+9SQOn1B7Ne+lJAEtQsjaz8UkCTw0/Kn/1SQBLM2Tds9VJANrN80vkMU0CEaXdYBA1TQGcDSV5HEVNAebg0OQQEU0B9ADgP4AJTQDqwQ56c+FJAUxkSrN/tUkD6xL7akvZSQGA3RzUq/VJA2dWslhsLU0BB9PuIkQdTQIELAnv//1JAi1T0ecL5UkDquyebFQBTQIx7yjRf8VJArHW+70vnUkBcC/NBm+5SQGKS1qtl3lJAxmiFTendUkCDB+NePuFSQBSpZ/GO31JASMOcMB/hUkAC1IHv+OBSQFUG6WT/5VJA043V3dnoUkCT/aEmwO9SQHLaX1tg71JA3cGoH9vwUkCVpT8VCvNSQOkTeYwr9lJAzBPnEpDwUkDGbDkNJ/FSQJXgAkHj8lJA/JpiumvtUkA2e+sZv+xSQB4Yi3UB7VJA5ozPBiHiUkBlfy7lpeNSQGam8Dze5VJALRJZm3jZUkA7lOuzDOJSQEM6U8Li5VJANxLdnlflUkAgaLkrX+NSQLabcrRl3FJA/V3aCovZUkA="},"shape":[64],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1414","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1415"}}},"glyph":{"type":"object","name":"Line","id":"p1410","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":1.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1411","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":1.5}},"muted_glyph":{"type":"object","name":"Line","id":"p1412","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":1.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1370","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1383"},{"type":"object","name":"WheelZoomTool","id":"p1384","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p1385","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1386","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p1392","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1391","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p1393"},{"type":"object","name":"ResetTool","id":"p1394"},{"type":"object","name":"HelpTool","id":"p1395"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1378","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1379","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1380"},"axis_label":"Estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p1381"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1373","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1374","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1375"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1376"}}}],"center":[{"type":"object","name":"Grid","id":"p1377","attributes":{"axis":{"id":"p1373"}}},{"type":"object","name":"Grid","id":"p1382","attributes":{"dimension":1,"axis":{"id":"p1378"}}},{"type":"object","name":"Legend","id":"p1405","attributes":{"location":"top_left","title_text_font_size":"11px","label_text_font_size":"11px","margin":4,"padding":4,"spacing":2,"items":[{"type":"object","name":"LegendItem","id":"p1406","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p1402"}]}},{"type":"object","name":"LegendItem","id":"p1416","attributes":{"label":{"type":"value","value":"estimator"},"renderers":[{"id":"p1413"}]}}]}}]}}]}};
-  const render_items = [{"docid":"6f61789e-f3b8-4d45-9ae3-498f11dac49b","roots":{"p1361":"c4484a3e-b2bf-4699-9a99-4f4ffb23bd67"},"root_ids":["p1361"]}];
+  const docs_json = {"13e8137c-f282-4432-812f-f119a0f5df81":{"version":"3.5.2","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p1001","attributes":{"width":400,"height":300,"x_range":{"type":"object","name":"DataRange1d","id":"p1002"},"y_range":{"type":"object","name":"DataRange1d","id":"p1003"},"x_scale":{"type":"object","name":"LinearScale","id":"p1011"},"y_scale":{"type":"object","name":"LinearScale","id":"p1012"},"title":{"type":"object","name":"Title","id":"p1004","attributes":{"text":"Monte Carlo sample variates","align":"center"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p1042","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1036","attributes":{"selected":{"type":"object","name":"Selection","id":"p1037","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1038"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAGUAAABmAAAAZwAAAGgAAABpAAAAagAAAGsAAABsAAAAbQAAAG4AAABvAAAAcAAAAHEAAAByAAAAcwAAAHQAAAB1AAAAdgAAAHcAAAB4AAAAeQAAAHoAAAB7AAAAfAAAAH0AAAB+AAAAfwAAAIAAAAA="},"shape":[128],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"rC2h9NvwUUB7zAd5SYVSQPWZJgQIcVBAreRYCGykUUDDz1TRx9FRQJNvPgXqFVNAhhDW/IKcUEAPxg/XwFNUQBVFTw8+MlRA2IuRYiyjUkDAldco4slSQA/Xb27xLlFAWUhBOjujU0DuYU9uU8BQQPG6RVqs6FJAu7bChTYLVECBdEEfyoVRQC8xqMo7clBArHr2VtXQUEBwByKtskpUQCx4OsnoCVFAicUpgmAkVkBCL2SatB9SQL5TXzMualNAiYwr+XykUUDlSGlhfqBTQKeGEsjFU1VAf7ZIIvjMUEBCyz91ATpSQP1UX1nyg1NAcNUKE6snUEAaMmeNIg1TQFR0frHKPVFARqG7zKnNUkBXJiUIlsNSQOQRPjaMW1FABWT02uL7UUBK6QZugWBRQBXXqPp7G1JA0Qm076SfU0DpRQXUwmVTQPWHa/dUBFNAe31Gg9P1UEB0syHKExlSQDvFwARzPVJAduOFmtNVUkDFVKDOdoxRQBFyhtqWZ1NAa0wN8wiQUEDLUoAhLvpRQO9v1xSfFVBA3yxsv3AAUUAc30OggJlRQHo0uX7RG1JACmvAvBY4UkC7PP4Ns9ZSQEHe+jCEdlJAGg0DYV7xUkBB4RZvvU9UQHwwyJ7hqlFAfDxyO9FwUUBhAKXKTr5SQPMv3n3x5FNAy2SXiCmjUkAa3qmQj3RRQEuGL/mWylJAwu37VjngUUBNLRuayYFUQK455bldmlJAOZvb2X3LU0BwTJGV+/hQQFGfqa51y1NAJcs2/8DJUECAPHVz3rFSQN3l528UYFRAXcy3FdwpUUDxJnofacFRQP4ZPrTVk1RATmrl5AnIUkDIBNOo0sBSQAZQWNclZFNAsQfx0hzxUkB/dA/HAiNUQOANkR5gDFJAxZkuSlbIUUBti+alg1FTQAxfRT8+g1RAFeQugNA1U0AH8YGJFQBSQI+yxQ1R8VNA7o381Cv2T0Bwa78E9oBUQMty56Du3lJA4E+KBmWUVEAo4Mw7re9RQIuLUj1bPlJAv8Wa1qZ1VEA8lgU4eH1QQLqWHpmbdVFARPYZVuH+UkAA4DXdVMZQQGCksNuCJlNARB1BK3UFVkADJ+9TnFFTQNEQrdtlM1JAD2QOeMiCUkDdd+Lg//BRQGjY4y9071JAPFlZ+Wt2U0DbK1YvRAtUQHIciI6L61FAoLziFrRtU0CLAUMJfXNSQFyZ7AsMT1NADlpmYDP2UkDeJsRKHuJUQCCu4cv0j1RAYn/iRVDsU0A2DKtY5OhTQJDzeLCDvFVAxNuqw7VXU0Bxlz2RDNZSQAouS7vWUVNAYo/nu8OsUEBxdHyNU3JSQCkNwLOS7VNAUVRHcdQMU0BAgsGwzvFRQA=="},"shape":[128],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1043","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1044"}}},"glyph":{"type":"object","name":"Scatter","id":"p1039","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"hatch_color":{"type":"value","value":"gray"}}},"nonselection_glyph":{"type":"object","name":"Scatter","id":"p1040","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.1},"fill_alpha":{"type":"value","value":0.1},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"Scatter","id":"p1041","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_color":{"type":"value","value":"gray"},"line_alpha":{"type":"value","value":0.2},"fill_alpha":{"type":"value","value":0.2},"hatch_color":{"type":"value","value":"gray"},"hatch_alpha":{"type":"value","value":0.2}}}}},{"type":"object","name":"GlyphRenderer","id":"p1053","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p1047","attributes":{"selected":{"type":"object","name":"Selection","id":"p1048","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p1049"},"data":{"type":"map","entries":[["x",{"type":"ndarray","array":{"type":"bytes","data":"AQAAAAIAAAADAAAABAAAAAUAAAAGAAAABwAAAAgAAAAJAAAACgAAAAsAAAAMAAAADQAAAA4AAAAPAAAAEAAAABEAAAASAAAAEwAAABQAAAAVAAAAFgAAABcAAAAYAAAAGQAAABoAAAAbAAAAHAAAAB0AAAAeAAAAHwAAACAAAAAhAAAAIgAAACMAAAAkAAAAJQAAACYAAAAnAAAAKAAAACkAAAAqAAAAKwAAACwAAAAtAAAALgAAAC8AAAAwAAAAMQAAADIAAAAzAAAANAAAADUAAAA2AAAANwAAADgAAAA5AAAAOgAAADsAAAA8AAAAPQAAAD4AAAA/AAAAQAAAAEEAAABCAAAAQwAAAEQAAABFAAAARgAAAEcAAABIAAAASQAAAEoAAABLAAAATAAAAE0AAABOAAAATwAAAFAAAABRAAAAUgAAAFMAAABUAAAAVQAAAFYAAABXAAAAWAAAAFkAAABaAAAAWwAAAFwAAABdAAAAXgAAAF8AAABgAAAAYQAAAGIAAABjAAAAZAAAAGUAAABmAAAAZwAAAGgAAABpAAAAagAAAGsAAABsAAAAbQAAAG4AAABvAAAAcAAAAHEAAAByAAAAcwAAAHQAAAB1AAAAdgAAAHcAAAB4AAAAeQAAAHoAAAB7AAAAfAAAAH0AAAB+AAAAfwAAAIAAAAA="},"shape":[128],"dtype":"int32","order":"little"}],["y",{"type":"ndarray","array":{"type":"bytes","data":"rC2h9NvwUUAUfdS2EjtSQF8xRXtkolFAMh6KXuaiUUAcqLKoRqxRQLCedI2M6FFA867LeB25UUDXMZTkcQxSQGxQ/pOISVJAXtbZW39SUkB+0JPLWV1SQLV7e24mRFJAN9oACChfUkDFmk+PhkFSQGEUcTarTFJAhy5m65NoUkBZ50XBPFtSQALP5wgSQFJA1UOK/70sUkDQQDgI10dSQB7uXE6zOFJARmygc1JmUkAO5E91QGNSQAve5Qc1blJAYnS1bSNmUkC2cneeOnJSQLXuAaCLjVJA13WEW4Z9UkBov5NTMntSQIZm+IYFhFJA4YIJvYZwUkBbcIyba3VSQMimFyD6a1JAgIgrpdluUkDXznttRXFSQLRQSIGOaVJA0XMjtJdmUkDo9psQsl9SQKj8r1HyXVJAY+M8L/1lUkCSxkEzOmxSQNj1TlDZb1JAoCicwg5nUkCC1GoOSWVSQDzl6W5mZFJA2hwJVBVkUkBWzELkfl9SQMvfDmT/ZFJA3ZjaTG1bUkBNO5Zle1lSQFpBVrkcTlJAbCM5CLJHUkBqb6ilaERSQBpg5jeoQ1JAuD+NX3JDUkAY+zyHE0ZSQDi3cRXtRlJAYxXIYd1JUkAzKgZvpFJSQApmSafYT1JAzS63qTBMUkDkiMvbB05SQE68RVh9VFJA8AIHCbhVUkDJp0BCQVJSQKy6FQMUVFJAOZVlWFlSUkCyE3t3k1pSQMwmHCOAW1JA3A7d7sFgUkCwdIW3sFtSQEf1ZVfMYFJAhpn45ThbUkDIQSemZFxSQAIbC9xEY1JAE6RGKiVfUkCL/76/GF1SQM5EAtBcZFJARPRF0J9lUkASHi6mw2ZSQNA0YXfkaVJAJLH1nYprUkD6e74W1nBSQGKoK+yjb1JAeOpkC6xtUkC8ub9FUnBSQF/8aIZsdlJAXlMoTJl4UkB38AOmPndSQE94kQ1ye1JAtpbXmWh0UkAo5Jw5HHpSQLPwmsExe1JApt4PxeiAUkAB//5nYX9SQM3dNwK0flJAymbHYOODUkA7CUgkmX5SQKSg/Onre1JAnmYRKzt9UkDU+rO14nhSQJcV13mWelJA3vKecWSDUkBKuN8OYIVSQCcHhTCYhFJAvzqX0JOEUkDU1jW7MoNSQFRgXVYzhFJA4PFTOWyGUkBeAEYr9YlSQFnCONKHiFJAJ9kepZOKUkCy9LZWX4pSQHnLev4YjFJAZhhOMAWNUkCzjx7sKpJSQIz/bluGllJAWKNr3WuZUkBTULWMPZxSQFqcAc3oolJA7eY3UmekUkCr7sx+z6RSQCkIg543plJAaa6eGiSiUkD9hPgtwqFSQG/dqldkpFJAxpHo3DalUkCmQ5AM0KNSQA=="},"shape":[128],"dtype":"float64","order":"little"}]]}}},"view":{"type":"object","name":"CDSView","id":"p1054","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p1055"}}},"glyph":{"type":"object","name":"Line","id":"p1050","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_width":1.5}},"nonselection_glyph":{"type":"object","name":"Line","id":"p1051","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.1,"line_width":1.5}},"muted_glyph":{"type":"object","name":"Line","id":"p1052","attributes":{"x":{"type":"field","field":"x"},"y":{"type":"field","field":"y"},"line_alpha":0.2,"line_width":1.5}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p1010","attributes":{"tools":[{"type":"object","name":"PanTool","id":"p1023"},{"type":"object","name":"WheelZoomTool","id":"p1024","attributes":{"renderers":"auto"}},{"type":"object","name":"BoxZoomTool","id":"p1025","attributes":{"overlay":{"type":"object","name":"BoxAnnotation","id":"p1026","attributes":{"syncable":false,"line_color":"black","line_alpha":1.0,"line_width":2,"line_dash":[4,4],"fill_color":"lightgrey","fill_alpha":0.5,"level":"overlay","visible":false,"left":{"type":"number","value":"nan"},"right":{"type":"number","value":"nan"},"top":{"type":"number","value":"nan"},"bottom":{"type":"number","value":"nan"},"left_units":"canvas","right_units":"canvas","top_units":"canvas","bottom_units":"canvas","handles":{"type":"object","name":"BoxInteractionHandles","id":"p1032","attributes":{"all":{"type":"object","name":"AreaVisuals","id":"p1031","attributes":{"fill_color":"white","hover_fill_color":"lightgray"}}}}}}}},{"type":"object","name":"SaveTool","id":"p1033"},{"type":"object","name":"ResetTool","id":"p1034"},{"type":"object","name":"HelpTool","id":"p1035"}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p1018","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1019","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1020"},"axis_label":"Estimates","major_label_policy":{"type":"object","name":"AllLabels","id":"p1021"}}}],"below":[{"type":"object","name":"LinearAxis","id":"p1013","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p1014","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p1015"},"axis_label":"Sample index","major_label_policy":{"type":"object","name":"AllLabels","id":"p1016"}}}],"center":[{"type":"object","name":"Grid","id":"p1017","attributes":{"axis":{"id":"p1013"}}},{"type":"object","name":"Grid","id":"p1022","attributes":{"dimension":1,"axis":{"id":"p1018"}}},{"type":"object","name":"Legend","id":"p1045","attributes":{"location":"top_left","title_text_font_size":"11px","label_text_font_size":"11px","margin":4,"padding":4,"spacing":2,"items":[{"type":"object","name":"LegendItem","id":"p1046","attributes":{"label":{"type":"value","value":"samples"},"renderers":[{"id":"p1042"}]}},{"type":"object","name":"LegendItem","id":"p1056","attributes":{"label":{"type":"value","value":"estimator"},"renderers":[{"id":"p1053"}]}}]}}]}}]}};
+  const render_items = [{"docid":"13e8137c-f282-4432-812f-f119a0f5df81","roots":{"p1001":"d953edb2-7cc8-421a-ba31-463fb9daad79"},"root_ids":["p1001"]}];
   void root.Bokeh.embed.embed_items_notebook(docs_json, render_items);
   }
   if (root.Bokeh !== undefined) {
@@ -788,10 +753,10 @@ Deg-50 approx error (full reorth.) : 9.442567959828599e-14</code></pre>
 </div>
 </div>
 <p>You can also pass a callback function, which receives as its only argument an <code>EstimatorResult</code> instance. This can be useful for quickly monitoring convergence status, saving intermediate information, etc.</p>
-<div id="7a6ee6f0" class="cell" data-execution_count="10">
+<div id="eea6cfb7" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.estimators <span class="im">import</span> EstimatorResult</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hutch_callback(result: EstimatorResult):</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (result.nit <span class="op">%</span> <span class="dv">150</span>) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (result.nit <span class="op">%</span> <span class="dv">10</span>) <span class="op">==</span> <span class="dv">0</span>:</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(result.criterion.message(result.estimator))</span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>est, info <span class="op">=</span> hutch(A, converge<span class="op">=</span><span class="st">"confidence"</span>, callback<span class="op">=</span>hutch_callback)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1402,13 +1367,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../index.html" class="pagination-link" aria-label="Overview">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Overview</span>
+      <a href="../basic/integration.html" class="pagination-link" aria-label="Integration">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Integration</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../basic/install.html" class="pagination-link" aria-label="Installing">
-        <span class="nav-page-text">Installing</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../guides/intro_trace.html" class="pagination-link" aria-label="Introduction">
+        <span class="nav-page-text">Introduction</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>hutch</title>
+<title>quadrature</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -64,8 +64,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../reference/hutchpp.html" rel="next">
-<link href="../reference/quadrature.html" rel="prev">
+<link href="../reference/hutch.html" rel="next">
+<link href="../reference/rayleigh_ritz.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -198,7 +198,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/quadrature.html">Integrate</a></li><li class="breadcrumb-item"><a href="../reference/quadrature.html">quadrature</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -226,14 +226,8 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../quickstart.html" class="sidebar-item-text sidebar-link">
+  <a href="../basic/quickstart.qmd" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Quickstart</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../imate_compare.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -253,8 +247,8 @@ window.Quarto = {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../basic/integration.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Implicit representations</span></a>
+  <a href="../basic/imate_compare.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparison to <em>imate</em></span></a>
   </div>
 </li>
       </ul>
@@ -262,35 +256,12 @@ window.Quarto = {
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Guides</span></a>
+ <span class="menu-text">API Reference</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../basic/intro_trace.qmd" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Introduction</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../guides/matrix_functions.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Matrix functions</span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
- <span class="menu-text">API Reference</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/index.html" class="sidebar-item-text sidebar-link">
@@ -299,13 +270,13 @@ window.Quarto = {
 </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
  <span class="menu-text">Lanczos</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/lanczos.html" class="sidebar-item-text sidebar-link">
@@ -322,16 +293,16 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
  <span class="menu-text">Integrate</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/quadrature.html" class="sidebar-item-text sidebar-link">
+  <a href="../reference/quadrature.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">quadrature</span></a>
   </div>
 </li>
@@ -339,16 +310,16 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
  <span class="menu-text">Trace</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link active">
+  <a href="../reference/hutch.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">hutch</span></a>
   </div>
 </li>
@@ -368,13 +339,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
  <span class="menu-text">Diagonal</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/diag.html" class="sidebar-item-text sidebar-link">
@@ -391,13 +362,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
  <span class="menu-text">Operators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/MatrixFunction.html" class="sidebar-item-text sidebar-link">
@@ -420,13 +391,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
  <span class="menu-text">Random</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/isotropic.html" class="sidebar-item-text sidebar-link">
@@ -449,13 +420,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
  <span class="menu-text">Estimators</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/Estimator.html" class="sidebar-item-text sidebar-link">
@@ -508,13 +479,13 @@ window.Quarto = {
   </li>
           <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
  <span class="menu-text">Stats</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../reference/Covariance.html" class="sidebar-item-text sidebar-link">
@@ -541,69 +512,40 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#parameters" id="toc-parameters" class="nav-link active" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#integrate.quadrature" id="toc-integrate.quadrature" class="nav-link active" data-scroll-target="#integrate.quadrature">quadrature</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
   <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
-  <li><a href="#see-also" id="toc-see-also" class="nav-link" data-scroll-target="#see-also">See Also</a></li>
-  <li><a href="#reference" id="toc-reference" class="nav-link" data-scroll-target="#reference">Reference</a></li>
-  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">Trace</a></li><li class="breadcrumb-item"><a href="../reference/hutch.html">hutch</a></li></ol></nav>
-<div class="quarto-title">
-<h1 class="title">hutch</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>trace.hutch(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    A,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    batch<span class="op">=</span><span class="dv">32</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    pdf<span class="op">=</span><span class="st">'rademacher'</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    converge<span class="op">=</span><span class="st">'default'</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    full<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Estimates the trace of a symmetric <code>A</code> via the Girard-Hutchinson estimator.</p>
-<p>This function uses random vectors to estimate of the trace of <span class="math inline">A</span> via the approximation: <span class="math display"> \mathrm{tr}(A) = \sum_{i=1}^n e_i^T A e_i \approx n^{-1}\sum_{i=1}^n v^T A v </span> When <span class="math inline">v</span> are isotropic, this approximation forms an unbiased estimator of the trace.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Convergence behavior is controlled by the <code>estimator</code> parameter: “confidence” uses the central limit theorem to generate confidence intervals on the fly, which may be used in conjunction with <code>atol</code> and <code>rtol</code> to upper-bound the error of the approximation.</p>
-</div>
-</div>
+<section id="integrate.quadrature" class="level1">
+<h1>quadrature</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>quadrature(d, e, deg<span class="op">=</span><span class="va">None</span>, quad<span class="op">=</span><span class="st">'gw'</span>, nodes<span class="op">=</span><span class="va">None</span>, weights<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.</p>
+<p>This function computes the fixed degree Gaussian quadrature rule for a symmetric Jacobi matrix <span class="math inline">J</span>, which associates <code>nodes</code> <span class="math inline">x_i</span> to the eigenvalues of <span class="math inline">J</span> and <code>weights</code> <span class="math inline">w_i</span> to the squares of the first components of their corresponding normalized eigenvectors. The resulting rule is a weighted sum approximating the definite integral:</p>
+<p><span class="math display"> \int_{a}^{b} f(x) \omega(x) dx \approx \sum\limits_{i=1}^d f(x_i) \cdot w_i </span></p>
+<p>where <span class="math inline">\omega(x)</span> denotes the weight function and <span class="math inline">f(x)</span> represents the function being approximated. When <code>J</code> is constructed by the Lanczos method on a symmetric matrix <span class="math inline">A \in \mathbb{R}^{n \times n}</span>, the rule can be used to approximate the weighted integral:</p>
+<p><span class="math display"> \int_{a}^{b} f(x) \psi(x; A, v) dx \approx \sum\limits_{i=1}^n f(\lambda_i)</span></p>
+<p>where <span class="math inline">\psi(x)</span> is the eigenvector spectral density associated to the pair <span class="math inline">(A,v)</span>:</p>
+<p><span class="math display"> \psi(x; A, v) = \sum\limits_{i=1}^n \lvert u_i^T v \rvert^2 \delta(x - \lambda_i), \quad A = U \Lambda U^T </span></p>
+<p>For more details on this, see the references.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 6%">
-<col style="width: 27%">
-<col style="width: 55%">
-<col style="width: 10%">
+<col style="width: 7%">
+<col style="width: 19%">
+<col style="width: 62%">
+<col style="width: 9%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -615,52 +557,40 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td>A</td>
-<td>Union[LinearOperator, np.ndarray]</td>
-<td>real symmetric matrix or linear operator.</td>
+<td>d</td>
+<td>np.ndarray</td>
+<td>array of <code>n</code> diagonal elements.</td>
 <td><em>required</em></td>
 </tr>
 <tr class="even">
-<td>batch</td>
-<td>int</td>
-<td>Number of random vectors to sample at a time for batched matrix multiplication.</td>
-<td><code>32</code></td>
+<td>e</td>
+<td>np.ndarray</td>
+<td>array of <code>n</code> or <code>n-1</code> off-diagonal elements. See details.</td>
+<td><em>required</em></td>
 </tr>
 <tr class="odd">
-<td>pdf</td>
-<td>Union[str, Callable]</td>
-<td>Choice of zero-centered distribution to sample random vectors from.</td>
-<td><code>'rademacher'</code></td>
-</tr>
-<tr class="even">
-<td>converge</td>
-<td>Union[str, ConvergenceCriterion]</td>
-<td>Convergence criterion to test for estimator convergence. See details.</td>
-<td><code>'default'</code></td>
-</tr>
-<tr class="odd">
-<td>seed</td>
-<td>Union[int, np.random.Generator, None]</td>
-<td>Seed to initialize the <code>rng</code> entropy source. Set <code>seed</code> &gt; -1 for reproducibility.</td>
+<td>deg</td>
+<td>Optional[int]</td>
+<td>degree of the quadrature rule to compute.</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td>full</td>
-<td>bool</td>
-<td>Whether to return additional information about the computation.</td>
-<td><code>False</code></td>
+<td>quad</td>
+<td>str</td>
+<td>method used to compute the rule. Either Golub Welsch or FTTR is supported.</td>
+<td><code>'gw'</code></td>
 </tr>
 <tr class="odd">
-<td>callback</td>
-<td>Optional[Callable]</td>
-<td>Optional callable to execute after each batch of samples.</td>
+<td>nodes</td>
+<td>Optional[np.ndarray]</td>
+<td>output array to store the <code>deg</code> nodes of the quadrature (optional).</td>
 <td><code>None</code></td>
 </tr>
 <tr class="even">
-<td>**kwargs</td>
-<td>dict</td>
-<td>Additional keyword arguments to parameterize the convergence criterion.</td>
-<td><code>{}</code></td>
+<td>weights</td>
+<td>Optional[np.ndarray]</td>
+<td>output array to store the <code>deg</code> weights of the quadrature (optional).</td>
+<td><code>None</code></td>
 </tr>
 </tbody>
 </table>
@@ -669,9 +599,9 @@ Note
 <h2 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h2>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 5%">
-<col style="width: 16%">
-<col style="width: 78%">
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 81%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -683,34 +613,18 @@ Note
 <tbody>
 <tr class="odd">
 <td></td>
-<td>Union[float, tuple]</td>
-<td>Estimate the trace of <span class="math inline">f(A)</span>. If <code>info = True</code>, additional information about the computation is also returned.</td>
+<td>tuple</td>
+<td>tuple (nodes, weights) of the degree-<code>deg</code> Gaussian quadrature rule.</td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="see-also" class="level2 doc-section doc-section-see-also">
-<h2 class="doc-section doc-section-see-also anchored" data-anchor-id="see-also">See Also</h2>
-<ul>
-<li><a href="../reference/lanczos.lanczos.md">lanczos</a>: the lanczos tridiagonalization algorithm.</li>
-<li><a href="../reference/MeanEstimator.md">MeanEstimator</a>: Standard estimator of the mean from iid samples.</li>
-<li><a href="../reference/ConfidenceCriterion.md">ConfidenceCriterion</a>: Criterion for convergence that uses the central limit theorem.</li>
-</ul>
-</section>
-<section id="reference" class="level2 doc-section doc-section-reference">
-<h2 class="doc-section doc-section-reference anchored" data-anchor-id="reference">Reference</h2>
-<ol type="1">
-<li>Ubaru, S., Chen, J., &amp; Saad, Y. (2017). Fast estimation of tr(f(A)) via stochastic Lanczos quadrature. SIAM Journal on Matrix Analysis and Applications, 38(4), 1075-1099.</li>
-<li>Hutchinson, Michael F. “A stochastic estimator of the trace of the influence matrix for Laplacian smoothing splines.” Communications in Statistics-Simulation and Computation 18.3 (1989): 1059-1076.</li>
-</ol>
-</section>
-<section id="examples" class="level2 doc-section doc-section-examples">
-<h2 class="doc-section doc-section-examples anchored" data-anchor-id="examples">Examples</h2>
-<div id="272c9340" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> primate.trace <span class="im">import</span> hutch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="notes" class="level2 doc-section doc-section-notes">
+<h2 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h2>
+<p>To compute the weights of the quadrature, <code>quad</code> can be set to either ‘golub_welsch’ or ‘fttr’. The former uses a LAPACK call to the method of relatively robust representations (RRR), which builds local LDL decompositions around clusters of eigenvalues, while the latter (FTTR) uses the explicit recurrence expression for orthogonal polynomials. Though both require <span class="math inline">O(\mathrm{deg}^2)</span> time to execute, the former requires <span class="math inline">O(\mathrm{deg}^2)</span> space but is highly accurate, while the latter uses only <span class="math inline">O(1)</span> space at the cost of backward stability. If <code>deg</code> is large, <code>fttr</code> is preferred for performance, though pilot testing should be done to ensure that instability does not cause a large bias in the approximation.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -1280,13 +1194,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../reference/quadrature.html" class="pagination-link" aria-label="quadrature">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">quadrature</span>
+      <a href="../reference/rayleigh_ritz.html" class="pagination-link" aria-label="rayleigh_ritz">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">rayleigh_ritz</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../reference/hutchpp.html" class="pagination-link" aria-label="hutchpp">
-        <span class="nav-page-text">hutchpp</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../reference/hutch.html" class="pagination-link" aria-label="hutch">
+        <span class="nav-page-text">hutch</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

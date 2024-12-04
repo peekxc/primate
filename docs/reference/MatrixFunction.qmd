@@ -23,12 +23,6 @@ method on a fixed-degree Krylov expansion.
 | dtype  | np.dtype             | floating point dtype to execute in. Must be float64 or float32. | `np.float64` |
 | kwargs | dict                 | keyword arguments to pass to the Lanczos method.                | `{}`         |
 
-## Returns {.doc-section .doc-section-returns}
-
-| Name   | Type   | Description                                        |
-|--------|--------|----------------------------------------------------|
-|        |        | `LinearOperator` representing the matrix function. |
-
 ## Methods
 
 | Name | Description |

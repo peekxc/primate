@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
-from typing import Optional
+from typing import Optional, Union, Sequence
+from .estimators import Estimator, EstimatorResult, ConfidenceCriterion, MeanEstimator
 
 
 def figure_csm(values: np.ndarray, **kwargs):
@@ -59,21 +60,22 @@ def figure_jacobi(deg: int = 4, alpha: float = 0, beta: float = 0):
 	return p
 
 
-def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: dict):
+def figure_sequence(estimator: Union[Estimator, Sequence], mu: Optional[float] = None, **kwargs: dict):
 	"""Generates figures showing the convergence of sample estimates."""
 	from bokeh.models import Span
 	from bokeh.plotting import figure
 
 	# ## Extract samples and take averages
-	sample_vals = np.ravel(samples)
-	valid_samples = sample_vals != 0
+	sample_vals = np.ravel(estimator.values) if isinstance(estimator, Estimator) else np.array(estimator).ravel()
+	valid_samples = ~np.isnan(sample_vals)
 	n_samples = np.sum(valid_samples)
 	sample_index = np.arange(1, n_samples + 1)
 	sample_avgs = np.cumsum(sample_vals[valid_samples]) / sample_index
 
 	## Build the figure
 	fig_title = "Monte Carlo sample variates"
-	p = figure(width=400, height=300, title=fig_title, **kwargs)
+	fig_kwargs = dict(width=400, height=300, title=fig_title)
+	p = figure(**(fig_kwargs | kwargs))
 	p.toolbar_location = None
 	p.scatter(sample_index, sample_vals, size=4.0, color="gray", legend_label="samples")
 	p.title.align = "center"
@@ -112,20 +114,55 @@ def figure_sequence(samples: np.ndarray, mu: Optional[float] = None, **kwargs: d
 # 	p.add_layout(conf_band)
 
 
-# def figure_est_error(results: EstimatorResult, absolute: bool = True, title: str = "Estimator accuracy"):
-# 	if absolute:
-# 		q2 = figure(width=300, height=150, y_axis_location="left")
-# 		q2.toolbar_location = None
-# 		q2.yaxis.axis_label = f"Abs. error ({(self.confidence*100):.0f}% CI)"
-# 		q2.xaxis.axis_label = "Sample index"
-# 		q2.x_range = Range1d(0, len(sample_index))
+def figure_error(
+	estimator: Union[Estimator, Sequence],
+	mu: Optional[float] = None,
+	threshold: Optional[float] = None,
+	absolute: bool = True,
+	title: str = "Estimator accuracy",
+	**kwargs: dict,
+):
+	from bokeh.models import Span, Range1d
+	from bokeh.plotting import figure
 
-# 		## Plot the absolute error + thresholds for convergence
-# 		abs_error_line = q2.line(sample_index, cum_abs_error, line_color="black")
-# 		abs_error_threshold = q2.line(
-# 			x=[0, sample_index[-1]], y=[self.atol, self.atol], line_dash="dashed", line_color="darkgray", line_width=1.0
-# 		)
-# 		return q2
+	## Extract samples and take averages
+	sample_vals = np.ravel(estimator.values) if isinstance(estimator, Estimator) else np.array(estimator).ravel()
+	valid_samples = ~np.isnan(sample_vals)
+	n_samples = np.sum(valid_samples)
+	sample_index = np.arange(1, n_samples + 1)
+	sample_avgs = np.cumsum(sample_vals[valid_samples]) / sample_index
+
+	fig_kwargs = dict(width=400, height=300, title=title, y_axis_location="left")
+	q = figure(**(fig_kwargs | kwargs))
+	q.xaxis.axis_label = "Sample index"
+	q.x_range = Range1d(0, len(sample_index))
+	q.toolbar_location = None
+
+	if mu is not None:
+		cum_abs_error = np.abs(mu - sample_avgs)
+	else:
+		est = MeanEstimator()
+		cc = ConfidenceCriterion()
+		abs_error, rel_error = [], []
+		for sample in sample_vals[valid_samples]:
+			est.update(sample)
+			moe, rerr = cc._error(est)
+			abs_error.append(moe)
+			rel_error.append(rerr)
+		cum_abs_error = np.array(abs_error)
+
+	if absolute:
+		q.yaxis.axis_label = f"Abs. error"
+		#  ({(self.confidence*100):.0f}% CI)
+		## Plot the absolute error + thresholds for convergence
+		q.line(sample_index, cum_abs_error, line_color="black")
+		if threshold is not None:
+			q.line(
+				x=[0, sample_index[-1]], y=[threshold, threshold], line_dash="dashed", line_color="darkgray", line_width=1.0
+			)
+		return q
+
+
 # 	else:
 # 		q1 = figure(width=300, height=150, y_axis_location="left", title=title)
 # 		q1.toolbar_location = None

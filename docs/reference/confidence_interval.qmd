@@ -1,0 +1,7 @@
+# confidence_interval { #stats.confidence_interval }
+
+```python
+confidence_interval(a, confidence=0.95, sdist='t')
+```
+
+Confidence intervals for the sample mean of a set of measurements.

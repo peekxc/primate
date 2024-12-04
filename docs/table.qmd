@@ -1,0 +1,24 @@
+---
+title: "Table of matrix functions"
+---
+
+Listed below is a table of some common matrix functions, some of their application domains, and their corresponding NumPy/SciPy 
+calls (under each respective `linalg` module). 
+
+| **name**       | **matrix function**       | **Applications**                          | **numpy call**                     |
+|----------------|---------------------------|-------------------------------------------|------------------------------------|
+| identity       | $A$                      | Basic matrix operations                   | `A`                                |
+| log            | $\log(A)$                | Determinant, entropy-like measures        | `logm(A)`                         |
+| exp            | $e^A$                    | Dynamical systems, graph diffusion        | `expm(A)`                         |
+| inv            | $A^{-1}$                 | Stability analysis, linear systems        | `inv(A)`                          |
+| sign           | $\text{sgn}_\epsilon(A)$ | Rank approximation, low-rank modeling     | `U @ U.T`                         |
+| sqrt           | $A^{1/2}$                | Diffusion, kernel methods                 | `sqrtm(A)`                        |
+| square         | $A^2$                    | Energy measures, stability                | `A @ A`                           |
+| topk            | $P_A$ (eigenspace)       | Dim. reduction, feature extraction        | Custom projection matrix          |
+| tikhonov       | $(A + \lambda I)^{-1}$   | Regularized inversion, stability          | `inv(A + lambda * eye(n))`        |
+| exp           | $e^{-tA}$                | Diffusion on graphs, spectral clustering  | `expm(-t * A)`                    |
+| pagerank       | $(I - \alpha A)^{-1}v$   | Network centrality, web ranking           | Iterative solver                  |
+
+<br/>
+
+If you know of another useful or commonly used matrix function, feel feel to make a PR to add it! 

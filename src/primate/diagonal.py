@@ -31,9 +31,10 @@ def diag(
 	Parameters:
 		A: real symmetric matrix or linear operator.
 		pdf: Choice of zero-centered distribution to sample random vectors from.
-		estimator: Type of estimator to use for convergence testing. See details.
+		converge: Convergence criterion to use for convergence testing. See details.
 		seed: Seed to initialize the `rng` entropy source. Set `seed` > -1 for reproducibility.
 		full: Whether to return additional information about the computation.
+		callback: Callable to execute between each iteration.
 
 	Returns:
 		Estimate the diagonal of $A$. If `full = True`, additional information about the computation is also returned.
