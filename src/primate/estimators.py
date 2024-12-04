@@ -10,7 +10,7 @@ from typing import Callable, Iterable, Literal, Optional, Protocol, Sized, Union
 import numpy as np
 import scipy as sp
 
-from .typing import restrict_kwargs, setdiff_kwargs
+from .typing import restrict_kwargs
 from .stats import Covariance
 
 

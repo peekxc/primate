@@ -1,0 +1,203 @@
+---
+title: "Quickstart"
+---
+
+`primate` contains a variety of algorithms for estimating quantities from matrices and matrix functions, with a focus 
+on common quantities of interest, such as the trace or the diagonal. This page briefly outlines the variety of options
+`primate` offers to approximate these quantities, and how to configure these approximations per use case. 
+
+```{python}
+#| echo: false
+#| output: false
+from bokeh.plotting import figure, show
+from bokeh.io import output_notebook
+output_notebook()
+import numpy as np
+np.random.seed(1234)
+```
+
+## Implicit matrix representations 
+
+In all of the examples below, by the term _matrix_ we mean generically anything that comes with an associated 
+$v \mapsto Av$ capability via and overloaded `__matvec__` or `__matmul__` magic. While this includes dense matrices, 
+such as those used by e.g. NumPy and PyTorch, is also includes [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html)
+and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator). 
+Because the latter mots option need not store any part of `A` explicitly, such operators are referred to as _implicit_ matrix 
+representations. 
+<!-- All of `primate`'s estimators work out-of-the-box with Numpy matrices, [sparse matrices](https://docs.scipy.org/doc/scipy/reference/sparse.html), and [LinearOperator's](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html#linearoperator).  -->
+
+## Trace estimation 
+
+The _implicit matrix trace estimation_ problem is to estimate the trace using *only* $v \mapsto Av$ applications: 
+
+$$ \mathrm{tr}(A) = \sum\limits_{i=1}^n A_{ii} = \sum\limits_{i=1}^n \lambda_i = \sum\limits_{i=1}^n e_i^T A e_i $$
+
+This _implicit trace_ estimators are available in the`primate.trace`, which include the Girard-Hutchinson estimator (`hutch`), the improved Hutch++ (`hutchpp`), and XTrace (`xtrace`):
+
+```{python}
+from primate.trace import hutch, hutchpp, xtrace
+from primate.random import symmetric
+rng = np.random.default_rng(1234)      # for reproducibility 
+A = symmetric(150, pd=True, seed=rng)  # random PD matrix 
+
+print(f"Trace   :  {A.trace():6f}")   ## Actual trace
+print(f"Hutch   :  {hutch(A):6f}")    ## Crude Monte-Carlo estimator
+print(f"Hutch++ :  {hutchpp(A):6f}")  ## Monte-Carlo estimator w/ deflation 
+print(f"XTrace  :  {xtrace(A):6f}")   ## Epperly's algorithm
+```
+
+If the spectral sum of interest is comprised of summing eigenvalues under composition with some spectral function $f(\lambda)$, i.e. of the form: 
+
+$$ \mathrm{tr}(f(A)) = \sum\limits_{i=1}^n f(A)_{ii} = \sum\limits_{i=1}^n f(\lambda_i) = \sum\limits_{i=1}^n e_i^T f(A) e_i $$
+
+Then you may use the `matrix_function` API to construct a `LinearOperator` that approximates matrix function applications $v \mapsto f(A)v$. 
+To do this, simply call `matrix_function(A, fun=...)` where `fun` is either: 
+
+1. a string representing the name of one of a built-in matrix function, or
+2. the corresponding spectral function as a `Callable`
+
+For example, one might compute the log-determinant of a positive definite matrix as follows:
+
+```{python}
+from primate.operators import matrix_function, IdentityOperator
+M = matrix_function(A, fun="log") # or fun=np.log 
+
+print(f"logdet(A) :  {np.log(np.linalg.det(A)):6f}")
+print(f"tr(log(A)):  {np.sum(np.log(np.linalg.eigvalsh(A))):6f}")
+print(f"Hutch     :  {hutch(M):6f}")
+print(f"Hutch++   :  {hutchpp(M):6f}")
+print(f"XTrace    :  {xtrace(M):6f}")
+```
+
+## Diagonal estimation 
+
+The diagonals of matrices and matrix functions (implicitly or explicitly represented) can also be estimated via nearly identical API used for the trace.  
+
+```{python}
+from primate.estimators import arr_summary
+from primate.diagonal import diag, xdiag
+
+d1 = A.diagonal()
+d2 = diag(A, rtol=1e-4)
+d3 = xdiag(A)
+
+print(f"Diagonal (true): {arr_summary(d1)}")
+print(f"Diagonal Hutch : {arr_summary(d2)}")
+print(f"Diagonal XDiag : {arr_summary(d3)}")
+```
+
+## Matrix function approximation 
+
+In `primate`, the matrix function $f(A)$ is not constructed explicitly but instead the action $v \mapsto f(A)v$ is approximated with a fixed-degree Krylov expansion. This can be useful when, for example, the matrix $A$ itself is so large that the corresponding (typically dense) matrix function $f(A) \in \mathbb{R}^{n \times n}$ simply is too large to be explicitly represented. If you just want to approximate the action of a matrix function for a single vector $v \in \mathbb{R}^n$, simply supply the vector and the matrix alongside the `matrix_function` call: 
+
+```{python}
+from primate.operators import matrix_function
+v = np.random.uniform(size=A.shape[0])
+y = matrix_function(A, fun=np.exp, v=v)
+print(f"f(A)v = {arr_summary(y.ravel())}")
+```
+
+Alternatively, if you prefer an object-oriented approach (or you plan on doing multiple matvecs), you can construct a `MatrixFunction` instance and use it like any other `LinearOperator`: 
+
+```{python}
+from primate.operators import MatrixFunction
+ExpA = MatrixFunction(A, fun=np.exp)
+y = ExpA @ v
+print(f"exp(A)v = {arr_summary(y)}")
+```
+
+If you don't supply a vector `v` to the `matrix_function` call, a `MatrixFunction` instance is constructed using whatever additional arguments are passed in and returned. Note some function specializations are inherently more difficult to approximate and can depend on the smoothness of $f$ and the conditioning of the corresponding operator $f(A)$; in general, a `MatrixFunction` instance with degree $k$ approximates the action $v \mapsto f(A)v$ about as well as the operator $p(A)$, where $p$ is a degree $2k-1$ polynomial interpolant of $f$. 
+
+```{python}
+from scipy.linalg import expm
+ExpA = expm(A)
+ExpA0 = MatrixFunction(A, fun=np.exp, deg=5, orth=0)
+ExpA1 = MatrixFunction(A, fun=np.exp, deg=20, orth=0)
+ExpA2 = MatrixFunction(A, fun=np.exp, deg=50, orth=50)
+
+w = ExpA @ v
+x = ExpA0 @ v
+y = ExpA1 @ v 
+z = ExpA2 @ v
+
+print(f"Deg-5 approx error  (no reorth.)   : {np.linalg.norm(w - x)}")
+print(f"Deg-20 approx error (no reorth.)   : {np.linalg.norm(w - y)}")
+print(f"Deg-50 approx error (full reorth.) : {np.linalg.norm(w - z)}")
+```
+
+As you can see, for smoother matrix functions (like $\mathrm{exp}(A)$), even a low degree Krylov expansion can be more than sufficient for many application purposes---all without any re-orthogonalization! See the matrix function guide for more background on this. 
+
+## Configuring the output
+
+<!-- By default, the various estimators offered by `primate` simply return the estimated quantity under reasonable default parameter settings. However, in many applications one would like to have greater control over both the computation itself and the type of information collected during execution.  -->
+
+Passing `full=True` returns additional information about the computation in the form of `EstimatorResult` (along with the estimate itself), which contains information about execution itself, convergence information of the estimator, and other status messages. 
+
+For example, with the default `converge="confidene"` criterion, the margin of error of a default-constructed confidence interval is returned: 
+```{python}
+rng = np.random.default_rng(1234) # for reproducibility
+est, info = hutch(A, converge="confidence", full=True, seed=rng)
+print(info.message)
+```
+
+A more visual way of viewing the sample values and the corresponding estimate as a function of the sample size is to plot the sequence with 
+the `figure_sequence` function (note this requires saving the samples with `record=True`):
+```{python}
+#| echo: true
+from primate.plotting import figure_sequence
+
+est, info = hutch(A, full=True, record=True, seed=rng)
+p = figure_sequence(info.estimator.values)
+show(p)
+```
+
+You can also pass a callback function, which receives as its only argument an `EstimatorResult` instance. 
+This can be useful for quickly monitoring convergence status, saving intermediate information, etc. 
+
+```{python}
+from primate.estimators import EstimatorResult
+def hutch_callback(result: EstimatorResult):
+	if (result.nit % 10) == 0:
+		print(result.criterion.message(result.estimator))
+
+est, info = hutch(A, batch=10, converge="confidence", callback=hutch_callback, seed=rng)
+```
+
+
+
+
+<!-- For example, consider applying the `sign` function at some tolerance level $\epsilon$:
+
+$$ \mathrm{sign}_\epsilon(x) = \begin{align} 1 & x \geq \epsilon \\ 0 & \text{otherwise} \end{align} $$
+
+The spectral sum defined by applying this function corresponds to the numerical rank of the operator, which is an interesting and sometimes useful quantity to estimate. However, the sign function itself is discontinuous (at $\epsilon$) and otherwise not smooth; thus, it cannot be well approximated by any polynomial of finite degree. Non-analytic functions such as these can prove difficult to approximate, as shown below:
+
+```{python}
+ew = np.sort(np.random.uniform(size=150, low=0, high=1))
+ew[:30] = 0.0
+A = symmetric(150, ew = ew, pd = False)
+M = matrix_function(A, fun="numrank")
+
+print(f"numrank(A): {np.linalg.matrix_rank(A)}")
+print(f"GR approx:  {hutch(M)}")
+print(f"Hutch++ :   {hutchpp(M)}")
+print(f"XTrace:     {xtrace(M)}")
+``` -->
+<!-- from timeit import timeit
+timeforlan = timeit(lambda: ExpA @ v, number=100)/100
+
+timeforexpmA = timeit(lambda: expm(A), number=100)/100
+B = expm(A)
+timeforexpmAv = timeit(lambda: B @ v, number=100)/100
+
+sample_index = 1 + np.arange(30)
+timeforsp = timeforexpmA + timeforexpmAv * sample_index
+timeformf = timeforlan * sample_index
+
+p = figure(width=350, height=200)
+
+p.line(sample_index, timeforsp, color='red')
+p.scatter(sample_index, timeforsp, color='red',  size=1)
+p.line(sample_index, timeformf, color='blue')
+p.scatter(sample_index, timeformf, color='blue', size=1)
+show(p) -->

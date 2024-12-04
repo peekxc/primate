@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 from typing import Optional, Union, Sequence
-from .estimators import Estimator, EstimatorResult, ConfidenceCriterion, MeanEstimator
+from .estimators import Estimator, ConfidenceCriterion, MeanEstimator
 
 
 def figure_csm(values: np.ndarray, **kwargs):
@@ -122,7 +122,7 @@ def figure_error(
 	title: str = "Estimator accuracy",
 	**kwargs: dict,
 ):
-	from bokeh.models import Span, Range1d
+	from bokeh.models import Range1d
 	from bokeh.plotting import figure
 
 	## Extract samples and take averages
@@ -152,7 +152,7 @@ def figure_error(
 		cum_abs_error = np.array(abs_error)
 
 	if absolute:
-		q.yaxis.axis_label = f"Abs. error"
+		q.yaxis.axis_label = "Abs. error"
 		#  ({(self.confidence*100):.0f}% CI)
 		## Plot the absolute error + thresholds for convergence
 		q.line(sample_index, cum_abs_error, line_color="black")
