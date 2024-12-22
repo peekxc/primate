@@ -4,10 +4,9 @@ import numpy as np
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, eigsh
 from scipy.sparse.linalg._interface import IdentityOperator
 
-from primate.special import param_callable
-
-from .lanczos import _lanczos
 from .integrate import quadrature
+from .lanczos import _lanczos
+from .special import param_callable
 from .tridiag import eigh_tridiag
 
 
@@ -46,12 +45,19 @@ class MatrixFunction(LinearOperator):
 		A: numpy array, sparse matrix, or LinearOperator.
 		fun: optional spectral function to associate to the operator.
 		deg: degree of the Krylov expansion to perform.
+		orth: number of Lanczos vectors to orthogonalize against.
 		dtype: floating point dtype to execute in. Must be float64 or float32.
 		kwargs: keyword arguments to pass to the Lanczos method.
 	"""
 
 	def __init__(
-		self, A: np.ndarray, fun: Optional[Callable] = None, deg: int = 20, dtype: np.dtype = np.float64, **kwargs: dict
+		self,
+		A: np.ndarray,
+		fun: Optional[Callable] = None,
+		deg: int = 20,
+		orth: int = 3,
+		dtype: np.dtype = np.float64,
+		**kwargs: dict,
 	) -> None:
 		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
@@ -71,7 +77,6 @@ class MatrixFunction(LinearOperator):
 		self._Q = np.zeros((A.shape[0], self._deg), dtype=dtype, order="F")
 		assert self._Q.flags["F_CONTIGUOUS"] and self._Q.flags["WRITEABLE"] and self._Q.flags["OWNDATA"]
 		self._rtol = 1e-8
-		orth = kwargs.get("orth", 3)
 		self._orth = self._deg if orth < 0 or orth > self._deg else orth
 		self._A = A
 		self.shape = A.shape
@@ -147,7 +152,7 @@ class MatrixFunction(LinearOperator):
 
 
 ## NOTE: this could act as a nice way of handling keyword arguments in kwargs to generate a MF
-def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.ndarray = None, deg: int = 20):
+def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: Optional[np.ndarray] = None, deg: int = 20):
 	# (a, b), Q = lanczos(A, v0=v, deg=deg, return_basis=True)  # O(nd)  space
 	# rw, Y = eigh_tridiag(a, b)  # O(d^2) space
 	# ## Equivalent to |x| * Q @ Y @ diag(rw) @ Y.T @ e_1
@@ -160,7 +165,7 @@ def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: np.nda
 class Toeplitz(LinearOperator):
 	"""Matrix-free operator for representing Toeplitz or circulant matrices."""
 
-	def __init__(self, c: np.ndarray, r: np.ndarray = None, dtype=None):
+	def __init__(self, c: np.ndarray, r: Optional[np.ndarray] = None, dtype: Optional[np.dtype] = None):
 		self.c = np.array(c)
 		self.r = np.array(c if r is None else r)
 		self._d = np.concatenate((self.c, [0], np.flip(self.r[1:])))

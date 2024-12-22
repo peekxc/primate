@@ -4,14 +4,15 @@
 
 import typing
 from dataclasses import dataclass, field
-from operator import and_, or_, not_
+from operator import and_, not_, or_
 from typing import Callable, Iterable, Literal, Optional, Protocol, Sized, Union, runtime_checkable
+from numpy.typing import ArrayLike
 
 import numpy as np
 import scipy as sp
 
+from .stats import Mean, Covariance
 from .typing import restrict_kwargs
-from .stats import Covariance
 
 
 def arr_summary(x: Union[None, float, np.ndarray]) -> str:
@@ -41,11 +42,12 @@ class Estimator(Sized, Protocol):
 
 	n_samples: int = 0
 	values: Optional[list] = None
+	delta: Union[float, np.ndarray] = np.inf
 
 	def __len__(self) -> int:
 		return self.n_samples
 
-	def update(self, x: Union[float, np.ndarray], **kwargs: dict): ...
+	def update(self, x: ArrayLike): ...
 
 	@property
 	def estimate(self) -> Union[float, np.ndarray]: ...
@@ -88,78 +90,84 @@ class EstimatorResult:
 	def __iter__(self) -> Iterable:
 		return iter((self.estimator, self.criterion, self.estimate, self.message, self.nit, self.info))
 
-	def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs: dict):
-		self.estimator = est
-		self.criterion = converge
-		self.estimate = est.estimate
-		self.message = converge.message(est) if hasattr(converge, "message") else ""
-		self.nit = len(est)
-		self.info |= kwargs
+	# def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs: dict):
+	# 	self.estimator = est
+	# 	self.criterion = converge
+	# 	self.estimate = est.estimate
+	# 	self.message = converge.message(est) if hasattr(converge, "message") else ""
+	# 	self.nit = len(est)
+	# 	self.info |= kwargs
 
 
 class MeanEstimator(Estimator):
-	"""Sample mean estimator with stable covariance updating."""
+	"""Sample mean estimator with optional stable covariance updating."""
 
 	n_samples: int = 0
 	delta: Union[float, np.ndarray] = np.atleast_1d(np.inf)
-	cov: Optional[Covariance] = None
 	values: Optional[list] = []
 
-	def __init__(self, dim: Optional[int] = None, record: bool = False) -> None:
+	def __init__(self, dim: int = 1, covariance: bool = False, record: bool = False) -> None:
 		self.n_samples = 0
-		self.delta = np.atleast_1d(np.inf)
+		self.delta = np.full(shape=dim, fill_value=np.inf)
 		self.values = [] if record else None
-		if dim is not None:
-			dim: int = int(dim)
-			self.cov = Covariance(dim=dim)
+		if covariance:
+			self._cov = Covariance(dim=dim)
+		else:
+			self._mean = Mean(dim=dim)
 
 	@property
-	def mean(self) -> Optional[float]:
-		if self.cov is None:
-			return None
-		mu = np.atleast_1d(self.cov.mean)
-		return mu.item() if len(mu) == 1 else np.ravel(mu)
+	def mean(self) -> Union[float, np.ndarray]:
+		if hasattr(self, "_cov"):
+			mu = np.atleast_1d(self._cov.mean())
+			return mu.item() if len(mu) == 1 else np.ravel(mu)
+		else:
+			return self._mean()
 
 	## ndim = 1, x.shape = (n,) => we have n samples of 1-d
 	## ndim = 2, x.shape = (n,m) => we have n samples of m-d
-	def update(self, x: Union[float, np.ndarray]):
+	def update(self, x: ArrayLike) -> None:
 		x = np.atleast_1d(x)
 		x = x[:, None] if x.ndim == 1 else x
-		if self.cov is None:
-			self.cov = Covariance(x.shape[1])
-			self.delta = np.full(x.shape[1], np.inf)
-		old_mu = self.cov.mu.copy()
-		self.cov.update(x)
-		self.delta = self.cov.mu - old_mu
+		if hasattr(self, "_cov"):
+			old_mu = self._cov.mu.copy()
+			self._cov.update(x)
+			self.delta = self._cov.mu - old_mu
+		else:
+			old_mu = self._mean.mu.copy()
+			self._mean.update(x)
+			self.delta = self._mean.mu - old_mu
 		self.n_samples += x.shape[0]
 		if self.values is not None:
 			self.values.extend(x)
 
 	@property
-	def estimate(self) -> Union[float, np.ndarray, None]:
+	def estimate(self) -> Union[float, np.ndarray]:
 		return self.mean
 
 
 class ControlVariableEstimator(MeanEstimator):
-	def __init__(self, ecv: Union[float, np.ndarray], alpha: Union[float, np.ndarray, None] = None, **kwargs: dict):
-		super().__init__(**kwargs)
+	def __init__(self, ecv: Union[float, np.ndarray], alpha: Union[float, np.ndarray, None] = None, record: bool = False):
 		ecv: np.ndarray = np.atleast_1d(ecv).ravel()
+		super().__init__(len(ecv), covariance=False, record=record)
 		if alpha is not None:
 			alpha: np.ndarray = np.atleast_1d(alpha).ravel()
-			assert len(ecv) == len(alpha), "Coefficients alpha must have same length as the control variables."
+			assert len(ecv) == len(alpha), "Coefficients alpha must have same length as the control variables."  # type: ignore
 		self.alpha = alpha
 		self.ecv = ecv
 		self.cov = Covariance(dim=len(ecv) + 1)
 		self._estimate_cor = alpha is None
 		self.n_samples = 0
+		self.delta = np.inf
 
 	def __len__(self) -> int:
 		return self.n_samples
 
-	def update(self, samples: np.ndarray, cvs: np.ndarray):
-		self.cov.update(np.c_[samples, cvs])
+	@typing.no_type_check
+	def update(self, samples: ArrayLike):
+		samples: np.ndarray = np.atleast_1d(samples)
+		self.cov.update(samples)  # type: ignore
 		self.n_samples = self.cov.n
-		C = self.cov.covariance(ddof=1)
+		C = self.cov(ddof=1)
 		if self._estimate_cor:
 			C_01, C_11 = C[1:, 0], C[1:, 1:]
 			self.alpha = (C[0, 1] / C[1, 1]) if self.cov.dim == 2 else np.linalg.solve(C_11, C_01)
@@ -272,14 +280,14 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	def _error(self, est: MeanEstimator):
 		if est.n_samples < 3:
 			return (np.inf, np.inf)
-		std_dev = est.cov.covariance() ** (1 / 2)
+		std_dev = est.cov() ** (1 / 2)
 		std_error = std_dev / np.sqrt(est.n_samples)
 		rel_error = abs(std_error / est.estimate)
 		score = self.t_scores[est.n_samples] if est.n_samples < 30 else self.z
 		margin_of_error = score * std_error
 		return (margin_of_error, rel_error)
 
-	def __call__(self, est: MeanEstimator) -> bool:
+	def __call__(self, est: Estimator) -> bool:
 		assert isinstance(est, MeanEstimator), "Must be a mean estimator"
 		moe, rerr = self._error(est)
 		return moe <= self.atol or rerr <= self.rtol

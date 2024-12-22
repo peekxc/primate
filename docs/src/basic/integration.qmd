@@ -35,17 +35,20 @@ class DiagonalOp(LinearOperator):
 
 Note that by following the subclassing rules of [SciPy's LinearOperator](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html), this class inherits a `.matvec()` method and thus satisfies the constraints above. 
 
-Alternativelu, using SciPy's `aslinearoperator`, this can also be done in a one-liner: 
+Alternatively, using SciPy's `aslinearoperator`, this can also be done more succinctly: 
 
 ```python
 from scipy.sparse.linalg import aslinearoperator 
-aslinearoperator(type('DiagonalOp', (object,), {'shape': (len(d),)*2, 'matvec': lambda x: np.atleast_2d(d).T * v}))
+aslinearoperator(type('DiagonalOp', (object,), {
+	'shape': (len(d),)*2, 
+	'matvec': lambda x: np.atleast_2d(d).T * v
+}))
 # <_CustomLinearOperator with dtype=float64>
 ```
 
 ## C++ usage 
 
-Similarly, to call any C++ function, such `hutch` or `lanczos`, simply pass any type with `.shape()` and `.matvec()` member functions: 
+On the C++ side, it is similar: simply pass any type with `.shape()` and `.matvec()` member functions: 
 
 ```cpp
 class LinOp {

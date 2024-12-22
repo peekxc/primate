@@ -1,27 +1,69 @@
 from numbers import Number
+from typing import Union
 import numpy as np
 import scipy as sp
 
 
-class Covariance:
+class Mean:
+	def __init__(self, dim: int = 1):
+		self.dim = dim
+		self.n = 0
+		self.mu = np.zeros(dim)
+
+	def __call__(self) -> Union[float, np.ndarray]:
+		if self.n == 0:
+			return np.nan
+		return self.mu.item() if self.dim == 1 else self.mu
+
+	def mean(self) -> Union[float, np.ndarray]:
+		if self.n == 0:
+			return np.nan
+		return self.mu.item() if self.dim == 1 else self.mu
+
+	def update(self, X: Union[float, np.ndarray]) -> None:
+		"""Update sample mean estimates based on new observations.
+
+		Parameters:
+			X: (batch_size, dim)-array representing new observations
+		"""
+		X = np.atleast_1d(X)
+		X = X[:, None] if X.ndim == 1 else X
+		assert X.shape[1] == self.dim, f"Expected shape (n, {self.dim}), got {X.shape}"
+
+		## Compute batch mean and update overall mean
+		batch_mean = X.mean(axis=0)
+		delta_mean = batch_mean - self.mu
+		new_n = self.n + X.shape[0]
+		self.mu += (X.shape[0] / new_n) * delta_mean
+		self.n = new_n
+
+
+class Covariance(Mean):
 	"""Updateable covariance matrix.
 
 	Uses Welford's algorithm to stably update the sample mean and (co)variance estimates.
 	"""
 
 	def __init__(self, dim: int = 1):
-		self.dim = dim
-		self.n = 0
-		self.mu = np.zeros(dim)
+		super().__init__(dim)
 		self.S = np.zeros((dim, dim))
 
-	@property
-	def mean(self):
-		if self.n == 0:
-			return np.nan
-		return self.mu.item() if self.dim == 1 else self.mu
+	def __call__(self, ddof: int = 1) -> Union[float, np.ndarray]:
+		"""Covariance matrix of the observations.
 
-	def update(self, X: np.ndarray) -> None:
+		Parameters:
+		  ddof: Delta degrees of freedom (1 for sample covariance, 0 for population)
+
+		Returns:
+		  Current covariance matrix estimate of shape (dim, dim)
+		"""
+		# assert ddof < self.n, f"Need more than {ddof} samples for ddof={ddof}"
+		if (self.n - ddof) <= 0:
+			return np.inf if self.dim else np.diag(np.inf, self.dim)
+		cov = self.S / (self.n - ddof)
+		return cov.item() if self.dim == 1 else cov
+
+	def update(self, X: Union[float, np.ndarray]) -> None:
 		"""Update mean and (co)variance estimates based on new observations.
 
 		Parameters:
@@ -43,20 +85,7 @@ class Covariance:
 		self.S += (X_centered.T @ X_centered) + (self.n * X.shape[0] / new_n) * X_shift
 		self.n = new_n
 
-	def covariance(self, ddof: int = 1) -> np.ndarray:
-		"""Covariance matrix of the observations.
-
-		Parameters:
-		  ddof: Delta degrees of freedom (1 for sample covariance, 0 for population)
-
-		Returns:
-		  Current covariance matrix estimate of shape (dim, dim)
-		"""
-		# assert ddof < self.n, f"Need more than {ddof} samples for ddof={ddof}"
-		if (self.n - ddof) <= 0:
-			return np.inf if self.dim else np.diag(np.inf, self.dim)
-		cov = self.S / (self.n - ddof)
-		return cov.item() if self.dim == 1 else cov
+	covariance = __call__
 
 
 ## See also:

@@ -15,6 +15,7 @@ from primate.stats import confidence_interval
 
 
 def test_MeanEstimator():
+	## Test basic dim = 1
 	rng = np.random.default_rng(1234)
 	mu = MeanEstimator()
 	samples = []
@@ -23,6 +24,25 @@ def test_MeanEstimator():
 		mu.update(samples[-10:])
 	assert np.allclose(np.mean(samples), mu.mean)
 	assert isinstance(mu.estimate, float)
+
+	## Test dim > 1
+	rng = np.random.default_rng(1234)
+	mu = MeanEstimator(dim=2)
+	samples = []
+	for _ in range(25):
+		samples.extend(rng.normal(size=(10, 2)))
+		mu.update(samples[-10:])
+	assert np.allclose(np.mean(samples, axis=0), mu.mean)
+
+	## Test covariance
+	rng = np.random.default_rng(1234)
+	mu = MeanEstimator(dim=2, covariance=True)
+	samples = []
+	for _ in range(25):
+		samples.extend(rng.normal(size=(10, 2)))
+		mu.update(samples[-10:])
+	assert np.allclose(np.mean(samples, axis=0), mu.mean)
+	assert np.allclose(np.cov(samples, rowvar=False), mu._cov.covariance())
 
 
 ## From Variance reduction book

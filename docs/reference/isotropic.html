@@ -520,7 +520,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="random.isotropic" class="level1">
 <h1>isotropic</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>random.isotropic(size<span class="op">=</span><span class="va">None</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, seed<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>random.isotropic(size<span class="op">=</span><span class="va">None</span>, pdf<span class="op">=</span><span class="st">'rademacher'</span>, seed<span class="op">=</span><span class="va">None</span>, out<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Generates random vectors from a specified isotropic distribution.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
@@ -548,7 +548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td>pdf</td>
-<td>Union[Callable, str]</td>
+<td>str</td>
 <td>Isotropic distribution to sample from. Must be “rademacher”, “sphere”, or “normal”.</td>
 <td><code>'rademacher'</code></td>
 </tr>
@@ -556,6 +556,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>seed</td>
 <td>Union[int, np.random.Generator, None]</td>
 <td>Seed or generator for pseudorandom number generation.</td>
+<td><code>None</code></td>
+</tr>
+<tr class="even">
+<td>out</td>
+<td>Optional[np.ndarray]</td>
+<td>Output array to fill values in-place.</td>
 <td><code>None</code></td>
 </tr>
 </tbody>

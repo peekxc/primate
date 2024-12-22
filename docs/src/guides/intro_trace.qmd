@@ -1,6 +1,9 @@
 ---
 title: "Introduction to trace estimation with `primate`"
 bibliography: ../references.bib
+format:
+  html:
+    html-math-method: katex
 ---
 
 `primate` contains a variety of methods for estimating quantities from _matrix functions_. One popular such quantity is the [trace](https://en.wikipedia.org/wiki/Trace_(linear_algebra)) of $f(A)$, for some generic $f: [a,b] \to \mathbb{R}$ defined on the spectrum of $A$:

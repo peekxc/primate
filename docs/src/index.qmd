@@ -9,9 +9,9 @@ format:
 
 $$ f(A) \triangleq U f(\Lambda) U^{\intercal}, \quad \quad f : [a,b] \to \mathbb{R}$$
 
-This definition is quite general in that different parameterizations of $f$ produce a variety of spectral quantities, including the matrix inverse $A^{-1}$, the matrix exponential $\mathrm{exp}(A)$, the matrix logarithm $\mathrm{log}(A)$, and so on. 
+Different parameterizations of $f$ encompass a wide variety of spectral quantities, including the matrix inverse $A^{-1}$, the matrix exponential $\mathrm{exp}(A)$, the matrix logarithm $\mathrm{log}(A)$, etc. 
 
-Composing these with _trace_ and _diagonal_ estimators yields approximations for the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), the [Heat Kernel Signature](https://en.wikipedia.org/wiki/Heat_kernel_signature), and so on. 
+Similarly, _trace_ or _diagonal_ estimators may be used to approximate the [numerical rank](https://doi.org/10.1016/j.amc.2007.06.005), the [log-determinant](https://en.wikipedia.org/wiki/Determinant#Trace), the [Schatten norms](https://en.wikipedia.org/wiki/Schatten_norm), the [eigencount](https://doi.org/10.1002/nla.2048), the [Estrada index](https://en.wikipedia.org/wiki/Estrada_index), the [Heat Kernel Signature](https://en.wikipedia.org/wiki/Heat_kernel_signature), etc. 
 
 <!-- `primate` also exports functionality for estimating the [spectral density](https://doi.org/10.1137/130934283) and for computing Gaussian quadrature rules from Jacobi matrices.  -->
 

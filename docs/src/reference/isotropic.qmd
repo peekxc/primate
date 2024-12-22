@@ -1,7 +1,7 @@
 # isotropic { #random.isotropic }
 
 ```python
-random.isotropic(size=None, pdf='rademacher', seed=None)
+random.isotropic(size=None, pdf='rademacher', seed=None, out=None)
 ```
 
 Generates random vectors from a specified isotropic distribution.
@@ -11,8 +11,9 @@ Generates random vectors from a specified isotropic distribution.
 | Name   | Type                                    | Description                                                                         | Default        |
 |--------|-----------------------------------------|-------------------------------------------------------------------------------------|----------------|
 | size   | Union\[int, tuple, None\]               | Output shape to generate.                                                           | `None`         |
-| pdf    | Union\[Callable, str\]                  | Isotropic distribution to sample from. Must be "rademacher", "sphere", or "normal". | `'rademacher'` |
+| pdf    | str                                     | Isotropic distribution to sample from. Must be "rademacher", "sphere", or "normal". | `'rademacher'` |
 | seed   | Union\[int, np.random.Generator, None\] | Seed or generator for pseudorandom number generation.                               | `None`         |
+| out    | Optional\[np.ndarray\]                  | Output array to fill values in-place.                                               | `None`         |
 
 ## Returns {.doc-section .doc-section-returns}
 

@@ -578,9 +578,14 @@ window.Quarto = {
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Lanczos method for symmetric tridiagonalization.</p>
-<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional modifications to support varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization.</p>
-<p>The Lanczos method builds a tridiagonal <code>T</code> from a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display"> Q^T A Q  = T </span> Unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;sophisticated restarting, deflation, and selective-reorthogonalization steps, this method simply executes <code>deg</code> steps of the Lanczos method with the supplied <code>v0</code> and returns the diagonals of the resulting tridiagonal matrix <code>T</code>.</p>
-<p>Rayleigh-Ritz approximations of the eigenvalues of <code>A</code> can be further obtained by diagonalizing <code>T</code> via any symmetric tridiagonal eigenvalue solver, <code>scipy.linalg.eigh_tridiagonal</code> though note unlike <code>eigsh</code> no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>. Supplying either negative values or values larger than <code>deg</code> for <code>orth</code> will result in full re-orthogonalization, though note the number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
+<p>This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, which builds a tridiagonal <code>T</code> from a symmetric <code>A</code> via an orthogonal change-of-basis <code>Q</code>: <span class="math display">
+        \begin{align*}
+        K &amp;= [v, Av, A^2 v, ..., A^{n-1}v] &amp;&amp; \\
+        Q &amp;= [q_1, q_2, ..., q_{n} ] \gets \mathrm{qr}(K) &amp;&amp;  \\
+        T &amp;= Q^T A Q &amp;&amp;
+        \end{align*}
+</span> Note that unlike other Lanczos implementations (e.g.&nbsp;SciPy’s <code>eigsh</code>), which includes e.g.&nbsp;restarting, &amp; deflation steps, this method simply executes <code>deg</code> steps of the Lanczos method with <code>orth</code> vector reorthogonalizations (per step) and returns the entries of <code>T</code>.</p>
+<p>This implementation supports varying degrees of re-orthogonalization. In particular, <code>orth=0</code> corresponds to no re-orthogonalization, <code>orth &lt; deg</code> corresponds to partial re-orthogonalization, and <code>orth &gt;= deg</code> corresponds to full re-orthogonalization. The number of matvecs scales linearly with <code>deg</code> and the number of inner-products scales quadratically with <code>orth</code>.</p>
 <section id="parameters" class="level2 doc-section doc-section-parameters">
 <h2 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h2>
 <table class="caption-top table">

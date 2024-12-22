@@ -1,10 +1,10 @@
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 import numpy as np
 from scipy.sparse import sparray, spdiags
 from scipy.sparse.linalg import LinearOperator
 
-from . import _lanczos
+from . import _lanczos  # type: ignore
 from .tridiag import eigh_tridiag, eigvalsh_tridiag
 
 
@@ -33,23 +33,24 @@ def lanczos(
 	dtype: Optional[np.dtype] = None,
 	**kwargs: Any,
 ) -> tuple:
-	"""Lanczos method for symmetric tridiagonalization.
+	r"""Lanczos method for symmetric tridiagonalization.
 
-	This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional
-	modifications to support varying degrees of re-orthogonalization. In particular, `orth=0` corresponds to no re-orthogonalization,
-	`orth < deg` corresponds to partial re-orthogonalization, and `orth >= deg` corresponds to full re-orthogonalization.
-
-	The Lanczos method builds a tridiagonal `T` from a symmetric `A` via an orthogonal change-of-basis `Q`:
-	$$ Q^T A Q  = T $$
-	Unlike other Lanczos implementations (e.g. SciPy's `eigsh`), which includes e.g. sophisticated restarting,
-	deflation, and selective-reorthogonalization steps, this method simply executes `deg` steps of the Lanczos method with
-	the supplied `v0` and returns the diagonals of the resulting tridiagonal matrix `T`.
-
-	Rayleigh-Ritz approximations of the eigenvalues of `A` can be further obtained by diagonalizing `T` via any
-	symmetric tridiagonal eigenvalue solver, `scipy.linalg.eigh_tridiagonal` though note unlike `eigsh` no checking is performed
-	for 'ghost' or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing `orth`
-	and `deg`. Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization,
-	though note the number of matvecs scales linearly with `deg` and the number of inner-products scales quadratically with `orth`.
+	This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,
+	which builds a tridiagonal `T` from a symmetric `A` via an orthogonal change-of-basis `Q`:
+	$$ 
+		\begin{align*}
+		K &= [v, Av, A^2 v, ..., A^{n-1}v] && \\
+		Q &= [q_1, q_2, ..., q_{n} ] \gets \mathrm{qr}(K) &&  \\
+		T &= Q^T A Q &&
+		\end{align*}
+	$$
+	Note that unlike other Lanczos implementations (e.g. SciPy's `eigsh`), which includes e.g. restarting,
+	& deflation steps, this method simply executes `deg` steps of the Lanczos method with
+	`orth` vector reorthogonalizations (per step) and returns the entries of `T`.
+	
+	This implementation supports varying degrees of re-orthogonalization. In particular, `orth=0` corresponds to no 
+	re-orthogonalization, `orth < deg` corresponds to partial re-orthogonalization, and `orth >= deg` corresponds to full re-orthogonalization.
+	The number of matvecs scales linearly with `deg` and the number of inner-products scales quadratically with `orth`.
 
 	Parameters:
 		A: Symmetric operator to tridiagonalize.
@@ -115,7 +116,32 @@ def lanczos(
 		return (a, b) if not return_basis else ((a, b), Q)
 
 
-def rayleigh_ritz(A, deg: Optional[int] = None, return_eigenvectors: bool = False, method: str = "RRR", **kwargs: dict):
+def rayleigh_ritz(
+	A, deg: Optional[int] = None, return_eigenvectors: bool = False, method: str = "RRR", **kwargs: dict
+) -> Union[np.ndarray, tuple]:
+	"""Computes Rayleigh-Ritz eigenvalue approximations of a symmetric matrix.
+
+	This function computes Rayleigh-Ritz approximations of the eigenvalues of `A` by first tri-diagonalizing it via
+	the Lanczos method up to degree `deg`, afterwards a symmetric tridiagonal solver is used.
+
+	For the `method` argument, supply either "rrr" or "tqli"; the former uses the method of Relatively Robust Representations (RRR or mR3),
+	which is the default staple used by LAPACK. If accuracy is not as important as speed, you can supply `method = "tqli"` with a custom
+	number of iterations `maxiter` to perform a variant of the QL decomposition using Givens rotations.
+
+	:::{.callout-note}
+		Unlike `eigsh` no checking is performed for 'ghost' or already converged eigenvalues. To increase the accuracy of
+		these eigenvalue approximation, try increasing `orth` and `deg`.
+	:::
+
+	Parameters:
+		A: symmetric matrix or linear operator.
+		deg: degree of the Lanczos expansion.
+		return_eigenvectors: whether to compute the eigenvectors as well.
+		method: the tridiagonal solver. See details.
+
+	Returns:
+		the rayleigh-ritz values of `A` up the prescribed degree.
+	"""
 	n: int = A.shape[0]
 	deg: int = A.shape[1] if deg is None else min(deg, A.shape[1])
 	assert deg > 0, "Number of steps must be positive!"

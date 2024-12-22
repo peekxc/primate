@@ -93,7 +93,8 @@ def hutch(
 	else:
 		converge = convergence_criterion(converge, **kwargs)
 	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
-	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
+	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.diag(np.atleast_2d((v.T @ (A @ v)))))
+	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.einsum("...i,...i->...", v.T, (A @ v).T))
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
@@ -106,8 +107,8 @@ def hutch(
 		while not converge(estimator):
 			v = pdf(size=(N, batch)).astype(f_dtype)
 			estimator.update(quad_form(v))
-			result.update(estimator, converge)
 			callback(result)
+		result.message = converge.message(estimator)
 		return (estimator.estimate, result)
 	else:
 		while not converge(estimator):
@@ -139,7 +140,8 @@ def hutchpp(
 	pdf = isotropic(pdf=pdf, seed=rng)
 
 	## Prepare quadratic form evaluator
-	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+	# quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: (v.T @ (A @ v)).item())
+	quad_form = (lambda v: A.quad(v)) if hasattr(A, "quad") else (lambda v: np.einsum("...i,...i->...", v.T, (A @ v).T))
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
@@ -159,11 +161,13 @@ def hutchpp(
 	## Full mode may not be space efficient, but is potentially vectorized, so suitable for relatively small output dimen.
 	## Uses at most O(n) memory, but potentially slower
 	## https://stackoverflow.com/questions/18541851/calculate-vt-a-v-for-a-matrix-of-vectors-v
+	# np.einsum("...i,...i->...", V.T, A.dot(V).T)
+	# np.einsum("...i,...i->...", v.T, (A @ v).T) # should one works even for n x 1
 	rng_ests = np.einsum("...i,...i->...", A @ Q, Q) if mode == "full" else np.array([quad_form(q) for q in Q.T])
 	tr_rng = np.sum(rng_ests)
 
 	## Estimate trace of the residual on the deflated subspaces
-	G = pdf(size=(N, nb), seed=rng).astype(f_dtype)
+	G = pdf(size=(N, nb)).astype(f_dtype)
 	G -= Q @ (Q.T @ G)
 	defl_ests = np.einsum("...i,...i->...", A @ G, G)  # [(g @ A @ g) for g in G[g_1, g_2, ..., g_nb]]
 	tr_defl = (1 / nb) * np.sum(defl_ests)
@@ -271,15 +275,16 @@ def xtrace(
 		converge |= convergence_criterion(converge, **kwargs)
 
 	## Setup outputs. TODO: these should really be resizable arrays
-	W = np.zeros(shape=(n, 0))  # Isotropic vectors
+	W = np.zeros(shape=(n, 0), order="F")  # Isotropic vectors
 	Y = np.zeros(shape=(n, 0))  # Im(A @ W)
-	Z = np.zeros(shape=(n, 0))  # Im(A @ orth(Y))
+	Z = np.zeros(shape=(n, 0), order="F")  # Im(A @ orth(Y))
 	Q, R = np.linalg.qr(Y, mode="reduced")
 	R_inv = np.zeros(shape=(0, 0))
 
 	## Commence the batch-iterations
 	result = EstimatorResult()
 	rng = np.random.default_rng(seed)
+	pdf = isotropic(pdf=pdf, seed=rng)
 	while not converge(estimator):
 		## Determine number of new sample vectors to generate
 		ns = min(A.shape[1] - W.shape[1], int(batch))
@@ -287,12 +292,12 @@ def xtrace(
 		## Sample a batch of random isotropic vectors
 		## TODO: replace with proper batch updates
 		## TODO: https://stackoverflow.com/questions/6042308/numpy-inverting-an-upper-triangular-matrix
-		N = isotropic(size=(ns, n), pdf=pdf, seed=rng)  # 'new' vectors
-		for eta in N:
-			y = A @ eta.T
-			Q, R = qr_insert(Q, R, u=y, k=Q.shape[1], which="col")  # rcond=FLOAT_MIN
+		N = pdf(size=(n, ns))  # 'new' vectors
+		Y = A @ N
+		for j in range(ns):
+			Q, R = qr_insert(Q, R, u=Y[:, j], k=Q.shape[1], which="col")  # rcond=FLOAT_MIN
 			R_inv = update_trinv(R_inv, R[:, -1])
-		W = np.c_[W, N.T]
+		W = np.c_[W, N]
 		Z = np.c_[Z, A @ Q[:, -ns:]]
 
 		## Expand the subspace
@@ -301,7 +306,9 @@ def xtrace(
 		## Test for convergence
 		estimator = MeanEstimator(record=record)  # degenerate approach since XTrace tracks this
 		estimator.update(t_samples.ravel())
-		result.update(estimator, converge)
 		callback(result)
 
+	result.estimator = estimator
+	result.estimate = estimator.estimate
+	result.criterion = converge
 	return (result.estimate, result) if full else result.estimate

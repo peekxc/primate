@@ -17,21 +17,22 @@ lanczos(
 
 Lanczos method for symmetric tridiagonalization.
 
-This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators, with additional
-modifications to support varying degrees of re-orthogonalization. In particular, `orth=0` corresponds to no re-orthogonalization,
-`orth < deg` corresponds to partial re-orthogonalization, and `orth >= deg` corresponds to full re-orthogonalization.
+This function implements Paiges A27 variant (1) of the Lanczos method for tridiagonalizing linear operators,
+which builds a tridiagonal `T` from a symmetric `A` via an orthogonal change-of-basis `Q`:
+$$ 
+        \begin{align*}
+        K &= [v, Av, A^2 v, ..., A^{n-1}v] && \\
+        Q &= [q_1, q_2, ..., q_{n} ] \gets \mathrm{qr}(K) &&  \\
+        T &= Q^T A Q &&
+        \end{align*}
+$$
+Note that unlike other Lanczos implementations (e.g. SciPy's `eigsh`), which includes e.g. restarting,
+& deflation steps, this method simply executes `deg` steps of the Lanczos method with
+`orth` vector reorthogonalizations (per step) and returns the entries of `T`.
 
-The Lanczos method builds a tridiagonal `T` from a symmetric `A` via an orthogonal change-of-basis `Q`:
-$$ Q^T A Q  = T $$
-Unlike other Lanczos implementations (e.g. SciPy's `eigsh`), which includes e.g. sophisticated restarting,
-deflation, and selective-reorthogonalization steps, this method simply executes `deg` steps of the Lanczos method with
-the supplied `v0` and returns the diagonals of the resulting tridiagonal matrix `T`.
-
-Rayleigh-Ritz approximations of the eigenvalues of `A` can be further obtained by diagonalizing `T` via any
-symmetric tridiagonal eigenvalue solver, `scipy.linalg.eigh_tridiagonal` though note unlike `eigsh` no checking is performed
-for 'ghost' or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing `orth`
-and `deg`. Supplying either negative values or values larger than `deg` for `orth` will result in full re-orthogonalization,
-though note the number of matvecs scales linearly with `deg` and the number of inner-products scales quadratically with `orth`.
+This implementation supports varying degrees of re-orthogonalization. In particular, `orth=0` corresponds to no 
+re-orthogonalization, `orth < deg` corresponds to partial re-orthogonalization, and `orth >= deg` corresponds to full re-orthogonalization.
+The number of matvecs scales linearly with `deg` and the number of inner-products scales quadratically with `orth`.
 
 ## Parameters {.doc-section .doc-section-parameters}
 

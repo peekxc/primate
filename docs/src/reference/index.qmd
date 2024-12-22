@@ -5,7 +5,7 @@
 | | |
 | --- | --- |
 | [lanczos](lanczos.qmd#lanczos.lanczos) | Lanczos method for symmetric tridiagonalization. |
-| [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) |  |
+| [rayleigh_ritz](rayleigh_ritz.qmd#lanczos.rayleigh_ritz) | Rayleigh-Ritz approximations of the eigenvalues of `A` can be further obtained by diagonalizing `T` via any |
 
 ## Integrate
 

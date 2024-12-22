@@ -1,6 +1,9 @@
 ---
 title: "Matrix function estimation with `primate`"
 bibliography: ../references.bib
+format:
+  html:
+    html-math-method: katex
 ---
 
 ```{python}
@@ -82,17 +85,10 @@ print(f"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}")
 ```
 
 Observe $M$ matches the ground truth $v \mapsto (A + \epsilon I)v$. In this way, one benefit of using `matrix_function` is that it allows one to approximate $f(A)$ by thinking only about what is happening at the spectral level (as opposed to the matrix level). 
-We can check the result is identical to approach (1) and (2) above: 
 
-```{python}
-np.allclose(A @ v + 0.10 * v, v_truth)
-```
+## Beyond the baseline
 
-Baseline established.
-
-## When $v \mapsto f(A)v$ is not known
-
-On the other hand, there are many situations where the explicit expression of the matrix polynomial corresponding to $f$ is analytically intractable, too computationally expensive to obtain, or simply unknown. For example, consider the map: 
+Of course, the aforementioned baseline is not useful, as an explicit expression of the matrix polynomial is already available ($A + \epsilon I$). However, there many situations where the matrix polynomial corresponding to $f$ is analytically intractable, expensive to obtain, or simply unknown. For example, consider the map: 
 
 $$v \mapsto (A + \epsilon I)^{-1} v$$
 
@@ -117,7 +113,7 @@ print(f"Max diff:    {np.max(np.abs(v_truth - np.ravel(v_test))):.6e}")
 print(f"cosine sim:  {np.dot(v_test, v_truth) / (vn * vn_approx):6e}")
 ```
 
-There is a larger degree of error compared to the base as evidenced by the $\lVert \cdot \rVert_\infty$-normed difference between `v_truth` and `v_test`, however this is to be expected, as in general approximating the action $v \mapsto A^{-1} v$ will always be more difficult that $v \mapsto A v$, even if $A$ is well-conditioned.
+There is a larger degree of error compared to the base as evidenced by the $\lVert \cdot \rVert_\infty$-normed difference between `v_truth` and `v_test`. This is to be expected, as in general approximating the action $v \mapsto A^{-1} v$ will always be more difficult that $v \mapsto A v$, even if $A$ is well-conditioned.
 
 ## Back to trace estimation 
 

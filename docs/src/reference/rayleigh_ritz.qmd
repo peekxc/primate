@@ -4,3 +4,7 @@
 rayleigh_ritz(A, deg=None, return_eigenvectors=False, method='RRR', **kwargs)
 ```
 
+Rayleigh-Ritz approximations of the eigenvalues of `A` can be further obtained by diagonalizing `T` via any
+symmetric tridiagonal eigenvalue solver, `scipy.linalg.eigh_tridiagonal` though note unlike `eigsh` no checking is performed
+for 'ghost' or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing `orth`
+and `deg`.

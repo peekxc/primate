@@ -10,7 +10,7 @@ def test_Covariance():
 		samples.extend(rng.normal(size=10))
 		C.update(samples[-10:])
 		assert np.isclose(np.var(samples, ddof=1), C.covariance())
-		assert np.isclose(np.mean(samples), C.mean)
+		assert np.isclose(np.mean(samples), C.mean())
 		assert len(samples) == C.n
 
 	C = Covariance(dim=2)
@@ -19,7 +19,7 @@ def test_Covariance():
 		samples.extend(rng.normal(size=(10, 2)))
 		C.update(samples[-10:])
 		assert np.allclose(np.cov(samples, rowvar=False, ddof=1), C.covariance())
-		assert np.allclose(np.mean(samples, axis=0), C.mean)
+		assert np.allclose(np.mean(samples, axis=0), C.mean())
 		assert len(samples) == C.n
 
 

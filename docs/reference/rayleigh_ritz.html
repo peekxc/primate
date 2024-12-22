@@ -517,6 +517,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="lanczos.rayleigh_ritz" class="level1">
 <h1>rayleigh_ritz</h1>
 <div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rayleigh_ritz(A, deg<span class="op">=</span><span class="va">None</span>, return_eigenvectors<span class="op">=</span><span class="va">False</span>, method<span class="op">=</span><span class="st">'RRR'</span>, <span class="op">**</span>kwargs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Rayleigh-Ritz approximations of the eigenvalues of <code>A</code> can be further obtained by diagonalizing <code>T</code> via any symmetric tridiagonal eigenvalue solver, <code>scipy.linalg.eigh_tridiagonal</code> though note unlike <code>eigsh</code> no checking is performed for ‘ghost’ or already converged eigenvalues. To increase the accuracy of these eigenvalue approximation, try increasing <code>orth</code> and <code>deg</code>.</p>
 
 
 </section>

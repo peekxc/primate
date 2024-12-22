@@ -599,13 +599,16 @@ window.Quarto = {
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    out <span class="op">=</span> <span class="va">self</span>.diag <span class="op">*</span> np.ravel(x)</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out.reshape(x.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Note that by following the subclassing rules of <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">SciPy’s LinearOperator</a>, this class inherits a <code>.matvec()</code> method and thus satisfies the constraints above.</p>
-<p>Alternativelu, using SciPy’s <code>aslinearoperator</code>, this can also be done in a one-liner:</p>
+<p>Alternatively, using SciPy’s <code>aslinearoperator</code>, this can also be done more succinctly:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.sparse.linalg <span class="im">import</span> aslinearoperator </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>aslinearoperator(<span class="bu">type</span>(<span class="st">'DiagonalOp'</span>, (<span class="bu">object</span>,), {<span class="st">'shape'</span>: (<span class="bu">len</span>(d),)<span class="op">*</span><span class="dv">2</span>, <span class="st">'matvec'</span>: <span class="kw">lambda</span> x: np.atleast_2d(d).T <span class="op">*</span> v}))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;_CustomLinearOperator with dtype=float64&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>aslinearoperator(<span class="bu">type</span>(<span class="st">'DiagonalOp'</span>, (<span class="bu">object</span>,), {</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'shape'</span>: (<span class="bu">len</span>(d),)<span class="op">*</span><span class="dv">2</span>, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'matvec'</span>: <span class="kw">lambda</span> x: np.atleast_2d(d).T <span class="op">*</span> v</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt;_CustomLinearOperator with dtype=float64&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <section id="c-usage" class="level2">
 <h2 class="anchored" data-anchor-id="c-usage">C++ usage</h2>
-<p>Similarly, to call any C++ function, such <code>hutch</code> or <code>lanczos</code>, simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>
+<p>On the C++ side, it is similar: simply pass any type with <code>.shape()</code> and <code>.matvec()</code> member functions:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LinOp <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> nrow<span class="op">,</span> ncol<span class="op">;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  </span>

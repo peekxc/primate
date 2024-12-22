@@ -15,6 +15,7 @@ def diag(
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
+	record: bool = False,
 	**kwargs: dict,
 ) -> Union[float, tuple]:
 	r"""Estimates the diagonal of a symmetric `A` via the Girard-Hutchinson estimator.
@@ -58,7 +59,7 @@ def diag(
 	## Parameterize the random vector generation
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-	estimator = MeanEstimator(record=kwargs.pop("record", False))
+	estimator = MeanEstimator(record=record)
 	converge = convergence_criterion(converge, **kwargs)
 
 	## Catch degenerate case
@@ -71,19 +72,19 @@ def diag(
 		result = EstimatorResult(estimator, converge)
 
 		while not converge(estimator):
-			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
+			v = pdf(size=(N, 1)).astype(f_dtype)
 			u = (A @ v).ravel()
 			numer += u * v.ravel()
 			denom += np.square(v.ravel())
 			estimator.update(np.atleast_2d(numer / denom))
-			result.update(estimator, converge)
 			if callback is not None:
 				callback(result)
+		result.estimate = estimator.estimate
 		return (estimator.estimate, result)
 	else:
 		numer, denom = np.zeros(N, dtype=f_dtype), np.zeros(N, dtype=f_dtype)
 		while not converge(estimator):
-			v = pdf(size=(N, 1), seed=rng).astype(f_dtype)
+			v = pdf(size=(N, 1)).astype(f_dtype)
 			u = (A @ v).ravel()
 			numer += u * v.ravel()
 			denom += np.square(v.ravel())
