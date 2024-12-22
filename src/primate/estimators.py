@@ -6,12 +6,12 @@ import typing
 from dataclasses import dataclass, field
 from operator import and_, not_, or_
 from typing import Callable, Iterable, Literal, Optional, Protocol, Sized, Union, runtime_checkable
-from numpy.typing import ArrayLike
 
 import numpy as np
 import scipy as sp
+from numpy.typing import ArrayLike
 
-from .stats import Mean, Covariance
+from .stats import Covariance, Mean
 from .typing import restrict_kwargs
 
 
@@ -90,7 +90,7 @@ class EstimatorResult:
 	def __iter__(self) -> Iterable:
 		return iter((self.estimator, self.criterion, self.estimate, self.message, self.nit, self.info))
 
-	# def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs: dict):
+	# def update(self, est: Estimator, converge: ConvergenceCriterion, **kwargs):
 	# 	self.estimator = est
 	# 	self.criterion = converge
 	# 	self.estimate = est.estimate
@@ -190,7 +190,7 @@ class ControlVariableEstimator(MeanEstimator):
 	def estimate(self):
 		if self.n_samples == 0:
 			return np.nan
-		cv_est = self.cov.mean[0] - np.dot(self.alpha, self.cov.mean[1:] - self.ecv)
+		cv_est = self.cov.mu[0] - np.dot(self.alpha, self.cov.mu[1:] - self.ecv)
 		# alpha = self.alpha if self.alpha is not None else (C[0, 1] / C[1, 1])
 		# cv_est = self.cov.mean[0] - alpha * (self.cov.mean[1] - self.ev)
 		return cv_est.item()
@@ -280,7 +280,7 @@ class ConfidenceCriterion(ConvergenceCriterion):
 	def _error(self, est: MeanEstimator):
 		if est.n_samples < 3:
 			return (np.inf, np.inf)
-		std_dev = est.cov() ** (1 / 2)
+		std_dev = est._cov.covariance() ** (1 / 2)
 		std_error = std_dev / np.sqrt(est.n_samples)
 		rel_error = abs(std_error / est.estimate)
 		score = self.t_scores[est.n_samples] if est.n_samples < 30 else self.z
@@ -343,7 +343,7 @@ CRITERIA = {
 
 ## TODO: see https://mypy.readthedocs.io/en/stable/changelog.html#using-typeddict-for-kwargs-typing for Unpack
 @typing.no_type_check
-def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs: dict) -> ConvergenceCriterion:
+def convergence_criterion(criterion: Union[str, ConvergenceCriterion], **kwargs) -> ConvergenceCriterion:
 	"""Parameterizes a convergence criterion."""
 	if isinstance(criterion, ConvergenceCriterion):
 		return criterion

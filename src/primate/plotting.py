@@ -60,7 +60,7 @@ def figure_jacobi(deg: int = 4, alpha: float = 0, beta: float = 0):
 	return p
 
 
-def figure_sequence(estimator: Union[Estimator, Sequence], mu: Optional[float] = None, **kwargs: dict):
+def figure_sequence(estimator: Union[Estimator, Sequence], mu: Optional[float] = None, **kwargs):
 	"""Generates figures showing the convergence of sample estimates."""
 	from bokeh.models import Span
 	from bokeh.plotting import figure
@@ -120,7 +120,7 @@ def figure_error(
 	threshold: Optional[float] = None,
 	absolute: bool = True,
 	title: str = "Estimator accuracy",
-	**kwargs: dict,
+	**kwargs,
 ):
 	from bokeh.models import Range1d
 	from bokeh.plotting import figure

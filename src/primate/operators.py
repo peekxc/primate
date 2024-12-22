@@ -57,7 +57,7 @@ class MatrixFunction(LinearOperator):
 		deg: int = 20,
 		orth: int = 3,
 		dtype: np.dtype = np.float64,
-		**kwargs: dict,
+		**kwargs,
 	) -> None:
 		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"

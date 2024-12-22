@@ -75,7 +75,7 @@ def step(x: Optional[np.ndarray] = None, c: float = 0.0, nonnegative: bool = Fal
 
 
 @typing.no_type_check
-def param_callable(fun: Union[str, None], **kwargs: dict) -> Callable:
+def param_callable(fun: Union[str, None], **kwargs) -> Callable:
 	if isinstance(fun, str):
 		assert fun in _BUILTIN_MATRIX_FUNCTIONS, "If given as a string, matrix_function be one of the builtin functions."
 	if fun is None or fun == "identity":

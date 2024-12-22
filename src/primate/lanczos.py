@@ -117,7 +117,7 @@ def lanczos(
 
 
 def rayleigh_ritz(
-	A, deg: Optional[int] = None, return_eigenvectors: bool = False, method: str = "RRR", **kwargs: dict
+	A, deg: Optional[int] = None, return_eigenvectors: bool = False, method: str = "RRR", **kwargs
 ) -> Union[np.ndarray, tuple]:
 	"""Computes Rayleigh-Ritz eigenvalue approximations of a symmetric matrix.
 

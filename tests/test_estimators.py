@@ -66,7 +66,7 @@ def test_ControlVariableEstimator():
 		y_cv = np.apply_along_axis(h_cv, 1, U * a)
 		est1, est2 = MeanEstimator(), ControlVariableEstimator(mu_cv)
 		est1.update(y)
-		est2.update(y, y_cv)
+		est2.update(np.c_[y, y_cv])
 		n_efficient += np.linalg.norm(est2.estimate - mu) <= np.linalg.norm(est1.estimate - mu)
 	assert n_efficient >= 120
 
@@ -102,7 +102,7 @@ def test_ConfidenceCriterion():
 	containing_intervals = 0
 	for _ in range(1500):
 		atol = 0.50
-		est = MeanEstimator()
+		est = MeanEstimator(covariance=True)
 		cc = ConfidenceCriterion(confidence=0.95, atol=atol, rtol=0.0)
 		while not cc(est):
 			est.update(rng.normal(size=5, loc=mu, scale=1 / 2))
@@ -123,7 +123,7 @@ def test_KneeCriterion():
 
 def test_CriterionComposability():
 	rng = np.random.default_rng(1234)
-	mu = MeanEstimator()
+	mu = MeanEstimator(covariance=True)
 	cc1 = CountCriterion(200)
 	cc2 = ConfidenceCriterion(confidence=0.95, atol=0.50, rtol=0.0)
 
@@ -137,7 +137,7 @@ def test_CriterionComposability():
 	assert cc1(mu) and cc2(mu) and cc(mu)
 
 	## Test OR
-	mu = MeanEstimator()
+	mu = MeanEstimator(covariance=True)
 	cc = cc1 | cc2
 	assert isinstance(cc, Callable) and cc(mu) is False
 	while not (cc1(mu) or cc2(mu)):

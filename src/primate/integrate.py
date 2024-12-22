@@ -13,7 +13,7 @@ def quadrature(
 	quad: str = "gw",  # The method of computing the weights
 	nodes: Optional[np.ndarray] = None,  # Output nodes of the quadrature
 	weights: Optional[np.ndarray] = None,  # Output weights of the quadrature
-	**kwargs: dict,
+	**kwargs,
 ) -> tuple:
 	r"""Compute the Gaussian quadrature rule of a tridiagonal Jacobi matrix.
 

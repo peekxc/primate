@@ -39,7 +39,7 @@ def hutch(
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
-	**kwargs: dict,
+	**kwargs,
 ) -> Union[float, tuple]:
 	r"""Estimates the trace of a symmetric `A` via the Girard-Hutchinson estimator.
 
@@ -85,7 +85,7 @@ def hutch(
 	## Parameterize the various quantities
 	rng = np.random.default_rng(seed)
 	pdf = isotropic(pdf=pdf, seed=rng)
-	estimator = MeanEstimator(record=kwargs.pop("record", False))
+	estimator = MeanEstimator(covariance=True, record=kwargs.pop("record", False))
 	if converge == "default":
 		cc1 = CountCriterion(count=200)
 		cc2 = ConfidenceCriterion(confidence=0.95, atol=1.0, rtol=0.0)
@@ -238,7 +238,7 @@ def xtrace(
 	seed: Union[int, np.random.Generator, None] = None,
 	full: bool = False,
 	callback: Optional[Callable] = None,
-	**kwargs: dict,
+	**kwargs,
 ) -> Union[float, tuple]:
 	"""Estimates the trace of `A` using the XTrace estimator.
 
