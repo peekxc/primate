@@ -84,7 +84,7 @@ def hutch(
 
 	## Parameterize the various quantities
 	rng = np.random.default_rng(seed)
-	pdf = isotropic(pdf=pdf, seed=rng)
+	pdf = isotropic(pdf=pdf, seed=rng) if isinstance(pdf, str) else pdf
 	estimator = MeanEstimator(covariance=True, record=kwargs.pop("record", False))
 	if converge == "default":
 		cc1 = CountCriterion(count=200)
@@ -145,7 +145,7 @@ def hutchpp(
 
 	## Catch degenerate case
 	if np.prod(A.shape) == 0:
-		return 0.0 if not full else (0.0, EstimatorResult(0.0, False, "", 0, []))
+		return 0.0 if not full else (0.0, EstimatorResult())
 
 	## Setup constants
 	nb = (N // 3) if m is None else m  # number of samples to dedicate to deflation
@@ -175,7 +175,7 @@ def hutchpp(
 	if not full:
 		return tr_rng + tr_defl
 	else:
-		result = EstimatorResult(0.0, False, None, 0, {})
+		result = EstimatorResult()
 		result.estimate = tr_rng + tr_defl
 		result.nit = 2 * nb
 		result.samples = np.concatenate([rng_ests, defl_ests])
@@ -273,6 +273,7 @@ def xtrace(
 	else:
 		converge = CountCriterion(count=n)
 		converge |= convergence_criterion(converge, **kwargs)
+	assert isinstance(converge, ConvergenceCriterion)
 
 	## Setup outputs. TODO: these should really be resizable arrays
 	W = np.zeros(shape=(n, 0), order="F")  # Isotropic vectors
@@ -284,7 +285,7 @@ def xtrace(
 	## Commence the batch-iterations
 	result = EstimatorResult()
 	rng = np.random.default_rng(seed)
-	pdf = isotropic(pdf=pdf, seed=rng)
+	pdf = isotropic(pdf=pdf, seed=rng) if isinstance(pdf, str) else pdf
 	while not converge(estimator):
 		## Determine number of new sample vectors to generate
 		ns = min(A.shape[1] - W.shape[1], int(batch))

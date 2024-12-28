@@ -9,6 +9,8 @@ from .lanczos import _lanczos
 from .special import param_callable
 from .tridiag import eigh_tridiag
 
+F64: np.dtype = np.dtype("float64")
+
 
 def is_valid_operator(A: Union[np.ndarray, LinearOperator]) -> np.dtype:
 	attr_checks = [hasattr(A, "__matmul__"), hasattr(A, "matmul"), hasattr(A, "dot"), hasattr(A, "matvec")]
@@ -51,20 +53,18 @@ class MatrixFunction(LinearOperator):
 	"""
 
 	def __init__(
-		self,
-		A: np.ndarray,
-		fun: Optional[Callable] = None,
-		deg: int = 20,
-		orth: int = 3,
-		dtype: np.dtype = np.float64,
-		**kwargs,
+		self, A: np.ndarray, fun: Optional[Callable] = None, deg: int = 20, orth: int = 3, dtype: np.dtype = F64, **kwargs
 	) -> None:
 		assert is_linear_op(A), "Invalid operator `A`; must be dim=2 symmetric operator with defined matvec"
 		assert deg >= 2, "Degree must be >= 2"
+		self.shape = A.shape
+		self.dtype = np.dtype(dtype)
+
+		## Parmaeterize function
 		fun = fun if fun is not None else lambda x: x
 		fun = param_callable(fun, **kwargs) if isinstance(fun, str) else fun
-		assert callable(fun), "Function must be Callable"
-		self._fun = fun
+		self.fun = fun
+
 		self._deg = min(deg, A.shape[0])
 		self._alpha = np.zeros(self._deg + 1, dtype=dtype)
 		self._beta = np.zeros(self._deg + 1, dtype=dtype)
@@ -79,8 +79,6 @@ class MatrixFunction(LinearOperator):
 		self._rtol = 1e-8
 		self._orth = self._deg if orth < 0 or orth > self._deg else orth
 		self._A = A
-		self.shape = A.shape
-		self.dtype = np.dtype(dtype)
 
 	@property
 	def degree(self) -> int:
@@ -94,7 +92,8 @@ class MatrixFunction(LinearOperator):
 	def fun(self, value: Callable) -> None:
 		assert callable(value), "Function must be callable."
 		out = value(np.ones(self.shape[1]))
-		assert isinstance(out, np.ndarray) and len(out) == self.shape[0], "Function must return array-like"
+		assert isinstance(out, np.ndarray), "Function must return array-like"
+		assert out.shape[-1] == self.shape[0], "Last dimension of output must match number of rows."
 		self._fun = value
 
 	def _adjoint(self):
@@ -121,7 +120,8 @@ class MatrixFunction(LinearOperator):
 
 		## TODO: call the lapack function with pre-allocated memory for extra speed
 		rw, Y = eigh_tridiag(self._alpha[: self._deg], self._beta[1 : self._deg])  # O(d^2) space
-		return x_norm * self._Q @ Y @ (self._fun(rw) * Y[0, :])[:, np.newaxis]
+		# return x_norm * self._Q @ Y @ (self._fun(rw) * Y[0, :])[:, np.newaxis]
+		return x_norm * self._Q @ Y @ (np.atleast_2d(self._fun(rw)) * Y[0, :]).T
 
 	def quad(self, x: np.ndarray):
 		r"""Estimates the quadratic form using Lanczos quadrature.
@@ -165,14 +165,14 @@ def matrix_function(A: LinearOperator, fun: Optional[Callable] = None, v: Option
 class Toeplitz(LinearOperator):
 	"""Matrix-free operator for representing Toeplitz or circulant matrices."""
 
-	def __init__(self, c: np.ndarray, r: Optional[np.ndarray] = None, dtype: Optional[np.dtype] = None):
+	def __init__(self, c: np.ndarray, r: Optional[np.ndarray] = None, dtype: np.dtype = F64):
 		self.c = np.array(c)
 		self.r = np.array(c if r is None else r)
 		self._d = np.concatenate((self.c, [0], np.flip(self.r[1:])))
 		self._dfft = np.real(np.fft.fft(self._d))
 		self._z = np.zeros(len(c) * 2)  # workspace
 		self.shape = (len(c), len(c))
-		self.dtype = np.dtype(np.float64) if dtype is None else dtype
+		self.dtype = dtype
 
 	## NOTE: We return a copy because the output cannot be a view
 	def _matvec(self, x: np.ndarray) -> np.ndarray:

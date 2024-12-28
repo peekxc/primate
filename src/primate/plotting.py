@@ -125,8 +125,15 @@ def figure_error(
 	from bokeh.models import Range1d
 	from bokeh.plotting import figure
 
+	if isinstance(estimator, Estimator):
+		assert hasattr(
+			estimator, "values"
+		), "Estimator does not have values attached! Did you pass 'record=True' to the estimation call?"
+		sample_vals = np.ravel(estimator.values)
+	else:
+		sample_vals = np.array(estimator).ravel()
+
 	## Extract samples and take averages
-	sample_vals = np.ravel(estimator.values) if isinstance(estimator, Estimator) else np.array(estimator).ravel()
 	valid_samples = ~np.isnan(sample_vals)
 	n_samples = np.sum(valid_samples)
 	sample_index = np.arange(1, n_samples + 1)
@@ -140,27 +147,26 @@ def figure_error(
 
 	if mu is not None:
 		cum_abs_error = np.abs(mu - sample_avgs)
+		cum_rel_error = np.abs(mu - sample_avgs / mu)
 	else:
-		est = MeanEstimator()
-		cc = ConfidenceCriterion()
-		abs_error, rel_error = [], []
+		est = MeanEstimator(covariance=True)
+		cc = ConfidenceCriterion(confidence=0.95)
+		cum_error = []
 		for sample in sample_vals[valid_samples]:
 			est.update(sample)
 			moe, rerr = cc._error(est)
-			abs_error.append(moe)
-			rel_error.append(rerr)
-		cum_abs_error = np.array(abs_error)
+			cum_error.append(moe if absolute else rerr)
+	cum_error = np.array(cum_error)
 
-	if absolute:
-		q.yaxis.axis_label = "Abs. error"
-		#  ({(self.confidence*100):.0f}% CI)
-		## Plot the absolute error + thresholds for convergence
-		q.line(sample_index, cum_abs_error, line_color="black")
-		if threshold is not None:
-			q.line(
-				x=[0, sample_index[-1]], y=[threshold, threshold], line_dash="dashed", line_color="darkgray", line_width=1.0
-			)
-		return q
+	## Finish the plot
+	y_label = "Abs. error" if absolute else "Rel. error"
+	y_label += " (true)" if mu is not None else " (CI bound)"
+	q.yaxis.axis_label = y_label
+	## Plot the absolute error + thresholds for convergence
+	q.line(sample_index, cum_error, line_color="black")
+	if threshold is not None:
+		q.line(x=[0, sample_index[-1]], y=[threshold, threshold], line_dash="dashed", line_color="darkgray", line_width=1.0)
+	return q
 
 
 # 	else:

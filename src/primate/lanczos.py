@@ -1,3 +1,4 @@
+import typing
 from typing import Any, Optional, Union
 
 import numpy as np
@@ -94,7 +95,7 @@ def lanczos(
 		v0: np.ndarray = rng.uniform(size=A.shape[1], low=-1.0, high=+1.0).astype(dt)
 	else:
 		v0: np.ndarray = np.array(v0).astype(dt)
-	assert len(v0) == A.shape[1], "Invalid starting vector; must match the number of columns of A."
+	assert len(v0) == A.shape[1], "Invalid starting vector; must match the number of columns of A."  # type: ignore
 
 	## Allocate the tridiagonal elements + lanczos vectors in column-major storage
 	alpha = kwargs.get("alpha", np.zeros(deg + 1, dtype=f_dtype))
@@ -168,6 +169,7 @@ def rayleigh_ritz(
 ## Also: Chen's Krylov-aware method
 
 
+@typing.no_type_check
 def _lanczos_py(A: np.ndarray, v0: np.ndarray, k: int, tol: float) -> int:  # pragma: no cover
 	"""Base lanczos algorithm, for establishing a baseline"""
 	n = A.shape[0]
@@ -190,6 +192,7 @@ def _lanczos_py(A: np.ndarray, v0: np.ndarray, k: int, tol: float) -> int:  # pr
 	return alpha, beta
 
 
+@typing.no_type_check
 def _orth_vector(v, U, start_idx, p, reverse=False):  # pragma: no cover
 	n = U.shape[0]
 	m = U.shape[1]
@@ -204,6 +207,7 @@ def _orth_vector(v, U, start_idx, p, reverse=False):  # pragma: no cover
 			v -= (s_proj / u_norm) * U[:, i]
 
 
+@typing.no_type_check
 def _lanczos_recurrence(A, q, deg, rtol, orth, V, ncv):  # pragma: no cover
 	n, m = A.shape
 	residual_tol = np.sqrt(n) * rtol
