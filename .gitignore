@@ -10,6 +10,11 @@ wheelhouse
 todo
 benchmarks
 *.npz
+notebooks
+subprojects
+openmp
+notebooks
+presentations
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,8 +1,0 @@
-{
-	"name": "musllinux-x86_64",
-	"dockerComposeFile": ["../docker-compose.yml"],
-	"service": "musllinux",
-	"shutdownAction": "none",
-	"workspaceFolder": "/workspace/",
-	"mounts": ["type=bind,source=../../primate,target=/primate"]
-}

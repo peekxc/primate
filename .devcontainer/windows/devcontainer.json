@@ -1,8 +1,0 @@
-{
-	"name": "windows-latest",
-	"dockerComposeFile": ["../docker-compose.yml"],
-	"service": "windows",
-	"shutdownAction": "none",
-	"workspaceFolder": "/workspace/",
-	"mounts": ["type=bind,source=../../primate,target=/primate"]
-}
